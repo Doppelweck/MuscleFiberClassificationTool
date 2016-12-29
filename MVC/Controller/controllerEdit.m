@@ -78,11 +78,13 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
+            % listeners MODEL
             addlistener(obj.modelEditHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
             
+            % listeners VIEW
             addlistener(obj.viewEditHandle.B_Threshold, 'ContinuousValueChange',@obj.thresholdEvent);
-            addlistener(obj.viewEditHandle.B_Alpha,'ContinuousValueChange',@obj.alphaMapEvent);
-            addlistener(obj.viewEditHandle.B_LineWidth,'ContinuousValueChange',@obj.lineWidthEvent);
+            addlistener(obj.viewEditHandle.B_Alpha, 'ContinuousValueChange',@obj.alphaMapEvent);
+            addlistener(obj.viewEditHandle.B_LineWidth, 'ContinuousValueChange',@obj.lineWidthEvent);
         end
         
         function addMyCallbacks(obj)
