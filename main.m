@@ -9,11 +9,14 @@ pause(0.1);
 
 if checkSystem()
 
+hf = startSrcreen();    
+setAlwaysOnTop(hf,true);   
 % Init View's
 
 mainFig = figure('Units','pixels','Position',[1 50 1900 900],...
     'Name','Fiber types classification tool','DockControls','off',...
-    'doublebuffer', 'off','Menubar','figure','Visible','on');
+    'doublebuffer', 'off','Menubar','figure','Visible','on',...
+    'WindowStyle','normal');
 
 set( findall(mainFig,'ToolTipString','Edit Plot') ,'Visible','Off');
 % set( findall(mainFig,'ToolTipString','Rotate 3D') ,'Visible','Off');
@@ -34,12 +37,16 @@ movegui(mainFig,'center');
 
 
 viewEditHandle = viewEdit(mainCard);
-pause(0.1);
+
 mainCard.Selection = 1;
+pause(1);
+
 viewAnalyzeHandle = viewAnalyze(mainCard);
-mainCard.Selection = 1;
-pause(0.1);
+mainCard.Selection = 2;
+pause(1);
 viewResultsHandle = viewResults(mainCard);
+mainCard.Selection = 3;
+pause(1);
 mainCard.Selection = 1;
 pause(0.1);
 
@@ -65,4 +72,5 @@ controllerAnalyzeHandle.controllerEditHandle = controllerEditHandle;
 controllerAnalyzeHandle.controllerResultsHandle = controllerResultsHandle;
 controllerResultsHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
 
+delete(hf);
 end
