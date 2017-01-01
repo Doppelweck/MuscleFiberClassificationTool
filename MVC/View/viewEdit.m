@@ -83,19 +83,20 @@ classdef viewEdit < handle
             fontSizeM = 12; % Font size medium
             fontSizeB = 16; % Font size big
             
-            screenSize = get(0,'screensize');
+%             screenSize = get(0,'screensize');
             
 %             obj.hFP = figure('NumberTitle','off','Units','normalized','Name','Fiber types classification: EDITING MODE','Visible','off','Tag','viewEditFigure','DockControls','off');
 %             set(obj.hFP, 'position', [0 0 1 0.85]);
 %             set(obj.hFP,'WindowStyle','normal');
 %              % Center window
 %             movegui(obj.hFP,'center');
-            obj.hFP = uix.BoxPanel('Parent', mainCard); 
+%             obj.hFP = uix.BoxPanel('Parent', mainCard,'Title','Edit-Mode'); 
 
-            mainPanelBox = uix.HBox( 'Parent', obj.hFP, 'Spacing',5,'Padding',5);
+            mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
             
             obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',35);
             obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'Control Panel' ,'FontSize',fontSizeB);
+            set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             set(obj.panelPicture,'Title','Picture');
             

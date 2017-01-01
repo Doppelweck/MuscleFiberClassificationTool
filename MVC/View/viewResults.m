@@ -48,12 +48,13 @@ classdef viewResults < handle
 %             
 %             set(obj.hFR, 'doublebuffer', 'off');
             
-            obj.hFR = uix.BoxPanel('Parent', mainCard); 
+%             obj.hFR = uix.BoxPanel('Parent', mainCard); 
             
-            mainPanelBox = uix.HBox( 'Parent', obj.hFR,'Spacing',5,'Padding',5 );
+            mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',5,'Padding',5 );
             
             obj.panelResults = uix.Panel( 'Title', 'Results', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
             obj.panelControl = uix.Panel( 'Title', 'Control Panel', 'Parent', mainPanelBox,'FontSize',fontSizeB );
+            set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             
             %%%%%%%%%%%%%%%%%% Panel controls %%%%%%%%%%%%%%%%%%%%%%%%%%%%
