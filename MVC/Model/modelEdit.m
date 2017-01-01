@@ -451,6 +451,7 @@ classdef modelEdit < handle
                 set(obj.handlePicBW,'AlphaData',alphaMat);
                
             end
+            
         end
         
         function invertPicBWEvent(obj)

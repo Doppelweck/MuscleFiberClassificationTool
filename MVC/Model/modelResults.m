@@ -628,11 +628,12 @@ classdef modelResults < handle
         
         function showPicProcessedGUI(obj,axesPicAnalyze,axesResults)
             
+            axes(axesResults);
             
+            imshow(ones(size(obj.PicRGB)));
             obj.InfoMessage = '   - Load picture into GUI...';
             
-            copyobj(axesPicAnalyze.Children ,axesResults)
-            
+            copyobj(axesPicAnalyze.Children ,axesResults);
 %             axesh = obj.handlePicRGB.Parent;
             axes(axesResults);
             hold on
