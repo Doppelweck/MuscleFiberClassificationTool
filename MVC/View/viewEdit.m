@@ -1,8 +1,8 @@
 classdef viewEdit < handle
     %viewEdit   view of the edit-MVC (Model-View-Controller).
-    %Creates the window to select new pictures for further
-    %processing. The viewEdit class is called by the main.m file. 
-    %Contains serveral buttons and uicontrol elements to manipulate
+    %Creates the first card panel in the main figure to select new pictures 
+    %for further processing. The viewEdit class is called by the main.m  
+    %file. Contains serveral buttons and uicontrol elements to manipulate
     %the binary picture.
     %
     %
@@ -35,7 +35,7 @@ classdef viewEdit < handle
         B_Redo; %Button, to redo a change in the binary image.
         B_NewPic; %Button, to select a new picture.
         B_CheckPlanes;%Button, opens a new figure to check and change the image planes.
-        B_StartAnalyzeMode; %Button, closes the figure EditMode and opens the the AnalyzeMode.
+        B_StartAnalyzeMode; %Button, close the EditMode and opens the the AnalyzeMode.
         
         B_Alpha; %Slider, to change the transperancy between the binary and the RGB picture.
         B_AlphaValue; % TextEditBox, to change the transperancy between the binary and the RGB picture.
@@ -83,14 +83,15 @@ classdef viewEdit < handle
             
             mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
             
-            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',35);
+            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
             obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'Control Panel' ,'FontSize',fontSizeB);
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             set(obj.panelPicture,'Title','Picture');
             
-            obj.hAP = axes('Parent',obj.panelPicture,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture));
             axis image
+            set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
             PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 5,'Padding',5);
             
@@ -111,8 +112,8 @@ classdef viewEdit < handle
             
             
             HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
-            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'NewPic' );
-            obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'Check Planes' ,'Enable','off');
+            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'New image' );
+            obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'Check planes' ,'Enable','off');
             
             HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5,'Spacing',5);
             obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl3,'FontSize',fontSizeB,'Style','pushbutton', 'String', 'Start analyzing mode' ,'Enable','off');

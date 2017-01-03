@@ -1,58 +1,72 @@
 classdef viewAnalyze < handle
-    %UNTITLED7 Summary of this class goes here
-    %   Detailed explanation goes here7
+    %viewAnalyze   view of the analyze-MVC (Model-View-Controller).
+    %Creates the second card panel in the main figure to select the  
+    %parameters for further classification. The viewEdit class is called by  
+    %the main.m file. Contains serveral buttons and uicontrol elements to 
+    %tchange the classification parameters and to runs the classification.
+    %
+    %
+    %======================================================================
+    %
+    % AUTHOR:           - Sebastian Friedrich,
+    %                     Trier University of Applied Sciences, Germany
+    %
+    % SUPERVISOR:       - Prof. Dr.-Ing. K.P. Koch
+    %                     Trier University of Applied Sciences, Germany
+    %
+    %                   - Mr Justin Perkins, BVetMed MS CertES Dip ECVS MRCVS
+    %                     The Royal Veterinary College, Hertfordshire United Kingdom
+    %
+    % FIRST VERSION:    30.12.2016 (V1.0)
+    %
+    % REVISION:         none
+    %
+    %======================================================================
+    % 
     
     properties(SetObservable)
-        hFP;    %handle to figure with pictures ans controls
-        panelControl;    %handle to panel with controls
-        panelPicture;   %handle to panel with picture
-        hAP;    %handle to axes with pictures
-        hFM; %handle to figure to manipulate Fiber-Type
-        
-        B_BackEdit;
-        B_StartAnalyze;
-        B_StartResults;
-        
-        B_AnalyzeMode
-        
-        B_AreaActive
-        B_MinArea
-        B_MaxArea
-        
-        B_RoundnessActive
-        B_MinRoundness
-        
-        B_AspectRatioActive
-        B_MinAspectRatio
-        B_MaxAspectRatio
-        
-        B_ColorDistanceActive
-        B_ColorDistance
-        
-        B_ColorValueActive
-        B_ColorValue
-        
-        B_TextObjNo;
 
-        B_TextArea;
-
-        B_TextRoundness;
-
-        B_TextFiberType
-
-        B_TextAspectRatio
-
-        B_TextColorValue
-
-        B_TextColorDistance
+        panelControl;    %handle to panel with controls.
+        panelPicture;   %handle to panel with image.
+        hAP;    %handle to axes with image.
+        hFM; %handle to figure to change the Fiber-Type.
         
-        B_AxesInfo
+        B_BackEdit; %Button, close the AnalyzeMode and opens the the EditMode.     
+        B_StartAnalyze; %Button, runs the segmentation and classification functions.
+        B_StartResults; %Button, close the AnalyzeMode and opens the the ResultsMode.
         
-        B_InfoText
+        B_AnalyzeMode; %Popup menu, select the classification method.
         
-        B_FiberTypeManipulate
-        B_ManipulateOK
-        B_ManipulateCancel
+        B_AreaActive; %Ceckbox, select if area parameter is used for classificaton.
+        B_MinArea; %TextEditBox, minimal allowed fiber area.
+        B_MaxArea; %TextEditBox, maximal allowed fiber area.
+        
+        B_RoundnessActive; %Ceckbox, select if roundness parameter is used for classificaton.
+        B_MinRoundness; %TextEditBox, minimal allowed fiber roudness.
+        
+        B_AspectRatioActive %Ceckbox, select if aspect ratio parameter is used for classificaton.
+        B_MinAspectRatio; %TextEditBox, minimal allowed fiber aspect ratio.
+        B_MaxAspectRatio; %TextEditBox, maximal allowed fiber aspect ratio.
+        
+        B_ColorDistanceActive; %Ceckbox, select if color distance parameter is used for classificaton.
+        B_ColorDistance; %TextEditBox, minimal allowed fiber color distance.
+        
+        B_ColorValueActive; %Ceckbox, select if color value parameter is used for classificaton.
+        B_ColorValue; %TextEditBox, minimal allowed fiber color value (HSV).
+        
+        B_TextObjNo; %TextBox, shows label number of selected fiber in the fiber information panel.
+        B_TextArea; %TextBox, shows area of selected fiber in the fiber information panel.
+        B_TextRoundness; %TextBox, shows roundness of selected fiber in the fiber information panel.
+        B_TextFiberType; %TextBox, shows fiber type of selected fiber in the fiber information panel.
+        B_TextAspectRatio; %TextBox, shows aspect ratio of selected fiber in the fiber information panel.
+        B_TextColorValue; %TextBox, shows color value (HSV) of selected fiber in the fiber information panel.
+        B_TextColorDistance; %TextBox, shows color distance of selected fiber in the fiber information panel.
+        B_AxesInfo; %handle to axes with image of selected fiber in the fiber information panel.
+        B_InfoText; %Shows the info log text.
+        
+        B_FiberTypeManipulate; %Popup menu, select new fiber type.
+        B_ManipulateOK; %Button, apply fiber type changes.
+        B_ManipulateCancel; %Button, cancel fiber type changes.
         
     end
     
@@ -63,38 +77,23 @@ classdef viewAnalyze < handle
             fontSizeM = 12; % Font size medium
             fontSizeB = 16; % Font size big
             
-%             screenSize = get(0,'screensize');
-%             
-%             obj.hFP = figure('NumberTitle','off','Units','normalized','Name','Fiber types classification: ANALYZING MODE','Visible','off','Tag','viewAnalyze');
-% %             set(obj.hFP, 'position', [0 0.1 0.8 1]);
-%             set(obj.hFP, 'position', [0 0 1 0.85]);
-%             set(obj.hFP,'WindowStyle','normal');
-%             
-%              % Center window
-%             movegui(obj.hFP,'center');
-            
-%             obj.hFP = uix.BoxPanel('Parent', mainCard); 
-%             set(obj.hFP, 'doublebuffer', 'off');
-            
             mainPanelBox = uix.HBox( 'Parent', mainCard ,'Spacing',5,'Padding',5);
             
-            obj.panelPicture = uix.Panel( 'Title', 'Picture', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',35);
+            obj.panelPicture = uix.Panel( 'Title', 'Picture', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
             obj.panelControl = uix.Panel( 'Title', 'Control Panel', 'Parent', mainPanelBox,'FontSize',fontSizeB );
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             
-            obj.hAP = axes('Parent',obj.panelPicture,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture));
             axis image
-            
-%             obj.hFC = figure('NumberTitle','off','Units','normalized','Name','Analyzing Controls','Visible','off');
-%             set(obj.hFC, 'position', [0.801 0.1 0.199 1]);
+            set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
             PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 1,'Padding',1);
             
-            PanelControl = uix.Panel('Parent',PanelVBox,'Title','Control','FontSize',fontSizeB,'Padding',1);
+            PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',1);
             PanelPara = uix.Panel('Parent',PanelVBox,'Title','Parameter','FontSize',fontSizeB,'Padding',1);
-            PanelFiberInformation = uix.Panel('Parent',PanelVBox,'Title','Fiber Information','FontSize',fontSizeB,'Padding',1);
-            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info Text Log','FontSize',fontSizeB,'Padding',1);
+            PanelFiberInformation = uix.Panel('Parent',PanelVBox,'Title','Fiber informations','FontSize',fontSizeB,'Padding',1);
+            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',1);
             
             
             set( PanelVBox, 'Heights', [-4 -5 -11 -4], 'Spacing', 1 );
@@ -230,10 +229,10 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color distance Blue/Red:' );
             obj.B_TextColorDistance = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color Value-channel:' );
+            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color value (HSV):' );
             obj.B_TextColorValue = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Fiber Type:' );
+            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Fiber-Type:' );
             obj.B_TextFiberType = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
             
@@ -251,12 +250,28 @@ classdef viewAnalyze < handle
             obj.B_InfoText = uicontrol('Parent',PanelInfo,'Style','listbox','FontSize',fontSizeM,'String',{});
             
             %%%%%%%%%%%%%%% call edit functions for GUI
-%             obj.editToolBar();
-%             obj.setToolTipStrings();
-            mainCard.Selection = 1;
+            obj.setToolTipStrings();
+
         end
         
         function showInfoToManipulate(obj,PosInAxes,PosMainFig,PosCurrent,Info)
+            % Creates a new figure to show and change the type of the
+            % selected fiber object. 
+            %
+            %   showInfoToManipulate(obj,PosInAxes,PosMainFig,PosCurrent,Info);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to viewEdit object
+            %           PosInAxes:  Relative position of the point where
+            %                       the users clicked in the axes
+            %           PosMainFig: Positon of the main figure
+            %           PosCurrent: Position of the point where the users
+            %                       clicked in the figure
+            %           Info:       Cell array that contains all needed
+            %                       informations and images
+            %
             
             fontSizeS = 10; % Font size small
             fontSizeM = 12; % Font size medium
@@ -314,12 +329,16 @@ classdef viewAnalyze < handle
             
             switch Info{7} %Fiber Type
                 case '1'
+                    %Fiber Type 1 (blue)
                     set(obj.B_FiberTypeManipulate,'Value',1);
                 case '2'
+                    %Fiber Type 2 (red)
                     set(obj.B_FiberTypeManipulate,'Value',2);
                 case '3'
+                    %Fiber Type 3 (magenta)
                     set(obj.B_FiberTypeManipulate,'Value',3);
                 case '0'
+                    %Fiber Type 0 (white)
                     set(obj.B_FiberTypeManipulate,'Value',4);
             end
             
@@ -327,21 +346,60 @@ classdef viewAnalyze < handle
             set(obj.hFM,'Visible','on')
         end
         
-        function editToolBar(obj)
-            set( findall(obj.hFP,'ToolTipString','Edit Plot') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Rotate 3D') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Data Cursor') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Insert Colorbar') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Insert Legend') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Hide Plot Tools') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','New Figure') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Show Plot Tools') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Brush/Select Data') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Show Plot Tools and Dock Figure') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Link Plot') ,'Visible','Off');
-        end
-        
         function setToolTipStrings(obj)
+            % Set all tooltip strings in the properties of the operationg
+            % elements that are shown in the GUI
+            %
+            %   setToolTipStrings(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to viewAnalyze object
+            %
+            
+            BackEditToolTip = sprintf(['Go back to edit mode.']);
+            
+            ShowResultsToolTip = sprintf(['Show classification results']);
+            
+            StartAnaToolTip = sprintf(['Start fiber type classification']);
+            
+            ClassModeToolTip = sprintf(['Select classification method.']);
+            
+            MinAreaToolTip = sprintf(['Change minimal area value. \n',...
+                'Smaller objects will be removed.']);
+            
+            MaxAreaToolTip = sprintf(['Change maximal area value. \n',...
+                'Larger objects will be classified as Type 0 fiber.']);
+            
+            MinAspectToolTip = sprintf(['Change minimal aspect ratio.']);
+            
+            MaxAspectToolTip = sprintf(['Change maximal aspect ratio. \n',...
+                'Objects with larger aspect ration will be classified as Type 0 fiber.']);
+            
+            MinRoundToolTip = sprintf(['Change minimal roundness value. \n',...
+                'Objects with samller roundness value will be classified as Type 0 fiber.']);
+            
+            MinColorDistToolTip = sprintf(['Change minimal color distance. \n',...
+                'Normalized distance between red and blue color value. \n',...
+                'Objects with samller color distance value will be classified as Type 3 fiber.']);
+            
+            MinColorValueToolTip = sprintf(['Change minimal color value. \n',...
+                'Value form the HSV color model (lightness).',...
+                'Objects with samller color value will be classified as Type 0 fiber.']);
+            
+            set(obj.B_BackEdit,'tooltipstring',BackEditToolTip);
+            set(obj.B_StartResults,'tooltipstring',ShowResultsToolTip);
+            set(obj.B_StartAnalyze,'tooltipstring',StartAnaToolTip);
+            
+            set(obj.B_AnalyzeMode,'tooltipstring',ClassModeToolTip);
+            set(obj.B_MinArea,'tooltipstring',MinAreaToolTip);
+            set(obj.B_MaxArea,'tooltipstring',MaxAreaToolTip);
+            set(obj.B_MinAspectRatio,'tooltipstring',MinAspectToolTip);
+            set(obj.B_MaxAspectRatio,'tooltipstring',MaxAspectToolTip);
+            set(obj.B_MinRoundness,'tooltipstring',MinRoundToolTip);
+            set(obj.B_ColorDistance,'tooltipstring',MinColorDistToolTip);
+            set(obj.B_ColorValue,'tooltipstring',MinColorValueToolTip);
             
         end
         

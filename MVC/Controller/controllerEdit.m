@@ -559,7 +559,7 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
-            
+
             if strcmp(evnt.Source.Tag,'textAlpha')
                 % Text Value has changed
                 

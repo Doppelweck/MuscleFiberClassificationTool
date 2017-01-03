@@ -158,16 +158,19 @@ classdef viewResults < handle
             statsVBoxleft = uix.VBox( 'Parent', statisticTabHBox, 'Spacing', 15 ,'Padding',5);
             statsVBoxright = uix.VBox( 'Parent', statisticTabHBox, 'Spacing', 15 ,'Padding',5);
             
-            PanelArea = uix.Panel('Parent',statsVBoxleft);
-            PanelCount = uix.Panel('Parent',statsVBoxleft);
-            PanelDia = uix.Panel('Parent',statsVBoxright);
-            PanelScatter = uix.Panel('Parent',statsVBoxright);
+            PanelArea = uix.Panel('Parent',statsVBoxleft,'Padding',5);
+            PanelCount = uix.Panel('Parent',statsVBoxleft,'Padding',5);
+            PanelDia = uix.Panel('Parent',statsVBoxright,'Padding',5);
+            PanelScatter = uix.Panel('Parent',statsVBoxright,'Padding',5);
             
-            obj.hAArea = axes('Parent',uicontainer('Parent',PanelArea));   
+            obj.hAArea = axes('Parent',uicontainer('Parent',PanelArea));
+            set(obj.hAArea, 'LooseInset', [0,0,0,0]);
             obj.hACount= axes('Parent',uicontainer('Parent',PanelCount));
+            set(obj.hACount, 'LooseInset', [0,0,0,0]);
             obj.hAScatterAll = axes('Parent',uicontainer('Parent',PanelDia));
+            set(obj.hAScatterAll, 'LooseInset', [0,0,0,0]);
             obj.hAScatter = axes('Parent',uicontainer('Parent',PanelScatter));
-            
+            set(obj.hAScatter, 'LooseInset', [0,0,0,0]);
             
             
             PanelStatisticTabel = uix.Panel('Parent',statisticTabHBox,'Padding',5,'Title', 'Fiber-Type statistics','FontSize',fontSizeM);

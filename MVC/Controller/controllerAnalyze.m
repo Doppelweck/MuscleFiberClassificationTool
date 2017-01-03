@@ -551,8 +551,8 @@ classdef controllerAnalyze < handle
             % Clear PicRGB and Boundarie Objects
             handleChild = allchild(obj.modelAnalyzeHandle.handlePicRGB.Parent);
             delete(handleChild);
-            % clear all axes in viewResult figure
-            arrayfun(@cla,findall(obj.viewAnalyzeHandle.hFP,'type','axes'))
+%             % clear all axes in viewResult figure
+%             arrayfun(@cla,findall(obj.viewAnalyzeHandle.hFP,'type','axes'))
             
              % If a window for Fibertype manipulation already exists,
                 % delete it

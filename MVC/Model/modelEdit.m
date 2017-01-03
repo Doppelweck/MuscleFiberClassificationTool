@@ -447,8 +447,8 @@ classdef modelEdit < handle
         function alphaMapEvent(obj,src,evnt)
             
             if ~isempty(obj.handlePicBW)
-                alphaMat = obj.AlphaMapValue*ones(size(obj.PicBW));
-                set(obj.handlePicBW,'AlphaData',alphaMat);
+
+                set(obj.handlePicBW,'AlphaData',obj.AlphaMapValue);
                
             end
             
