@@ -103,8 +103,8 @@ classdef viewAnalyze < handle
             VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 5 );
             HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 600],'Spacing', 5 );
             
-            obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', '<- Back to edit mode','FontSize',fontSizeB );
-            obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', 'Show results ->','FontSize',fontSizeB );
+            obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', 'Back to edit mode','FontSize',fontSizeB );
+            obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', 'Show results','FontSize',fontSizeB );
             
             obj.B_StartAnalyze = uicontrol( 'Parent', VBBoxControl, 'String', 'Start analyzing','FontSize',fontSizeB );
             
