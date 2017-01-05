@@ -210,7 +210,7 @@ classdef viewEdit < handle
             obj.B_MorphOP = uicontrol( 'Parent', HButtonBoxMorph1,'Style','popupmenu','FontSize',fontSizeM, 'String', String ,'Enable','off');
             
             uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontSize',fontSizeM, 'String', 'Structuring element:');
-            String = {'choose SE' , 'dimond', 'disk', 'octagon' ,'square'};
+            String = {'choose SE' , 'diamond', 'disk', 'octagon' ,'square'};
             obj.B_ShapeSE = uicontrol( 'Parent', HButtonBoxMorph2,'Style','popupmenu','FontSize',fontSizeM, 'String', String,'Enable','off' );
             
             uicontrol( 'Parent', HButtonBoxMorph3,'Style','text','FontSize',fontSizeM, 'String', 'Size of structuring element:');
@@ -368,7 +368,8 @@ classdef viewEdit < handle
             
             NoOfIterationsToolTip = sprintf(['Change the number of iterations']);
             
-            RunMorphToolTip = sprintf(['Apply the morphological operation to the binary image']);
+            RunMorphToolTip = sprintf(['Perform the morphological operation \n',...
+                'to the binary image']);
             
             set(obj.B_Undo,'tooltipstring',UndoToolTip);
             set(obj.B_Redo,'tooltipstring',RedoToolTip);

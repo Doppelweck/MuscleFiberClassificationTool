@@ -40,17 +40,20 @@ classdef controllerEdit < handle
             % View objects. Saves the needed handles of the corresponding
             % View and Model in the properties.
             %
-            %   controllerEdit(mainFigure,mainCardPanel,viewEditH,modelEditH);
+            %   obj = controllerEdit(mainFigure,mainCardPanel,viewEditH,modelEditH);
             %
             %   ARGUMENTS:
             %
             %       - Input
-            %           obj:            Handle to controllerEdit object
             %           mainFigure:     Handle to main figure
             %           mainCardPanel:  Handle to main card panel
             %           viewEditH:      Hande to viewEdit instance
             %           modelEditH:     Hande to modelEdit instance
             %
+            %       - Output:
+            %           obj:            Handle to controllerEdit object
+            %
+            
             obj.mainFigure =mainFigure;
             obj.mainCardPanel =mainCardPanel;
             
@@ -153,7 +156,6 @@ classdef controllerEdit < handle
             set(obj.mainFigure,'WindowButtonMotionFcn','');
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
         end
-        
         
         function setInitValueInModel(obj)
             % set the initalize values in the editModel.
@@ -286,7 +288,7 @@ classdef controllerEdit < handle
                     
                     %show images in GUI
                     obj.setInitPicsGUI();
-                    
+                    obj.modelEditHandle.InfoMessage = '- opening images completed';
                     %enable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
@@ -501,7 +503,8 @@ classdef controllerEdit < handle
             % Callback function of the threshold mode popupmenu in the
             % GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values in the
-            % model depending on the selection.
+            % model depending on the selection. Calls the
+            % createBinary() function in the model.
             %
             %   thresholdModeEvent(obj,src,evnt);
             %
@@ -525,12 +528,18 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.InfoMessage = '      - Manual threshold mode has been selected';
                 obj.modelEditHandle.InfoMessage = '      - Use slider to change threshold';
                 
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
+                
             elseif Mode == 2
                 % Use automatic adaptive threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Adaptive threshold mode has been selected';
+                
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
                 
             elseif Mode == 3
                 % Use automatic adaptive and manual global threshold for binarization
@@ -539,6 +548,9 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Combined threshold has been selected';
                 obj.modelEditHandle.InfoMessage = '      - Use slider to change threshold';
+                
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
             else
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in thresholdModeEvent() FUNCTION !';
@@ -550,7 +562,8 @@ classdef controllerEdit < handle
             % Callback function of the threshold slider and the text edit
             % box in the GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values
-            % in the model depending on the selection.
+            % in the model depending on the selection. Calls the
+            % createBinary() function in the model.
             %
             %   thresholdEvent(obj,src,evnt);
             %
@@ -574,29 +587,53 @@ classdef controllerEdit < handle
                         % Value is bigger than 1. Set Value to 1.
                         set(obj.viewEditHandle.B_Threshold,'Value',1);
                         set(obj.viewEditHandle.B_ThresholdValue,'String','1');
+                        
+                        %Set threshold value in the model
                         obj.modelEditHandle.ThresholdValue = 1;
                         
+                        %Create binary image with new threshold
+                        obj.modelEditHandle.createBinary();
                     elseif Value < 0
                         % Value is smaller than 0. Set Value to 0.
                         set(obj.viewEditHandle.B_Threshold,'Value',0);
                         set(obj.viewEditHandle.B_ThresholdValue,'String','0');
+                        
+                        %Set threshold value in the model
                         obj.modelEditHandle.ThresholdValue = 0;
+                        
+                        %Create binary image with new threshold
+                        obj.modelEditHandle.createBinary();
                     else
                         % Value is ok
                         set(obj.viewEditHandle.B_Threshold,'Value',Value);
+                        
+                        %Set threshold value in the model
                         obj.modelEditHandle.ThresholdValue = Value;
+                        
+                        %Create binary image with new threshold
+                        obj.modelEditHandle.createBinary();
                     end
                 else
                     % Value is not numerical. Set Value to 0.1.
                     set(obj.viewEditHandle.B_Threshold,'Value',0.1);
                     set(obj.viewEditHandle.B_ThresholdValue,'String','0.1');
+                    
+                    %Set threshold value in the model
                     obj.modelEditHandle.ThresholdValue = 0.1;
+                    
+                    %Create binary image with new threshold
+                    obj.modelEditHandle.createBinary();
                 end
                 
             elseif strcmp(evnt.Source.Tag,'sliderThreshold')
                 % slider Value has changed
                 set(obj.viewEditHandle.B_ThresholdValue,'String',num2str(evnt.Source.Value));
+                
+                %Set threshold value in the model
                 obj.modelEditHandle.ThresholdValue = evnt.Source.Value;
+                
+                %Create binary image with new threshold
+                obj.modelEditHandle.createBinary();
             else
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in thresholdEvent() FUNCTION !';
@@ -630,32 +667,73 @@ classdef controllerEdit < handle
                     
                     if Value > 1
                         % Value is bigger than 1. Set Value to 1.
+                        
+                        %Set the slider value in GUI to 1
                         set(obj.viewEditHandle.B_Alpha,'Value',1);
+                        
+                        %Set the text edit box string in GUI to '1'
                         set(obj.viewEditHandle.B_AlphaValue,'String','1');
+                        
+                        %Set alphamap value in the model
                         obj.modelEditHandle.AlphaMapValue = 1;
+                        
+                        %Change alphamp (transparency) of binary image
+                        obj.modelEditHandle.alphaMapEvent();
                     elseif Value < 0
                         % Value is smaller than 0. Set Value to 0.
+                        
+                        %Set the slider value in GUI to 0
                         set(obj.viewEditHandle.B_Alpha,'Value',0);
+                        
+                        %Set the text edit box string in GUI to '0'
                         set(obj.viewEditHandle.B_AlphaValue,'String','0');
+                        
+                        %Set alphamap value in the model
                         obj.modelEditHandle.AlphaMapValue = 0;
+                        
+                        %Change alphamp (transparency) of binary image
+                        obj.modelEditHandle.alphaMapEvent();
                         
                     else
                         % Value is ok
+                        
+                        %Copy the textedit value into the text slider in the GUI
                         set(obj.viewEditHandle.B_Alpha,'Value',Value);
+                        
+                        %Set alphamap value in the model
                         obj.modelEditHandle.AlphaMapValue = Value;
+                        
+                        %Change alphamp (transparency) of binary image
+                        obj.modelEditHandle.alphaMapEvent();
                     end
                 else
                     % Value is not numerical. Set Value to 1.
+                    
+                    %Set the slider value in GUI to 1
                     set(obj.viewEditHandle.B_Alpha,'Value',1);
+                    
+                    %Set the text edit box string in GUI to '1'
                     set(obj.viewEditHandle.B_AlphaValue,'String','1');
+                    
+                    %Set alphamap value in the model
                     obj.modelEditHandle.AlphaMapValue = 1;
+                    
+                    %Change alphamp (transparency) of binary image
+                    obj.modelEditHandle.alphaMapEvent();
                     
                 end
                 
             elseif strcmp(evnt.Source.Tag,'sliderAlpha')
                 % slider Value has changed
+                
+                %Copy the slider value into the text edit box in the GUI
                 set(obj.viewEditHandle.B_AlphaValue,'String',num2str(evnt.Source.Value));
+                
+                %Set alphamap value in the model
                 obj.modelEditHandle.AlphaMapValue = evnt.Source.Value;
+                
+                %Change alphamp (transparency) of binary image
+                obj.modelEditHandle.alphaMapEvent();
             else
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in alphaMapEvent() FUNCTION !';
@@ -911,21 +989,25 @@ classdef controllerEdit < handle
             
             switch String
                 
-                case 'dimond'
+                case 'diamond'
                     
-                    obj.modelEditHandle.SE = 'dimond';
-                    
+                    obj.modelEditHandle.SE = 'diamond';
+                    obj.modelEditHandle.FactorSE = 1;
                 case 'disk'
                     
                     obj.modelEditHandle.SE = 'disk';
+                    obj.modelEditHandle.FactorSE = 1;
                     
                 case 'octagon'
                     
                     obj.modelEditHandle.SE = 'octagon';
+                    %Size if octagon must be n*3
+                    obj.modelEditHandle.FactorSE = 3;
                     
                 case 'square'
                     
                     obj.modelEditHandle.SE = 'square';
+                    obj.modelEditHandle.FactorSE = 1;
                     
                 otherwise
                     
