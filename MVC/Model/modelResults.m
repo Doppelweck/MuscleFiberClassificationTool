@@ -12,6 +12,7 @@ classdef modelResults < handle
         PathNames;
         PicRGB;
         handlePicRGB;
+        PicPRGBPlanes;
         
         SaveFiberTable;
         SaveStatisticTable;

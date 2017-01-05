@@ -54,27 +54,28 @@ classdef controllerResults < handle
             obj.modelResultsHandle.FileNamesRGB = Data{1};
             obj.modelResultsHandle.PathNames = Data{2};
             obj.modelResultsHandle.PicRGB = Data{3};
-            obj.modelResultsHandle.Stats = Data{4};
-            obj.modelResultsHandle.LabelMat = Data{5};
+            obj.modelResultsHandle.PicPRGBPlanes = Data{4};
+            obj.modelResultsHandle.Stats = Data{5};
+            obj.modelResultsHandle.LabelMat = Data{6};
             
-            obj.modelResultsHandle.AnalyzeMode = Data{6};
+            obj.modelResultsHandle.AnalyzeMode = Data{7};
             
-            obj.modelResultsHandle.AreaActive = Data{7};
-            obj.modelResultsHandle.MinAreaPixel = Data{8};
-            obj.modelResultsHandle.MaxAreaPixel = Data{9};
+            obj.modelResultsHandle.AreaActive = Data{8};
+            obj.modelResultsHandle.MinAreaPixel = Data{9};
+            obj.modelResultsHandle.MaxAreaPixel = Data{10};
             
-            obj.modelResultsHandle.AspectRatioActive = Data{10};
-            obj.modelResultsHandle.MinAspectRatio = Data{11};
-            obj.modelResultsHandle.MaxAspectRatio = Data{12};
+            obj.modelResultsHandle.AspectRatioActive = Data{11};
+            obj.modelResultsHandle.MinAspectRatio = Data{12};
+            obj.modelResultsHandle.MaxAspectRatio = Data{13};
             
-            obj.modelResultsHandle.RoundnessActive = Data{13};
-            obj.modelResultsHandle.MinRoundness = Data{14};
+            obj.modelResultsHandle.RoundnessActive = Data{14};
+            obj.modelResultsHandle.MinRoundness = Data{15};
             
-            obj.modelResultsHandle.ColorDistanceActive = Data{15};
-            obj.modelResultsHandle.MinColorDistance = Data{16};
+            obj.modelResultsHandle.ColorDistanceActive = Data{16};
+            obj.modelResultsHandle.MinColorDistance = Data{17};
             
-            obj.modelResultsHandle.ColorValueActive = Data{17};
-            obj.modelResultsHandle.ColorValue = Data{18};
+            obj.modelResultsHandle.ColorValueActive = Data{18};
+            obj.modelResultsHandle.ColorValue = Data{19};
             
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));

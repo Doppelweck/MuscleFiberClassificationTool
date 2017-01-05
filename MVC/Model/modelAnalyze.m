@@ -491,7 +491,7 @@ classdef modelAnalyze < handle
                 delete(htemp);
                 
                 % plot new boundarie
-                htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color);
+                htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color,'LineWidth',0.1);
                 set(htemp,'Tag',['boundLabel ' num2str(labelNo)])
                 obj.InfoMessage = ['   - Fiber-Type object No. ' num2str(labelNo) ' changed by user'];
             end
@@ -503,26 +503,27 @@ classdef modelAnalyze < handle
             Data{1} = obj.FileNamesRGB;
             Data{2} = obj.PathNames;
             Data{3} = obj.PicRGB;
-            Data{4} = obj.Stats;
-            Data{5} = obj.LabelMat;
-            % Analyze Paraeter
-            Data{6} = obj.AnalyzeMode;
-            Data{7} = obj.AreaActive;
-            Data{8} = obj.MinAreaPixel;
-            Data{9} = obj.MaxAreaPixel;
+            Data{4} = obj.PicPRGBPlanes; 
+            Data{5} = obj.Stats;
+            Data{6} = obj.LabelMat;
+            % Analyze Parameter
+            Data{7} = obj.AnalyzeMode;
+            Data{8} = obj.AreaActive;
+            Data{9} = obj.MinAreaPixel;
+            Data{10} = obj.MaxAreaPixel;
             
-            Data{10} = obj.AspectRatioActive;
-            Data{11} = obj.MinAspectRatio;
-            Data{12} = obj.MaxAspectRatio;
+            Data{11} = obj.AspectRatioActive;
+            Data{12} = obj.MinAspectRatio;
+            Data{13} = obj.MaxAspectRatio;
             
-            Data{13} = obj.RoundnessActive;
-            Data{14} = obj.MinRoundness;
+            Data{14} = obj.RoundnessActive;
+            Data{15} = obj.MinRoundness;
             
-            Data{15} = obj.ColorDistanceActive;
-            Data{16} = obj.MinColorDistance;
+            Data{16} = obj.ColorDistanceActive;
+            Data{17} = obj.MinColorDistance;
             
-            Data{17} = obj.ColorValueActive;
-            Data{18} = obj.ColorValue;
+            Data{18} = obj.ColorValueActive;
+            Data{19} = obj.ColorValue;
             
         end
         

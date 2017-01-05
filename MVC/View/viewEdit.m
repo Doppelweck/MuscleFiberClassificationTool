@@ -327,7 +327,7 @@ classdef viewEdit < handle
         
         function setToolTipStrings(obj)
             % Set all tooltip strings in the properties of the operationg
-            % elements that are shown in the GUI
+            % elements that are shown in the GUI.
             %
             %   setToolTipStrings(obj);
             %

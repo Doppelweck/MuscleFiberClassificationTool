@@ -87,7 +87,7 @@ classdef controllerEdit < handle
         
         function addMyListener(obj)
             % add listeners to the several button objects in the viewEdit
-            % instance and value objects or handles in the editModel.
+            % instance and value objects or handles in the modelEdit.
             %
             %   addMyListener(obj);
             %
@@ -107,7 +107,7 @@ classdef controllerEdit < handle
         end
         
         function addMyCallbacks(obj)
-            % set callback functions to several button objects in the viewEdit
+            % Set callback functions to several button objects in the viewEdit
             % instance and handles im the editModel.
             %
             %   addMyCallbacks(obj);
@@ -142,7 +142,7 @@ classdef controllerEdit < handle
         end
         
         function addWindowCallbacks(obj)
-            % set callback functions of the main figure
+            % Set callback functions of the main figure
             %
             %   addWindowCallbacks(obj);
             %
@@ -158,7 +158,8 @@ classdef controllerEdit < handle
         end
         
         function setInitValueInModel(obj)
-            % set the initalize values in the editModel.
+            % Get the values from the button ang GUI objects in the View
+            % and set the values in the Model.
             %
             %   setInitValueInModel(obj);
             %
@@ -1279,7 +1280,7 @@ classdef controllerEdit < handle
             % the model. Is called when InfoMessage string changes. Appends
             % the text in InfoMessage to the log text in the GUI.
             %
-            %   redoEvent(obj,src,evnt);
+            %   updateInfoLogEvent(obj,src,evnt);
             %
             %   ARGUMENTS:
             %
@@ -1299,7 +1300,7 @@ classdef controllerEdit < handle
         function closeProgramEvent(obj,~,~)
             % Colose Request function of the main figure.
             %
-            %   redoEvent(obj,src,evnt);
+            %   closeProgramEvent(obj,~,~)
             %
             %   ARGUMENTS:
             %
