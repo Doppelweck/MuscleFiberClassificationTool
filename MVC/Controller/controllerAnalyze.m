@@ -1025,6 +1025,10 @@ classdef controllerAnalyze < handle
             
             switch choice
                 case 'Yes'
+                    delete(obj.viewAnalyzeHandle);
+                    delete(obj.modelAnalyzeHandle);
+                    delete(obj.mainCardPanel);
+
                     figHandles = findall(0,'Type','figure');
                     object_handles = findall(figHandles);
                     delete(object_handles);
@@ -1039,6 +1043,7 @@ classdef controllerAnalyze < handle
         
         function delete(obj)
             %deconstructor
+            delete(obj)
         end
         
         

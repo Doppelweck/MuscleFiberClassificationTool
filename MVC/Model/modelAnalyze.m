@@ -638,7 +638,7 @@ classdef modelAnalyze < handle
                 axesh = obj.handlePicRGB.Parent;
                 
                 %select boundarie color depending on the new fiber type
-                switch obj.Stats(labelNo).FiberType
+                switch newFiberType
                     case 0
                         Color = 'w';
                     case 1

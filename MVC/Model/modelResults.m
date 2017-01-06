@@ -46,6 +46,7 @@ classdef modelResults < handle
         SaveStatisticTable; %Indicates whether the statistics table should be saved.
         SavePlots; %Indicates whether the statistics plots should be saved.
         SavePicProcessed; %Indicates whether the processed image should be saved.
+        SavePlanePicture; %Indicates whether the color-plane image should be saved.
         SavePath; % Save Path, same as the selected RGB image path.
         
         LabelMat; %Label array of all fiber objects.
@@ -544,9 +545,9 @@ classdef modelResults < handle
             obj.SavePath = SaveDir;
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save picture processed with boudaries
+            % save image processed with boudaries
             if obj.SavePicProcessed
-                obj.InfoMessage = '      - saving picture with boundaries';
+                obj.InfoMessage = '      - saving image processed with boundaries';
                 
                 % save picture as tif file
                 f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
@@ -566,13 +567,28 @@ classdef modelResults < handle
                 cd(oldPath)
                 
                 close(f);
-                obj.InfoMessage = '         - Picture has been saved as .tif';
+                obj.InfoMessage = '         - image has been saved as .tif';
                 
                 % save picture as vector graphics
                 fileName = [fileNameRGB '_image_processed' time '.pdf'];
                 fullFileName = fullfile(SaveDir,fileName);
                 saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fullFileName);
-                obj.InfoMessage = '         - Picture has been saved as .pdf vector grafic'; 
+                obj.InfoMessage = '         - image has been saved as .pdf vector grafic'; 
+            end
+            
+             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % save color plane image as tif file
+            if obj.SavePlanePicture
+                obj.InfoMessage = '      - saving color plane image';
+                
+                fileName = [fileNameRGB '_image_colorPlane' time '.tif'];
+                
+                oldPath = pwd;
+                cd(SaveDir)
+                imwrite(obj.PicPRGBPlanes,fileName)
+                cd(oldPath)
+                
+                obj.InfoMessage = '         - image has been saved as .tif';
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -750,13 +766,13 @@ classdef modelResults < handle
             
             %sjow RGB image in GUI
             imshow(ones(size(obj.PicRGB)));
-            obj.InfoMessage = '   - Load picture into GUI...';
+            obj.InfoMessage = '      - load image processed into GUI...';
             
             %copy boundaries from analyze to result GUI.
             copyobj(axesPicAnalyze.Children ,axesResults);
             axes(axesResults);
             hold on
-            obj.InfoMessage = '      - show labels...';
+            obj.InfoMessage = '         - show labels...';
             
             %plot labels in the image
             for k = 1:size(obj.Stats,1)
@@ -767,7 +783,7 @@ classdef modelResults < handle
                     'VerticalAlignment', 'middle');
             end
             hold off
-            obj.InfoMessage = '   - Load picture complete';
+            
             
         end
         

@@ -39,16 +39,15 @@ movegui(mainFig,'center');
 viewEditHandle = viewEdit(mainCard);
 
 mainCard.Selection = 1;
-pause(1);
-
+pause(1.5);
 viewAnalyzeHandle = viewAnalyze(mainCard);
 mainCard.Selection = 2;
-pause(1);
+pause(1.5);
 viewResultsHandle = viewResults(mainCard);
 mainCard.Selection = 3;
-pause(1);
+pause(1.5);
 mainCard.Selection = 1;
-pause(0.1);
+pause(0.5);
 
 set(mainFig,'Visible','on');
 %Init Model's

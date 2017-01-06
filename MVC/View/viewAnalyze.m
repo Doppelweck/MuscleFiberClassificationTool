@@ -41,17 +41,17 @@ classdef viewAnalyze < handle
         B_MinArea; %TextEditBox, minimal allowed fiber area.
         B_MaxArea; %TextEditBox, maximal allowed fiber area.
         
-        B_RoundnessActive; %Ceckbox, select if roundness parameter is used for classificaton.
+        B_RoundnessActive; %Checkbox, select if roundness parameter is used for classificaton.
         B_MinRoundness; %TextEditBox, minimal allowed fiber roudness.
         
-        B_AspectRatioActive %Ceckbox, select if aspect ratio parameter is used for classificaton.
+        B_AspectRatioActive %Checkbox, select if aspect ratio parameter is used for classificaton.
         B_MinAspectRatio; %TextEditBox, minimal allowed fiber aspect ratio.
         B_MaxAspectRatio; %TextEditBox, maximal allowed fiber aspect ratio.
         
-        B_ColorDistanceActive; %Ceckbox, select if color distance parameter is used for classificaton.
+        B_ColorDistanceActive; %Checkbox, select if color distance parameter is used for classificaton.
         B_ColorDistance; %TextEditBox, minimal allowed fiber color distance.
         
-        B_ColorValueActive; %Ceckbox, select if color value parameter is used for classificaton.
+        B_ColorValueActive; %Checkbox, select if color value parameter is used for classificaton.
         B_ColorValue; %TextEditBox, minimal allowed fiber color value (HSV).
         
         B_TextObjNo; %TextBox, shows label number of selected fiber in the fiber information panel.
@@ -173,7 +173,7 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', HButtonBoxPara42,'Style','text','FontSize',fontSizeM, 'String', 'Minimal roundness ratio :' );
             
             HButtonBoxPara43 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_MinRoundness = uicontrol( 'Parent', HButtonBoxPara43,'Style','edit','FontSize',fontSizeM,'Tag','MinRoundValue', 'String', '0.2' );
+            obj.B_MinRoundness = uicontrol( 'Parent', HButtonBoxPara43,'Style','edit','FontSize',fontSizeM,'Tag','MinRoundValue', 'String', '0.15' );
             
             set( HBoxPara4, 'Widths', [-1 -4 -4] );
             
@@ -202,7 +202,7 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', HButtonBoxPara62,'Style','text','FontSize',fontSizeM, 'String', 'Minimal color value :' );
             
             HButtonBoxPara63 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_ColorValue = uicontrol( 'Parent', HButtonBoxPara63,'Style','edit','FontSize',fontSizeM,'Tag','ColorValue', 'String', '0.2' );
+            obj.B_ColorValue = uicontrol( 'Parent', HButtonBoxPara63,'Style','edit','FontSize',fontSizeM,'Tag','ColorValue', 'String', '0.1' );
             
             set( HBoxPara6, 'Widths', [-1 -4 -4] );
             

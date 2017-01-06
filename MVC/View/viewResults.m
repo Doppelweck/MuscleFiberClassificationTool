@@ -28,7 +28,8 @@ classdef viewResults < handle
         hFR; %handle to figure with Results and controls.
         panelControl; %handle to panel with controls.
         panelResults; %handle to panel with results.
-        hAPProcessed; %handle to axes with processed picture in the picture Panel.
+        hAPProcessed; %handle to axes with processed image in the picture Panel.
+        hAPColorPlane; %handle to axes with image created from the Red Green and Blue color-planes.
         
         hAArea; %handle to axes with area plot.  
         hACount %handle to axes with counter plot.
@@ -40,10 +41,11 @@ classdef viewResults < handle
         B_NewPic; %Button, to select a new picture.
         B_CloseProgramm; %Button, to close the program.
         
-        B_SaveFiberTable; %Ceckbox, select if fiber table should be saved.
-        B_SaveStatisticTable; %Ceckbox, select if statistic table should be saved.
-        B_SavePlots; %Ceckbox, select if all plots should be saved.
-        B_SaveAnaPicture; %Ceckbox, select if analyzed picture table should be saved.
+        B_SaveFiberTable; %Checkbox, select if fiber table should be saved.
+        B_SaveStatisticTable; %Checkbox, select if statistic table should be saved.
+        B_SavePlots; %Checkbox, select if all plots should be saved.
+        B_SaveAnaPicture; %Checkbox, select if processed image should be saved.
+        B_SavePlanePicture; %Checkbox, select if color-plane image should be saved.
         B_SaveOpenDir %Button, opens the save directory.
         
         B_TableStatistic; %Table, that shows all statistic data.
@@ -89,7 +91,7 @@ classdef viewResults < handle
             obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', 'Save data','FontSize',fontSizeB );
             
             %%%%%%%%%%%%%%%%%%%Panel SaveOptions %%%%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxSave = uix.VButtonBox('Parent', PanelSave,'ButtonSize',[600 600],'Spacing', 5 );
+            mainVBBoxSave = uix.VBox('Parent', PanelSave,'Spacing', 5 );
             
             %%%%%%%%%%%%%%%% 1. Row Save Fiber Table 
             HBoxSave1 = uix.HBox('Parent', mainVBBoxSave);
@@ -128,18 +130,32 @@ classdef viewResults < handle
             HBoxSave4 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave41 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontSize',fontSizeM, 'String', 'Save processed picture :' );
+            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontSize',fontSizeM, 'String', 'Save processed image :' );
             
             HButtonBoxSave42 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SaveAnaPicture = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SaveProcessedPicture');
             
             set( HBoxSave4, 'Widths', [-10 -1] );
-
-            %%%%%%%%%%%%%%%% 5. Row Save dir
+            
+            %%%%%%%%%%%%%%%% 5. Row Save Picture analyzed 
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[600 30],'Padding', 1 );
-            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave51,'FontSize',fontSizeM, 'String', 'Open results folder' );
+            HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 18],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontSize',fontSizeM, 'String', 'Save image created from color-planes :' );
+            
+            HButtonBoxSave52 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
+            obj.B_SavePlanePicture = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SaveColorPlanePicture');
+            
+            set( HBoxSave5, 'Widths', [-10 -1] );
+
+            %%%%%%%%%%%%%%%% 6. Row Save dir
+            HBoxSave6 = uix.HBox('Parent', mainVBBoxSave);
+            
+            HButtonBoxSave61 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[600 30],'Padding', 1 );
+            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave61,'FontSize',fontSizeM, 'String', 'Open results folder' );
+            
+            %%%%%%%%
+            set( mainVBBoxSave, 'Heights', [-1 -1 -1 -1 -1 -2] );
             
             %%%%%%%%%%%%%%%%%%% Pnael Info Text Log %%%%%%%%%%%%%%%%%%%%%%%
             
@@ -152,10 +168,11 @@ classdef viewResults < handle
             
             statisticTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             pictureTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
+            pictureRGBPlaneTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             tableTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             
             
-            tabPanel.TabTitles = {'Statistics','Picture', 'Object Table'};
+            tabPanel.TabTitles = {'Statistics','Original image processed','RGB Plane-Image', 'Object Table'};
             
             %%%%%%%%%%%%%%%%%%% Tab 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
@@ -204,12 +221,19 @@ classdef viewResults < handle
            
             %%%%%%%%%%%%%%%%%%%%%%%% Tab 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
-            mainPicPanel = uix.Panel('Parent',pictureTabPanel,'Padding',35,'Title', 'Picture with boundaries and label numbers','FontSize',fontSizeM);
+            mainPicPanel = uix.Panel('Parent',pictureTabPanel,'Padding',35,'Title', 'Image processed with object boundaries and label numbers','FontSize',fontSizeM);
             
             obj.hAPProcessed = axes('Parent',mainPicPanel,'Units','normalized','Position',[0 0 1 1]);
             axis image
             
             %%%%%%%%%%%%%%%%%%%%%%%% Tab 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            mainPicPlanePanel = uix.Panel('Parent',pictureRGBPlaneTabPanel,'Padding',35,'Title', 'Image created from the Red Green and Blue color-planes','FontSize',fontSizeM);
+            
+            obj.hAPColorPlane = axes('Parent',mainPicPlanePanel,'Units','normalized','Position',[0 0 1 1]);
+            axis image
+            
+            %%%%%%%%%%%%%%%%%%%%%%%% Tab 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             mainTablePanel = uix.Panel('Parent',tableTabPanel,'Padding',5,'Title', 'Table object information','FontSize',fontSizeM);
             obj.B_TableMain = uitable('Parent',mainTablePanel,'FontSize',fontSizeB);

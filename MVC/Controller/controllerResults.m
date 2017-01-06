@@ -278,6 +278,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.SaveStatisticTable = obj.viewResultsHandle.B_SaveStatisticTable.Value;
             obj.modelResultsHandle.SavePlots = obj.viewResultsHandle.B_SavePlots.Value;
             obj.modelResultsHandle.SavePicProcessed = obj.viewResultsHandle.B_SaveAnaPicture.Value;
+            obj.modelResultsHandle.SavePlanePicture = obj.viewResultsHandle.B_SavePlanePicture.Value;
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','off');
             set(obj.viewResultsHandle.B_Save,'Enable','off');
@@ -587,8 +588,8 @@ classdef controllerResults < handle
         end
         
         function showPicProcessedGUI(obj)
-            % Shows the proceesed images in the corresponding axes 
-            % in the GUI. 
+            % Shows the proceesed images ande the color plane image in the  
+            % corresponding axes in the GUI. 
             %
             %   showPicProcessedGUI(obj);
             %
@@ -598,12 +599,24 @@ classdef controllerResults < handle
             %           obj:    Handle to controllerResults object.
             %
             
+            obj.modelResultsHandle.InfoMessage = '   - load images into GUI';
+            
+            %Show proccesd image
             % get axes in the analyze GUI with rgb image
             axesPicAnalyze = obj.controllerAnalyzeHandle.viewAnalyzeHandle.hAP;
             % get axes in the results GUI
             axesResults = obj.viewResultsHandle.hAPProcessed;
             % copy axes childs from analyze to results GUI
             obj.modelResultsHandle.showPicProcessedGUI(axesPicAnalyze,axesResults);
+            
+            obj.modelResultsHandle.InfoMessage = '      - load color plane into GUI...';
+            %Show color-plane image 
+            %make axes for color plane the current axes
+            axes(obj.viewResultsHandle.hAPColorPlane);
+            %show image
+            imshow(obj.modelResultsHandle.PicPRGBPlanes);
+            
+            obj.modelResultsHandle.InfoMessage = '   - load images complete';
             
         end
         
@@ -708,6 +721,11 @@ classdef controllerResults < handle
             
             switch choice
                 case 'Yes'
+                    
+                    delete(obj.viewResultsHandle);
+                    delete(obj.modelResultsHandle);
+                    delete(obj.mainCardPanel);
+                    
                     figHandles = findall(0,'Type','figure');
                     object_handles = findall(figHandles);
                     delete(object_handles);
@@ -722,6 +740,7 @@ classdef controllerResults < handle
        
         function delete(obj)
             %deconstructor
+            delete(obj);
         end
         
     end

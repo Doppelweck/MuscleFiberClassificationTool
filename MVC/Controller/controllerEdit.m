@@ -1314,6 +1314,11 @@ classdef controllerEdit < handle
             
             switch choice
                 case 'Yes'
+                    
+                    delete(obj.viewEditHandle);
+                    delete(obj.modelEditHandle);
+                    delete(obj.mainCardPanel);
+                    
                     %find all objects
                     object_handles = findall(obj.mainFigure);
                     %delete objects
@@ -1330,6 +1335,7 @@ classdef controllerEdit < handle
         
         function delete(obj)
             %deconstructor
+            delete(obj)
         end
     end
     
