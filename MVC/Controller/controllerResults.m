@@ -1,24 +1,67 @@
 classdef controllerResults < handle
-    %UNTITLED2 Summary of this class goes here
-    %   Detailed explanation goes here
+    %controllerResults   Controller of the Results-MVC (Model-View-Controller).
+    %Controls the communication and data exchange between the view
+    %instance and the model instance. Connected to the Analyze
+    %Controllers to communicate with the Analyze-MVC and to
+    %exchange data between them.
+    %
+    %
+    %======================================================================
+    %
+    % AUTHOR:           - Sebastian Friedrich,
+    %                     Trier University of Applied Sciences, Germany
+    %
+    % SUPERVISOR:       - Prof. Dr.-Ing. K.P. Koch
+    %                     Trier University of Applied Sciences, Germany
+    %
+    %                   - Mr Justin Perkins, BVetMed MS CertES Dip ECVS MRCVS
+    %                     The Royal Veterinary College, Hertfordshire United Kingdom
+    %
+    % FIRST VERSION:    30.12.2016 (V1.0)
+    %
+    % REVISION:         none
+    %
+    %======================================================================
+    %
     
     properties
-        mainFigure;
-        mainCardPanel;
-        viewResultsHandle;
-        modelResultsHandle;
-        controllerAnalyzeHandle;
+        
+        mainFigure; %handle to main figure.
+        mainCardPanel; %handle to card panel in the main figure.
+        viewResultsHandle; %hande to viewResults instance.
+        modelResultsHandle; %hande to modelResults instance.
+        controllerAnalyzeHandle; %handle to controllerAnalyze instance.
+        
     end
     
     methods
-        function obj = controllerResults(mainFigure,mainCardPanel,viewResultsHandle,modelResultsHandle)
+        
+        function obj = controllerResults(mainFigure,mainCardPanel,viewResultsH,modelResultsH)
+            % Constuctor of the controllerResults class. Initialize the
+            % callback and listener functions to observes the corresponding
+            % View objects. Saves the needed handles of the corresponding
+            % View and Model in the properties.
+            %
+            %   obj = controllerResults(mainFigure,mainCardPanel,viewResultsH,modelResultsH)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           mainFigure:     Handle to main figure.
+            %           mainCardPanel:  Handle to main card panel.
+            %           viewAnalyzeH:   Hande to viewResults instance.
+            %           modelAnalyzeH:  Hande to modelResults instance.
+            %
+            %       - Output:
+            %           obj:            Handle to controllerResults object.
+            %
             
             obj.mainFigure =mainFigure;
             obj.mainCardPanel =mainCardPanel;
             
-            obj.viewResultsHandle = viewResultsHandle;
+            obj.viewResultsHandle = viewResultsH;
             
-            obj.modelResultsHandle = modelResultsHandle;
+            obj.modelResultsHandle = modelResultsH;
             
             obj.addMyCallback();
             
@@ -26,7 +69,16 @@ classdef controllerResults < handle
         end
         
         function addMyCallback(obj)
-%             set(obj.viewResultsHandle.hFR,'CloseRequestFcn',@obj.closeProgramEvent);
+            % Set callback functions to several button objects in the
+            % viewResults instance.
+            %
+            %   addMyCallbacks(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Callback',@obj.backAnalyzeEvent);
             set(obj.viewResultsHandle.B_Save,'Callback',@obj.saveResultsEvent);
@@ -36,57 +88,119 @@ classdef controllerResults < handle
         end
         
         function addWindowCallbacks(obj)
+            % Set callback functions of the main figure
+            %
+            %   addWindowCallbacks(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
+            
             set(obj.mainFigure,'WindowButtonMotionFcn','');
             set(obj.mainFigure,'ButtonDownFcn','');
-%             set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
 
         end
         
         function addMyListener(obj)
+            % add listeners to the several button objects in the
+            % viewResults instance and value objects or handles in the
+            % modelResults.
+            %
+            %   addMyListener(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
+            
             addlistener(obj.modelResultsHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
+            
         end
         
         function startResultsMode(obj,Data,InfoText)
-%              set(obj.controllerAnalyzeHandle.viewAnalyzeHandle.hFP,'Visible','off');
-            % Get all Data from AnalyzeController and save it in the
-            % ResultModel properties
+            % Called by the controllerAnalyze instance when the user change
+            % the program state to Results-mode. Saves all nessessary Data
+            % from the Analyze model into the Result model.
+            %
+            %   startResultsMode(obj,Data,InfoText);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to controllerResults object.
+            %           Data:    Cell Array that contains the file- and
+            %               pathnames of the RGB. Also contains all analyze
+            %               parameters:
+            %
+            %               Data{1}: filename RGB image.
+            %               Data{2}: path RGB image.
+            %               Data{3}: RGB image.
+            %               Data{4}: RGB image create from color plane
+            %               images.            
+            %               Data{5}: Stats table that contains all fiber
+            %               informations.
+            %               Data{6}: Label array of all fiber objects.
+            %               Data{7}: Selected analyze-mode
+            %               Data{8}: Area active parameter
+            %               Data{9}: Area min value
+            %               Data{10}: Area max value
+            %               Data{11}: Aspect ratio active parameter
+            %               Data{12}: Aspect ratio min value
+            %               Data{13}: Aspect ratio max value
+            %               Data{14}: Roundness active parameter
+            %               Data{15}: Roundness value
+            %               Data{16}: ColorDistance active parameter
+            %               Data{17}: ColorDistance value
+            %               Data{18}: ColorValue active parameter
+            %               Data{19}: ColorValuee value
+            %
+            %           InfoText:   Info text log.
+            %
+            
+            % Set PicData Properties in the Analyze Model
             obj.modelResultsHandle.FileNamesRGB = Data{1};
             obj.modelResultsHandle.PathNames = Data{2};
             obj.modelResultsHandle.PicRGB = Data{3};
-            obj.modelResultsHandle.Stats = Data{4};
-            obj.modelResultsHandle.LabelMat = Data{5};
+            obj.modelResultsHandle.PicPRGBPlanes = Data{4};
+            obj.modelResultsHandle.Stats = Data{5};
+            obj.modelResultsHandle.LabelMat = Data{6};
             
-            obj.modelResultsHandle.AnalyzeMode = Data{6};
+            % Set Analyze parameters in the Analyze Model
+            obj.modelResultsHandle.AnalyzeMode = Data{7};
             
-            obj.modelResultsHandle.AreaActive = Data{7};
-            obj.modelResultsHandle.MinAreaPixel = Data{8};
-            obj.modelResultsHandle.MaxAreaPixel = Data{9};
+            obj.modelResultsHandle.AreaActive = Data{8};
+            obj.modelResultsHandle.MinAreaPixel = Data{9};
+            obj.modelResultsHandle.MaxAreaPixel = Data{10};
             
-            obj.modelResultsHandle.AspectRatioActive = Data{10};
-            obj.modelResultsHandle.MinAspectRatio = Data{11};
-            obj.modelResultsHandle.MaxAspectRatio = Data{12};
+            obj.modelResultsHandle.AspectRatioActive = Data{11};
+            obj.modelResultsHandle.MinAspectRatio = Data{12};
+            obj.modelResultsHandle.MaxAspectRatio = Data{13};
             
-            obj.modelResultsHandle.RoundnessActive = Data{13};
-            obj.modelResultsHandle.MinRoundness = Data{14};
+            obj.modelResultsHandle.RoundnessActive = Data{14};
+            obj.modelResultsHandle.MinRoundness = Data{15};
             
-            obj.modelResultsHandle.ColorDistanceActive = Data{15};
-            obj.modelResultsHandle.MinColorDistance = Data{16};
+            obj.modelResultsHandle.ColorDistanceActive = Data{16};
+            obj.modelResultsHandle.MinColorDistance = Data{17};
             
-            obj.modelResultsHandle.ColorValueActive = Data{17};
-            obj.modelResultsHandle.ColorValue = Data{18};
+            obj.modelResultsHandle.ColorValueActive = Data{18};
+            obj.modelResultsHandle.ColorValue = Data{19};
             
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));
             
+            % set panel title to filename and path
             Titel = [obj.modelResultsHandle.PathNames obj.modelResultsHandle.FileNamesRGB];
             obj.viewResultsHandle.panelResults.Title = Titel;
             
            
-%             set(obj.viewResultsHandle.hFR,'Visible','on');
-%             figure(obj.viewResultsHandle.hFR);
-
+            %change the card panel to selection 3: results mode
             obj.mainCardPanel.Selection = 3;
+            
+            %change the figure callbacks for the results mode
             obj.addWindowCallbacks()
             
             obj.modelResultsHandle.InfoMessage = '*** Start Result mode ***';
@@ -96,21 +210,30 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-
+            
+            %show results data in the GUI
             obj.modelResultsHandle.startResultMode();
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
             set(obj.viewResultsHandle.B_Save,'Enable','on');
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
-%             figure(obj.viewResultsHandle.hFR);
             
         end
         
         function backAnalyzeEvent(obj,~,~)
-            
-%             set(obj.viewResultsHandle.hFR,'Visible','off');
-            
+            % Callback function of the back analyze mode button in the GUI.
+            % Clears the data in the results model and change the state of
+            % the program to the analyze mode. Refresh the figure callbacks
+            % for the analyze mode.
+            %
+            %   backAnalyzeEvent(obj,~,~);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
             
             obj.modelResultsHandle.InfoMessage = ' ';
             
@@ -119,9 +242,6 @@ classdef controllerResults < handle
             obj.modelResultsHandle.LabelMat = [];
             obj.viewResultsHandle.B_TableMain.Data = {};
             obj.viewResultsHandle.B_TableStatistic.Data = {};
-            
-            % clear all axes in viewResult figure
-            arrayfun(@cla,findall(obj.viewResultsHandle.hFR,'type','axes'))
             
             % Clear PicRGB and Boundarie Objects if exist
             if isfield(obj.modelResultsHandle.handlePicRGB,'Parent')
@@ -132,15 +252,27 @@ classdef controllerResults < handle
             % set log text from Result GUI to Analyze GUI
             obj.controllerAnalyzeHandle.setInfoTextView(get(obj.viewResultsHandle.B_InfoText, 'String'));
             
-%             set(obj.controllerAnalyzeHandle.viewAnalyzeHandle.hFP,'Visible','on');
-%             figure(obj.controllerAnalyzeHandle.viewAnalyzeHandle.hFP);
-            
+            %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
-            obj.controllerAnalyzeHandle.addWindowCallbacks()
+            
+            %change the figure callbacks for the analyze mode
+            obj.controllerAnalyzeHandle.addWindowCallbacks();
+            
             obj.controllerAnalyzeHandle.modelAnalyzeHandle.InfoMessage = '*** Back to Analyze mode ***';
         end
         
         function saveResultsEvent(obj,~,~)
+            % Callback function of the save data button in the GUI.
+            % Check wich data should be saved and calls the saveResults()
+            % function in the model.
+            %
+            %   saveResultsEvent(obj,~,~);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
             
             obj.modelResultsHandle.SaveFiberTable = obj.viewResultsHandle.B_SaveFiberTable.Value;
             obj.modelResultsHandle.SaveStatisticTable = obj.viewResultsHandle.B_SaveStatisticTable.Value;
@@ -153,6 +285,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
             
+            %Save results
             obj.modelResultsHandle.saveResults();
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
@@ -164,12 +297,35 @@ classdef controllerResults < handle
         end
         
         function showInfoInTableGUI(obj)
-            obj.viewResultsHandle.B_TableMain.Data = obj.modelResultsHandle.StatsMatData;
+            % Shows the fibertype data and the statistc data in the
+            % corresponding table in the GUI.
+            %
+            %   showInfoInTableGUI(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
             
+            obj.viewResultsHandle.B_TableMain.Data = obj.modelResultsHandle.StatsMatData;
             obj.viewResultsHandle.B_TableStatistic.Data = obj.modelResultsHandle.StatisticMat;
+            
         end
         
         function showAxesDataInGUI(obj)
+            % Shows the fibertype data and the statistc data in the
+            % corresponding axes in the GUI. Including area statistics
+            % plot, number of fiber types plot, scatter plot fiber types
+            % and scatter plot all objects.
+            %
+            %   showAxesDataInGUI(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
             
             obj.modelResultsHandle.InfoMessage = '   - Plot data into GUI axes...';
             
@@ -252,6 +408,7 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle.InfoMessage = '      - plot scatter...';
             
+            %clear axes
             cla(obj.viewResultsHandle.hAScatter)
             axes(obj.viewResultsHandle.hAScatter);
             
@@ -430,16 +587,41 @@ classdef controllerResults < handle
         end
         
         function showPicProcessedGUI(obj)
-            axesPicAnalyze = obj.controllerAnalyzeHandle.viewAnalyzeHandle.hAP;
-            axesResults = obj.viewResultsHandle.hAPProcessed;
-%             copyobj(axesPicAnalyze.Children ,obj.viewResultsHandle.hAPProcessed)
+            % Shows the proceesed images in the corresponding axes 
+            % in the GUI. 
+            %
+            %   showPicProcessedGUI(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
             
-%             axes(obj.viewResultsHandle.hAPProcessed)
-%             obj.modelResultsHandle.handlePicRGB = imshow(obj.modelResultsHandle.PicRGB);
+            % get axes in the analyze GUI with rgb image
+            axesPicAnalyze = obj.controllerAnalyzeHandle.viewAnalyzeHandle.hAP;
+            % get axes in the results GUI
+            axesResults = obj.viewResultsHandle.hAPProcessed;
+            % copy axes childs from analyze to results GUI
             obj.modelResultsHandle.showPicProcessedGUI(axesPicAnalyze,axesResults);
+            
         end
         
         function updateInfoLogEvent(obj,src,evnt)
+            % Listener callback function of the InfoMessage propertie in
+            % the model. Is called when InfoMessage string changes. Appends
+            % the text in InfoMessage to the log text in the GUI.
+            %
+            %   updateInfoLogEvent(obj,src,evnt);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResult object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
+            
             InfoText = cat(1, get(obj.viewResultsHandle.B_InfoText, 'String'), {obj.modelResultsHandle.InfoMessage});
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));
@@ -448,6 +630,18 @@ classdef controllerResults < handle
         end
         
         function newPictureEvent(obj,~,~)
+            % Callback of the New Pic button in the GUI. Get back to the edit
+            % mode and call the newPictureEvent function to select a new
+            % image for further processing.
+            %
+            %   newPictureEvent(obj,~,~);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResul object
+            %
+            
             choice = questdlg({'Are you sure you want to open a new picture? ','All unsaved data will be lost.'},...
                 'Close Program', ...
                 'Yes','No','No');
@@ -464,6 +658,18 @@ classdef controllerResults < handle
         end
         
         function openSaveDirectory(obj,~,~)
+            % Callback of the open save directory button in the GUI. Opens
+            % the directory where the files are saved. Is the same
+            % directory in which the RGB image lies.
+            %
+            %   openSaveDirectory(obj,~,~);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResult object
+            %
+            
             if ~isempty(obj.modelResultsHandle.SavePath)
                 
                 if ismac
@@ -486,7 +692,16 @@ classdef controllerResults < handle
         end
         
         function closeProgramEvent(obj,~,~)
-            
+            % Colose Request function of the main figure and callback
+            % function of the close button in the GUI.
+            %
+            %   closeProgramEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResult object
+            %
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
                 'Close Program', ...
                 'Yes','No','No');
@@ -506,8 +721,10 @@ classdef controllerResults < handle
         end
        
         function delete(obj)
-            
+            %deconstructor
         end
+        
     end
+    
 end
 

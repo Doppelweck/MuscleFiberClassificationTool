@@ -1,99 +1,136 @@
 classdef modelEdit < handle
-    %UNTITLED6 Summary of this class goes here
-    %   Detailed explanation goes here7
+    %modelEdit   Model of the edit-MVC (Model-View-Controller). Runs all
+    %nessesary calculations. Is connected and gets controlled by the
+    %correspondening Controller.
+    %The main tasks are:
+    %   - Open the selected RGB image, search and load the associated color
+    %     plane images (.zvi file).
+    %   - Identification of color plane images.
+    %   - Performing the brightness correction on the color plane images.
+    %   - Creating the binary image.
+    %   - Calculating the line objects for the hand draw methods.
+    %
+    %
+    %======================================================================
+    %
+    % AUTHOR:           - Sebastian Friedrich,
+    %                     Trier University of Applied Sciences, Germany
+    %
+    % SUPERVISOR:       - Prof. Dr.-Ing. K.P. Koch
+    %                     Trier University of Applied Sciences, Germany
+    %
+    %                   - Mr Justin Perkins, BVetMed MS CertES Dip ECVS MRCVS
+    %                     The Royal Veterinary College, Hertfordshire United Kingdom
+    %
+    % FIRST VERSION:    30.12.2016 (V1.0)
+    %
+    % REVISION:         none
+    %
+    %======================================================================
+    %
     
     
     properties
-        %Handle to other Classes
-        controllerEditHandle
+        
+        controllerEditHandle; %hande to controllerEdit instance.
+        
+        FileNamesRGB; %Filename of the selected RGB image.
+        PathNames; %Directory path of the selected RGB image.
+        PicRGB; %RGB image.
+        PicBW; %Binary image.
+        handlePicRGB; %handle to RGB image.
+        handlePicBW; %handle to binary image.
+        PicPlane1; %first unidentified color plane image.
+        PicPlane2; %second unidentified color plane image.
+        PicPlane3; %third unidentified color plane image.
+        PicPlane4; %fourth unidentified color plane image.
+        PicPlaneGreen; %Green identified color plane image.
+        PicPlaneBlue; %Blue identified color plane image.
+        PicPlaneRed; %Red identified color plane image.
+        PicPlaneFarRed; %Farred identified color plane image.
+        PicRGBPlanes; %RGB image created from the color plane images.
+        PicPlaneGreen_adj; %Green color plane image after brightness adjustment.
+        PicPlaneBlue_adj; %Blue color plane image after brightness adjustment.
+        PicPlaneRed_adj; %Red color plane image after brightness adjustment.
+        PicPlaneFarRed_adj; %Farred color plane image after brightness adjustment.
+        PicA4; %Brightness adjustment image for Blue color plane image.
+        PicL5; %Brightness adjustment image for Green color plane image.
+        PicTX; %Brightness adjustment image for Red color plane image.
+        PicY5; %Brightness adjustment image for FarRed color plane image.
+        
+        PicBWisInvert = 'false'; %Invert staus of binary image.
+        
+        ThresholdMode; %Selected threshold mode.
+        ThresholdValue; %Selected threshold value.
+        
+        AlphaMapValue; %Selected alphamap value (transparency).
+        
+        LineWidthValue = 1; %Selected linewidth value.
+        ColorValue = 1; %Selected color value. 1 for white, 0 for black
+        
+        PicBufferPointer = 1; %Pointer to the current buffer element. Buffer contains binary iamges for undo and redo functionality
+        BufferSize = 100; %Size of the buffer;
+        PicBuffer; %Image buffer for binary images.Used for undo and redo functionality.
+        
+        morphOP = ''; %Selected morphological method.
+        SE = ''; %Selected structering element shape.
+        SizeSE = 1; %Size of the selected structering element.
+        FactorSE = 1; %Multiplier for the size of the selected structering element.
+        NoIteration = 1; %Number of iterations of the selected morphological method.
+        
+        x1; %x-coordinate of the starting point for the line object. Used for hand draw functionality.
+        x2; %x-coordinate of the end point for the line object. Used for hand draw functionality.
+        y1; %y-coordinate of the starting point for the line object. Used for hand draw functionality.
+        y2; %y-coordinate of the end point for the line object. Used for hand draw functionality.
+        x_v; %Vektor 2x1 of sorted x values (start and end point sorted by size).
+        y_v; %Vektor 2x1 of sorted y values (start and end point sorted by size).
+        dx; %Gradient in x-direction. Used for hand draw functionality.
+        dy; %Gradient in y-direction. Used for hand draw functionality.
+        abs_dx; %Abslote value of the gradient in x-direction. Used for hand draw functionality.
+        abs_dy; %Abslote value of the gradient in y-direction. Used for hand draw functionality.
+        dist; %Euclidean distance between the start and end point of line object. Used for hand draw functionality.
+        m; %Gradient of the line object. Used for hand draw functionality.
+        b; %Offset of the line object. Used for hand draw functionality.
+        xValues; %Vector nx1 with interpolated x values for the line to draw the binary image. Used for hand draw functionality.
+        yValues; %Vector nx1 with interpolated y values for the line to draw the binary image. Used for hand draw functionality.
+        index; %Index vektor to draw the line in the binary image.
     end
-    
     properties(SetObservable)
-        FileNamesRGB
-        PathNames
-        PicRGB
-        PicBW
-        handlePicRGB
-        handlePicBW
-        PicPlane1
-        PicPlane2
-        PicPlane3
-        PicPlane4
-        PicPlaneGreen
-        PicPlaneBlue
-        PicPlaneRed
-        PicPlaneFarRed
-        PicRGBPlanes
-        PicPlaneGreen_adj
-        PicPlaneBlue_adj
-        PicPlaneRed_adj
-        PicPlaneFarRed_adj
-        PicA4
-        PicL5
-        PicTX
-        PicY5
-        
-        PicBWisInvert = 'false';
-        
-        ThresholdMode;
-        ThresholdValue;
-        AlphaMapValue;
-        LineWidthValue = 1;
-        ColorValue = 1;
-        
-        InfoMessage
-        
-        PicBufferPointer = 1;
-        BufferSize = 100;
-        PicBuffer
-        
-        morphOP = '';
-        SE = '';
-        SizeSE = 1;
-        NoIteration = 1;
-        
-        x1
-        x2
-        y1
-        y2
-        x_v
-        y_v
-        dx
-        dy
-        abs_dx
-        abs_dy
-        dist
-        m
-        b
-        xValues
-        yValues
-        index
-        
+        %Properties that are observed
+        InfoMessage; %Last info message in the GUI log text. Observed by the Controller.
         
     end
-    
-  
     
     methods
         
-        
-        
-        
         function obj = modelEdit()
-            obj.addMyListener();
-            %             obj.PicBuffer = cell(1,obj.BufferSize);
-        end
-        
-        
-        function addMyListener(obj)
+            % Constuctor of the modelEdit class. Does absolutely nothing.
+            %
+            %   obj = modelEdit();
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %
+            %       - Output
+            %           obj:    Handle to modelEdit object
+            %
             
-            addlistener(obj,'ThresholdValue' ,'PostSet',@obj.createBinary);
-            addlistener(obj,'ThresholdMode' ,'PostSet',@obj.createBinary);
-            addlistener(obj,'AlphaMapValue' ,'PostSet',@obj.alphaMapEvent);
-            %             addlistener(obj,'LineWidthValue' ,'PostSet',@obj.lineWidthEvent);
         end
         
         function clearPicData(obj)
+            % Clears all image data. Set all images to an empty array.
+            %Deletes filename and pathnames of the images. Reset the image
+            %buffer.
+            %
+            %   addMyListener(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
+            
             obj.InfoMessage = '- clear all picture data';
             
             obj.FileNamesRGB = '';
@@ -124,10 +161,39 @@ classdef modelEdit < handle
         end
         
         function PicData = sendPicsToController(obj)
+            % Send all image data from the model to the Controller that are
+            % needed.
+            %
+            %   PicData = sendPicsToController(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to modelEdit object
+            %
+            %       - Output
+            %           PicData:    Cell Array that contains the file- and
+            %               pathnames of the RGB image. Also contains the
+            %               RGB and the color plane images:
+            %
+            %               PicData{1}: filename RGB image
+            %               PicData{2}: path RGB image
+            %               PicData{3}: RGB image
+            %               PicData{4}: binary image
+            %               PicData{5}: green plane image
+            %               PicData{6}: blue plane image
+            %               PicData{7}: red plane image
+            %               PicData{8}: farred plane image
+            %               PicData{9}: RGB image create from color plane
+            %               images
+            %
+            
             PicData{1} = obj.FileNamesRGB;
             PicData{2} = obj.PathNames;
             PicData{3} = obj.PicRGB;   %RGB
             
+            % send binary pic to controller only in the normal non-inverted
+            % form
             if strcmp(obj.PicBWisInvert,'true')
                 PicData{4} = ~obj.handlePicBW.CData;    %BW
             else
@@ -142,29 +208,63 @@ classdef modelEdit < handle
         end
         
         function succses = openNewPic(obj)
+            % Opens a file select dialog box where the user can select a
+            % new RGB image for further processing. Only allows to select
+            % one image .tif file. If a new picture was selected all old
+            % image data will be deleted.
+            %
+            %   PicData = sendPicsToController(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to modelEdit object
+            %
+            %       - Output
+            %           succses:    returns true if a new image was
+            %               selected, otherwise flase.
+            
+            %Get filename and path of the new image
             [tempFileNamesRGB,tempPathNames] = uigetfile('*.tif','Select the image','MultiSelect', 'off');
             
-              if isequal(tempFileNamesRGB ,0) && isequal(tempPathNames,0)
+            if isequal(tempFileNamesRGB ,0) && isequal(tempPathNames,0)
+                %no image was selected
                 obj.InfoMessage = '   - open image canceled';
                 succses = false;
-              else
-                  % clear old Pic Data if a new one is selected
+            else
+                % clear old Pic Data if a new one is selected
                 obj.clearPicData();
+                
+                %save filename and path in the properties
                 obj.FileNamesRGB = tempFileNamesRGB;
                 obj.PathNames = tempPathNames;
                 succses = true;
-              end
+            end
         end
         
         function sucsess = loadPics(obj)
-            %UNTITLED Summary of this function goes here
-            %   Detailed explanation goes here
+            % Search for the .zvi file that contains the color plane images
+            % and the brightness adjustment images in the same directory as
+            % the selected RGB image.
+            %
+            %   PicData = sucsess = loadPics(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to modelEdit object
+            %
+            %       - Output
+            %           succses:    returns true if the color plane images
+            %               was founded, otherwise false.
+            %
             
             obj.InfoMessage = '   - open image';
             obj.InfoMessage = ['      - ' obj.FileNamesRGB ' was selected'];
             
             obj.InfoMessage = '   - searching for color plane images';
             
+            %The .zvi file has always the same name as the RGB image.
             LFN = length(obj.FileNamesRGB);
             FileNamesZIV = obj.FileNamesRGB;
             FileNamesZIV(LFN)='i';
@@ -172,59 +272,76 @@ classdef modelEdit < handle
             FileNamesZIV(LFN-2)='z';
             
             if exist([obj.PathNames FileNamesZIV], 'file') == 2
+                %.zvi file was found
+                
                 obj.InfoMessage = '      - loading color plane images';
                 
+                %open .zvi file
                 reader = bfGetReader([obj.PathNames FileNamesZIV]);
                 
+                %read and save RGB image
                 obj.PicRGB = imread([obj.PathNames, obj.FileNamesRGB]);
                 
+                %read and save plane color images (unidentified)
                 obj.PicPlane1 = bfGetPlane(reader,1);
                 obj.PicPlane2 = bfGetPlane(reader,2);
                 obj.PicPlane3 = bfGetPlane(reader,3);
                 obj.PicPlane4 = bfGetPlane(reader,4);
                 
                 % Searching for brightness adjustment Pics
-                obj.InfoMessage = '      - searching for brightness adjustment Pics';
+                obj.InfoMessage = '      - searching for brightness adjustment images';
                 
+                %Save currebt folder
                 currentFolder = pwd;
+                %go to the directory of the RGB image
                 cd(obj.PathNames);
                 
+                %search for brightness adjustment images
                 FileNamePicA4 = dir('A4*.zvi');
                 FileNamePicL5 = dir('L5*.zvi');
                 FileNamePicTX = dir('TX*.zvi');
                 FileNamePicY5 = dir('Y5*.zvi');
                 
                 cd(currentFolder);
-                if ~isempty(FileNamePicA4) && ~isempty(FileNamePicL5) && ~isempty(FileNamePicTX) && ~isempty(FileNamePicY5)
-                    
+                
+                if ~isempty(FileNamePicA4)
+                    %A4*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathNames FileNamePicA4(1).name]);
                     obj.PicA4 = bfGetPlane(readertemp,1);
                     obj.InfoMessage = ['      - ' FileNamePicA4(1).name ' were found'];
-                    pause(0.01);
-                    
+                else
+                    obj.InfoMessage = ['      - A4*.zvi file were not found'];
+                    obj.PicA4 = [];
+                end
+                
+                if ~isempty(FileNamePicL5)
+                    %L5*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathNames FileNamePicL5(1).name]);
                     obj.PicL5 = bfGetPlane(readertemp,1);
                     obj.InfoMessage = ['      - ' FileNamePicL5(1).name ' were found'];
-                    pause(0.01);
-                    
+                else
+                    obj.InfoMessage = ['      - L5*.zvi file were not found'];
+                    obj.PicL5 = [];
+                end
+                
+                if ~isempty(FileNamePicTX)
+                    %TX*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathNames FileNamePicTX(1).name]);
                     obj.PicTX = bfGetPlane(readertemp,1);
                     obj.InfoMessage = ['      - ' FileNamePicTX(1).name ' were found'];
-                    pause(0.01);
-                    
+                else
+                    obj.InfoMessage = ['      - TX*.zvi file were not found'];
+                    obj.PicTX = [];
+                end
+                
+                if ~isempty(FileNamePicY5)
+                    %Y5*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathNames FileNamePicY5(1).name]);
                     obj.PicY5 = bfGetPlane(readertemp,1);
                     obj.InfoMessage = ['      - ' FileNamePicY5(1).name ' were found'];
-                    pause(0.01);
-                    
                 else
-                    
-                    obj.InfoMessage = '      - no brightness pictures were found';
-                    obj.PicA4 = [];
-                    obj.PicL5 = [];
-                    obj.PicTX = [];
+                    obj.InfoMessage = ['      - Y5*.zvi file were not found'];
                     obj.PicY5 = [];
-                    
                 end
                 
                 cd(currentFolder);
@@ -241,65 +358,78 @@ classdef modelEdit < handle
         end
         
         function planeIdentifier(obj)
+            % Identifies which plane image (1 2 3 4) belongs to which color
+            % (green red blue farred).
+            %
+            %   planeIdentifier(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
+            
             if isequal(obj.FileNamesRGB ,0) && isequal(obj.PathNames,0)
                 obj.InfoMessage = '   - indentifing planes canceled';
             else
                 obj.InfoMessage = '   - indentifing planes';
                 
+                %Save unidentified plane images in one array
                 Pic= cat(3,obj.PicPlane1 ,obj.PicPlane2 ,obj.PicPlane3 ,obj.PicPlane4 );
                 
-                PicHSV = rgb2hsv(obj.PicRGB);
-                PicHSV_H = PicHSV(:,:,1); % H CHannel
-                PicMean = [];
+                %Dismantling the RGB image into its color channels
+                R=imadjust( obj.PicRGB(:,:,1) ); %Red channel
+                G=imadjust( obj.PicRGB(:,:,2) ); %Green channel
+                B=imadjust( obj.PicRGB(:,:,3) ); %Blue channel
                 
-                for i=1:1:length(Pic(1,1,:))
-                    PicBW(:,:,i) = im2bw(Pic(:,:,i),graythresh(Pic(:,:,i)));
-                    PicBW(:,:,i) = bwmorph(PicBW(:,:,i),'majority');
-                    PicMean(i,:) =[ mean(mean(PicHSV_H(PicBW(:,:,i) == 1))) i];
-                end
-                
-                b=sortrows(PicMean);
-                
-                R=imadjust( obj.PicRGB(:,:,1) );
-                G=imadjust( obj.PicRGB(:,:,2) );
-                B=imadjust( obj.PicRGB(:,:,3) );
-                
+                %Save unidentified plane images and RGB-channel images in
+                %one array.
                 PicRGB_P = cat(3,R, G, B);
                 
-                PicAnalyzed = cat( 3 , zeros(size(G),'uint8') , zeros(size(B),'uint8') , zeros(size(R),'uint8') , zeros(size(R),'uint8') );
-                r=[];
-                rf=[];
+                r=[]; %Array for the correlation coefficients
+                
                 for i=1:1:length(PicRGB_P(1,1,:))
-                    % i = 1 search for Green Plane
-                    % i = 2 search for Blue Plane
-                    % i = 3 search for Red Plane
-
                     for j=1:1:length(Pic(1,1,:))
                         % correlation between R G B Planes and unknown Planes
                         % r contains correlation coefficients
                         r(j,i) = corr2(PicRGB_P(:,:,i) , Pic(:,:,j));
                     end
-                    
                 end
                 
                 tempR = [];
                 tempFR=[];
                 tempG=[];
                 tempB=[];
+                
+                
                 for i=1:1:4
+                    %search for the highest correlation coefficient. Plane
+                    %and color are the indices of the correlation array r
                     [plane color] = ind2sub( size(r) , find( r==max(max(r)) ) );
                     
                     switch color
                         
                         case 1  %Red and FarRed
+                            % Red value should have two max values in the r
+                            % array. For red and farred plane
+                            
+                            %The first and highest correlation value in the
+                            %red color channel will be identified as red.
+                            %The second one as farred.
                             
                             if isempty(tempR)
+                                %red plane was identified
+                                %save red plane temporary
                                 tempR = Pic(:,:,plane);
+                                %clear foundet plane in the r array
                                 r(plane,:) = [];
                                 Pic(:,:,plane) = [];
                                 obj.InfoMessage = '      - red-plane was identified';
                             else
+                                %farred plane was identified
+                                %save farred plane temporary
                                 tempFR = Pic(:,:,plane);
+                                %clear foundet plane and color in the r array
                                 r(plane,:) = [];
                                 Pic(:,:,plane) = [];
                                 r(:,color) = 0;
@@ -307,7 +437,8 @@ classdef modelEdit < handle
                             end
                             
                         case 2  %Green
-                            
+                            %green plane was identified
+                            %save green plane temporary
                             tempG = Pic(:,:,plane);
                             r(plane,:) = [];
                             r(:,color) = 0;
@@ -315,8 +446,10 @@ classdef modelEdit < handle
                             obj.InfoMessage = '      - green-plane was identified';
                             
                         case 3  %Blue
-                            
+                            %blue plane was identified
+                            %save blue plane temporary
                             tempB = Pic(:,:,plane);
+                            %clear foundet plane and color in the r array
                             r(plane,:) = [];
                             r(:,color) = 0;
                             Pic(:,:,plane) = [];
@@ -324,68 +457,114 @@ classdef modelEdit < handle
                     end
                 end
                 
+                %Save identified planes in the properties
                 obj.PicPlaneGreen = tempG;
                 obj.PicPlaneBlue = tempB;
                 obj.PicPlaneRed = tempR;
                 obj.PicPlaneFarRed = tempFR;
                 
+                %Create an RGB image consisting of the identified red green
+                %and blue color planes. The user can check with that
+                %picture whether the planes were identified correctly.
                 obj.PicRGBPlanes(:,:,1) = tempR;
                 obj.PicRGBPlanes(:,:,2) = tempG;
                 obj.PicRGBPlanes(:,:,3) = tempB;
-                
                 obj.PicRGBPlanes = uint8(obj.PicRGBPlanes);
                 
-
             end
         end
         
         function brightnessAdjustment(obj)
+            % Perform a brightness correction with the brightness
+            % adjustment images on the color plane pictures. If no brightness
+            % adjustment images were found than the fuction performs the
+            % imadjust() function from the image processing toolbox.
+            %
+            %   brightnessAdjustment(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
+            
             obj.InfoMessage = '   - brightness adjustment';
             if isequal(obj.FileNamesRGB ,0) && isequal(obj.PathNames,0)
                 obj.InfoMessage = '   - pictures brightness adjustment canceled';
             else
+                %brightness adjustment PicPlaneGreen
                 if ~isempty(obj.PicL5)
-                    Mat1 = zeros(size(obj.PicRGB));
+                    %Divide the color plane image through the adjustment image
                     Mat1 = double(obj.PicPlaneGreen)./double(obj.PicL5);
                     Mat1 = uint8(Mat1./max(max(Mat1)).*255);
                     obj.PicPlaneGreen_adj = imadjust(Mat1);
                     obj.InfoMessage = '      - adjust green plane';
                 else
+                    %no adjustment image were found
                     obj.InfoMessage = '      - PicL5 not found';
                     obj.PicPlaneGreen_adj = imadjust(obj.PicPlaneGreen);
                 end
                 
+                %brightness adjustment PicPlaneRed
                 if ~isempty(obj.PicTX)
+                    %Divide the color plane image through the adjustment image
                     Mat2 = double(obj.PicPlaneRed)./double(obj.PicTX);
                     Mat2 = uint8(Mat2./max(max(Mat2)).*255);
                     obj.PicPlaneRed_adj = imadjust(Mat2);
                     obj.InfoMessage = '      - adjust red plane';
                 else
+                    %no adjustment image were found
                     obj.InfoMessage = '      - PicTX not found';
                     obj.PicPlaneRed_adj = imadjust(obj.PicPlaneRed);
                 end
                 
+                %brightness adjustment PicPlaneBlue
                 if ~isempty(obj.PicA4)
+                    %Divide the color plane image through the adjustment image
                     Mat3 = double(obj.PicPlaneBlue)./double(obj.PicA4);
                     Mat3 = uint8(Mat3./max(max(Mat3)).*255);
                     obj.PicPlaneBlue_adj = imadjust(Mat3);
                     obj.InfoMessage = '      - adjust blue plane';
                 else
+                    %no adjustment image were found
                     obj.InfoMessage = '      - PicA4 not found';
                     obj.PicPlaneBlue_adj = imadjust(obj.PicPlaneBlue);
                 end
                 
-                obj.PicPlaneFarRed_adj = imadjust(obj.PicPlaneFarRed);
+                %brightness adjustment PicPlaneFarRed
+                if ~isempty(obj.PicY5)
+                    %Divide the color plane image through the adjustment image
+                    Mat4 = double(obj.PicPlaneFarRed)./double(obj.PicY5);
+                    Mat4 = uint8(Mat4./max(max(Mat4)).*255);
+                    obj.PicPlaneFarRed_adj = imadjust(Mat4);
+                    obj.InfoMessage = '      - adjust farred plane';
+                else
+                    %no adjustment image were found
+                    obj.InfoMessage = '      - PicY4 not found';
+                    obj.PicPlaneFarRed_adj = imadjust(obj.PicPlaneFarRed);
+                end
+                
+                
             end
-            obj.InfoMessage = '- opening images completed';
+            obj.InfoMessage = '   - brightness adjustment finished';
         end
         
-        function createBinary(obj,src,evnt)
+        function createBinary(obj)
+            % Creates a binary image from the green color image depending
+            % on the selected threshold mode and threshold value.
+            %
+            %   createBinary(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
             
             thresh = obj.ThresholdValue;
             
             if ~isempty(obj.PicPlaneGreen_adj)
-                % Picture was choosen by User. 
+                % Picture was choosen by User.
                 if strcmp (obj.PicBWisInvert , 'false')
                     % Binary pictur is not invert
                     switch obj.ThresholdMode
@@ -394,7 +573,7 @@ classdef modelEdit < handle
                             
                             obj.PicBW = im2bw(obj.PicPlaneGreen_adj,thresh);
                             obj.handlePicBW.CData = obj.PicBW;
-                    
+                            
                         case 2 % Use automatic adaptive threshold for binarization
                             
                             obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
@@ -410,18 +589,16 @@ classdef modelEdit < handle
                     end
                 else
                     % Binary pictur is invert
-                     switch obj.ThresholdMode
+                    switch obj.ThresholdMode
                         
                         case 1 % Use manual global threshold for binarization
                             
-%                             temp = obj.PicPlaneGreen_adj;
                             temp = im2bw(obj.PicPlaneGreen_adj,thresh);
                             obj.PicBW = ~temp;
                             obj.handlePicBW.CData = obj.PicBW;
-                    
+                            
                         case 2 % Use automatic adaptive threshold for binarization
                             
-%                             temp = obj.PicPlaneGreen_adj;
                             temp = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
                             obj.PicBW = ~temp;
                             obj.handlePicBW.CData = obj.PicBW;
@@ -439,22 +616,38 @@ classdef modelEdit < handle
             end
         end
         
-%         function [PicRGB PicBW] = setInitPicsGUI(obj)
-%             PicRGB = obj.PicRGB;
-%             PicBW = obj.PicBW;
-%         end
-        
-        function alphaMapEvent(obj,src,evnt)
+        function alphaMapEvent(obj)
+            % Set the alpha map value of the binary image dependingon the
+            % selected alpha value.
+            %
+            %   alphaMapEvent(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
             
             if ~isempty(obj.handlePicBW)
-                alphaMat = obj.AlphaMapValue*ones(size(obj.PicBW));
-                set(obj.handlePicBW,'AlphaData',alphaMat);
-               
+                
+                set(obj.handlePicBW,'AlphaData',obj.AlphaMapValue);
+                
             end
             
         end
         
         function invertPicBWEvent(obj)
+            % Invert die binary image. Saves the invert state of the image
+            % in the properties.
+            %
+            %   invertPicBWEvent(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
+            
             obj.InfoMessage = '   - Binarization operation';
             
             if strcmp(obj.PicBWisInvert,'true')
@@ -472,6 +665,20 @@ classdef modelEdit < handle
         end
         
         function startDragFcn(obj,CurPos)
+            % Called by the controller when a user clicked into the binary
+            % image. Get the position of the ckick and draw a circle with
+            % the color and the radius depending on the linewidth value
+            % that the user has selected at that position in the binary
+            % image.
+            %
+            %   startDragFcn(obj,CurPos)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %           CurPos: current cursor position in the binary image
+            %
             
             obj.x1 = int16(CurPos(1,1));
             
@@ -480,6 +687,7 @@ classdef modelEdit < handle
             [imageSizeY imageSizeX]=size(obj.PicBW);
             [columnsInImage rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
             radius = obj.LineWidthValue;
+            
             if obj.ColorValue;
                 % create white circle
                 circlePixels = ((rowsInImage - double(obj.y1)).^2 + (columnsInImage - double(obj.x1)).^2 <= radius.^2);
@@ -490,16 +698,30 @@ classdef modelEdit < handle
                 obj.handlePicBW.CData = obj.handlePicBW.CData & circlePixels;
             end
             
-            %             obj.handlePicBW.CData(obj.y1,obj.x1)=obj.ColorValue;
         end
         
         function DragFcn(obj,CurPos)
-            %           profile on
+            % Called by the controller when a user clicked into the binary
+            % image and moves the cursor with pressed key over the image.
+            % Interpolate a line between the cursor points that are saved
+            % when this function is called the next time during the cursor
+            % movement.
+            %
+            %   DragFcn(obj,CurPos)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %           CurPos: current cursor position in the binary image
+            %
+            
+            %get current cursor positon
             obj.x2 = double(CurPos(1,1));
             obj.y2 = double(CurPos(1,2));
             
-            %             [obj.x2 obj.y2] = obj.checkPosition(obj.x2,obj.y2);
-            
+            % Draw a circle with the selected linewidth at the point where
+            % the previews line ends a new lineobject starts.
             [imageSizeY imageSizeX]=size(obj.PicBW);
             [columnsInImage rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
             radius = obj.LineWidthValue;
@@ -513,164 +735,254 @@ classdef modelEdit < handle
                 obj.handlePicBW.CData = obj.handlePicBW.CData & circlePixels;
             end
             
+            %calculate gradient in x and y direction
             obj.dx = double(obj.x1)-obj.x2;
             obj.dy = double(obj.y1)-obj.y2;
             obj.abs_dx = abs(obj.dx);
             obj.abs_dy = abs(obj.dy);
             
+            %calculate eucledian distance between the points.
             obj.dist = sqrt((obj.abs_dx)^2+(obj.abs_dy)^2);
             
             obj.x_v = double( sort([obj.x1 obj.x2]) );
             obj.y_v = double( sort([obj.y1 obj.y2]) );
             
+            %Calculatae slope and offset of the line
             obj.m=double(obj.dy/obj.dx);
             obj.b = double(obj.y1)-obj.m*double(obj.x1);
-            
-            %             LineWidthValue = obj.LineWidthValue - 1;
             
             xMax = double(size(obj.PicBW,2));
             yMax = double(size(obj.PicBW,1));
             
+            %Draw line object in binary image
             if obj.dx == 0
+                %dx is zero, m ins Inf
+                
                 for i=-obj.LineWidthValue:1:obj.LineWidthValue
+                    
+                    %crate x values vektor for the line
                     obj.xValues = (double(obj.x_v(1))+i)*ones(1, int32(obj.dist*2));
+                    %check if the values in the range if the image
                     obj.xValues(obj.xValues<1)=double(1);
                     obj.xValues(obj.xValues>xMax)=xMax;
                     
+                    %crate y values vektor for the line
                     obj.yValues = linspace(obj.y_v(1),obj.y_v(2),int32(obj.dist*2));
+                    %check if the values in the range if the image
                     obj.yValues(obj.yValues<1)=double(1);
                     obj.yValues(obj.yValues>yMax)=yMax;
                     
+                    %create index vector of the line object
                     obj.index = sub2ind(size(obj.handlePicBW.CData),round(obj.yValues),round(obj.xValues));
+                    %draw line in the binary image
                     obj.handlePicBW.CData(obj.index) = obj.ColorValue;
+                    
                 end
             elseif obj.abs_dx >= obj.abs_dy
+                
                 for i=-obj.LineWidthValue:1:obj.LineWidthValue
+                    
+                    %crate x values vektor for the line
                     obj.xValues = linspace(obj.x_v(1),obj.x_v(2),int32(obj.dist*2));
+                    %crate y values vektor for the line
                     obj.yValues = obj.m*obj.xValues+obj.b+i;
+                    
+                    %check if the values in the range if the image
                     obj.xValues(obj.xValues<1)=double(1);
                     obj.xValues(obj.xValues>xMax)=xMax;
                     obj.yValues(obj.yValues<1)=double(1);
                     obj.yValues(obj.yValues>yMax)=yMax;
+                    
+                    %create index vector of the line object
                     obj.index = sub2ind(size(obj.handlePicBW.CData),round(obj.yValues),round(obj.xValues));
+                    %draw line in the binary image
                     obj.handlePicBW.CData(obj.index) = obj.ColorValue;
+                    
                 end
             elseif obj.abs_dy > obj.abs_dx
+                
                 for i=-obj.LineWidthValue:1:obj.LineWidthValue
+                    
+                    %crate y values vektor for the line
                     obj.yValues = linspace(obj.y_v(1),obj.y_v(2),int32(obj.dist*2));
+                    %crate x values vektor for the line
                     obj.xValues = ((obj.yValues-obj.b)/obj.m)+i;
+                    
+                    %check if the values in the range if the image
                     obj.xValues(obj.xValues<1)=double(1);
                     obj.xValues(obj.xValues>xMax)=xMax;
                     obj.yValues(obj.yValues<1)=double(1);
                     obj.yValues(obj.yValues>yMax)=yMax;
+                    
+                    %create index vector of the line object
                     obj.index = sub2ind(size(obj.handlePicBW.CData),round(obj.yValues),round(obj.xValues));
+                    %draw line in the binary image
                     obj.handlePicBW.CData(obj.index) = obj.ColorValue;
+                    
                 end
             end
-            
+            %set the end point of the current line as starting point for the
+            %next line oject.
             obj.x1 = obj.x2;
             obj.y1 = obj.y2;
             
         end
         
+        function stopDragFcn(obj)
+            % Called by the controller when the user stops hand drawing.
+            % Save binary image with changes in the buffer for undo and
+            % redo functionality.
+            %
+            %   stopDragFcn(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
+            
+            obj.addToBuffer();
+        end
+        
         function runMorphOperation(obj)
+            % Performs the selected mophological operation when a user
+            % press the run morph button in the GUI.
+            %
+            %   runMorphOperation(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
             
             obj.InfoMessage = '   - Run morpholigical operation';
-            pause(0.01)
             
+            %check wich morph operation is selected
             switch obj.morphOP
                 
                 case 'erode'
                     
-                    se = strel(obj.SE,obj.SizeSE);
+                    se = strel(obj.SE,obj.SizeSE*obj.FactorSE);
                     for i=1:1:obj.NoIteration
                         obj.handlePicBW.CData = imerode(obj.handlePicBW.CData,se);
                     end
+                    obj.InfoMessage = '      - erode operation completed';
                     
                 case 'dilate'
                     
-                    se = strel(obj.SE,obj.SizeSE);
+                    se = strel(obj.SE,obj.SizeSE*obj.FactorSE);
                     for i=1:1:obj.NoIteration
                         obj.handlePicBW.CData = imdilate(obj.handlePicBW.CData , se);
                     end
+                    obj.InfoMessage = '      - dilate operation completed';
                     
                 case 'skel'
                     
                     obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'skel',Inf);
-%                     se = strel('disk',1);
-%                     obj.handlePicBW.CData = imdilate(obj.handlePicBW.CData, se);
+                    obj.InfoMessage = '      - skel operation completed';
                     
                 case 'thin'
                     
                     obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'thin',obj.NoIteration);
+                    obj.InfoMessage = '      - thin operation completed';
                     
                 case 'open'
                     
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'open',obj.NoIteration);
+                    obj.InfoMessage = '      - open operation completed';
                     
                 case 'remove'
+                    
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'remove',obj.NoIteration);
+                    obj.InfoMessage = '      - remove operation completed';
                     
                 case 'shrink'
                     
                     obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'shrink',obj.NoIteration);
+                    obj.InfoMessage = '      - shrink operation completed';
                     
                 case 'majority'
                     
-                    for i=1:1:obj.NoIteration
-                        obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority');
-                    end
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',obj.NoIteration);
+                    obj.InfoMessage = '      - majority operation completed';
                     
                 case 'edge smoothing'
                     
-                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',Inf);
+                    %performs the majority morph 500 times
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',500);
                     obj.InfoMessage = '      - edge smoothing completed';
-                    pause(0.01)
                     
                 case 'close small gaps'
                     
                     obj.InfoMessage = ['      - closing small gaps with a size of ' num2str(obj.NoIteration) ' pixels'];
-                    pause(0.01)
-                                        if strcmp(obj.PicBWisInvert,'true')
-                                            tempPic = ~obj.handlePicBW.CData;    %BW
-                                        else
-                                            tempPic = obj.handlePicBW.CData;
-                                        end
                     
+                    %Check invert status of the binary image
+                    if strcmp(obj.PicBWisInvert,'true')
+                        %image is invert
+                        tempPic = ~obj.handlePicBW.CData;
+                    else
+                        %image is in normal form
+                        tempPic = obj.handlePicBW.CData;
+                    end
                     
-                                        se = strel('disk',1);
-                                        
-                                        for i = 1:1:round(obj.NoIteration/2)
-                                        
-                                        tempPic = imdilate(tempPic , se);
-
-                                        end
-                                        
-
-                                        tempPic = bwmorph(tempPic,'skel',Inf);
-                                        tempPic = imdilate(tempPic , se);
-                                        tempPic = bwmorph(tempPic,'majority',Inf);
-
-                                        if strcmp(obj.PicBWisInvert,'true')
-                                            obj.handlePicBW.CData = ~(~obj.handlePicBW.CData | tempPic);    %BW
-                                        else
-                                            obj.handlePicBW.CData = obj.handlePicBW.CData | tempPic;
-                                        end
+                    %create small structering element
+                    se = strel('disk',1);
                     
+                    %perform n times a dilate with small SE
+                    for i = 1:1:round(obj.NoIteration/2)
+                        tempPic = imdilate(tempPic , se);
+                        if mod(i,2)==0
+                            tempPic = bwmorph(tempPic,'majority',1);
+                        end
+                    end
                     
-%                                         obj.handlePicBW.CData = obj.handlePicBW.CData | tempPic;
-                                        
-                                        obj.InfoMessage = '      - closing gaps complete';
+                    %skel the temp binary image again
+                    tempPic = bwmorph(tempPic,'skel',Inf);
+                    %perform one times a dilate with small SE to make the
+                    %skeleton thicker
+                    tempPic = imdilate(tempPic , se);
+                    %remove pixels with a small neighborhood
+                    tempPic = bwmorph(tempPic,'majority',1);
+                    
+                    %add the temp pic to the binary mask
+                    if strcmp(obj.PicBWisInvert,'true')
+                        obj.handlePicBW.CData = ~(~obj.handlePicBW.CData | tempPic);    %BW
+                    else
+                        obj.handlePicBW.CData = obj.handlePicBW.CData | tempPic;
+                    end
+                    
+                    obj.InfoMessage = '      - closing gaps complete';
                 otherwise
-                    
+                    obj.InfoMessage = '! ERROR in runMorphOperation() FUNCTION !';
             end
             
             obj.addToBuffer();
         end
         
-        function stopDragFcn(obj)
-            obj.addToBuffer();
-        end
-        
         function [xOut yOut] = checkPosition(obj,PosX,PosY)
+            % Check whether the positon of the cursor is in the binary
+            % image while drawing a line. If the positon is out if range
+            % the poition will be set to the max and min values of the
+            % image bounding box.
+            %
+            %   [xOut yOut] = checkPosition(obj,PosX,PosY)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           PosX:   Current x positon of the cursor relativ to
+            %               the axes with icluded image. Pos can be negativ
+            %               if its outside of the axes.
+            %           PosY:   Current y positon of the cursor relativ to
+            %               the axes with icluded image. Pos can be negativ
+            %               if its outside of the axes.
+            %           obj:    Handle to modelEdit object.
+            %
+            %       - Output
+            %           xOut:    Corrected x position.
+            %           yOut:    Corrected y position.
+            %
             
             if PosX < 1
                 PosX = 1;
@@ -693,6 +1005,18 @@ classdef modelEdit < handle
         end
         
         function undo(obj)
+            % Gets the previous image out of the buffer and set it to the
+            % current iamge.
+            %
+            %   undo(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object.
+            %
+
+            
             if obj.PicBufferPointer > 1 && obj.PicBufferPointer <= obj.BufferSize
                 obj.PicBufferPointer = obj.PicBufferPointer-1;
                 obj.handlePicBW.CData = obj.PicBuffer{1,obj.PicBufferPointer};
@@ -701,6 +1025,17 @@ classdef modelEdit < handle
         end
         
         function redo(obj)
+            % Gets the next image out of the buffer and set it to the
+            % current iamge.
+            %
+            %   redo(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object.
+            %
+            
             if obj.PicBufferPointer >= 1 && obj.PicBufferPointer < obj.BufferSize && obj.PicBufferPointer < size(obj.PicBuffer,2)
                 obj.PicBufferPointer = obj.PicBufferPointer+1;
                 obj.handlePicBW.CData = obj.PicBuffer{1,obj.PicBufferPointer};
@@ -708,113 +1043,18 @@ classdef modelEdit < handle
             end
         end
         
-%         function closeGabs(obj)
-%             
-%             imSkel = bwmorph(obj.handlePicBW.CData,'skel',Inf);
-%             EndPoints = find_skel_ends(imSkel)
-%             
-%             [imageSizeY imageSizeX]=size(obj.PicBW);
-%             [columnsInImage rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
-%             
-%             radius = obj.NoIteration;
-%             
-%             for j=1:1:length(EndPoints)
-%                 workbar(j/length(EndPoints),'Gab','Gab');
-%                 % Check if second Object is in the max Raduis
-%                 circlePixels = ((rowsInImage - double(EndPoints(j,2))).^2 + (columnsInImage - double(EndPoints(j,1))).^2 <= radius.^2);
-%                 detectionArea = circlePixels & obj.handlePicBW.CData;
-%                 [BoundarieMat LabelMat] = bwboundaries(detectionArea,4);
-%                 NoObjCircle = max(max(LabelMat));
-%                 
-%                 if NoObjCircle == 0
-%                     % Error
-%                 elseif NoObjCircle == 1
-%                     % NO second object near by the end of skeleton
-%                 elseif NoObjCircle == 2
-%                     % second object near by
-%                     stats = regionprops('struct',LabelMat,'Centroid');
-%                     
-%                     % Find the Object thats the center of the cirle search
-%                     % area
-%                     LabelCenter = LabelMat(EndPoints(j,2),EndPoints(j,1));
-%                     % Delete that Object in the stats struct
-%                     stats(LabelCenter) = [];
-%                     
-%                     center = stats(1).Centroid;
-%                     
-%                     dx = center(1)-EndPoints(j,1);
-%                     dy = center(2)-EndPoints(j,2);
-%                     dist = sqrt(dx^2+dy^2);
-%                     
-%                     if dx == 0
-%                         xValues = EndPoints(j,1)*ones(1, int32(dist*3));
-%                         yValues = linspace(EndPoints(j,2),center(2),int32(dist*3));
-%                         index = sub2ind(size(obj.handlePicBW.CData),round(yValues),round(xValues));
-%                         obj.handlePicBW.CData(index) = 1;
-%                     else
-%                         xValues = linspace(EndPoints(j,1),center(1),int32(dist*3));
-%                         m = double(dy/dx);
-%                         b = double(center(2))-m*double(center(1));
-%                         yValues = m*xValues+b;
-%                         index = sub2ind(size(obj.handlePicBW.CData),round(yValues),round(xValues));
-%                         obj.handlePicBW.CData(index) = 1;
-%                     end
-%                     
-%                 elseif NoObjCircle > 2
-%                     % more Objects near by. Find the nearst one
-%                     
-%                     for radius=1:1:obj.NoIteration
-%                         circlePixels = ((rowsInImage - double(EndPoints(j,2))).^2 + (columnsInImage - double(EndPoints(j,1))).^2 <= radius.^2);
-%                         
-%                         detectionArea = circlePixels & obj.handlePicBW.CData;
-%                         
-%                         [BoundarieMat LabelMat] = bwboundaries(detectionArea,4);
-%                         NoObjCircle = max(max(LabelMat));
-%                         
-%                         if NoObjCircle > 1
-%                             
-%                             stats = regionprops('struct',LabelMat,'Centroid');
-%                             
-%                             % Find the Object thats the center of the cirle search
-%                             % area
-%                             LabelCenter = LabelMat(EndPoints(j,2),EndPoints(j,1));
-%                             % Delete that Object in the stats struct
-%                             stats(LabelCenter) = [];
-%                             
-%                             for i=1:1:NoObjCircle-1
-%                                 center = stats(i).Centroid;
-%                                 dx = EndPoints(j,1)-center(1);
-%                                 dy = EndPoints(j,2)-center(2);
-%                                 dist = sqrt(dx^2+dy^2);
-%                                 
-%                                 if dx == 0
-%                                     xValues = EndPoints(j,1)*ones(1, int32(dist*3));
-%                                     yValues = linspace(EndPoints(j,2),center(2),int32(dist*3));
-%                                     index = sub2ind(size(obj.handlePicBW.CData),round(yValues),round(xValues));
-%                                     obj.handlePicBW.CData(index) = 1;
-%                                 else
-%                                     xValues = linspace(EndPoints(j,1),center(1),int32(dist*3));
-%                                     m = double(dy/dx);
-%                                     b = double(EndPoints(j,2))-m*double(EndPoints(j,1));
-%                                     yValues = m*xValues+b;
-%                                     index = sub2ind(size(obj.handlePicBW.CData),round(yValues),round(xValues));
-%                                     obj.handlePicBW.CData(index) = 1;
-%                                 end
-%                                 
-%                             end
-%                            
-% %                             break;
-%                         end
-%                     end
-%                 end
-%                 
-%                 
-%             end
-%             
-%             disp('Gabs end')
-%         end
-        
         function addToBuffer(obj)
+            % Save current binary image in the buffer for redo and undo
+            % functionality.
+            %
+            %   addToBuffer(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object.
+            %
+            
             if obj.PicBufferPointer >= obj.BufferSize
                 temp = obj.PicBuffer;
                 
@@ -830,7 +1070,7 @@ classdef modelEdit < handle
         end
         
         function delete(obj)
-            
+            %deconstructor
         end
         
     end

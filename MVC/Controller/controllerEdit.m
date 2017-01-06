@@ -25,17 +25,35 @@ classdef controllerEdit < handle
     %
     
     properties
-        mainFigure;
-        mainCardPanel;
-        viewEditHandle; %hande to viewEdit object
-        modelEditHandle; %hande to modelEdit object
-        controllerAnalyzeHandle; %hande to controllerAnalyze object
+        mainFigure; %handle to main figure.
+        mainCardPanel; %handle to card panel in the main figure.
+        viewEditHandle; %hande to viewEdit instance.
+        modelEditHandle; %hande to modelEdit instance.
+        controllerAnalyzeHandle; %hande to controllerAnalyze instance.
     end
     
     methods
         
         function obj = controllerEdit(mainFigure,mainCardPanel,viewEditH,modelEditH)
-            % constructer
+            % Constuctor of the controllerEdit class. Initialize the
+            % callback and listener functions to observes the corresponding
+            % View objects. Saves the needed handles of the corresponding
+            % View and Model in the properties.
+            %
+            %   obj = controllerEdit(mainFigure,mainCardPanel,viewEditH,modelEditH);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           mainFigure:     Handle to main figure
+            %           mainCardPanel:  Handle to main card panel
+            %           viewEditH:      Hande to viewEdit instance
+            %           modelEditH:     Hande to modelEdit instance
+            %
+            %       - Output:
+            %           obj:            Handle to controllerEdit object
+            %
+            
             obj.mainFigure =mainFigure;
             obj.mainCardPanel =mainCardPanel;
             
@@ -51,12 +69,13 @@ classdef controllerEdit < handle
             
             obj.addWindowCallbacks();
             
+            %show init text in the info log
             obj.modelEditHandle.InfoMessage = '*** Start program ***';
             obj.modelEditHandle.InfoMessage = 'Fiber-Type classification tool';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Developed by:';
             obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences';
-            obj.modelEditHandle.InfoMessage = 'Version 1.0 2016';
+            obj.modelEditHandle.InfoMessage = 'Version 1.0 2017';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Press "NewPic" to start';
             
@@ -68,7 +87,7 @@ classdef controllerEdit < handle
         
         function addMyListener(obj)
             % add listeners to the several button objects in the viewEdit
-            % instance and value objects or handles in the editModel.
+            % instance and value objects or handles in the modelEdit.
             %
             %   addMyListener(obj);
             %
@@ -88,7 +107,7 @@ classdef controllerEdit < handle
         end
         
         function addMyCallbacks(obj)
-            % set callback functions to several button objects in the viewEdit
+            % Set callback functions to several button objects in the viewEdit
             % instance and handles im the editModel.
             %
             %   addMyCallbacks(obj);
@@ -99,10 +118,9 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
+            %ButtonDownFcn of the binary pic. Starts the hand draw
+            %functions
             set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragFcn);
-% %             set(obj.viewEditHandle.hAP,'ButtonDownFcn',@obj.startDragFcn);
-% %             set(obj.viewEditHandle.hFP,'WindowButtonUpFcn',@obj.stopDragFcn);
-%             set(obj.viewEditHandle.hFP,'CloseRequestFcn',@obj.closeProgramEvent);
             
             set(obj.viewEditHandle.B_Undo,'Callback',@obj.undoEvent);
             set(obj.viewEditHandle.B_Redo,'Callback',@obj.redoEvent);
@@ -124,14 +142,24 @@ classdef controllerEdit < handle
         end
         
         function addWindowCallbacks(obj)
+            % Set callback functions of the main figure
+            %
+            %   addWindowCallbacks(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerEdit object
+            %
+            
             set(obj.mainFigure,'ButtonDownFcn',@obj.startDragFcn);
             set(obj.mainFigure,'WindowButtonMotionFcn','');
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
         end
         
-        
         function setInitValueInModel(obj)
-            % set the initalize values in the editModel.
+            % Get the values from the button ang GUI objects in the View
+            % and set the values in the Model.
             %
             %   setInitValueInModel(obj);
             %
@@ -166,7 +194,7 @@ classdef controllerEdit < handle
             axes(obj.viewEditHandle.hAP);
             
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
-                % first start of the programm. No imagehandle exist.
+                % first start of the programm. No image handle exist.
                 % create image handle for Pic RGB
                 obj.modelEditHandle.handlePicRGB = imshow(PicRGB);
             else
@@ -177,7 +205,7 @@ classdef controllerEdit < handle
             hold on
             
             if isa(obj.modelEditHandle.handlePicBW,'struct')
-                % first start of the programm. No imagehandle exist.
+                % first start of the programm. No image handle exist.
                 % create image handle for Pic BW
                 obj.modelEditHandle.handlePicBW = imshow(PicBW);
                 
@@ -200,7 +228,8 @@ classdef controllerEdit < handle
         function newPictureEvent(obj,~,~)
             % Callback function of the NewPic-Button in the GUI. Opens a
             % input dialog where the user can select a new image for
-            % further processing.
+            % further processing. Identify the color planes and create the
+            % binary pic after a correct image was selected.
             %
             %   newPictureEvent(obj);
             %
@@ -210,6 +239,7 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
+            %disable GUI objects
             set(obj.viewEditHandle.B_NewPic,'Enable','off');
             set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
@@ -223,33 +253,44 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
             
+            %select a new image
             succsesNewPic = obj.modelEditHandle.openNewPic();
             
-            %             temp = obj.modelEditHandle.loadPics();
-            
             if succsesNewPic
+                %selecting a new image was successfully
                 
                 % clear info text log
                 set(obj.viewEditHandle.B_InfoText, 'String','*** New Picture selected ***')
                 
+                % search and load the color plane images .zvi file
                 sucsessLoadPic = obj.modelEditHandle.loadPics();
                 
                 if sucsessLoadPic
+                    %loading color plane images was successfully
+                    
+                    %Identify color planes
                     obj.modelEditHandle.planeIdentifier();
                     
+                    %brightness adjustment of color plane images
                     obj.modelEditHandle.brightnessAdjustment();
                     
+                    %reset invert status of binary pic
                     obj.modelEditHandle.PicBWisInvert = 'false';
                     
+                    %create binary pic
                     obj.modelEditHandle.createBinary();
                     
+                    %reset pic buffer for undo redo functionality
                     obj.modelEditHandle.PicBuffer = {};
-                    
+                    %load binary pic in the buffer
                     obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
-                    
+                    %reset buffer pointer
                     obj.modelEditHandle.PicBufferPointer = 1;
                     
+                    %show images in GUI
                     obj.setInitPicsGUI();
+                    obj.modelEditHandle.InfoMessage = '- opening images completed';
+                    %enable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
@@ -262,8 +303,10 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
-
+                    
                 else
+                    %loading color plane images was not successfully
+                    %disable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
@@ -278,11 +321,15 @@ classdef controllerEdit < handle
                 end
                 
             elseif isa(obj.modelEditHandle.handlePicRGB,'struct')
-                
+                %selecting a new image was not successfully. No image is
+                %loaded into the program
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
             else
+                %selecting a new image was not successfully.
                 if isempty(obj.modelEditHandle.handlePicBW);
+                    %No image is loaded into the program.
+                    %disable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
@@ -296,6 +343,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 else
+                    %One image is already loaded into the program.
+                    %enable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
@@ -371,6 +420,8 @@ classdef controllerEdit < handle
                 if length(C) == 4
                     % All Values are unique. No Plane Type is selestet twice
                     obj.modelEditHandle.InfoMessage = '      - changing planes...';
+                    
+                    %change plane orders
                     temp{1} = obj.modelEditHandle.PicPlaneGreen;
                     temp{2} = obj.modelEditHandle.PicPlaneBlue;
                     temp{3} = obj.modelEditHandle.PicPlaneRed;
@@ -388,19 +439,30 @@ classdef controllerEdit < handle
                     obj.modelEditHandle.PicRGBPlanes(:,:,3) = obj.modelEditHandle.PicPlaneBlue;
                     obj.modelEditHandle.PicRGBPlanes = uint8(obj.modelEditHandle.PicRGBPlanes);
                     
+                    %brightness adjustment of color plane image
                     obj.modelEditHandle.brightnessAdjustment();
+                    
+                    %reset invert status of binary pic
                     obj.modelEditHandle.PicBWisInvert = 'false';
+                    
+                    %create binary pic
                     obj.modelEditHandle.createBinary();
+                    
+                    %reset pic buffer for undo redo functionality
                     obj.modelEditHandle.PicBuffer = {};
+                    %load binary pic in the buffer
                     obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+                    %reset buffer pointer
                     obj.modelEditHandle.PicBufferPointer = 1;
                     
+                    %show new color planes order in the check planes figure
                     obj.viewEditHandle.B_AxesCheckPlaneGreen.Children.CData = obj.modelEditHandle.PicPlaneGreen;
                     obj.viewEditHandle.B_AxesCheckPlaneBlue.Children.CData = obj.modelEditHandle.PicPlaneBlue;
                     obj.viewEditHandle.B_AxesCheckPlaneRed.Children.CData = obj.modelEditHandle.PicPlaneRed;
                     obj.viewEditHandle.B_AxesCheckPlaneFarRed.Children.CData = obj.modelEditHandle.PicPlaneFarRed;
                     obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
                     
+                    %reset the color popupmenus
                     obj.viewEditHandle.B_ColorPlaneGreen.Value = 1;
                     obj.viewEditHandle.B_ColorPlaneBlue.Value = 2;
                     obj.viewEditHandle.B_ColorPlaneRed.Value = 3;
@@ -442,7 +504,8 @@ classdef controllerEdit < handle
             % Callback function of the threshold mode popupmenu in the
             % GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values in the
-            % model depending on the selection.
+            % model depending on the selection. Calls the
+            % createBinary() function in the model.
             %
             %   thresholdModeEvent(obj,src,evnt);
             %
@@ -466,12 +529,18 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.InfoMessage = '      - Manual threshold mode has been selected';
                 obj.modelEditHandle.InfoMessage = '      - Use slider to change threshold';
                 
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
+                
             elseif Mode == 2
                 % Use automatic adaptive threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Adaptive threshold mode has been selected';
+                
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
                 
             elseif Mode == 3
                 % Use automatic adaptive and manual global threshold for binarization
@@ -480,10 +549,13 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Combined threshold has been selected';
                 obj.modelEditHandle.InfoMessage = '      - Use slider to change threshold';
+                
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
             else
                 % Error Code
+                obj.modelEditHandle.InfoMessage = '! ERROR in thresholdModeEvent() FUNCTION !';
             end
-            
             
         end
         
@@ -491,7 +563,8 @@ classdef controllerEdit < handle
             % Callback function of the threshold slider and the text edit
             % box in the GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values
-            % in the model depending on the selection.
+            % in the model depending on the selection. Calls the
+            % createBinary() function in the model.
             %
             %   thresholdEvent(obj,src,evnt);
             %
@@ -515,31 +588,56 @@ classdef controllerEdit < handle
                         % Value is bigger than 1. Set Value to 1.
                         set(obj.viewEditHandle.B_Threshold,'Value',1);
                         set(obj.viewEditHandle.B_ThresholdValue,'String','1');
+                        
+                        %Set threshold value in the model
                         obj.modelEditHandle.ThresholdValue = 1;
                         
+                        %Create binary image with new threshold
+                        obj.modelEditHandle.createBinary();
                     elseif Value < 0
                         % Value is smaller than 0. Set Value to 0.
                         set(obj.viewEditHandle.B_Threshold,'Value',0);
                         set(obj.viewEditHandle.B_ThresholdValue,'String','0');
+                        
+                        %Set threshold value in the model
                         obj.modelEditHandle.ThresholdValue = 0;
+                        
+                        %Create binary image with new threshold
+                        obj.modelEditHandle.createBinary();
                     else
                         % Value is ok
                         set(obj.viewEditHandle.B_Threshold,'Value',Value);
+                        
+                        %Set threshold value in the model
                         obj.modelEditHandle.ThresholdValue = Value;
+                        
+                        %Create binary image with new threshold
+                        obj.modelEditHandle.createBinary();
                     end
                 else
                     % Value is not numerical. Set Value to 0.1.
                     set(obj.viewEditHandle.B_Threshold,'Value',0.1);
                     set(obj.viewEditHandle.B_ThresholdValue,'String','0.1');
+                    
+                    %Set threshold value in the model
                     obj.modelEditHandle.ThresholdValue = 0.1;
+                    
+                    %Create binary image with new threshold
+                    obj.modelEditHandle.createBinary();
                 end
                 
             elseif strcmp(evnt.Source.Tag,'sliderThreshold')
                 % slider Value has changed
                 set(obj.viewEditHandle.B_ThresholdValue,'String',num2str(evnt.Source.Value));
+                
+                %Set threshold value in the model
                 obj.modelEditHandle.ThresholdValue = evnt.Source.Value;
+                
+                %Create binary image with new threshold
+                obj.modelEditHandle.createBinary();
             else
                 % Error Code
+                obj.modelEditHandle.InfoMessage = '! ERROR in thresholdEvent() FUNCTION !';
             end
             
         end
@@ -570,34 +668,76 @@ classdef controllerEdit < handle
                     
                     if Value > 1
                         % Value is bigger than 1. Set Value to 1.
+                        
+                        %Set the slider value in GUI to 1
                         set(obj.viewEditHandle.B_Alpha,'Value',1);
+                        
+                        %Set the text edit box string in GUI to '1'
                         set(obj.viewEditHandle.B_AlphaValue,'String','1');
+                        
+                        %Set alphamap value in the model
                         obj.modelEditHandle.AlphaMapValue = 1;
+                        
+                        %Change alphamp (transparency) of binary image
+                        obj.modelEditHandle.alphaMapEvent();
                     elseif Value < 0
                         % Value is smaller than 0. Set Value to 0.
+                        
+                        %Set the slider value in GUI to 0
                         set(obj.viewEditHandle.B_Alpha,'Value',0);
+                        
+                        %Set the text edit box string in GUI to '0'
                         set(obj.viewEditHandle.B_AlphaValue,'String','0');
+                        
+                        %Set alphamap value in the model
                         obj.modelEditHandle.AlphaMapValue = 0;
+                        
+                        %Change alphamp (transparency) of binary image
+                        obj.modelEditHandle.alphaMapEvent();
                         
                     else
                         % Value is ok
+                        
+                        %Copy the textedit value into the text slider in the GUI
                         set(obj.viewEditHandle.B_Alpha,'Value',Value);
+                        
+                        %Set alphamap value in the model
                         obj.modelEditHandle.AlphaMapValue = Value;
+                        
+                        %Change alphamp (transparency) of binary image
+                        obj.modelEditHandle.alphaMapEvent();
                     end
                 else
                     % Value is not numerical. Set Value to 1.
+                    
+                    %Set the slider value in GUI to 1
                     set(obj.viewEditHandle.B_Alpha,'Value',1);
+                    
+                    %Set the text edit box string in GUI to '1'
                     set(obj.viewEditHandle.B_AlphaValue,'String','1');
+                    
+                    %Set alphamap value in the model
                     obj.modelEditHandle.AlphaMapValue = 1;
+                    
+                    %Change alphamp (transparency) of binary image
+                    obj.modelEditHandle.alphaMapEvent();
                     
                 end
                 
             elseif strcmp(evnt.Source.Tag,'sliderAlpha')
                 % slider Value has changed
+                
+                %Copy the slider value into the text edit box in the GUI
                 set(obj.viewEditHandle.B_AlphaValue,'String',num2str(evnt.Source.Value));
+                
+                %Set alphamap value in the model
                 obj.modelEditHandle.AlphaMapValue = evnt.Source.Value;
+                
+                %Change alphamp (transparency) of binary image
+                obj.modelEditHandle.alphaMapEvent();
             else
                 % Error Code
+                obj.modelEditHandle.InfoMessage = '! ERROR in alphaMapEvent() FUNCTION !';
             end
             
         end
@@ -656,6 +796,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.LineWidthValue = Value;
             else
                 % Error Code
+                obj.modelEditHandle.InfoMessage = '! ERROR in alphaMapEvent() FUNCTION !';
             end
             
         end
@@ -683,6 +824,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.ColorValue = 0;
             else
                 % Error Code
+                obj.modelEditHandle.InfoMessage = '! ERROR in lineWidthEvent() FUNCTION !';
             end
             
         end
@@ -720,6 +862,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
+            %check wich morph operation is selected
             String = src.String{src.Value};
             
             switch String
@@ -781,6 +924,7 @@ classdef controllerEdit < handle
             tempMorpStr = obj.modelEditHandle.morphOP;
             % get structering element string
             tempSEStr = obj.modelEditHandle.SE;
+            
             % Check wich operation is selected
             if strcmp(tempMorpStr,'choose operation') || strcmp(tempMorpStr,'')
                 % No operation is selected
@@ -791,15 +935,20 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 
             elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate')
-                % Morph options that need a structuring element
+                % Morph options that need a structuring element. No
+                % structering element is selected
                 
+                %disable run morph button until a structering element was
+                %selected
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','on')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
                 
                 if ~strcmp(tempSEStr,'') && ~strcmp(tempSEStr,'choose SE')
+                    % Morph options with choosen structuring element
                     
+                    %enable run morph button
                     set(obj.viewEditHandle.B_SizeSE,'Enable','on')
                     set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
@@ -807,7 +956,10 @@ classdef controllerEdit < handle
                 end
                 
             else
+                % Morph options that dont need a structuring element
                 
+                %enable run morph button, diable structering element
+                %buttons
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','on')
@@ -833,25 +985,30 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
+            %check wich structering element is selected
             String = src.String{src.Value};
             
             switch String
                 
-                case 'dimond'
+                case 'diamond'
                     
-                    obj.modelEditHandle.SE = 'dimond';
-                    
+                    obj.modelEditHandle.SE = 'diamond';
+                    obj.modelEditHandle.FactorSE = 1;
                 case 'disk'
                     
                     obj.modelEditHandle.SE = 'disk';
+                    obj.modelEditHandle.FactorSE = 1;
                     
                 case 'octagon'
                     
                     obj.modelEditHandle.SE = 'octagon';
+                    %Size if octagon must be n*3
+                    obj.modelEditHandle.FactorSE = 3;
                     
                 case 'square'
                     
                     obj.modelEditHandle.SE = 'square';
+                    obj.modelEditHandle.FactorSE = 1;
                     
                 otherwise
                     
@@ -868,26 +1025,43 @@ classdef controllerEdit < handle
             tempMorpStr = obj.modelEditHandle.morphOP;
             % get structering element string
             tempSEStr = obj.modelEditHandle.SE;
+            
             % Check wich operation is selected
             if strcmp(tempMorpStr,'choose operation') || strcmp(tempMorpStr,'')
                 % No operation is selected
+                
+                %disable run morph button, diable structering element
+                %buttons
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
+                
             elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate')
-                % Morph options that need a structuring element
+                % Morph options that need a structuring element. No
+                % structering element is selected
+                
+                %disable run morph button until a structering element was
+                %selected
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','on')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
+                
                 if ~strcmp(tempSEStr,'') && ~strcmp(tempSEStr,'choose SE')
+                    % Morph options with choosen structuring element
+                    
+                    %enable run morph button
                     set(obj.viewEditHandle.B_SizeSE,'Enable','on')
                     set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
                 end
                 
             else
+                % Morph options that dont need a structuring element
+                
+                %enable run morph button, diable structering element
+                %buttons
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','on')
@@ -897,10 +1071,10 @@ classdef controllerEdit < handle
         end
         
         function morphValuesEvent(obj,src,evnt)
-            % Callback function of the value textedit boxes Size and 
-            % NoInterations in the GUI. Checks whether the value is within 
-            % the permitted value range. Sets the corresponding value in 
-            % the model depending on the selection. 
+            % Callback function of the value textedit boxes Size and
+            % NoInterations in the GUI. Checks whether the value is within
+            % the permitted value range. Sets the corresponding value in
+            % the model depending on the selection.
             %
             %   structurElementEvent(obj,src,evnt);
             %
@@ -912,19 +1086,29 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
+            %get strings from GUI text box and transform into numeric value
             ValueSE = round(str2double(obj.viewEditHandle.B_SizeSE.String));
             ValueNoI = round(str2double(obj.viewEditHandle.B_NoIteration.String));
             
             if isnan(ValueSE) || ValueSE < 1 || ~isreal(ValueSE)
+                %Value size of structering element is not numeric, not real
+                %or negativ.
+                
+                %set value to 1
                 ValueSE = 1;
                 set(obj.viewEditHandle.B_SizeSE,'String','1')
             end
             
             if isnan(ValueNoI) || ValueNoI < 1 || ~isreal(ValueNoI)
+                %Value number of iterations is not numeric, not real or
+                %negativ.
+                
+                %set value to 1
                 ValueSE = 1;
                 set(obj.viewEditHandle.B_NoIteration,'String','1')
             end
             
+            %set value in the model
             obj.modelEditHandle.SizeSE = ValueSE;
             set(obj.viewEditHandle.B_SizeSE,'String',num2str(ValueSE));
             
@@ -955,7 +1139,7 @@ classdef controllerEdit < handle
             % WindowButtonMotionFcn callback function of the GUI figure.
             % Get the current cursor position in the figure and calls the
             % startDragFcn in the editModel.
-            % 
+            %
             %
             %   startDragFcn(obj);
             %
@@ -966,16 +1150,16 @@ classdef controllerEdit < handle
             %
             if ~isempty(obj.modelEditHandle.handlePicBW);
                 
-            set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-            set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
-            Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
-            obj.modelEditHandle.startDragFcn(Pos);
-            
+                set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
+                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+                Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
+                obj.modelEditHandle.startDragFcn(Pos);
+                
             end
         end
         
         function dragFcn(obj,~,~)
-            % WindowButtonMotionFcn callback function of the GUI figure. 
+            % WindowButtonMotionFcn callback function of the GUI figure.
             % Get the current cursor position in the figure and calls the
             % dragFcn in the editModel.
             %
@@ -987,7 +1171,9 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
+            %get cursor positon in binary pic
             Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
+            %call drag fcn in model with given cursor position
             obj.modelEditHandle.DragFcn(Pos);
         end
         
@@ -995,7 +1181,7 @@ classdef controllerEdit < handle
             % ButtonUpFcn callback function of the GUI figure. Delete the
             % WindowButtonMotionFcn callback function of the GUI figure.
             % Calls the stopDragFcn in the editModel.
-            % 
+            %
             %
             %   stopDragFcn(obj);
             %
@@ -1005,15 +1191,17 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
+            %clear ButtonUp and motion function
             set(obj.mainFigure,'WindowButtonUpFcn','');
             set(obj.mainFigure,'WindowButtonMotionFcn','');
+            %call stop drag fcn in model
             obj.modelEditHandle.stopDragFcn();
         end
         
         function startAnalyzeModeEvent(obj,src,evnt)
             % Callback function of the Start Analyze Mode-Button in the GUI.
             % Calls the function sendPicsToController() in the editModel to
-            % send all image Data to the analyze model. Calls the 
+            % send all image Data to the analyze model. Calls the
             % startAnalyzeMode function in the controllerAnalyze instanze.
             %
             %   startAnalyzeModeEvent(obj,src,evnt);
@@ -1028,9 +1216,10 @@ classdef controllerEdit < handle
             
             obj.modelEditHandle.InfoMessage = ' ';
             
+            %get all pic data from the model
             PicData = obj.modelEditHandle.sendPicsToController();
             
-            %Send Data to Controller Alalyze
+            %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
             obj.controllerAnalyzeHandle.startAnalyzingMode(PicData,InfoText);
         end
@@ -1053,7 +1242,7 @@ classdef controllerEdit < handle
         end
         
         function redoEvent(obj,src,evnt)
-             % Callback function of the Redo Button in the GUI. Calls the
+            % Callback function of the Redo Button in the GUI. Calls the
             % redo() function in the editModel.
             %
             %   redoEvent(obj,src,evnt);
@@ -1070,11 +1259,37 @@ classdef controllerEdit < handle
         end
         
         function setInfoTextView(obj,InfoText)
+            % Sets the log text on the GUI.
+            % Only called by changing the MVC if the stage of the
+            % program changes.
+            %
+            %   setInfoTextView(obj,InfoText);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to controllerEdit object
+            %           InfoText:   Info text log
+            %
             set(obj.viewEditHandle.B_InfoText, 'String', InfoText);
             set(obj.viewEditHandle.B_InfoText, 'Value' , length(obj.viewEditHandle.B_InfoText.String));
         end
         
         function updateInfoLogEvent(obj,src,evnt)
+            % Listener callback function of the InfoMessage propertie in
+            % the model. Is called when InfoMessage string changes. Appends
+            % the text in InfoMessage to the log text in the GUI.
+            %
+            %   updateInfoLogEvent(obj,src,evnt);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerEdit object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
+            
             InfoText = cat(1, get(obj.viewEditHandle.B_InfoText, 'String'), {obj.modelEditHandle.InfoMessage});
             set(obj.viewEditHandle.B_InfoText, 'String', InfoText);
             set(obj.viewEditHandle.B_InfoText, 'Value' , length(obj.viewEditHandle.B_InfoText.String));
@@ -1083,6 +1298,15 @@ classdef controllerEdit < handle
         end
         
         function closeProgramEvent(obj,~,~)
+            % Colose Request function of the main figure.
+            %
+            %   closeProgramEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerEdit object
+            %
             
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
                 'Close Program', ...
@@ -1090,10 +1314,12 @@ classdef controllerEdit < handle
             
             switch choice
                 case 'Yes'
-                    figHandles = findall(0,'Type','figure');
-                    object_handles = findall(figHandles);
+                    %find all objects
+                    object_handles = findall(obj.mainFigure);
+                    %delete objects
                     delete(object_handles);
-                    delete(figHandles)
+                    %delete main figure
+                    delete(obj.mainFigure);
                 case 'No'
                     obj.modelEditHandle.InfoMessage = '   - closing program canceled';
                 otherwise
@@ -1103,7 +1329,7 @@ classdef controllerEdit < handle
         end
         
         function delete(obj)
-            
+            %deconstructor
         end
     end
     

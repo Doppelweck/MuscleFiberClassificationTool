@@ -1,24 +1,65 @@
 classdef controllerAnalyze < handle
-    %UNTITLED3 Summary of this class goes here
-    %   Detailed explanation goes here
+    %controllerAnalyze   Controller of the Analyze-MVC (Model-View-Controller).
+    %Controls the communication and data exchange between the view
+    %instance and the model instance. Connected to the edit- and results-
+    %Controllers to communicate with the edit- and resulzs-MVC and to
+    %exchange data between them.
+    %
+    %
+    %======================================================================
+    %
+    % AUTHOR:           - Sebastian Friedrich,
+    %                     Trier University of Applied Sciences, Germany
+    %
+    % SUPERVISOR:       - Prof. Dr.-Ing. K.P. Koch
+    %                     Trier University of Applied Sciences, Germany
+    %
+    %                   - Mr Justin Perkins, BVetMed MS CertES Dip ECVS MRCVS
+    %                     The Royal Veterinary College, Hertfordshire United Kingdom
+    %
+    % FIRST VERSION:    30.12.2016 (V1.0)
+    %
+    % REVISION:         none
+    %
+    %======================================================================
+    %
     
     properties
-        mainFigure;
-        mainCardPanel;
-        viewAnalyzeHandle;
-        modelAnalyzeHandle;
-        controllerEditHandle;
-        controllerResultsHandle;
+        mainFigure; %handle to main figure.
+        mainCardPanel; %handle to card panel in the main figure.
+        viewAnalyzeHandle; %hande to viewAnalyze instance.
+        modelAnalyzeHandle; %hande to modelAnalyze instance.
+        controllerEditHandle; %handle to controllerEdit instance.
+        controllerResultsHandle; %handle to controllerRsults instance.
     end
     
     
     methods
         
-        function obj = controllerAnalyze(mainFigure,mainCardPanel,viewAnalyzH,modelAnalyzeH)
+        function obj = controllerAnalyze(mainFigure,mainCardPanel,viewAnalyzeH,modelAnalyzeH)
+            % Constuctor of the controllerAnalyze class. Initialize the
+            % callback and listener functions to observes the corresponding
+            % View objects. Saves the needed handles of the corresponding
+            % View and Model in the properties.
+            %
+            %   obj = controllerAnalyze(mainFigure,mainCardPanel,viewAnalyzH,modelAnalyzeH)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           mainFigure:     Handle to main figure.
+            %           mainCardPanel:  Handle to main card panel.
+            %           viewAnalyzeH:   Hande to viewAnalyze instance.
+            %           modelAnalyzeH:  Hande to modelAnalyze instance.
+            %
+            %       - Output:
+            %           obj:            Handle to controllerAnalyze object.
+            %
+            
             obj.mainFigure =mainFigure;
             obj.mainCardPanel =mainCardPanel;
             
-            obj.viewAnalyzeHandle = viewAnalyzH;
+            obj.viewAnalyzeHandle = viewAnalyzeH;
             obj.modelAnalyzeHandle =modelAnalyzeH;
             
             obj.setInitValueInModel();
@@ -29,6 +70,17 @@ classdef controllerAnalyze < handle
         end
         
         function setInitValueInModel(obj)
+            % Get the values from the buttons and GUI objects in the View
+            % and set the values in the Model.
+            %
+            %   setInitValueInModel(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
+            
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
@@ -51,9 +103,16 @@ classdef controllerAnalyze < handle
         end
         
         function addMyCallbacks(obj)
-%             set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
-%             set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
-%             set(obj.viewAnalyzeHandle.hFP,'CloseRequestFcn',@obj.closeProgramEvent);
+            % Set callback functions to several button objects in the
+            % viewAnalyze instance.
+            %
+            %   addMyCallbacks(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
             
             set(obj.viewAnalyzeHandle.B_BackEdit,'Callback',@obj.backEditEvent);
             set(obj.viewAnalyzeHandle.B_StartResults,'Callback',@obj.startResultsEvent);
@@ -69,14 +128,37 @@ classdef controllerAnalyze < handle
         end
         
         function addWindowCallbacks(obj)
+            % Set callback functions of the main figure
+            %
+            %   addWindowCallbacks(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
+            
             set(obj.mainFigure,'ButtonDownFcn','');
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
             set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
-
+            
         end
         
         function addMyListener(obj)
+            % add listeners to the several button objects in the
+            % viewAnalyze instance and value objects or handles in the
+            % modelAnalyze.
+            %
+            %   addMyListener(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
+            
+            % listeners VIEW
             addlistener(obj.viewAnalyzeHandle.B_MinArea,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_MaxArea,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_MinRoundness,'String','PostSet',@obj.valueUpdateEvent);
@@ -85,198 +167,194 @@ classdef controllerAnalyze < handle
             addlistener(obj.viewAnalyzeHandle.B_MaxAspectRatio,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_ColorValue,'String','PostSet',@obj.valueUpdateEvent);
             
-%             addlistener(obj.modelAnalyzeHandle,'CalculationRunning', 'PostSet',@obj.calculationEvent);
+            % listeners MODEL
             addlistener(obj.modelAnalyzeHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
         end
         
         function valueUpdateEvent(obj,src,evnt)
+            % Checks if a value in the GUI parameter panel has changed. If
+            % a value has changed the function checks which source has
+            % triggered the event. Checks if the value is in the permitted
+            % range. Only changes the values in the view (GUI) not in the
+            % model. Data will be send to the model after pressing start
+            % analyze button.
+            %
+            %   valueUpdateEvent(obj,src,evnt);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
+            %
+            
             % Which element has triggered the callback
             Tag = evnt.AffectedObject.Tag;
             % Value that has changed
-            Value = str2num(evnt.AffectedObject.String);
+            Value = str2double(evnt.AffectedObject.String);
             
             switch Tag
+                
                 case obj.viewAnalyzeHandle.B_MinArea.Tag
-                    
                     % MinArea has changed. Can only be positiv integer
                     % must be smaller than MaxArea
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
                         if Value < 0
                             % If MinArea < 0 set MinArea to 0
-                            
                             set(obj.viewAnalyzeHandle.B_MinArea,'String','0');
-                        elseif Value > obj.modelAnalyzeHandle.MaxAreaPixel
+                        elseif Value > str2double(obj.viewAnalyzeHandle.B_MaxArea.String)
                             %if MinArea > MaxArea set MinArea to MaxArea
-                            %                             obj.modelAnalyzeHandle.MinAreaPixel = round(obj.modelAnalyzeHandle.MaxAreaPixel);
                             set(obj.viewAnalyzeHandle.B_MinArea,'String',obj.viewAnalyzeHandle.B_MaxArea.String);
                         else
-                            % Set MinArea to Value
-                            %                             obj.modelAnalyzeHandle.MinAreaPixel = round(Value);
-                            %                             set(obj.viewAnalyzeHandle.B_MinArea,'String',num2str(round(Value)));
+                            % Set MinArea value
+                            set(obj.viewAnalyzeHandle.B_MinArea,'String',num2str(round(Value)));
                         end
                     else
-                        % Value is not numerical. Set Value to 0.
-                        %                         obj.modelAnalyzeHandle.MinAreaPixel = 0;
-                        set(obj.viewAnalyzeHandle.B_MinArea,'String','0');
+                        % Value is not numerical. Set MinArea to MaxArea.
+                        set(obj.viewAnalyzeHandle.B_MinArea,'String',obj.viewAnalyzeHandle.B_MaxArea.String);
                     end
                     
                 case obj.viewAnalyzeHandle.B_MaxArea.Tag
-                    
                     % MaxArea has changed. Can only be positiv
                     % integer. Must be greater than MinArea
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
-                        if Value < obj.modelAnalyzeHandle.MinAreaPixel
+                        if Value < str2double(obj.viewAnalyzeHandle.B_MinArea.String)
                             % If MaxArea < MinArea set MaxArea to MinArea
-                            %                             obj.modelAnalyzeHandle.MaxAreaPixel = obj.modelAnalyzeHandle.MinAreaPixel;
                             set(obj.viewAnalyzeHandle.B_MaxArea,'String',obj.viewAnalyzeHandle.B_MinArea.String);
                         else
-                            % Set MaxArea to Value
-                            %                             obj.modelAnalyzeHandle.MaxAreaPixel = round(Value);
-                            %                             set(obj.viewAnalyzeHandle.B_MinArea,'String',num2str(round(Value)));
+                            % Set MaxArea value
+                            set(obj.viewAnalyzeHandle.B_MaxArea,'String',num2str(round(Value)));
                         end
                     else
-                        % Value is not numerical. Set Value to MinAreaValue.
-                        %                         obj.modelAnalyzeHandle.MaxAreaPixel = obj.modelAnalyzeHandle.MinAreaPixel;
+                        % Value is not numerical. Set MaxArea to MinArea
                         set(obj.viewAnalyzeHandle.B_MaxArea,'String',obj.viewAnalyzeHandle.B_MinArea.String);
                     end
                     
                 case obj.viewAnalyzeHandle.B_MinRoundness.Tag
-                    
                     % MinRoundness has changed. Can only be between 0 and
                     % 1
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
                         if Value < 0
                             % If Value < 0 set MinRoundness = 0
-                            %                             obj.modelAnalyzeHandle.MinRoundness = 0;
                             set(obj.viewAnalyzeHandle.B_MinRoundness,'String','0');
                         elseif Value > 1
                             % If Value > 1 set MinRoundness = 1
-                            %                             obj.modelAnalyzeHandle.MinRoundness = 1;
                             set(obj.viewAnalyzeHandle.B_MinRoundness,'String','1');
                         else
-                            % Set MinRound to Value
-                            %                             obj.modelAnalyzeHandle.MinRoundness = Value;
-                            %                             set(obj.viewAnalyzeHandle.B_MinRoundness,'String',num2str(Value));
+                            % Set MinRound value
+                            set(obj.viewAnalyzeHandle.B_MinRoundness,'String',num2str(Value));
                         end
                     else
-                        % Value is not numerical. Set Value to 0.
-                        %                         obj.modelAnalyzeHandle.MinRoundness = 0;
+                        % Value is not numerical. Set value to 0
                         set(obj.viewAnalyzeHandle.B_MinRoundness,'String','0');
                     end
                     
                 case obj.viewAnalyzeHandle.B_ColorDistance.Tag
-                    
                     % ColorDistance has changed. Can only be between 0
                     % and 1
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
                         if Value < 0
                             % If Value < 0 set ColorDistance = 0
-                            %                             obj.modelAnalyzeHandle.MinColorDistance = 0;
                             set(obj.viewAnalyzeHandle.B_ColorDistance,'String','0');
                         elseif Value > 1
                             % If Value > 1 setColorDistance = 1
-                            %                             obj.modelAnalyzeHandle.MinColorDistance = 1;
                             set(obj.viewAnalyzeHandle.B_ColorDistance,'String','1');
                         else
-                            % Set ColorDistance to Value
-                            %                             obj.modelAnalyzeHandle.MinColorDistance = Value;
-                            %                             set(obj.viewAnalyzeHandle.B_ColorDistance,'String',num2str(Value));
+                            % Set ColorDistance value
+                            set(obj.viewAnalyzeHandle.B_ColorDistance,'String',num2str(Value));
                         end
                     else
-                        % Value is not numerical. Set Value to 0.
-                        %                         obj.modelAnalyzeHandle.MinColorDistance = 0;
+                        % Value is not numerical. Set Value to 0
                         set(obj.viewAnalyzeHandle.B_ColorDistance,'String','0');
                     end
                     
                 case obj.viewAnalyzeHandle.B_MinAspectRatio.Tag
-                    
                     % MinAspectRatio has changed. Can only be positiv
                     % Integer >= 1. Must be smaller than MaxAspectRatio
-                    
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
                         if Value < 1
                             % If Value < 1 set MinAspectRatio = 1
-                            %                             obj.modelAnalyzeHandle.MinAspectRatio = 1;
                             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'String','1');
-                        elseif Value > obj.modelAnalyzeHandle.MaxAspectRatio
+                        elseif Value > str2double(obj.viewAnalyzeHandle.B_MaxAspectRatio.String)
                             % If MinAspectRatio > MaxAspectRatio set MinAspectRatio to MaxAspectRatio
-                            %                             obj.modelAnalyzeHandle.MinAspectRatio = obj.modelAnalyzeHandle.MaxAspectRatio;
                             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'String',obj.viewAnalyzeHandle.B_MaxAspectRatio.String);
                         else
-                            % Set MinAspectRatio to Value
-                            %                             obj.modelAnalyzeHandle.MinAspectRatio = Value;
-                            %                             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'String',num2str(round(Value)));
+                            % Set MinAspectRatio value
+                            set(obj.viewAnalyzeHandle.B_MinAspectRatio,'String',num2str(Value));
                         end
                     else
-                        % Value is not numerical. Set Value to 1.
-                        %                         obj.modelAnalyzeHandle.MinAspectRatio = 1;
+                        % Value is not numerical. Set value to 1
                         set(obj.viewAnalyzeHandle.B_MinAspectRatio,'String','1');
                     end
                     
                 case obj.viewAnalyzeHandle.B_MaxAspectRatio.Tag
-                    
                     % MaxAspectRatio has changed. Can only be positiv
                     % Integer >= 1. Must be greater or equal than MaxAspectRatio
-                    
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
-                        
-                        if Value < obj.modelAnalyzeHandle.MinAspectRatio
+                        if Value < str2double(obj.viewAnalyzeHandle.B_MinAspectRatio.String)
                             % If MaxAspectRatio < MinAspectRatio set MaxAspectRatio to MinAspectRatio
-                            %                             obj.modelAnalyzeHandle.MaxAspectRatio = obj.modelAnalyzeHandle.MinAspectRatio;
                             set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'String',obj.viewAnalyzeHandle.B_MinAspectRatio.String);
                         else
                             % Set MaxAspectRatio to Value
-                            %                             obj.modelAnalyzeHandle.MaxAspectRatio = Value;
-                            %                             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'String',num2str(round(Value)));
+                            set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'String',num2str(Value));
                         end
                     else
-                        % Value is not numerical. Set Value to MinAspectRatio.
-                        %                         obj.modelAnalyzeHandle.MaxAspectRatio = obj.modelAnalyzeHandle.MinAspectRatio;
+                        % Value is not numerical. Set MaxAspectRatio to MinAspectRatio
                         set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'String',obj.viewAnalyzeHandle.B_MinAspectRatio.String);
                     end
                     
                 case obj.viewAnalyzeHandle.B_ColorValue.Tag
-                    
                     % ColorValue has changed. Can only be between 0
                     % and 1
                     if isscalar(Value) && isreal(Value) && ~isnan(Value)
                         % Value is numerical
                         if Value < 0
                             % If Value < 0 set ColorDistance = 0
-                            %                             obj.modelAnalyzeHandle.ColorValue = 0;
                             set(obj.viewAnalyzeHandle.B_ColorValue,'String','0');
                         elseif Value > 1
                             % If Value > 1 setColorDistance = 1
-                            %                             obj.modelAnalyzeHandle.ColorValue = 1;
                             set(obj.viewAnalyzeHandle.B_ColorValue,'String','1');
                         else
                             % Set ColorDistance to Value
-                            obj.modelAnalyzeHandle.ColorValue = Value;
-                            %                             set(obj.viewAnalyzeHandle.B_ColorDistance,'String',num2str(Value));
+                            set(obj.viewAnalyzeHandle.B_ColorValue,'String',num2str(Value));
                         end
                     else
-                        % Value is not numerical. Set Value to 0.
-                        %                         obj.modelAnalyzeHandle.ColorValue = 0;
+                        % Value is not numerical. Dont change value.
                         set(obj.viewAnalyzeHandle.B_ColorValue,'String','0');
                     end
                     
                 otherwise
                     % Error Code
+                    obj.modelAnalyzeHandle.InfoMessage = '! ERROR in valueUpdateEvent() FUNCTION !';
             end
             
         end
         
         function analyzeModeEvent(obj,src,evnt)
-            
-            %                     obj.modelAnalyzeHandle.AnalyzeMode = src.Value;
+            % Checks wich analyze mode is selecred. Only changes the values
+            % in the view (GUI) not in the model. Data will be send to the
+            % model after pressing start analyze button.
+            %
+            %   analyzeModeEvent(obj,src,evnt);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
+            %
             
             if src.Value == 1
+                % Colordistance-Based classification
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
                 obj.modelAnalyzeHandle.InfoMessage = '      - Colordistance-Based classification were selected';
                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 1;
@@ -284,6 +362,8 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','on')
                 
             elseif src.Value == 2
+                % Cluster-Based  classification 2 Fiber Type cluster
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
                 obj.modelAnalyzeHandle.InfoMessage = '      - searching for 2 Fiber Type cluster';
@@ -293,6 +373,8 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
                 
             elseif src.Value == 3
+                % Cluster-Based  classification 3 Fiber Type cluster
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
                 obj.modelAnalyzeHandle.InfoMessage = '      - searching for 3 Fiber Type cluster';
@@ -306,6 +388,22 @@ classdef controllerAnalyze < handle
         end
         
         function activeParaEvent(obj,src,evnt)
+            % Checks if the active status of a parameter has changed.
+            % Disables or enables the correspondening edit box elements in
+            % the GUI if nessesary. Only changes the values in the view
+            % (GUI) not in the model. Data will be send to the model after
+            % pressing start analyze button.
+            %
+            %   activeParaEvent(obj,src,evnt)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
+            %
+            
             % Which element has triggered the callback
             Tag = evnt.Source.Tag;
             % Value that has changed. Can only be 1 or 0 (true or false)
@@ -316,8 +414,6 @@ classdef controllerAnalyze < handle
                 case obj.viewAnalyzeHandle.B_AreaActive.Tag
                     % AreaActive has changed. If it is zero, Area parameters
                     % won't be used for classification.
-                    
-                    %                     obj.modelAnalyzeHandle.AreaActive = Value;
                     
                     if Value == 0
                         set(obj.viewAnalyzeHandle.B_MinArea,'Enable','off')
@@ -330,9 +426,6 @@ classdef controllerAnalyze < handle
                 case obj.viewAnalyzeHandle.B_RoundnessActive.Tag
                     % RoundActive has changed. If it is zero, Roundness parameter
                     % won't be used for classification.
-                    
-                    %                     obj.modelAnalyzeHandle.RoundnessActive = Value;
-                    
                     if Value == 0
                         set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','off')
                     elseif Value == 1
@@ -342,9 +435,6 @@ classdef controllerAnalyze < handle
                 case obj.viewAnalyzeHandle.B_AspectRatioActive.Tag
                     % AspectRatioActive has changed. If it is zero AspectRatio parameters
                     % won't be used for classification.
-                    
-                    %                     obj.modelAnalyzeHandle.AspectRatioActive = Value;
-                    
                     if Value == 0
                         set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
                         set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
@@ -356,9 +446,6 @@ classdef controllerAnalyze < handle
                 case obj.viewAnalyzeHandle.B_ColorDistanceActive.Tag
                     % ColorDistanceActive has changed. If it is zero ColorDistance parameters
                     % won't be used for classification.
-                    
-                    %                     obj.modelAnalyzeHandle.ColorDistanceActive = Value;
-                    
                     if Value == 0
                         set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
                     elseif Value == 1
@@ -368,9 +455,6 @@ classdef controllerAnalyze < handle
                 case obj.viewAnalyzeHandle.B_ColorValueActive.Tag
                     % ColorValueActive has changed. If it is zero ColorValue parameters
                     % won't be used for classification.
-                    
-                    %                     obj.modelAnalyzeHandle.ColorValueActive = Value;
-                    
                     if Value == 0
                         set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
                     elseif Value == 1
@@ -384,8 +468,34 @@ classdef controllerAnalyze < handle
         end
         
         function startAnalyzingMode(obj,PicData,InfoText)
-           
-%             set(obj.controllerEditHandle.viewEditHandle.hFP,'Visible','off'); 
+            % Called by the controllerEdit instance when the user change
+            % the program state to analyze-mode. Saves all nessessary Data
+            % from the edit model into the analyze model.
+            %
+            %   startAnalyzingMode(obj,PicData,InfoText)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to controllerAnalyze object.
+            %           PicData:    Cell Array that contains the file- and
+            %               pathnames of the RGB image. Also contains the
+            %               RGB and the color plane images:
+            %
+            %               PicData{1}: filename RGB image
+            %               PicData{2}: path RGB image
+            %               PicData{3}: RGB image
+            %               PicData{4}: binary image
+            %               PicData{5}: green plane image
+            %               PicData{6}: blue plane image
+            %               PicData{7}: red plane image
+            %               PicData{8}: farred plane image
+            %               PicData{9}: RGB image create from color plane
+            %               images
+            %
+            %           InfoText:   Info text log.
+            %
+            
             
             % Set PicData Properties in the Analyze Model
             obj.modelAnalyzeHandle.FileNamesRGB = PicData{1};
@@ -401,30 +511,24 @@ classdef controllerAnalyze < handle
             % get axes for PicRGB in Analyze GUI
             axes(obj.viewAnalyzeHandle.hAP);
             
+            % show PicRGB in Analyze GUI
             obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
             axis on
             axis image
             
+            % set panel title to filename and path
             Titel = [obj.modelAnalyzeHandle.PathNames obj.modelAnalyzeHandle.FileNamesRGB];
             obj.viewAnalyzeHandle.panelPicture.Title = Titel;
-            %             set(obj.viewAnalyzeHandle.hAP,'Units','normalized','Position',[0 0 1 1]);
             
-            % get axes for zoomed Pic in Analyze GUI Control Panel
+            % get axes for zoomed Pic in Analyze GUI FIber Information Panel
             axes(obj.viewAnalyzeHandle.B_AxesInfo);
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'image');
             obj.modelAnalyzeHandle.handleInfoAxes = imshow([]);
             axis on
-            % set InfoText in View
+            
+            % set InfoText log in View
             set(obj.viewAnalyzeHandle.B_InfoText, 'String', InfoText);
             set(obj.viewAnalyzeHandle.B_InfoText, 'Value' , length(obj.viewAnalyzeHandle.B_InfoText.String));
-            
-            %             set(obj.viewAnalyzeHandle.B_AxesInfo,'OuterPosition',[0 0 1 1]);
-            % Show Analyze GUI
-            %             set(obj.viewAnalyzeHandle.hFC,'Visible','on');
-            
-            
-%             pause(0.05);
-            
             
             % If a window for Fibertype manipulation already exists,
             % delete it
@@ -435,12 +539,11 @@ classdef controllerAnalyze < handle
             OldBox = findobj('Tag','highlightBox');
             delete(OldBox);
             
-            % refresh Callbacks
-%             obj.addMyCallbacks();
+            %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
+            
+            %change the figure callbacks for the analyze mode
             obj.addWindowCallbacks()
-%             set(obj.viewAnalyzeHandle.hFP,'Visible','on');
-%             figure(obj.viewAnalyzeHandle.hFP);
             
             obj.modelAnalyzeHandle.InfoMessage = '*** Start analyzing mode ***';
             obj.modelAnalyzeHandle.InfoMessage = '   -Set Parameters and press "Start analyzimg"';
@@ -448,46 +551,65 @@ classdef controllerAnalyze < handle
         end
         
         function startAnalyzeEvent(obj,~,~)
+            % Callback function of the start analyze button in the GUI.
+            % Transfers all parameter data into the analyze model and start
+            % the fiber type classification functions in the model. Disable
+            % all GUI elements during the classification.
+            %
+            %   startAnalyzeEvent(obj,~,~);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
             
             % If a window for Fibertype manipulation already exists,
-                % delete it
-                OldFig = findobj('Tag','FigureManipulate');
-                if ~isempty(OldFig)
-                    delete(OldFig);
-                    %refresh WindowButtonMotionFcn. If a Figure Manipulate
-                    %exist, than the WindowButtonMotionFcn is deleted
-                    set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
-                end
-                
-                % If a Higlight Boundarie Box already exists,
-                % delete it
-                if ~isempty(OldFig)
-                    OldBox = findobj('Tag','highlightBox');
-                    delete(OldBox);
-                    %refresh WindowButtonMotionFcn. If a Higlight Boundarie Box
-                    %exist, than the WindowButtonMotionFcn is deleted
-                    set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
-                end
+            % delete it
+            OldFig = findobj('Tag','FigureManipulate');
+            if ~isempty(OldFig)
+                delete(OldFig);
+                %refresh WindowButtonMotionFcn. If a Figure Manipulate
+                %exist, than the WindowButtonMotionFcn is deleted
+                set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            end
             
+            % If a Higlight Boundarie Box already exists,
+            % delete it
+            if ~isempty(OldFig)
+                OldBox = findobj('Tag','highlightBox');
+                delete(OldBox);
+                %refresh WindowButtonMotionFcn. If a Higlight Boundarie Box
+                %exist, than the WindowButtonMotionFcn is deleted
+                set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            end
+            
+            % send selected analyze mode to the model.
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
+            % send selected area parameters to the model.
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
-            obj.modelAnalyzeHandle.MinAreaPixel = str2num(obj.viewAnalyzeHandle.B_MinArea.String);
-            obj.modelAnalyzeHandle.MaxAreaPixel = str2num(obj.viewAnalyzeHandle.B_MaxArea.String);
+            obj.modelAnalyzeHandle.MinAreaPixel = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
+            obj.modelAnalyzeHandle.MaxAreaPixel = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
             
+            % send selected aspect ratio parameters to the model.
             obj.modelAnalyzeHandle.AspectRatioActive = obj.viewAnalyzeHandle.B_AspectRatioActive.Value;
-            obj.modelAnalyzeHandle.MinAspectRatio = str2num(obj.viewAnalyzeHandle.B_MinAspectRatio.String);
-            obj.modelAnalyzeHandle.MaxAspectRatio = str2num(obj.viewAnalyzeHandle.B_MaxAspectRatio.String);
+            obj.modelAnalyzeHandle.MinAspectRatio = str2double(obj.viewAnalyzeHandle.B_MinAspectRatio.String);
+            obj.modelAnalyzeHandle.MaxAspectRatio = str2double(obj.viewAnalyzeHandle.B_MaxAspectRatio.String);
             
+            % send selected roundness parameters to the model.
             obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
-            obj.modelAnalyzeHandle.MinRoundness = str2num(obj.viewAnalyzeHandle.B_MinRoundness.String);
+            obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
             
+            % send selected color distance parameters to the model.
             obj.modelAnalyzeHandle.ColorDistanceActive = obj.viewAnalyzeHandle.B_ColorDistanceActive.Value;
-            obj.modelAnalyzeHandle.MinColorDistance = str2num(obj.viewAnalyzeHandle.B_ColorDistance.String);
+            obj.modelAnalyzeHandle.MinColorDistance = str2double(obj.viewAnalyzeHandle.B_ColorDistance.String);
             
+            % send selected color value parameters to the model.
             obj.modelAnalyzeHandle.ColorValueActive = obj.viewAnalyzeHandle.B_ColorValueActive.Value;
-            obj.modelAnalyzeHandle.ColorValue = str2num(obj.viewAnalyzeHandle.B_ColorValue.String);
+            obj.modelAnalyzeHandle.ColorValue = str2double(obj.viewAnalyzeHandle.B_ColorValue.String);
             
+            % Disable all GUI buttons during classification
             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
@@ -505,8 +627,10 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
             set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
             
+            % start the classification
             obj.modelAnalyzeHandle.startAnalysze();
             
+            % Enable all GUI buttons
             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
@@ -541,7 +665,19 @@ classdef controllerAnalyze < handle
         end
         
         function backEditEvent(obj,~,~)
-%             set(obj.viewAnalyzeHandle.hFP,'Visible','off');
+            % Callback function of the back edit mode button in the GUI.
+            % Clears the data in the analyze model and change the state of
+            % the program to the edit mode. Refresh the figure callbacks
+            % for the edit mode.
+            %
+            %   backEditEvent(obj,~,~);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
+            
             obj.modelAnalyzeHandle.InfoMessage = ' ';
             
             %clear Data
@@ -551,45 +687,46 @@ classdef controllerAnalyze < handle
             % Clear PicRGB and Boundarie Objects
             handleChild = allchild(obj.modelAnalyzeHandle.handlePicRGB.Parent);
             delete(handleChild);
-            % clear all axes in viewResult figure
-            arrayfun(@cla,findall(obj.viewAnalyzeHandle.hFP,'type','axes'))
             
-             % If a window for Fibertype manipulation already exists,
-                % delete it
-                OldFig = findobj('Tag','FigureManipulate');
-                if ~isempty(OldFig)
-                    delete(OldFig);
-                    %refresh WindowButtonMotionFcn. If a Figure Manipulate
-                    %exist, than the WindowButtonMotionFcn is deleted
-%                     set(mainFig,'WindowButtonMotionFcn',@obj.showFiberInfo);
-                end
-                
-                % If a Higlight Boundarie Box already exists,
-                % delete it
-                if ~isempty(OldFig)
-                    OldBox = findobj('Tag','highlightBox');
-                    delete(OldBox);
-                    %refresh WindowButtonMotionFcn. If a Higlight Boundarie Box
-                    %exist, than the WindowButtonMotionFcn is deleted
-%                     set(mainFig,'WindowButtonMotionFcn',@obj.showFiberInfo);
-                end
+            % If a window for Fibertype manipulation already exists,
+            % delete it
+            OldFig = findobj('Tag','FigureManipulate');
+            if ~isempty(OldFig)
+                delete(OldFig);
+            end
+            
+            % If a Higlight Boundarie Box already exists,
+            % delete it
+            if ~isempty(OldFig)
+                OldBox = findobj('Tag','highlightBox');
+                delete(OldBox);
+            end
             
             % set log text from Analyze GUI to Pic GUI
             obj.controllerEditHandle.setInfoTextView(get(obj.viewAnalyzeHandle.B_InfoText, 'String'));
             
-            %             set(obj.controllerEditHandle.viewEditHandle.hFC,'Visible','on');
-            
-%             set(obj.controllerEditHandle.viewEditHandle.hFP,'Visible','on');
-            %make visible figure the current figure
-%             figure(obj.controllerEditHandle.viewEditHandle.hFP);
-
-
+            %change the card panel to selection 1: edit mode
             obj.mainCardPanel.Selection = 1;
+            
+            %change the figure callbacks for the edit mode
             obj.controllerEditHandle.addWindowCallbacks();
+            
             obj.controllerEditHandle.modelEditHandle.InfoMessage = '*** Back to Edit mode ***';
         end
         
         function startResultsEvent(obj,~,~)
+            % Callback function of the show rsults button in the GUI.
+            % Starts the rusults mode. transfers all data from the analyze
+            % model to the results model.
+            %
+            %   startResultsEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
+            
             if isempty(obj.modelAnalyzeHandle.Stats)
                 obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
                 obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
@@ -600,9 +737,6 @@ classdef controllerAnalyze < handle
                 OldFig = findobj('Tag','FigureManipulate');
                 if ~isempty(OldFig)
                     delete(OldFig);
-                    %refresh WindowButtonMotionFcn. If a Figure Manipulate
-                    %exist, than the WindowButtonMotionFcn is deleted
-%                     set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
                 end
                 
                 % If a Higlight Boundarie Box already exists,
@@ -610,27 +744,44 @@ classdef controllerAnalyze < handle
                 if ~isempty(OldFig)
                     OldBox = findobj('Tag','highlightBox');
                     delete(OldBox);
-                    %refresh WindowButtonMotionFcn. If a Higlight Boundarie Box
-                    %exist, than the WindowButtonMotionFcn is deleted
-%                     set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
                 end
                 
                 obj.modelAnalyzeHandle.InfoMessage = ' ';
                 
+                % get data from the analyze model
                 Data = obj.modelAnalyzeHandle.sendDataToController();
                 
+                % get info text log from analyze GUI
                 InfoText = get(obj.viewAnalyzeHandle.B_InfoText, 'String');
                 
+                % send all data to the result controller and start the
+                % result mode
                 obj.controllerResultsHandle.startResultsMode(Data,InfoText);
             end
         end
         
         function showFiberInfo(obj,~,~)
+            % WindowButtonMotionFcn of the main figure when the analyze
+            % stage of the program is active. If the first analyze is
+            % complete than the function shows the fiber information and a
+            % zoomed picture of the fiber object in the fiber information
+            % panel depending on the cursor position.
+            %
+            %   showFiberInfo(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
             
-            
+            %get current cursor position in the rgb image.
             Pos = get(obj.viewAnalyzeHandle.hAP, 'CurrentPoint');
-            Info = obj.modelAnalyzeHandle.showFiberInfo(Pos);
             
+            %get data form the fiber object at the current positon.
+            Info = obj.modelAnalyzeHandle.getFiberInfo(Pos);
+            
+            %show info in GUI fiber information panel.
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
             set(obj.viewAnalyzeHandle.B_TextArea,'String', Info{2} );
             set(obj.viewAnalyzeHandle.B_TextAspectRatio,'String', Info{3} );
@@ -663,9 +814,22 @@ classdef controllerAnalyze < handle
         end
         
         function manipulateFiberShowInfoEvent(obj,~,~)
+            % ButtonDownFcn Callback function of the RGB image axes. Opens
+            % a new figure at the positon where the user clicked. Allows
+            % the user to change the fiber type manually after the
+            % classification in that figure.
+            %
+            %   manipulateFiberShowInfoEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %
+            
             % Show the fiber information from the selected object on the
             % right side of the GUI
-            obj.showFiberInfo()
+            obj.showFiberInfo();
             
             % If a window already exists, delete it
             OldFig = findobj('Tag','FigureManipulate');
@@ -685,13 +849,26 @@ classdef controllerAnalyze < handle
                 Label = obj.modelAnalyzeHandle.LabelMat(PosOut(2),PosOut(1));
                 
                 if Label ~= 0
-                    set(obj.mainFigure,'WindowButtonMotionFcn','');
                     % If Label is zero than the click was on the background
                     % instead of a fiber object
                     
-                    % get object information at the selected position
-                    Info = obj.modelAnalyzeHandle.manipulateFiberShowInfo(Label,PosOut);
+                    %block WindowButtonMotionFcn
+                    set(obj.mainFigure,'WindowButtonMotionFcn','');
                     
+                    % make axes with rgb image the current axes
+                    axesh = obj.modelAnalyzeHandle.handlePicRGB.Parent;
+                    axes(axesh)
+                    
+                    % get bounding box of the fiber at the selected
+                    % position and plot the box.
+                    PosBoundingBox = obj.modelAnalyzeHandle.Stats(Label).BoundingBox;
+                    rectLine = rectangle('Position',PosBoundingBox,'EdgeColor','y','LineWidth',2);
+                    set(rectLine,'Tag','highlightBox')
+                    
+                    % get object information at the selected position
+                    Info = obj.modelAnalyzeHandle.getFiberInfo(PosOut);
+                    
+                    %get positon of the main figure
                     set(obj.mainFigure, 'Units','pixels');
                     PosMainFig = get(obj.mainFigure, 'Position');
                     PosCurrent = get(obj.mainFigure, 'CurrentPoint');
@@ -704,18 +881,34 @@ classdef controllerAnalyze < handle
                     set(obj.viewAnalyzeHandle.B_ManipulateOK,'Callback',@obj.manipulateFiberOKEvent);
                     set(obj.viewAnalyzeHandle.B_ManipulateCancel,'Callback',@obj.manipulateFiberCancelEvent);
                     set(obj.viewAnalyzeHandle.hFM,'closereq',@obj.manipulateFiberCancelEvent);
+                else
+                % click was on the background
+                % refresh Callback function in figure AnalyzeMode
+                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
                 end
             end
         end
         
         function manipulateFiberOKEvent(obj,src,evnt)
-            
+            % Callback function of the ok button in the maipulate fiber
+            % type figure. Calls the manipulateFiberOK() fuction in the
+            % model to change the fiber type into the new one.
+            %
+            %   manipulateFiberShowInfoEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
+            %
             
             NewFiberType = get(obj.viewAnalyzeHandle.B_FiberTypeManipulate, 'Value');
             LabelNumber = str2num( get(obj.viewAnalyzeHandle.B_TextObjNo, 'String') );
             
+            %change fiber type
             obj.modelAnalyzeHandle.manipulateFiberOK(NewFiberType, LabelNumber);
-            
             
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
             % If a window for Fibertype manipulation already exists,
@@ -729,6 +922,19 @@ classdef controllerAnalyze < handle
         end
         
         function manipulateFiberCancelEvent(obj,src,evnt)
+            % Callback function of the cancel button in the maipulate fiber
+            % type figure. Deletes the maipulate fiber figure object and
+            % refresh the callback functions of the main figure.
+            %
+            %   manipulateFiberShowInfoEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
+            %
             
             % If a window for Fibertype manipulation already exists,
             % delete it
@@ -743,24 +949,39 @@ classdef controllerAnalyze < handle
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
         end
         
-%         function calculationEvent(obj,src,evnt)
-%             if strcmp(evnt.AffectedObject.CalculationRunning, 'true')
-%                 set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
-%                 set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
-%                 set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
-%             else
-%                 set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
-%                 set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
-%                 set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
-%             end
-%         end
-        
         function setInfoTextView(obj,InfoText)
+            % Sets the log text on the GUI.
+            % Only called by changing the MVC if the stage of the
+            % program changes.
+            %
+            %   setInfoTextView(obj,InfoText);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to controllerEdit object
+            %           InfoText:   Info text log
+            %
+            
             set(obj.viewAnalyzeHandle.B_InfoText, 'String', InfoText);
             set(obj.viewAnalyzeHandle.B_InfoText, 'Value' , length(obj.viewAnalyzeHandle.B_InfoText.String));
         end
         
         function updateInfoLogEvent(obj,src,evnt)
+            % Listener callback function of the InfoMessage propertie in
+            % the model. Is called when InfoMessage string changes. Appends
+            % the text in InfoMessage to the log text in the GUI.
+            %
+            %   updateInfoLogEvent(obj,src,evnt)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
+            
             InfoText = cat(1, get(obj.viewAnalyzeHandle.B_InfoText, 'String'), {obj.modelAnalyzeHandle.InfoMessage});
             set(obj.viewAnalyzeHandle.B_InfoText, 'String', InfoText);
             set(obj.viewAnalyzeHandle.B_InfoText, 'Value' , length(obj.viewAnalyzeHandle.B_InfoText.String));
@@ -769,11 +990,34 @@ classdef controllerAnalyze < handle
         end
         
         function newPictureEvent(obj)
+            % Calls by the controller results-mode. Get back to the edit
+            % mode and call the newPictureEvent function to select a new
+            % image for further processing.
+            %
+            %   updateInfoLogEvent(obj,src,evnt)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
+            
             obj.backEditEvent();
             obj.controllerEditHandle.newPictureEvent();
         end
         
         function closeProgramEvent(obj,~,~)
+            % Colose Request function of the main figure.
+            %
+            %   closeProgramEvent(obj,~,~)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerAnalyze object
+            %
             
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
                 'Close Program', ...
@@ -786,15 +1030,15 @@ classdef controllerAnalyze < handle
                     delete(object_handles);
                     delete(figHandles)
                 case 'No'
-                obj.modelAnalyzeHandle.InfoMessage = '   - closing program canceled';
+                    obj.modelAnalyzeHandle.InfoMessage = '   - closing program canceled';
                 otherwise
-                obj.modelAnalyzeHandle.InfoMessage = '   - closing program canceled';   
+                    obj.modelAnalyzeHandle.InfoMessage = '   - closing program canceled';
             end
             
         end
         
         function delete(obj)
-            
+            %deconstructor
         end
         
         

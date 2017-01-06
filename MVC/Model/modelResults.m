@@ -1,70 +1,103 @@
 classdef modelResults < handle
-    %UNTITLED4 Summary of this class goes here
-    %   Detailed explanation goes here
+    %modelResults   Model of the results-MVC (Model-View-Controller). Runs
+    %all nessesary calculations. Is connected and gets controlled by the
+    %correspondening Controller.
+    %The main tasks are:
+    %   - calculate all area features.
+    %   - calculate all fiber features.
+    %   - transform Stats tabel to numerical structs
+    %   - specify all fiber objects with the given parameters.
+    %   - preparing the data to save.
+    %   - save data.
+    %
+    %
+    %======================================================================
+    %
+    % AUTHOR:           - Sebastian Friedrich,
+    %                     Trier University of Applied Sciences, Germany
+    %
+    % SUPERVISOR:       - Prof. Dr.-Ing. K.P. Koch
+    %                     Trier University of Applied Sciences, Germany
+    %
+    %                   - Mr Justin Perkins, BVetMed MS CertES Dip ECVS MRCVS
+    %                     The Royal Veterinary College, Hertfordshire United Kingdom
+    %
+    % FIRST VERSION:    30.12.2016 (V1.0)
+    %
+    % REVISION:         none
+    %
+    %======================================================================
+    %
     
     properties
-        %Handle to other Classes
-        controllerResultsHandle
+       
+        controllerResultsHandle; %hande to controllerResults instance.
+        
     end
     
     properties
-        FileNamesRGB;
-        PathNames;
-        PicRGB;
-        handlePicRGB;
+        FileNamesRGB; %Filename of the selected RGB image.
+        PathNames; %Directory path of the selected RGB image.
+        PicRGB; %RGB image.
+        handlePicRGB; %handle to RGB image.
+        PicPRGBPlanes; %RGB image created from the color plane images.
         
-        SaveFiberTable;
-        SaveStatisticTable;
-        SavePlots;
-        SavePicProcessed;
-        SavePath;
+        SaveFiberTable; %Indicates whether the fiber type table should be saved.
+        SaveStatisticTable; %Indicates whether the statistics table should be saved.
+        SavePlots; %Indicates whether the statistics plots should be saved.
+        SavePicProcessed; %Indicates whether the processed image should be saved.
+        SavePath; % Save Path, same as the selected RGB image path.
         
-        LabelMat;
+        LabelMat; %Label array of all fiber objects.
         
         %Analyze parameters
-        AnalyzeMode;
-        AreaActive
-        MinAreaPixel
-        MaxAreaPixel
-        AspectRatioActive
-        MinAspectRatio
-        MaxAspectRatio
-        RoundnessActive
-        MinRoundness
-        ColorDistanceActive
-        MinColorDistance
-        ColorValueActive
-        ColorValue
+        AnalyzeMode; %Indicates the selected analyze mode.
+        AreaActive; %Indicates if Area parameter is used for classification.
+        MinAreaPixel; %Minimal allowed Area. Is used for classification. Smaller Objects will be removed from binary mask.
+        MaxAreaPixel; %Maximal allowed Area. Is used for classification. Larger Objects will be classified as Type 0.
+        AspectRatioActive; %Indicates if AspectRatio parameter is used for classification.
+        MinAspectRatio; %Minimal allowed AspectRatio. Is used for classification. Objects with smaller AspectRatio will be classified as Type 0.
+        MaxAspectRatio; %Minimal allowed AspectRatio. Is used for classification. Objects with larger AspectRatio will be classified as Type 0.
+        RoundnessActive; %Indicates if Roundness parameter is used for classification.
+        MinRoundness; %Minimal allowed Roundness. Is used for classification. Objects with smaller Roundness will be classified as Type 0.
+        ColorDistanceActive; %Indicates if ColorDistance parameter is used for classification.
+        MinColorDistance; %Minimal allowed ColorDistance. Is used for classification. Objects with smaller ColorDistance will be classified as Type 3.
+        ColorValueActive; %Indicates if ColorValue parameter is used for classification.
+        ColorValue; %Minimal allowed ColorValue. Is used for classification. Objects with smaller ColorValue will be classified as Type 0.
         
-        NoOfObjects;
+        NoOfObjects; %Number of objects.
+        NoTyp1; %Number of Type 1 fibers.
+        NoTyp2; %Number of Type 2 fibers.
+        NoTyp3; %Number of Type 3 fibers.
+        NoTyp0; %Number of Type 0 fibers.
         
-        AreaPic; % Total area of the RGB image
-        AreaType1; % Total area of all type 1 fibers
-        AreaType2; % Total area of all type 2 fibers
-        AreaType3; % Total area of all type 3 fibers
-        AreaType0; % Total area of all type 0 fibers
-        AreaFibers; % Total area of all fiber objects
-        AreaNoneObj % Total area that contains no objects
+        AreaPic; % Total area of the RGB image.
+        AreaType1; % Total area of all type 1 fibers.
+        AreaType2; % Total area of all type 2 fibers.
+        AreaType3; % Total area of all type 3 fibers.
+        AreaType0; % Total area of all type 0 fibers.
+        AreaFibers; % Total area of all fiber objects.
+        AreaNoneObj % Total area that contains no objects.
         
-        AreaType1PC; % Area of all type 1 fibers in percent
-        AreaType2PC; % Aarea of all type 2 fibers in percent
-        AreaType3PC; % Area of all type 3 fibers in percent
-        AreaType0PC; % Area of all type 0 fibers in percent
-        AreaFibersPC; % Area of all fiber objects in percent
-        AreaNoneObjPC; % Area that contains no objects in percent
+        AreaType1PC; % Area of all type 1 fibers in percent.
+        AreaType2PC; % Aarea of all type 2 fibers in percent.
+        AreaType3PC; % Area of all type 3 fibers in percent.
+        AreaType0PC; % Area of all type 0 fibers in percent.
+        AreaFibersPC; % Area of all fiber objects in percent.
+        AreaNoneObjPC; % Area that contains no objects in percent.
         
-        AreaMinMax;
-        AreaMinMaxObj;
-        AreaMinMaxT1;
-        AreaMinMaxObjT1;
-        AreaMinMaxT2;
-        AreaMinMaxObjT2;
-        AreaMinMaxT3;
-        AreaMinMaxObjT3;
-        AreaMinMaxT0;
-        AreaMinMaxObjT0;
+        AreaMinMax; %Vector, contains the [min max] area in pixel of all objects.
+        AreaMinMaxObj; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of all objects.
+        AreaMinMaxT1; %Vector, contains the [min max] area in pixel of Type 1 fibers.
+        AreaMinMaxObjT1; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 1 fibers.
+        AreaMinMaxT2; %Vector, contains the [min max] area in pixel of Type 2 fibers.
+        AreaMinMaxObjT2; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2 fibers.
+        AreaMinMaxT3; %Vector, contains the [min max] area in pixel of Type 3 fibers.
+        AreaMinMaxObjT3; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 3 fibers.
+        AreaMinMaxT0; %Vector, contains the [min max] area in pixel of Type 0 fibers.
+        AreaMinMaxObjT0; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 0 fibers.
         
-        Stats; % Data structur of all fiber objets
+        Stats; % Data struct of all fiber objets
         
         StatsMatData; % Contains the numerical data of all fiber objets.
         % [LabelNO Area XPos YPos MinorAxis MajorAxis Perimeter Roundness ...
@@ -75,12 +108,9 @@ classdef modelResults < handle
         StatsMatDataT3; % Contains the numerical data of all type 3 fiber objets.
         StatsMatDataT0; % Contains the numerical data of all type 0 fiber objets.
         
-        StatisticMat;
+        StatisticMat; % Contains the statistc data af the ruslts.
         
-        NoTyp1;
-        NoTyp2;
-        NoTyp3;
-        NoTyp0;
+        
     end
     
     properties(SetObservable)
@@ -92,11 +122,33 @@ classdef modelResults < handle
     methods
         
         function obj = modelResults()
-            
-            
+            % Constuctor of the modelResults class.
+            %
+            %   obj = modelResults();
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %
+            %       - Output
+            %           obj:    Handle to modelResults object.
+            %
+             
         end
         
         function startResultMode(obj)
+            % Called by the controller when the program change in the
+            % rsults stage. Calls all culculation functions and GUI update
+            % functions.
+            %
+            %   startResultMode(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelResults object.
+            %
+            
             obj.InfoMessage = '- updating GUI';
             
             obj.transformDataStructToMatrix();
@@ -117,6 +169,15 @@ classdef modelResults < handle
         end
         
         function transformDataStructToMatrix(obj)
+            % Ttransforms the Stats table in numerical data array.
+            %
+            %   transformDataStructToMatrix(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelResults object.
+            %
             obj.InfoMessage = '   - Transform data to Matrix';
             
             LabelNo = [1:1:length(obj.Stats)]';
@@ -168,6 +229,15 @@ classdef modelResults < handle
         end
         
         function calculateAreaFeatures(obj)
+            % Claculate all area features.
+            %
+            %   calculateAreaFeatures(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelResults object.
+            %
             
             obj.InfoMessage = '   - Calculate fiber type areas';
             obj.AreaPic = size(obj.PicRGB,1) * size(obj.PicRGB,2);
@@ -297,6 +367,16 @@ classdef modelResults < handle
         end
         
         function calculateFiberFeatures(obj)
+            % Claculate all fiber features.
+            %
+            %   calculateFiberFeatures(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelResults object.
+            %
+            
             obj.InfoMessage = '   - Calculate fiber type numbers';
             % Number of Fiber Objects
             obj.NoTyp1 = size(obj.StatsMatDataT1,1); % Type 1
@@ -308,7 +388,16 @@ classdef modelResults < handle
         end
         
         function createMatStatisticTable(obj)
-            %Create StatsMaz for Statistic Table
+            % Create table that is shown in the statistic tab in the GUI.
+            %
+            %   createMatStatisticTable(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelResults object.
+            %
+            
             obj.StatisticMat = {}; 
             
             obj.StatisticMat = {'Analyze Mode','Para min area','Para max area',...
@@ -403,20 +492,29 @@ classdef modelResults < handle
             obj.StatisticMat{36,2} =  obj.AreaMinMaxT3(2);
             obj.StatisticMat{37,2} =  obj.AreaMinMaxObjT3(2);
             
-%             obj.StatisticMat{37,1} =  obj.AreaMinMaxT3(1);
-%             obj.StatisticMat{38,1} =  obj.AreaMinMaxObjT3(1);
-%             obj.StatisticMat{39,1} =  obj.AreaMinMaxT3(2);
-%             obj.StatisticMat{40,1} =  obj.AreaMinMaxObjT3(2);
         end
         
         function saveResults(obj)
-            obj.InfoMessage = ' ';
-            obj.InfoMessage = '   - Saving data in the same dir than the RGB Pic was selected';
+            % Prepares all data for saving. Creates cell array depending on
+            % the save parameters that will be saved as excel sheet. Save
+            % all axes depending on the save parameters.
+            %
+            %   saveResults(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelResults object.
+            %
             
+            obj.InfoMessage = ' ';
+            obj.InfoMessage = '   - Saving data in the same dir than the RGB image was selected';
+            
+            %Cell arrays for saving data in excel sheet
             CellStatisticTable = {}; 
             CellFiberTable = {};
-            DataFile = {};
             
+            %Current date and time
             time = datestr(now,'_yyyy-mm-dd_HHMM');
             
             % Dlete file extension .tif before save
@@ -428,11 +526,11 @@ classdef modelResults < handle
             fileNameRGB(LFN-3)='';
             
            
-            
             % Save dir is the same as the dir from the selected Pic
             SaveDir = [obj.PathNames obj.FileNamesRGB '_RESULTS']; 
             obj.InfoMessage = ['   -' obj.PathNames obj.FileNamesRGB '_RESULTS']; 
             
+            % Check if reslut folder already exist.
             if exist( SaveDir ,'dir') == 7
                 % Reslut folder already exist.
                 obj.InfoMessage = '      - resluts folder allready excist';
@@ -446,10 +544,11 @@ classdef modelResults < handle
             obj.SavePath = SaveDir;
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save picture with boudaries
+            % save picture processed with boudaries
             if obj.SavePicProcessed
                 obj.InfoMessage = '      - saving picture with boundaries';
                 
+                % save picture as tif file
                 f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
                 h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,f);
                 SizeFig = size(obj.PicRGB)/max(size(obj.PicRGB));
@@ -460,7 +559,7 @@ classdef modelResults < handle
                 
                 frame = getframe(h);
                 frame=frame.cdata;
-                picName = [fileNameRGB '_processed' time '.tif'];
+                picName = [fileNameRGB '_image_processed' time '.tif'];
                 oldPath = pwd;
                 cd(SaveDir)
                 imwrite(frame,picName)
@@ -469,8 +568,8 @@ classdef modelResults < handle
                 close(f);
                 obj.InfoMessage = '         - Picture has been saved as .tif';
                 
-                
-                fileName = [fileNameRGB '_processed.pdf'];
+                % save picture as vector graphics
+                fileName = [fileNameRGB '_image_processed' time '.pdf'];
                 fullFileName = fullfile(SaveDir,fileName);
                 saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fullFileName);
                 obj.InfoMessage = '         - Picture has been saved as .pdf vector grafic'; 
@@ -570,7 +669,12 @@ classdef modelResults < handle
             % Save DataFile as xls file
             if ~isempty(DataFile)
                 obj.InfoMessage = '      - start creating .xlsx file';
-                if isunix
+                
+                if ismac
+                    % OS is macintosh. xlswrite is not supported. Use
+                    % undocumented function from the file exchange Matlab 
+                    % Forum for creating .xlsx files on a macintosh OS.
+                    
                     obj.InfoMessage = '         - UNIX-Systems (macOS) dont support xlswrite() MatLab function';
                     obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
                     
@@ -610,7 +714,7 @@ classdef modelResults < handle
                         cd(SaveDir)
                         fid=fopen(fileName,'a+');
                         % undocumented function from the file exchange Matlab Forum
-                        % for creating .xlsx files from Cell Arrays
+                        % for creating .txt files.
                         cell2file(fid,DataFile,'EndOfLine','\r\n');
                         fclose(fid);
                         cd(oldPath)
@@ -627,17 +731,34 @@ classdef modelResults < handle
         end
         
         function showPicProcessedGUI(obj,axesPicAnalyze,axesResults)
+            % Copys the boundarie objects from the axes in
+            % the analyze GUI and paste them into the results GUI.
+            %
+            %   showPicProcessedGUI(obj,axesPicAnalyze,axesResults);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:            Handle to modelResults object.
+            %           axesPicAnalyze: Handle to axes with image in
+            %               analyze GUI.
+            %           axesResults:    Handle to axes in result GUI.
+            %
             
+            %make axes results the current axes
             axes(axesResults);
             
+            %sjow RGB image in GUI
             imshow(ones(size(obj.PicRGB)));
             obj.InfoMessage = '   - Load picture into GUI...';
             
+            %copy boundaries from analyze to result GUI.
             copyobj(axesPicAnalyze.Children ,axesResults);
-%             axesh = obj.handlePicRGB.Parent;
             axes(axesResults);
             hold on
             obj.InfoMessage = '      - show labels...';
+            
+            %plot labels in the image
             for k = 1:size(obj.Stats,1)
                 hold on
                 c = obj.Stats(k).Centroid;
@@ -651,8 +772,7 @@ classdef modelResults < handle
         end
         
         function delete(obj)
-            
-            
+            %deconstructor
         end
         
     end

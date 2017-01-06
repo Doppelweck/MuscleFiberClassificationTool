@@ -16,11 +16,11 @@ setAlwaysOnTop(hf,true);
 mainFig = figure('Units','pixels','Position',[1 50 1900 900],...
     'Name','Fiber types classification tool','DockControls','off',...
     'doublebuffer', 'off','Menubar','figure','Visible','on',...
-    'WindowStyle','normal');
+    'WindowStyle','normal','NumberTitle','off');
 
 set( findall(mainFig,'ToolTipString','Edit Plot') ,'Visible','Off');
 % set( findall(mainFig,'ToolTipString','Rotate 3D') ,'Visible','Off');
-set( findall(mainFig,'ToolTipString','Data Cursor') ,'Visible','Off');
+% set( findall(mainFig,'ToolTipString','Data Cursor') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Colorbar') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Legend') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Hide Plot Tools') ,'Visible','Off');

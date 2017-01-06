@@ -1,32 +1,54 @@
 classdef viewResults < handle
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    %viewResults   view of the results-MVC (Model-View-Controller).
+    %Creates the third card panel in the main figure that shows the results  
+    %after the classification. The viewResult class is called by  
+    %the main.m file. Contains serveral buttons and uicontrol elements to 
+    %select wich data will be saved.
+    %
+    %
+    %======================================================================
+    %
+    % AUTHOR:           - Sebastian Friedrich,
+    %                     Trier University of Applied Sciences, Germany
+    %
+    % SUPERVISOR:       - Prof. Dr.-Ing. K.P. Koch
+    %                     Trier University of Applied Sciences, Germany
+    %
+    %                   - Mr Justin Perkins, BVetMed MS CertES Dip ECVS MRCVS
+    %                     The Royal Veterinary College, Hertfordshire United Kingdom
+    %
+    % FIRST VERSION:    30.12.2016 (V1.0)
+    %
+    % REVISION:         none
+    %
+    %======================================================================
+    % 
     
     properties
-        hFR;    %handle to figure with Results and controls
-        panelControl;    %handle to panel with controls
-        panelResults;   %handle to panel with results
-        hAPProcessed;    %handle to axes with processed picture in the picture Panel
+        hFR; %handle to figure with Results and controls.
+        panelControl; %handle to panel with controls.
+        panelResults; %handle to panel with results.
+        hAPProcessed; %handle to axes with processed picture in the picture Panel.
         
-        hAArea  
-        hACount
-        hAScatterAll
-        hAScatter
+        hAArea; %handle to axes with area plot.  
+        hACount %handle to axes with counter plot.
+        hAScatterAll %handle to axes with scatterplot that contains all objects.
+        hAScatter %handle to axes with scatterplot that contains fiber objects.
         
-        B_BackAnalyze;
-        B_Save;
-        B_NewPic;
-        B_CloseProgramm;
+        B_BackAnalyze; %Button, close the ResultsMode and opens the the AnalyzeMode.
+        B_Save; %Button, save data into the RGB image folder.
+        B_NewPic; %Button, to select a new picture.
+        B_CloseProgramm; %Button, to close the program.
         
-        B_SaveFiberTable
-        B_SaveStatisticTable
-        B_SavePlots
-        B_SaveAnaPicture
-        B_SaveOpenDir
+        B_SaveFiberTable; %Ceckbox, select if fiber table should be saved.
+        B_SaveStatisticTable; %Ceckbox, select if statistic table should be saved.
+        B_SavePlots; %Ceckbox, select if all plots should be saved.
+        B_SaveAnaPicture; %Ceckbox, select if analyzed picture table should be saved.
+        B_SaveOpenDir %Button, opens the save directory.
         
-        B_TableStatistic;
-        B_TableMain;
-        B_InfoText;
+        B_TableStatistic; %Table, that shows all statistic data.
+        B_TableMain; %Table, that shows all object data.
+        B_InfoText; %Shows the info log text.
         
     end
     
@@ -36,20 +58,7 @@ classdef viewResults < handle
             fontSizeS = 10; % Font size small
             fontSizeM = 12; % Font size medium
             fontSizeB = 16; % Font size big
-            
-%             screenSize = get(0,'screensize');
-%             
-% %             obj.hFR = figure('NumberTitle','off','Units','normalized','Name','Fiber types classification: RESULTS MODE','Visible','off','Tag','viewResults');
-% %             set(obj.hFR, 'position', [0 0 1 0.85]);
-% %             set(obj.hFR,'WindowStyle','normal');
-%             
-%              % Center window
-%             movegui(obj.hFR,'center');
-%             
-%             set(obj.hFR, 'doublebuffer', 'off');
-            
-%             obj.hFR = uix.BoxPanel('Parent', mainCard); 
-            
+
             mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',5,'Padding',5 );
             
             obj.panelResults = uix.Panel( 'Title', 'Results', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
@@ -64,21 +73,20 @@ classdef viewResults < handle
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',5);
             PanelSave = uix.Panel('Parent',PanelVBox,'Title','Save options','FontSize',fontSizeB,'Padding',5);
-%             PanelMorphOp = uix.Panel('Parent',PanelVBox,'Title','Morphological operations','FontSize',fontSizeM,'Padding',5);
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',5);
             
-            set( PanelVBox, 'Heights', [-1 -1 -3], 'Spacing', 5 );
+            set( PanelVBox, 'Heights', [-5 -6 -14], 'Spacing', 5 );
             
             %%%%%%%%%%%%%%%%%% Panel control %%%%%%%%%%%%%%%%%%%%%%%%
             mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 5 );
             
             HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
-            obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', '<- Back to Analyze mode','FontSize',fontSizeB );
+            obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', 'Back to analyze mode','FontSize',fontSizeB );
             obj.B_CloseProgramm = uicontrol( 'Parent', HBoxControl1,'FontSize',fontSizeB, 'String', 'Close program' );
             
             HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
-            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'NewPic' );
-            obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', 'Save Data','FontSize',fontSizeB );
+            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'New image' );
+            obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', 'Save data','FontSize',fontSizeB );
             
             %%%%%%%%%%%%%%%%%%%Panel SaveOptions %%%%%%%%%%%%%%%%%%%%%%%%%%
             mainVBBoxSave = uix.VButtonBox('Parent', PanelSave,'ButtonSize',[600 600],'Spacing', 5 );
@@ -126,9 +134,7 @@ classdef viewResults < handle
             obj.B_SaveAnaPicture = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SaveProcessedPicture');
             
             set( HBoxSave4, 'Widths', [-10 -1] );
-            
-            
-            
+
             %%%%%%%%%%%%%%%% 5. Row Save dir
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave);
             
@@ -158,16 +164,19 @@ classdef viewResults < handle
             statsVBoxleft = uix.VBox( 'Parent', statisticTabHBox, 'Spacing', 15 ,'Padding',5);
             statsVBoxright = uix.VBox( 'Parent', statisticTabHBox, 'Spacing', 15 ,'Padding',5);
             
-            PanelArea = uix.Panel('Parent',statsVBoxleft);
-            PanelCount = uix.Panel('Parent',statsVBoxleft);
-            PanelDia = uix.Panel('Parent',statsVBoxright);
-            PanelScatter = uix.Panel('Parent',statsVBoxright);
+            PanelArea = uix.Panel('Parent',statsVBoxleft,'Padding',5);
+            PanelCount = uix.Panel('Parent',statsVBoxleft,'Padding',5);
+            PanelDia = uix.Panel('Parent',statsVBoxright,'Padding',5);
+            PanelScatter = uix.Panel('Parent',statsVBoxright,'Padding',5);
             
-            obj.hAArea = axes('Parent',uicontainer('Parent',PanelArea));   
+            obj.hAArea = axes('Parent',uicontainer('Parent',PanelArea));
+            set(obj.hAArea, 'LooseInset', [0,0,0,0]);
             obj.hACount= axes('Parent',uicontainer('Parent',PanelCount));
+            set(obj.hACount, 'LooseInset', [0,0,0,0]);
             obj.hAScatterAll = axes('Parent',uicontainer('Parent',PanelDia));
+            set(obj.hAScatterAll, 'LooseInset', [0,0,0,0]);
             obj.hAScatter = axes('Parent',uicontainer('Parent',PanelScatter));
-            
+            set(obj.hAScatter, 'LooseInset', [0,0,0,0]);
             
             
             PanelStatisticTabel = uix.Panel('Parent',statisticTabHBox,'Padding',5,'Title', 'Fiber-Type statistics','FontSize',fontSizeM);
@@ -182,8 +191,6 @@ classdef viewResults < handle
             set(obj.hAArea,'xtick',[],'ytick',[])
             set(obj.hAArea,'PlotBoxAspectRatio',[1 1 1]);
             
-            
-%             obj.hACount.Title.String = 'Number of fiber type';
             set(obj.hACount,'Units','normalized','OuterPosition',[0 0 1 1]);
             
             set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
@@ -191,18 +198,6 @@ classdef viewResults < handle
             set(obj.hAScatter,'Units','normalized','OuterPosition',[0 0 1 1]);
 
             obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeB);
-%             obj.B_TableStatistic.RowName = {'Analyze Mode','Para min area','Para max area',...
-%                 'Para min Asp.Ratio','Para max Asp.Ratio',...
-%                 'Para min Roundn.','Para min Colordist.',...
-%                 'Para min ColorVal.',...
-%                 'No. Objects',...
-%                 'No. Type 1','No. Type 2','No. Type 3','No. Type 0',...
-%                 'Area Type 1','Area Type 2','Area Type 3','Area Type 0',...
-%                 'Area Type 1 in %','Area Type 2 in %','Area Type 3 in %','Area Type 0 in %',...
-%                 'Smallest Area','Smalest Fiber','Largest Area','Largest Fiber',...
-%                 'Smallest Area T1','Smalest Fiber T1','Largest Area T1','Largest Fiber T1',...
-%                 'Smallest Area T2','Smalest Fiber T2','Largest Area T2','Largest Fiber T2',...
-%                 'Smallest Area T3','Smalest Fiber T3','Largest Area T3','Largest Fiber T3'};
             obj.B_TableStatistic.RowName = [];
             obj.B_TableStatistic.ColumnName = {'Name of parameter                   ','Value of parameter                   '};
             
@@ -226,8 +221,6 @@ classdef viewResults < handle
             obj.B_TableMain.Units = 'normalized';
             obj.B_TableMain.Position =[0 0 1 1];
             
-            
-            
             set(obj.hACount,'Units','normalized','OuterPosition',[0 0 1 1]);
             
             set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
@@ -235,25 +228,39 @@ classdef viewResults < handle
             set(obj.hAScatter,'Units','normalized','OuterPosition',[0 0 1 1]);
             
             %%%%%%%%%%%%%%% call edit functions for GUI
-            obj.editToolBar()
-            
-%             drawnow;
+            obj.setToolTipStrings();
+
         end
-        
                 
-         function editToolBar(obj)
-            set( findall(obj.hFR,'ToolTipString','Edit Plot') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Rotate 3D') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Data Cursor') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Insert Colorbar') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Insert Legend') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Hide Plot Tools') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','New Figure') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Show Plot Tools') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Brush/Select Data') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Show Plot Tools and Dock Figure') ,'Visible','Off');
-            set( findall(obj.hFR,'ToolTipString','Link Plot') ,'Visible','Off');
-         end
+         function setToolTipStrings(obj)
+            % Set all tooltip strings in the properties of the operationg
+            % elements that are shown in the GUI
+            %
+            %   setToolTipStrings(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to viewAnalyze object
+            %
+            
+            BackAnalToolTip = sprintf(['Go back to analyze mode.']);
+            
+            NewPicToolTip = sprintf(['Select a new image for further processing.']);
+            
+            SaveToolTip = sprintf(['Saves the data in the same directory \n',...
+                'as the selected rgb image']);
+            
+            CloseToolTip = sprintf(['Quit the program. \n',...
+                'Unsaved data will be lost.']);
+            
+            set(obj.B_BackAnalyze,'tooltipstring',BackAnalToolTip);
+            set(obj.B_CloseProgramm,'tooltipstring',CloseToolTip);
+            set(obj.B_NewPic,'tooltipstring',NewPicToolTip);
+            set(obj.B_Save,'tooltipstring',SaveToolTip);
+
+            
+        end
         
          function delete(obj)
             
