@@ -192,6 +192,8 @@ classdef modelEdit < handle
             PicData{2} = obj.PathNames;
             PicData{3} = obj.PicRGB;   %RGB
             
+            % send binary pic to controller only in the normal non-inverted
+            % form
             if strcmp(obj.PicBWisInvert,'true')
                 PicData{4} = ~obj.handlePicBW.CData;    %BW
             else

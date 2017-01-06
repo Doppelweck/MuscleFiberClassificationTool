@@ -65,7 +65,7 @@ classdef modelResults < handle
         AreaMinMaxT0;
         AreaMinMaxObjT0;
         
-        Stats; % Data structur of all fiber objets
+        Stats; % Data struct of all fiber objets
         
         StatsMatData; % Contains the numerical data of all fiber objets.
         % [LabelNO Area XPos YPos MinorAxis MajorAxis Perimeter Roundness ...

@@ -669,7 +669,7 @@ classdef controllerAnalyze < handle
             % Clears the data in the analyze model and change the state of
             % the program to the edit mode. Refresh the figure callbacks
             % for the edit mode.
-            % 
+            %
             %   analyzeModeEvent(obj,src,evnt);
             %
             %   ARGUMENTS:
@@ -718,7 +718,7 @@ classdef controllerAnalyze < handle
             % Callback function of the show rsults button in the GUI.
             % Starts the rusults mode. transfers all data from the analyze
             % model to the results model.
-            % 
+            %
             %   startResultsEvent(obj,~,~)
             %
             %   ARGUMENTS:
@@ -766,7 +766,7 @@ classdef controllerAnalyze < handle
             % complete than the function shows the fiber information and a
             % zoomed picture of the fiber object in the fiber information
             % panel depending on the cursor position.
-            % 
+            %
             %   showFiberInfo(obj,~,~)
             %
             %   ARGUMENTS:
@@ -779,7 +779,7 @@ classdef controllerAnalyze < handle
             Pos = get(obj.viewAnalyzeHandle.hAP, 'CurrentPoint');
             
             %get data form the fiber object at the current positon.
-            Info = obj.modelAnalyzeHandle.showFiberInfo(Pos);
+            Info = obj.modelAnalyzeHandle.getFiberInfo(Pos);
             
             %show info in GUI fiber information panel.
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
@@ -818,7 +818,7 @@ classdef controllerAnalyze < handle
             % a new figure at the positon where the user clicked. Allows
             % the user to change the fiber type manually after the
             % classification in that figure.
-            % 
+            %
             %   manipulateFiberShowInfoEvent(obj,~,~)
             %
             %   ARGUMENTS:
@@ -829,7 +829,7 @@ classdef controllerAnalyze < handle
             
             % Show the fiber information from the selected object on the
             % right side of the GUI
-            obj.showFiberInfo()
+            obj.showFiberInfo();
             
             % If a window already exists, delete it
             OldFig = findobj('Tag','FigureManipulate');
@@ -855,8 +855,18 @@ classdef controllerAnalyze < handle
                     %block WindowButtonMotionFcn
                     set(obj.mainFigure,'WindowButtonMotionFcn','');
                     
+                    % make axes with rgb image the current axes
+                    axesh = obj.modelAnalyzeHandle.handlePicRGB.Parent;
+                    axes(axesh)
+                    
+                    % get bounding box of the fiber at the selected
+                    % position and plot the box.
+                    PosBoundingBox = obj.modelAnalyzeHandle.Stats(Label).BoundingBox;
+                    rectLine = rectangle('Position',PosBoundingBox,'EdgeColor','y','LineWidth',2);
+                    set(rectLine,'Tag','highlightBox')
+                    
                     % get object information at the selected position
-                    Info = obj.modelAnalyzeHandle.manipulateFiberShowInfo(Label,PosOut);
+                    Info = obj.modelAnalyzeHandle.getFiberInfo(PosOut);
                     
                     %get positon of the main figure
                     set(obj.mainFigure, 'Units','pixels');
@@ -871,6 +881,10 @@ classdef controllerAnalyze < handle
                     set(obj.viewAnalyzeHandle.B_ManipulateOK,'Callback',@obj.manipulateFiberOKEvent);
                     set(obj.viewAnalyzeHandle.B_ManipulateCancel,'Callback',@obj.manipulateFiberCancelEvent);
                     set(obj.viewAnalyzeHandle.hFM,'closereq',@obj.manipulateFiberCancelEvent);
+                else
+                % click was on the background
+                % refresh Callback function in figure AnalyzeMode
+                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
                 end
             end
         end
@@ -879,13 +893,15 @@ classdef controllerAnalyze < handle
             % Callback function of the ok button in the maipulate fiber
             % type figure. Calls the manipulateFiberOK() fuction in the
             % model to change the fiber type into the new one.
-            % 
+            %
             %   manipulateFiberShowInfoEvent(obj,~,~)
             %
             %   ARGUMENTS:
             %
             %       - Input
             %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
             %
             
             NewFiberType = get(obj.viewAnalyzeHandle.B_FiberTypeManipulate, 'Value');
@@ -909,13 +925,15 @@ classdef controllerAnalyze < handle
             % Callback function of the cancel button in the maipulate fiber
             % type figure. Deletes the maipulate fiber figure object and
             % refresh the callback functions of the main figure.
-            % 
+            %
             %   manipulateFiberShowInfoEvent(obj,~,~)
             %
             %   ARGUMENTS:
             %
             %       - Input
             %           obj:    Handle to controllerAnalyze object.
+            %           src:    source of the callback.
+            %           evnt:   callback event data.
             %
             
             % If a window for Fibertype manipulation already exists,
@@ -973,7 +991,7 @@ classdef controllerAnalyze < handle
         
         function newPictureEvent(obj)
             % Calls by the controller results-mode. Get back to the edit
-            % mode and call the newPictureEvent function to select a new 
+            % mode and call the newPictureEvent function to select a new
             % image for further processing.
             %
             %   updateInfoLogEvent(obj,src,evnt)
@@ -1019,7 +1037,7 @@ classdef controllerAnalyze < handle
         end
         
         function delete(obj)
-            
+            %deconstructor
         end
         
         
