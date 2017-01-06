@@ -605,46 +605,6 @@ classdef modelAnalyze < handle
             
         end
         
-%         function Info = manipulateFiberShowInfo(obj,Label,Pos)
-%             % Send the fiber information at the seleccted position to the
-%             % controller to show the data in the fiber manipulation figure.
-%             %
-%             %   Info = manipulateFiberShowInfo(obj,Label,Pos);
-%             %
-%             %   ARGUMENTS:
-%             %
-%             %       - Input
-%             %           obj:    Handle to modelAnalyze object.
-%             %           Label:  Label of selected fiber object.
-%             %           Pos:    Cursor position in RGB image.
-%             %
-%             %       - Output
-%             %           Info:   Cell array that contains the data that are
-%             %               shown in the fiber information panel in the GUI.
-%             %               Info{1}: Label
-%             %               Info{2}: Area
-%             %               Info{3}: AspectRatio
-%             %               Info{4}: Roundness
-%             %               Info{5}: ColorDistBlueRed
-%             %               Info{6}: ColorValue
-%             %               Info{7}: FiberType
-%             %               Info{8}: Cropped image of fiber type
-%             %               Info{9}: Boundarie of object
-%             
-%             axesh = obj.handlePicRGB.Parent;
-%             axes(axesh)
-%             
-%             PosBoundingBox = obj.Stats(Label).BoundingBox;
-% 
-%             rectLine = rectangle('Position',PosBoundingBox,'EdgeColor','y','LineWidth',2);
-%             set(rectLine,'Tag','highlightBox')
-%             
-%             % get fibertype informatoin at the selected pos and
-%             % return the Info cell array
-%             Info = obj.getFiberInfo(Pos);
-%             
-%         end
-        
         function manipulateFiberOK(obj,newFiberType,labelNo)
             % Called fom the manipulateFiberOK() callback function in the
             % controller. Changed the fiber type if the user has changed

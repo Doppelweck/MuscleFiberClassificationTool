@@ -556,7 +556,7 @@ classdef controllerAnalyze < handle
             % the fiber type classification functions in the model. Disable
             % all GUI elements during the classification.
             %
-            %   analyzeModeEvent(obj,src,evnt);
+            %   startAnalyzeEvent(obj,~,~);
             %
             %   ARGUMENTS:
             %
@@ -670,7 +670,7 @@ classdef controllerAnalyze < handle
             % the program to the edit mode. Refresh the figure callbacks
             % for the edit mode.
             %
-            %   analyzeModeEvent(obj,src,evnt);
+            %   backEditEvent(obj,~,~);
             %
             %   ARGUMENTS:
             %
@@ -977,7 +977,7 @@ classdef controllerAnalyze < handle
             %   ARGUMENTS:
             %
             %       - Input
-            %           obj:    Handle to controllerEdit object
+            %           obj:    Handle to controllerAnalyze object
             %           src:    source of the callback
             %           evnt:   callback event data
             %
@@ -999,10 +999,11 @@ classdef controllerAnalyze < handle
             %   ARGUMENTS:
             %
             %       - Input
-            %           obj:    Handle to controllerEdit object
+            %           obj:    Handle to controllerAnalyze object
             %           src:    source of the callback
             %           evnt:   callback event data
             %
+            
             obj.backEditEvent();
             obj.controllerEditHandle.newPictureEvent();
         end
@@ -1015,7 +1016,7 @@ classdef controllerAnalyze < handle
             %   ARGUMENTS:
             %
             %       - Input
-            %           obj:    Handle to controllerEdit object
+            %           obj:    Handle to controllerAnalyze object
             %
             
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
