@@ -353,7 +353,15 @@ classdef modelEdit < handle
                 obj.InfoMessage = ['      - ' FileNamesZIV ' dont exist'];
                 obj.InfoMessage = ['      - ' FileNamesZIV ' must be in the same path as the selected RGB.tif image'];
                 
+                infotext = {'Error while opening color plane pictures!',...
+                    '',...
+                    'Color plane pictures (.zvi file) not found.',...
+                    FileNamesZIV ' dont exist.',...
+                    FileNamesZIV ' must be in the same path as the selected RGB.tif image.'};
+                
                 sucsess = false;
+                
+                obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
             end
         end
         

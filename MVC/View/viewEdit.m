@@ -325,6 +325,20 @@ classdef viewEdit < handle
             drawnow;
         end
         
+        function infoMessage(obj,Text)
+            % Shows info text to the user.
+            %
+            %   infoMessage(obj,Text);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to viewEdit object
+            %           Text:   Cellaray containing the info text
+            %
+            uiwait(msgbox(Text,'Info','warn','modal'));
+        end
+        
         function setToolTipStrings(obj)
             % Set all tooltip strings in the properties of the operationg
             % elements that are shown in the GUI.
