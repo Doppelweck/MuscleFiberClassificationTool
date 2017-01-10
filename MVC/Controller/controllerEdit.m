@@ -223,6 +223,10 @@ classdef controllerEdit < handle
             Titel = [obj.modelEditHandle.PathNames obj.modelEditHandle.FileNamesRGB];
             obj.viewEditHandle.panelPicture.Title = Titel;
             
+           
+            mainTitel = ['Fiber types classification tool: ' obj.modelEditHandle.FileNamesRGB];
+            set(obj.mainFigure,'Name', mainTitel);
+            
         end
         
         function newPictureEvent(obj,~,~)
@@ -1221,7 +1225,7 @@ classdef controllerEdit < handle
             
             %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
-            obj.controllerAnalyzeHandle.startAnalyzingMode(PicData,InfoText);
+            obj.controllerAnalyzeHandle.startAnalyzeModeEvent(PicData,InfoText);
         end
         
         function undoEvent(obj,src,evnt)

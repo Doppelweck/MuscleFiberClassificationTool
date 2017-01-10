@@ -114,8 +114,8 @@ classdef controllerAnalyze < handle
             %           obj:    Handle to controllerAnalyze object.
             %
             
-            set(obj.viewAnalyzeHandle.B_BackEdit,'Callback',@obj.backEditEvent);
-            set(obj.viewAnalyzeHandle.B_StartResults,'Callback',@obj.startResultsEvent);
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Callback',@obj.backEditModeEvent);
+            set(obj.viewAnalyzeHandle.B_StartResults,'Callback',@obj.startResultsModeEvent);
             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Callback',@obj.startAnalyzeEvent);
             
             set(obj.viewAnalyzeHandle.B_AnalyzeMode,'Callback',@obj.analyzeModeEvent)
@@ -467,7 +467,7 @@ classdef controllerAnalyze < handle
             
         end
         
-        function startAnalyzingMode(obj,PicData,InfoText)
+        function startAnalyzeModeEvent(obj,PicData,InfoText)
             % Called by the controllerEdit instance when the user change
             % the program state to analyze-mode. Saves all nessessary Data
             % from the edit model into the analyze model.
@@ -630,6 +630,10 @@ classdef controllerAnalyze < handle
             % start the classification
             obj.modelAnalyzeHandle.startAnalysze();
             
+            %Set SavedStatus in results model to false if a new analyze
+            %were running and clear old results data.
+            obj.controllerResultsHandle.clearData();
+            
             % Enable all GUI buttons
             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
@@ -664,13 +668,13 @@ classdef controllerAnalyze < handle
             end
         end
         
-        function backEditEvent(obj,~,~)
+        function backEditModeEvent(obj,~,~)
             % Callback function of the back edit mode button in the GUI.
             % Clears the data in the analyze model and change the state of
             % the program to the edit mode. Refresh the figure callbacks
             % for the edit mode.
             %
-            %   backEditEvent(obj,~,~);
+            %   backEditModeEvent(obj,~,~);
             %
             %   ARGUMENTS:
             %
@@ -714,12 +718,12 @@ classdef controllerAnalyze < handle
             obj.controllerEditHandle.modelEditHandle.InfoMessage = '*** Back to Edit mode ***';
         end
         
-        function startResultsEvent(obj,~,~)
+        function startResultsModeEvent(obj,~,~)
             % Callback function of the show rsults button in the GUI.
             % Starts the rusults mode. transfers all data from the analyze
             % model to the results model.
             %
-            %   startResultsEvent(obj,~,~)
+            %   startResultsModeEvent(obj,~,~)
             %
             %   ARGUMENTS:
             %
@@ -756,7 +760,7 @@ classdef controllerAnalyze < handle
                 
                 % send all data to the result controller and start the
                 % result mode
-                obj.controllerResultsHandle.startResultsMode(Data,InfoText);
+                obj.controllerResultsHandle.startResultsModeEvent(Data,InfoText);
             end
         end
         

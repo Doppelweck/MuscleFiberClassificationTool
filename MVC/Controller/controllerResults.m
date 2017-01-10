@@ -80,7 +80,7 @@ classdef controllerResults < handle
             %           obj:    Handle to controllerResults object.
             %
             
-            set(obj.viewResultsHandle.B_BackAnalyze,'Callback',@obj.backAnalyzeEvent);
+            set(obj.viewResultsHandle.B_BackAnalyze,'Callback',@obj.backAnalyzeModeEvent);
             set(obj.viewResultsHandle.B_Save,'Callback',@obj.saveResultsEvent);
             set(obj.viewResultsHandle.B_NewPic,'Callback',@obj.newPictureEvent);
             set(obj.viewResultsHandle.B_CloseProgramm,'Callback',@obj.closeProgramEvent);
@@ -121,7 +121,7 @@ classdef controllerResults < handle
             
         end
         
-        function startResultsMode(obj,Data,InfoText)
+        function startResultsModeEvent(obj,Data,InfoText)
             % Called by the controllerAnalyze instance when the user change
             % the program state to Results-mode. Saves all nessessary Data
             % from the Analyze model into the Result model.
@@ -161,7 +161,7 @@ classdef controllerResults < handle
             %           InfoText:   Info text log.
             %
             
-            % Set PicData Properties in the Analyze Model
+            % Set PicData Properties in the Results Model
             obj.modelResultsHandle.FileNamesRGB = Data{1};
             obj.modelResultsHandle.PathNames = Data{2};
             obj.modelResultsHandle.PicRGB = Data{3};
@@ -169,7 +169,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.Stats = Data{5};
             obj.modelResultsHandle.LabelMat = Data{6};
             
-            % Set Analyze parameters in the Analyze Model
+            % Set Analyze parameters in the Results Model
             obj.modelResultsHandle.AnalyzeMode = Data{7};
             
             obj.modelResultsHandle.AreaActive = Data{8};
@@ -188,6 +188,7 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle.ColorValueActive = Data{18};
             obj.modelResultsHandle.ColorValue = Data{19};
+
             
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));
@@ -219,15 +220,37 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
             
+            %Check if a resultsfolder for the image already exist
+            % Dlete file extension .tif in the results folder before save
+            fileNameRGB = obj.modelResultsHandle.FileNamesRGB;
+            LFN = length(obj.modelResultsHandle.FileNamesRGB);
+            fileNameRGB(LFN)='';
+            fileNameRGB(LFN-1)='';
+            fileNameRGB(LFN-2)='';
+            fileNameRGB(LFN-3)='';
+            % Save dir is the same as the dir from the selected Pic
+            SaveDir = [obj.modelResultsHandle.PathNames obj.modelResultsHandle.FileNamesRGB '_RESULTS']; 
+            % Check if reslut folder already exist.
+            if exist( SaveDir ,'dir') == 7
+                % Reslut folder already exist.
+                %User can open that directory
+                obj.modelResultsHandle.SavePath = SaveDir;
+                set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','on');
+            else
+                % create new folder to save results
+                set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
+
+            end
+            
         end
         
-        function backAnalyzeEvent(obj,~,~)
+        function backAnalyzeModeEvent(obj,~,~)
             % Callback function of the back analyze mode button in the GUI.
             % Clears the data in the results model and change the state of
             % the program to the analyze mode. Refresh the figure callbacks
             % for the analyze mode.
             %
-            %   backAnalyzeEvent(obj,~,~);
+            %   backAnalyzeModeEvent(obj,~,~);
             %
             %   ARGUMENTS:
             %
@@ -236,18 +259,6 @@ classdef controllerResults < handle
             %
             
             obj.modelResultsHandle.InfoMessage = ' ';
-            
-            %clear Data
-            obj.modelResultsHandle.Stats = [];
-            obj.modelResultsHandle.LabelMat = [];
-            obj.viewResultsHandle.B_TableMain.Data = {};
-            obj.viewResultsHandle.B_TableStatistic.Data = {};
-            
-            % Clear PicRGB and Boundarie Objects if exist
-            if isfield(obj.modelResultsHandle.handlePicRGB,'Parent')
-                handleChild = allchild(obj.modelResultsHandle.handlePicRGB.Parent);
-                delete(handleChild);
-            end
             
             % set log text from Result GUI to Analyze GUI
             obj.controllerAnalyzeHandle.setInfoTextView(get(obj.viewResultsHandle.B_InfoText, 'String'));
@@ -280,6 +291,14 @@ classdef controllerResults < handle
             obj.modelResultsHandle.SavePicProcessed = obj.viewResultsHandle.B_SaveAnaPicture.Value;
             obj.modelResultsHandle.SavePlanePicture = obj.viewResultsHandle.B_SavePlanePicture.Value;
             
+            
+            if ( obj.modelResultsHandle.SaveFiberTable || ...
+                 obj.modelResultsHandle.SaveStatisticTable || ...
+                 obj.modelResultsHandle.SavePlots || ...
+                 obj.modelResultsHandle.SavePicProcessed || ...
+                 obj.modelResultsHandle.SavePlanePicture)
+                    
+                
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','off');
             set(obj.viewResultsHandle.B_Save,'Enable','off');
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
@@ -294,7 +313,10 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','on');
-            
+            else
+                obj.modelResultsHandle.InfoMessage = '- no data is selected for saving';
+                obj.modelResultsHandle.InfoMessage = '- no data has been saved';
+            end
         end
         
         function showInfoInTableGUI(obj)
@@ -328,7 +350,7 @@ classdef controllerResults < handle
             %           obj:    Handle to controllerResults object.
             %
             
-            obj.modelResultsHandle.InfoMessage = '   - Plot data into GUI axes...';
+            obj.modelResultsHandle.InfoMessage = '   - plot data into GUI axes...';
             
             % Define costom color map
             ColorMap(1,:) = [.25 .55 .79]; % Blue Fiber Type 1
@@ -375,6 +397,9 @@ classdef controllerResults < handle
             set(gca,'XTick',[1 2 3 4]);
             ylabel('Numbers');
             title('Number of fiber types','FontSize',16)
+            l(1) = legend('Type 1','Type 2','Type 3','Type 0 (no fiber)',...
+                    'Location','Best');
+            set(l(1),'Tag','LegendNumberPlot');
             grid on
             hold off
             
@@ -402,7 +427,8 @@ classdef controllerResults < handle
             set(hPie(9),'facecolor',ColorMap(5,:));
             
             title('Area of fiber types','FontSize',16)
-            legend('Type 1','Type 2','Type 3','Type 0','No Objects','Location','bestoutside');
+            l(2) = legend('Type 1','Type 2','Type 3','Type 0','No objects','Location','Best');
+            set(l(2),'Tag','LegendAreaPlot');
             
             % Plot Scatter Classification %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -417,7 +443,7 @@ classdef controllerResults < handle
             if isempty(obj.modelResultsHandle.StatsMatDataT1)
                 x = 0;
                 y = 0;
-                hScat(1) = scatter(x,y,0.1,'b');
+                hScat(1) = scatter(x,y,0.1,'b','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT1(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT1(:,12); %meanBlue Values
@@ -431,7 +457,7 @@ classdef controllerResults < handle
             if isempty(obj.modelResultsHandle.StatsMatDataT2)
                 x = 0;
                 y = 0;
-                hScat(2) = scatter(x,y,0.1,'r');
+                hScat(2) = scatter(x,y,0.1,'r','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT2(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT2(:,12); %meanBlue Values
@@ -443,7 +469,7 @@ classdef controllerResults < handle
             if isempty(obj.modelResultsHandle.StatsMatDataT3)
                 x = 0;
                 y = 0;
-                hScat(3) = scatter(x,y,0.1,'m');
+                hScat(3) = scatter(x,y,0.1,'m','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT3(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT3(:,12); %meanBlue Values
@@ -451,8 +477,8 @@ classdef controllerResults < handle
             end
             
             
-            ylabel('mean Blue --->','FontSize',12);
-            xlabel('mean Red --->','FontSize',12);
+            ylabel('mean Blue','FontSize',12);
+            xlabel('mean Red','FontSize',12);
             xlim([0 Inf] );
             ylim([0 Inf] );
             
@@ -487,32 +513,34 @@ classdef controllerResults < handle
                 
                 plot(R,B,'b');
                 text1 = ['B(R) = R/(1-' num2str(ColorDis) ')'];
-                legendText1 = char({'Upper limit color Distance', text1});
+                legendText1 = char({'Upper limit color Distance' text1});
                 
                 R = [0:Rmax/10:Rmax];
                 B = (1-ColorDis)*R;
                 plot(R,B,'r');
                 text2 = ['B(R) = R*(1-' num2str(ColorDis) ')'];
-                legendText2 = char({'Lower limit color Distance', text2});
+                legendText2 = char({'Lower limit color Distance' text2});
 %                 text(R(end-2),B(end-2),['\rightarrow B(R) = R*(1-' num2str(ColorDis) ')'],'HorizontalAlignment','left')
                 
-                legend('Type 1','Type 2','Type 3',legendText1,...
+                l(3) = legend('Type 1','Type 2','Type 3',legendText1,...
                     legendText2,'Location','Best');
-                
+                set(l(3),'Tag','LegendScatterPlot');
                 
                 
             elseif obj.modelResultsHandle.AnalyzeMode == 2
                 title('ScatterPlot Color-Cluster Classification, 2 Clusters','FontSize',16);
-                legend('Type 1','Type 2','Location','Best')
+                l(3) = legend('Type 1','Type 2','Location','Best');
+                set(l(3),'Tag','LegendScatterPlot');
             elseif obj.modelResultsHandle.AnalyzeMode == 3
                 title('ScatterPlot Color-Cluster Classification, 3 Clusters','FontSize',16);
-                legend('Type 1','Type 2','Type 3','Location','Best')
+                l(3) = legend('Type 1','Type 2','Type 3','Location','Best');
+                set(l(3),'Tag','LegendScatterPlot');
             end
             grid on
             hold off
             
             
-            % Plot 
+            % Plot Scatter All objects plot
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             cla(obj.viewResultsHandle.hAScatterAll);
             axes(obj.viewResultsHandle.hAScatterAll);
@@ -522,7 +550,7 @@ classdef controllerResults < handle
                 x = 0;
                 y = 0;
                 z = 0;
-                hScatAll(1) = scatter3(x,y,0.1,'b');
+                hScatAll(1) = scatter3(x,y,z,0.1,'b','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT1(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT1(:,12); %meanBlue Values
@@ -538,7 +566,7 @@ classdef controllerResults < handle
                 x = 0;
                 y = 0;
                 z = 0;
-                hScatAll(2) = scatter3(x,y,0.1,'r');
+                hScatAll(2) = scatter3(x,y,0.1,'r','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT2(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT2(:,12); %meanBlue Values
@@ -552,7 +580,7 @@ classdef controllerResults < handle
                 x = 0;
                 y = 0;
                 z = 0;
-                hScatAll(3) = scatter3(x,y,0.1,'m');
+                hScatAll(3) = scatter3(x,y,0.1,'m','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT3(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT3(:,12); %meanBlue Values
@@ -565,7 +593,7 @@ classdef controllerResults < handle
                 x = 0;
                 y = 0;
                 z = 0;
-                hScatAll(4) = scatter3(x,y,0.1,'k');
+                hScatAll(4) = scatter3(x,y,0.1,'k','Marker','none');
             else
                 x = obj.modelResultsHandle.StatsMatDataT0(:,10); %meanRed Values
                 y = obj.modelResultsHandle.StatsMatDataT0(:,12); %meanBlue Values
@@ -573,18 +601,19 @@ classdef controllerResults < handle
                 hScatAll(4) = scatter3(x,y,z,20,'k');
             end
             
-            ylabel('mean Blue --->','FontSize',12);
-            xlabel('mean Red --->','FontSize',12);
-            zlabel('mean FarRed --->','FontSize',12);
+            ylabel('mean Blue','FontSize',12);
+            xlabel('mean Red','FontSize',12);
+            zlabel('mean FarRed','FontSize',12);
             xlim([0 Inf] );
             ylim([0 Inf] );
             zlim([0 Inf] );
             title('ScatterPlot all Objects (Type 1,2,3,0)','FontSize',16);
             grid on
             hold off
-            legend('Type 1','Type 2','Type 3','Type 0 (no Fiber)',...
+            l(4) = legend('Type 1','Type 2','Type 3','Type 0 (no fiber)',...
                     'Location','Best');
-            obj.modelResultsHandle.InfoMessage = '   - Plot data into GUI complete';
+                set(l(4),'Tag','LegendScatterAllPlot');
+            obj.modelResultsHandle.InfoMessage = '   - plot data into GUI complete';
         end
         
         function showPicProcessedGUI(obj)
@@ -661,13 +690,102 @@ classdef controllerResults < handle
             
             switch choice
                 case 'Yes'
-                obj.backAnalyzeEvent();
-                obj.controllerAnalyzeHandle.newPictureEvent;
+                    %clear Data
+                    obj.clearData();
+                    
+                    obj.backAnalyzeEvent();
+                    obj.controllerAnalyzeHandle.newPictureEvent;
                 case 'No'
-                obj.modelResultsHandle.InfoMessage = '   - closing program canceled';
+                    obj.modelResultsHandle.InfoMessage = '   - closing program canceled';
                 otherwise
-                obj.modelResultsHandle.InfoMessage = '   - closing program canceled';  
+                    obj.modelResultsHandle.InfoMessage = '   - closing program canceled';  
             end
+        end
+        
+        function clearData(obj)
+            % Clears all data in the model. Set the ResultsUpdateStatus to
+            % false.
+            %
+            %   saveResults(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
+            
+            %clear Data
+            obj.modelResultsHandle.Stats = [];
+            obj.modelResultsHandle.LabelMat = [];
+            obj.viewResultsHandle.B_TableMain.Data = {};
+            obj.viewResultsHandle.B_TableStatistic.Data = {};
+            obj.modelResultsHandle.FileNamesRGB = [];
+            obj.modelResultsHandle.PathNames = [];
+            obj.modelResultsHandle.PicRGB = [];
+            obj.modelResultsHandle.PicPRGBPlanes = [];
+            obj.modelResultsHandle.Stats = [];
+            obj.modelResultsHandle.LabelMat = [];
+            obj.modelResultsHandle.AnalyzeMode = [];
+            obj.modelResultsHandle.AreaActive = [];
+            obj.modelResultsHandle.MinAreaPixel = [];
+            obj.modelResultsHandle.MaxAreaPixel = [];
+            obj.modelResultsHandle.AspectRatioActive = [];
+            obj.modelResultsHandle.MinAspectRatio = [];
+            obj.modelResultsHandle.MaxAspectRatio = [];
+            obj.modelResultsHandle.RoundnessActive = [];
+            obj.modelResultsHandle.MinRoundness = [];
+            obj.modelResultsHandle.ColorDistanceActive = [];
+            obj.modelResultsHandle.MinColorDistance = [];
+            obj.modelResultsHandle.ColorValueActive = [];
+            obj.modelResultsHandle.ColorValue = [];
+            
+            % Clear PicRGB and Boundarie Objects if exist
+            if isfield(obj.modelResultsHandle.handlePicRGB,'Parent')
+                handleChild = allchild(obj.modelResultsHandle.handlePicRGB.Parent);
+                delete(handleChild);
+            end
+            
+            % Clear PicColorPlane if exist
+            if ~isempty(obj.viewResultsHandle.hAPColorPlane.Children)
+                handleChild = allchild(obj.viewResultsHandle.hAPColorPlane);
+                delete(handleChild);
+            end
+            
+            % Clear area plot if exist
+            if ~isempty(obj.viewResultsHandle.hAArea.Children)
+                handleChild = allchild(obj.viewResultsHandle.hAArea);
+                delete(handleChild);
+            end
+            
+            % Clear count plot if exist
+            if ~isempty(obj.viewResultsHandle.hACount.Children)
+                handleChild = allchild(obj.viewResultsHandle.hACount);
+                delete(handleChild);
+            end
+            
+            % Clear scatter plot if exist
+            if ~isempty(obj.viewResultsHandle.hAScatter.Children)
+                handleChild = allchild(obj.viewResultsHandle.hAScatter);
+                delete(handleChild);
+            end
+            
+            % Clear scatter all plot if exist
+            if ~isempty(obj.viewResultsHandle.hAScatterAll.Children)
+                handleChild = allchild(obj.viewResultsHandle.hAScatterAll);
+                delete(handleChild);
+            end
+            
+            %Delete Legends
+            lTemp = findobj('Tag','LegendAreaPlot');
+            delete(lTemp);
+            lTemp = findobj('Tag','LegendNumberPlot');
+            delete(lTemp);
+            lTemp = findobj('Tag','LegendScatterPlot');
+            delete(lTemp);
+            lTemp = findobj('Tag','LegendScatterAllPlot');
+            delete(lTemp);
+            
+            obj.modelResultsHandle.ResultUpdateStaus = false;
         end
         
         function openSaveDirectory(obj,~,~)
@@ -682,8 +800,8 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResult object
             %
-            
-            if ~isempty(obj.modelResultsHandle.SavePath)
+
+            if exist(obj.modelResultsHandle.SavePath,'dir') == 7
                 
                 if ismac
                     obj.modelResultsHandle.InfoMessage = '   - open save directory';
@@ -695,11 +813,14 @@ classdef controllerResults < handle
                     
                 elseif ispc
                     obj.modelResultsHandle.InfoMessage = '   - open save directory';
+                    winopen(obj.modelResultsHandle.SavePath);
                 else
                     obj.modelResultsHandle.InfoMessage = '   - Error while opening save directory';
                 end
             else
-                obj.modelResultsHandle.InfoMessage = '   - no data has been saved';
+                obj.modelResultsHandle.InfoMessage = '   - save directory dont exist';
+                obj.modelResultsHandle.InfoMessage = '      - no data has been saved';
+                obj.modelResultsHandle.InfoMessage = '      - press Save button to saving data and creating directory';
             end
             
         end

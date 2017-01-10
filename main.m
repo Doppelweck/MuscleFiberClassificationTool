@@ -6,8 +6,8 @@ addpath(genpath(path));
 
 cl;
 pause(0.1);
-
-if checkSystem()
+% 
+% if checkSystem()
 
 hf = startSrcreen();    
 setAlwaysOnTop(hf,true);   
@@ -40,16 +40,19 @@ viewEditHandle = viewEdit(mainCard);
 
 mainCard.Selection = 1;
 pause(1.5);
+drawnow;
 viewAnalyzeHandle = viewAnalyze(mainCard);
 mainCard.Selection = 2;
 pause(1.5);
+drawnow;
 viewResultsHandle = viewResults(mainCard);
 mainCard.Selection = 3;
 pause(1.5);
+drawnow;
 mainCard.Selection = 1;
 pause(0.5);
+drawnow;
 
-set(mainFig,'Visible','on');
 %Init Model's
 modelEditHandle = modelEdit();
 modelAnalyzeHandle = modelAnalyze();
@@ -71,5 +74,7 @@ controllerAnalyzeHandle.controllerEditHandle = controllerEditHandle;
 controllerAnalyzeHandle.controllerResultsHandle = controllerResultsHandle;
 controllerResultsHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
 
+pause(0.5);
+drawnow;
 delete(hf);
-end
+% end

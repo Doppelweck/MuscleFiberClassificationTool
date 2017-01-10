@@ -73,9 +73,9 @@ classdef viewResults < handle
             
             PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 5,'Padding',5);
             
-            PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',5);
-            PanelSave = uix.Panel('Parent',PanelVBox,'Title','Save options','FontSize',fontSizeB,'Padding',5);
-            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',5);
+            PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
+            PanelSave = uix.Panel('Parent',PanelVBox,'Title','Save options','FontSize',fontSizeB,'Padding',2);
+            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
             
             set( PanelVBox, 'Heights', [-5 -6 -14], 'Spacing', 5 );
             
@@ -272,8 +272,9 @@ classdef viewResults < handle
             
             NewPicToolTip = sprintf(['Select a new image for further processing.']);
             
-            SaveToolTip = sprintf(['Saves the data in the same directory \n',...
-                'as the selected rgb image']);
+            SaveToolTip = sprintf(['Saves the data in the same \n',...
+                ' directory as the selected RGB image.',...
+                'Create a new folder for each timestamp.']);
             
             CloseToolTip = sprintf(['Quit the program. \n',...
                 'Unsaved data will be lost.']);

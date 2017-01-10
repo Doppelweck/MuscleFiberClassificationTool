@@ -48,6 +48,7 @@ classdef modelResults < handle
         SavePicProcessed; %Indicates whether the processed image should be saved.
         SavePlanePicture; %Indicates whether the color-plane image should be saved.
         SavePath; % Save Path, same as the selected RGB image path.
+        ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
         LabelMat; %Label array of all fiber objects.
         
@@ -134,6 +135,8 @@ classdef modelResults < handle
             %       - Output
             %           obj:    Handle to modelResults object.
             %
+            
+            obj.ResultUpdateStaus = false;
              
         end
         
@@ -150,7 +153,13 @@ classdef modelResults < handle
             %           obj:    Handle to modelResults object.
             %
             
-            obj.InfoMessage = '- updating GUI';
+            if obj.ResultUpdateStaus
+                %nothing has changed. 
+                obj.InfoMessage = '- No new analysis has been done';
+                obj.InfoMessage = '- updating data is not necessary';
+                obj.InfoMessage = '- updating GUI is not necessary';
+            else
+            obj.InfoMessage = '- updating GUI...';
             
             obj.transformDataStructToMatrix();
             
@@ -167,6 +176,9 @@ classdef modelResults < handle
             obj.controllerResultsHandle.showPicProcessedGUI();
             
             obj.InfoMessage = '- updating GUI complete';
+            
+            obj.ResultUpdateStaus = true;
+            end
         end
         
         function transformDataStructToMatrix(obj)
@@ -509,7 +521,7 @@ classdef modelResults < handle
             %
             
             obj.InfoMessage = ' ';
-            obj.InfoMessage = '   - Saving data in the same dir than the RGB image was selected';
+            obj.InfoMessage = '   - saving data in the same dir than the RGB image was selected';
             
             %Cell arrays for saving data in excel sheet
             CellStatisticTable = {}; 
@@ -537,17 +549,23 @@ classdef modelResults < handle
                 obj.InfoMessage = '      - resluts folder allready excist';
                 obj.InfoMessage = '      - add new results files to folder:';
                 obj.InfoMessage = ['      - ' SaveDir];
+                obj.SavePath = SaveDir;
             else
-                % create new folder to save results
+                % create new main folder to save results
                 mkdir(SaveDir);
                 obj.InfoMessage = '      - create resluts folder';
+                obj.SavePath = SaveDir;
             end
-            obj.SavePath = SaveDir;
+            
+            %Add folder with time and date in the main result folder.
+            SaveDir = fullfile(SaveDir,[obj.FileNamesRGB '_RESULTS' time]);
+            mkdir(SaveDir);
+            
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save image processed with boudaries
             if obj.SavePicProcessed
-                obj.InfoMessage = '      - saving image processed with boundaries';
+                obj.InfoMessage = '      - saving image processed with boundaries...';
                 
                 % save picture as tif file
                 f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
@@ -579,7 +597,7 @@ classdef modelResults < handle
              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save color plane image as tif file
             if obj.SavePlanePicture
-                obj.InfoMessage = '      - saving color plane image';
+                obj.InfoMessage = '      - saving color plane image...';
                 
                 fileName = [fileNameRGB '_image_colorPlane' time '.tif'];
                 
@@ -594,27 +612,61 @@ classdef modelResults < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save axes StatisticsTab
             if obj.SavePlots
-               obj.InfoMessage = '      - saving axes with statistics plots';
+               obj.InfoMessage = '      - saving axes with statistics plots...';
 
                obj.InfoMessage = '         - saving area plot as .pdf'; 
                fileName = [fileNameRGB '_processed_AreaPlot' time '.pdf'];
                fullFileName = fullfile(SaveDir,fileName);
-               saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAArea,fullFileName);
+               
+               fTemp = figure('Visible','off');
+               lTemp = findobj('Tag','LegendAreaPlot');
+               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAArea],fTemp);
+               set(lTemp,'Location','best')
+               
+               saveTightFigureOrAxes(fTemp,fullFileName);
+               
+               delete(fTemp)
                
                obj.InfoMessage = '         - saving number of Fiber-Types as .pdf'; 
                fileName = [fileNameRGB '_processed_NumberPlot' time '.pdf'];
                fullFileName = fullfile(SaveDir,fileName);
-               saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hACount,fullFileName);
                
+               fTemp = figure('Visible','off');
+               lTemp = findobj('Tag','LegendNumberPlot');
+               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hACount],fTemp);
+               set(lTemp,'Location','best')
+
+               saveTightFigureOrAxes(fTemp,fullFileName);
+               
+               delete(fTemp)
+
                obj.InfoMessage = '         - saving Scatter plot Classification as .pdf'; 
                fileName = [fileNameRGB '_processed_ScatterClassificationPlot' time '.pdf'];
                fullFileName = fullfile(SaveDir,fileName);
-               saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAScatter,fullFileName);
+               
+               fTemp = figure('Visible','off');
+               lTemp = findobj('Tag','LegendScatterPlot');
+               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatter],fTemp);
+               set(lTemp,'Location','best')
+               
+               saveTightFigureOrAxes(fTemp,fullFileName);
+               
+               delete(fTemp)
                
                obj.InfoMessage = '         - saving Scatter plot All-Objects as .pdf';
                fileName = [fileNameRGB '_processed_ScatterAllPlot' time '.pdf'];
                fullFileName = fullfile(SaveDir,fileName);
-               saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAScatterAll,fullFileName);
+               
+               fTemp = figure('Visible','off','position',[100 100 600 400]);
+               lTemp = findobj('Tag','LegendScatterAllPlot');
+               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterAll],fTemp);
+               set(lTemp,'Location','best')
+               
+               saveTightFigureOrAxes(fTemp,fullFileName);
+               
+               delete(fTemp)
+               
+               obj.InfoMessage = '   - saving axes complete';
             end
             
             
@@ -672,7 +724,7 @@ classdef modelResults < handle
                     % expand CellFiber to the smae length as
                     % CellStatistic
                     CellFiberTable{dimStatisticCell(1),dimStatisticCell(2)} = {};
-                    obj.InfoMessage = '      - concatenate arrays structs';
+                    obj.InfoMessage = '      - concatenate array structs';
                 end
                 
                 DataFile = cat(2,CellStatisticTable,CellFiberTable);
@@ -684,7 +736,7 @@ classdef modelResults < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Save DataFile as xls file
             if ~isempty(DataFile)
-                obj.InfoMessage = '      - start creating .xlsx file';
+                obj.InfoMessage = '      - creating .xlsx file';
                 
                 if ismac
                     % OS is macintosh. xlswrite is not supported. Use
@@ -744,6 +796,7 @@ classdef modelResults < handle
             end
             
             obj.InfoMessage = '   - Saving data complete';
+
         end
         
         function showPicProcessedGUI(obj,axesPicAnalyze,axesResults)

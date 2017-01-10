@@ -74,6 +74,7 @@ classdef modelAnalyze < handle
         CalculationRunning; %Indicates if any caluclation is still running.
         
         Stats; % Data struct of all fiber objets.
+        
     end
     
     properties(SetObservable)
@@ -407,7 +408,7 @@ classdef modelAnalyze < handle
                     % get workbar in foreground
                     pause(0.1)
                 end
-                workbar(percent,'Please Wait...ploting boundaries','ploting boundaries');
+                workbar(percent,'Please Wait...ploting boundaries','Boundaries');
             end
             
         end
@@ -632,6 +633,12 @@ classdef modelAnalyze < handle
             if newFiberType == oldFiberType
                 % Fiber Type hasn't changed
             else
+                
+                %Set SavedStatus in results model to false if a new analyze
+                %were running or a fiber type hase changed and clear old
+                %results data.
+                obj.controllerAnalyzeHandle.controllerResultsHandle.clearData();
+                
                 % Fiber Type has changed
                 
                 %get axes with RGB image

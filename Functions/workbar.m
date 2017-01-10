@@ -119,7 +119,8 @@ if isempty(progfig)
          'position',winpos,...                              % Set the position of the figure as above
          'color',wincolor,...                               % Set the figure color
          'resize','off',...                                 % Turn of figure resizing
-         'tag','timebar');                                  % Tag the figure for later checking
+         'tag','timebar',...                                % Tag the figure for later checking
+         'WindowStyle','modal');                            % Stay figure in forground                          
     
     work.progtitle = progtitle;                             % Store initial values for title
     work.message = message;                                 % Store initial value for message
