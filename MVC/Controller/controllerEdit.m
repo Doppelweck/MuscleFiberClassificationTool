@@ -258,7 +258,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
             
             %select a new image
-            succsesNewPic = obj.modelEditHandle.openNewPic();
+            succsesNewPic = obj.openNewPic();
             
             if succsesNewPic
                 %selecting a new image was successfully
@@ -364,6 +364,41 @@ classdef controllerEdit < handle
                 end
             end
             set(obj.viewEditHandle.B_NewPic,'Enable','on');
+        end
+        
+        function succses = openNewPic(obj)
+            % Opens a file select dialog box where the user can select a
+            % new RGB image for further processing. Only allows to select
+            % one image .tif file. If a new picture was selected all old
+            % image data will be deleted.
+            %
+            %   PicData = sendPicsToController(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to modelEdit object
+            %
+            %       - Output
+            %           succses:    returns true if a new image was
+            %               selected, otherwise flase.
+            
+            %Get filename and path of the new image
+            [tempFileNamesRGB,tempPathNames] = uigetfile('*.tif','Select the image','MultiSelect', 'off');
+            
+            if isequal(tempFileNamesRGB ,0) && isequal(tempPathNames,0)
+                %no image was selected
+                obj.modelEditHandle.InfoMessage = '   - open image canceled';
+                succses = false;
+            else
+                % clear old Pic Data if a new one is selected
+                obj.modelEditHandle.clearPicData();
+                
+                %save filename and path in the properties
+                obj.modelEditHandle.FileNamesRGB = tempFileNamesRGB;
+                obj.modelEditHandle.PathNames = tempPathNames;
+                succses = true;
+            end
         end
         
         function checkPlanesEvent(obj,~,~)

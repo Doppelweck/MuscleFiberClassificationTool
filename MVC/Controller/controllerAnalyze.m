@@ -1008,7 +1008,7 @@ classdef controllerAnalyze < handle
             %           evnt:   callback event data
             %
             
-            obj.backEditEvent();
+            obj.backEditModeEvent();
             obj.controllerEditHandle.newPictureEvent();
         end
         

@@ -1,7 +1,7 @@
 
-
+% find starting path
 path = cd;
-
+% add files to the matalb path
 addpath(genpath(path));
 
 cl;
@@ -9,18 +9,18 @@ pause(0.1);
 % 
 % if checkSystem()
 
+% create starting screen
 hf = startSrcreen();    
-setAlwaysOnTop(hf,true);   
-% Init View's
+setAlwaysOnTop(hf,true);
 
-mainFig = figure('Units','pixels','Position',[1 50 1900 900],...
+% create main figure
+mainFig = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85],...
     'Name','Fiber types classification tool','DockControls','off',...
     'doublebuffer', 'off','Menubar','figure','Visible','on',...
     'WindowStyle','normal','NumberTitle','off');
 
+% hide needless ToogleTool objects in teh main figure
 set( findall(mainFig,'ToolTipString','Edit Plot') ,'Visible','Off');
-% set( findall(mainFig,'ToolTipString','Rotate 3D') ,'Visible','Off');
-% set( findall(mainFig,'ToolTipString','Data Cursor') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Colorbar') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Legend') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Hide Plot Tools') ,'Visible','Off');
@@ -30,38 +30,31 @@ set( findall(mainFig,'ToolTipString','Brush/Select Data') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Show Plot Tools and Dock Figure') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Link Plot') ,'Visible','Off');
 
+%create card panel onbject
 mainCard = uix.CardPanel('Parent', mainFig,'Selection',0);
 
-movegui(mainFig,'center');
-
-
-
+%Init VIEW's
 viewEditHandle = viewEdit(mainCard);
-
 mainCard.Selection = 1;
-pause(1.5);
 drawnow;
 viewAnalyzeHandle = viewAnalyze(mainCard);
 mainCard.Selection = 2;
-pause(1.5);
 drawnow;
 viewResultsHandle = viewResults(mainCard);
 mainCard.Selection = 3;
-pause(1.5);
 drawnow;
 mainCard.Selection = 1;
-pause(0.5);
 drawnow;
 
-%Init Model's
+%Init MODEL's
 modelEditHandle = modelEdit();
 modelAnalyzeHandle = modelAnalyze();
 modelResultsHandle = modelResults();
 
-%Init Controller's
-controllerEditHandle = controllerEdit(mainFig,mainCard,viewEditHandle,modelEditHandle);
-controllerAnalyzeHandle = controllerAnalyze(mainFig,mainCard,viewAnalyzeHandle,modelAnalyzeHandle);
-controllerResultsHandle = controllerResults(mainFig,mainCard,viewResultsHandle,modelResultsHandle);
+%Init CONTROLLER's
+controllerEditHandle = controllerEdit(mainFig, mainCard, viewEditHandle, modelEditHandle);
+controllerAnalyzeHandle = controllerAnalyze(mainFig, mainCard, viewAnalyzeHandle, modelAnalyzeHandle);
+controllerResultsHandle = controllerResults(mainFig, mainCard, viewResultsHandle, modelResultsHandle);
 
 %Connecting Model's and their Controller's
 modelEditHandle.controllerEditHandle = controllerEditHandle;
@@ -76,5 +69,6 @@ controllerResultsHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
 
 pause(0.5);
 drawnow;
+% delete starting screen
 delete(hf);
 % end

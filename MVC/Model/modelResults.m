@@ -576,7 +576,7 @@ classdef modelResults < handle
                 h.Position = [0 0 1 1];
                 h.DataAspectRatioMode = 'auto';
                 
-                frame = getframe(h);
+                frame = getframe(f);
                 frame=frame.cdata;
                 picName = [fileNameRGB '_image_processed' time '.tif'];
                 oldPath = pwd;
@@ -764,13 +764,13 @@ classdef modelResults < handle
                     startRange = 'B2';
                     
                     oldPath = pwd;
-                    cd(SaveDir)
+                    cd(SaveDir);
                     
                     % undocumented function from the file exchange Matlab Forum
                     % for creating .xlsx files on a macintosh OS
                     status = xlwrite(fileName, DataFile, sheetName, startRange);
                     
-                    cd(oldPath)
+                    cd(oldPath);
                     
                     if status
                         obj.InfoMessage = '         - .xlxs file has been created';
@@ -790,6 +790,54 @@ classdef modelResults < handle
                     end
                     
                 elseif ispc
+                    
+                    obj.InfoMessage = '         - trying to create excel sheet...';
+                    fileName = [fileNameRGB '_results' time '.xlsx'];
+                    sheet = 1;
+                    startRange = 'B2';
+                    %delete enpty cells for xlswrite
+                    DataFileFull = DataFile;
+                    emptyIndex = cellfun('isempty',DataFileFull);
+                    DataFileFull(emptyIndex)= {' '};
+                    oldPath = pwd;
+                    cd(SaveDir);
+                    status = xlswrite(fileName, DataFileFull, sheet, startRange);
+                    cd(oldPath);
+                    
+                    if status
+                        obj.InfoMessage = '         - .xlxs file has been created';
+                    else
+                        obj.InfoMessage = '         - .xlxs file could not be created';
+                        obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
+                        
+                        fileName = [fileNameRGB '_results' time '.xlsx'];
+                        sheetName = 'Fiber types';
+                        startRange = 'B2';
+                        oldPath = pwd;
+                        cd(SaveDir);
+                        
+                        % undocumented function from the file exchange Matlab Forum
+                        % for creating .xlsx files on a macintosh OS
+                        status = xlwrite(fileName, DataFile, sheetName, startRange);
+                        
+                        cd(oldPath);
+                        if status
+                            
+                            obj.InfoMessage = '         - .xlxs file could not be created';
+                            obj.InfoMessage = '         - creating .txt file instead...';
+                            fileName = [fileNameRGB '_results' time '.txt'];
+                            oldPath = pwd;
+                            cd(SaveDir)
+                            fid=fopen(fileName,'a+');
+                            % undocumented function from the file exchange Matlab Forum
+                            % for creating .txt files.
+                            cell2file(fid,DataFile,'EndOfLine','\r\n');
+                            fclose(fid);
+                            cd(oldPath)
+                            obj.InfoMessage = '         - .txt file has been created';
+                        end
+                    end
+                    
                 end
                 
                 

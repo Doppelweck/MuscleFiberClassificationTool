@@ -693,7 +693,7 @@ classdef controllerResults < handle
                     %clear Data
                     obj.clearData();
                     
-                    obj.backAnalyzeEvent();
+                    obj.backAnalyzeModeEvent();
                     obj.controllerAnalyzeHandle.newPictureEvent;
                 case 'No'
                     obj.modelResultsHandle.InfoMessage = '   - closing program canceled';

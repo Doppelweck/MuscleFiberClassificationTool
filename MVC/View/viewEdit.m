@@ -79,7 +79,7 @@ classdef viewEdit < handle
             % constructor
             fontSizeS = 10; % Font size small
             fontSizeM = 12; % Font size medium
-            fontSizeB = 16; % Font size big
+            fontSizeB = 14; % Font size big
             
             mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
             
