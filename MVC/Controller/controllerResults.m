@@ -843,14 +843,16 @@ classdef controllerResults < handle
             switch choice
                 case 'Yes'
                     
-                    delete(obj.viewResultsHandle);
-                    delete(obj.modelResultsHandle);
+                    delete(obj.viewEditHandle);
+                    delete(obj.modelEditHandle);
                     delete(obj.mainCardPanel);
                     
-                    figHandles = findall(0,'Type','figure');
-                    object_handles = findall(figHandles);
+                    %find all objects
+                    object_handles = findall(obj.mainFigure);
+                    %delete objects
                     delete(object_handles);
-                    delete(figHandles);
+                    %delete main figure
+                    delete(obj.mainFigure);
                 case 'No'
                 obj.modelResultsHandle.InfoMessage = '   - closing program canceled';
                 otherwise
