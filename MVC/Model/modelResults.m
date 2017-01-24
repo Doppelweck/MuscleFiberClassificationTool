@@ -675,16 +675,49 @@ classdef modelResults < handle
             if obj.SaveFiberTable
                 obj.InfoMessage = '      - creating Fiber-Type struct';
                 
-                HeaderTable = {'Number' 'Area_(pixel)' 'FCP_x' 'FCP_y' ...
+                HeaderTable = {'Number' 'Code' 'Muscle' 'Count' 'Area_(pixel)' 'FCP_x' 'FCP_y' ...
                     'MinorAxis' 'MajorAxis' 'Perimeter_(pixel)'  'Roundness' ...
                     'AspectRatio' 'meanRed' 'meanGreen' 'meanBlue' 'meanFaraRed',...
                     'ColorValue (HSV)' 'colorHue (HSV)' 'RatioBlueRed' 'DistanceBlueRed' 'Type'};
                 for i=1:1:length(HeaderTable)
                     newFile{2,i} = HeaderTable{i};
                 end
-                CellFiberTable = mat2cell(obj.StatsMatData,ones(1,size(obj.StatsMatData,1)),ones(1,size(obj.StatsMatData,2)));
                 
-                CellFiberTable = cat(1,HeaderTable,CellFiberTable);
+                StringFileName = strsplit(obj.FileNamesRGB);
+                
+                if length(StringFileName) < 4
+                    StringFileName = strsplit(obj.FileNamesRGB,'-');
+                end
+                
+                if length(StringFileName) < 4
+                    StringFileName = strsplit(obj.FileNamesRGB,'_');
+                end
+                
+                if length(StringFileName) >= 4
+                    
+                    MuscleInfo = cell(size(obj.StatsMatData,1),3);
+                    
+                    [MuscleInfo{:,1}] = deal(StringFileName{2});
+                    [MuscleInfo{:,2}] = deal(StringFileName{3});
+                    [MuscleInfo{:,3}] = deal(StringFileName{4});
+                else
+                    MuscleInfo = cell(size(obj.StatsMatData,1),1);
+                    
+                    [MuscleInfo{:,1}] = deal(StringFileName{1});
+                    HeaderTable = {'Number' 'FileName' 'Area_(pixel)' 'FCP_x' 'FCP_y' ...
+                    'MinorAxis' 'MajorAxis' 'Perimeter_(pixel)'  'Roundness' ...
+                    'AspectRatio' 'meanRed' 'meanGreen' 'meanBlue' 'meanFaraRed',...
+                    'ColorValue (HSV)' 'colorHue (HSV)' 'RatioBlueRed' 'DistanceBlueRed' 'Type'};
+                end
+                
+                CellTable = mat2cell(obj.StatsMatData,ones(1,size(obj.StatsMatData,1)),ones(1,size(obj.StatsMatData,2)));
+                
+                temp1 = mat2cell(obj.StatsMatData(:,1),ones(1,size(obj.StatsMatData(:,1),1)),ones(1,size(obj.StatsMatData(:,1),2)));
+                temp2 = mat2cell(obj.StatsMatData(:,2:end),ones(1,size(obj.StatsMatData(:,2:end),1)),ones(1,size(obj.StatsMatData(:,2:end),2)));
+                
+                CellTable = cat(2,temp1,MuscleInfo,temp2);
+                
+                CellFiberTable = cat(1,HeaderTable,CellTable);
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -809,6 +842,19 @@ classdef modelResults < handle
                     else
                         obj.InfoMessage = '         - .xlxs file could not be created';
                         obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
+                        
+                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
+                        javaaddpath(path);
+                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-3.8-20120326.jar'];
+                        javaaddpath(path);
+                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-schemas-3.8-20120326.jar'];
+                        javaaddpath(path);
+                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/xmlbeans-2.3.0.jar'];
+                        javaaddpath(path);
+                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/dom4j-1.6.1.jar'];
+                        javaaddpath(path);
+                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
+                        javaaddpath(path);
                         
                         fileName = [fileNameRGB '_results' time '.xlsx'];
                         sheetName = 'Fiber types';
