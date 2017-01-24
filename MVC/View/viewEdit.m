@@ -35,6 +35,7 @@ classdef viewEdit < handle
         B_Redo; %Button, to redo a change in the binary image.
         B_NewPic; %Button, to select a new picture.
         B_CheckPlanes;%Button, opens a new figure to check and change the image planes.
+        B_CheckMask;
         B_StartAnalyzeMode; %Button, close the EditMode and opens the the AnalyzeMode.
         
         B_Alpha; %Slider, to change the transperancy between the binary and the RGB picture.
@@ -77,9 +78,21 @@ classdef viewEdit < handle
     methods
         function obj = viewEdit(mainCard)
             % constructor
-            fontSizeS = 10; % Font size small
-            fontSizeM = 12; % Font size medium
-            fontSizeB = 14; % Font size big
+            
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+                
+            end
             
             mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
             
@@ -106,16 +119,16 @@ classdef viewEdit < handle
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 5 );
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',5);
             obj.B_Undo = uicontrol( 'Parent', HBoxControl1, 'String', '<- Undo','FontSize',fontSizeB );
             obj.B_Redo = uicontrol( 'Parent', HBoxControl1, 'String', 'Redo ->','FontSize',fontSizeB );
             
-            
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',5);
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'New image' );
             obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'Check planes' ,'Enable','off');
             
-            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5,'Spacing',5);
+            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Spacing',5);
+            obj.B_CheckMask = uicontrol( 'Parent', HBoxControl3,'FontSize',fontSizeB,'Style','togglebutton', 'String', 'Check mask' ,'Enable','off');
             obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl3,'FontSize',fontSizeB,'Style','pushbutton', 'String', 'Start analyzing mode' ,'Enable','off');
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -129,7 +142,7 @@ classdef viewEdit < handle
             ThresholdModeText = uicontrol( 'Parent', HButtonBoxBinari11,'Style','text','FontSize',fontSizeM, 'String', 'Threshold Mode :' );
             
             HButtonBoxBinari12 = uix.HButtonBox('Parent', HBoxBinari1,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_ThresholdMode = uicontrol( 'Parent', HButtonBoxBinari12,'Style','popupmenu','FontSize',fontSizeM, 'String', {'Manual global' , 'Automatic adaptive', 'both'} ,'Enable','off');
+            obj.B_ThresholdMode = uicontrol( 'Parent', HButtonBoxBinari12,'Style','popupmenu','FontSize',fontSizeM, 'String', {'Manual global threshold' , 'Automatic adaptive threshold', 'Combined manual and adaptive', 'Automatic setup'} ,'Enable','off');
             
             set( HBoxBinari1, 'Widths', [-1 -2] );
             
@@ -189,7 +202,7 @@ classdef viewEdit < handle
             ColorText = uicontrol( 'Parent', HButtonBoxBinari51,'Style','text','FontSize',fontSizeM, 'String', 'Color:' );
             
             HButtonBoxBinari52 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_Color = uicontrol( 'Parent', HButtonBoxBinari52,'Style','popupmenu','FontSize',fontSizeM, 'String', {'White' , 'Black'} ,'Enable','off');
+            obj.B_Color = uicontrol( 'Parent', HButtonBoxBinari52,'Style','popupmenu','FontSize',fontSizeM, 'String', {'White' , 'Black', 'White fill region', 'Black fill region'} ,'Enable','off');
             
             HButtonBoxBinari53 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 30],'Padding', 1 );
             obj.B_Invert = uicontrol( 'Parent', HButtonBoxBinari53,'FontSize',fontSizeM, 'String', 'Invert' ,'Enable','off');
@@ -206,7 +219,7 @@ classdef viewEdit < handle
             HButtonBoxMorph5 = uix.HButtonBox('Parent', MainVBoxMorph,'ButtonSize',[3000 40]);
             
             uicontrol( 'Parent', HButtonBoxMorph1,'Style','text','FontSize',fontSizeM, 'String', 'Morphol. operation:');
-            String = {'choose operation' ,'edge smoothing','close small gaps' ,'erode', 'dilate', 'skel' ,'thin','shrink','majority'};
+            String = {'choose operation' ,'edge smoothing','close small gaps' ,'erode', 'dilate', 'skel' ,'thin','shrink','majority','remove'};
             obj.B_MorphOP = uicontrol( 'Parent', HButtonBoxMorph1,'Style','popupmenu','FontSize',fontSizeM, 'String', String ,'Enable','off');
             
             uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontSize',fontSizeM, 'String', 'Structuring element:');
@@ -233,7 +246,7 @@ classdef viewEdit < handle
             set(obj.B_ThresholdValue,'String',num2str(get(obj.B_Threshold,'Value')));
             set(obj.B_AlphaValue,'String',num2str(get(obj.B_Alpha,'Value')));
             
-            
+            set(obj.B_ThresholdMode,'Value',3);
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
 

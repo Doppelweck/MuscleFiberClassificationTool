@@ -77,7 +77,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences';
             obj.modelEditHandle.InfoMessage = 'Version 1.0 2017';
             obj.modelEditHandle.InfoMessage = ' ';
-            obj.modelEditHandle.InfoMessage = 'Press "NewPic" to start';
+            obj.modelEditHandle.InfoMessage = 'Press "New image" to start';
             
             
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
@@ -127,6 +127,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_NewPic,'Callback',@obj.newPictureEvent);
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Callback',@obj.startAnalyzeModeEvent);
             set(obj.viewEditHandle.B_CheckPlanes,'Callback',@obj.checkPlanesEvent);
+            set(obj.viewEditHandle.B_CheckMask,'Callback',@obj.checkMaskEvent);
             set(obj.viewEditHandle.B_Invert,'Callback',@obj.invertEvent);
             set(obj.viewEditHandle.B_ThresholdValue,'Callback',@obj.thresholdEvent);
             set(obj.viewEditHandle.B_AlphaValue,'Callback',@obj.alphaMapEvent);
@@ -246,6 +247,7 @@ classdef controllerEdit < handle
             %disable GUI objects
             set(obj.viewEditHandle.B_NewPic,'Enable','off');
             set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+            set(obj.viewEditHandle.B_CheckMask,'Enable','off');
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
             set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
@@ -256,6 +258,9 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_Alpha,'Enable','off');
             set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+            set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+            set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+            set(obj.viewEditHandle.B_NoIteration,'Enable','off');
             
             %select a new image
             succsesNewPic = obj.openNewPic();
@@ -297,6 +302,7 @@ classdef controllerEdit < handle
                     %enable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+                    set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                     set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -307,6 +313,9 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                    
+                    % check wich morphOp buttons must be enabled
+                    obj.morphOpEvent();
                     
                 else
                     %loading color plane images was not successfully
@@ -322,6 +331,9 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 end
                 
             elseif isa(obj.modelEditHandle.handlePicRGB,'struct')
@@ -329,13 +341,15 @@ classdef controllerEdit < handle
                 %loaded into the program
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                set(obj.viewEditHandle.B_CheckMask,'Enable','off');
             else
                 %selecting a new image was not successfully.
-                if isempty(obj.modelEditHandle.handlePicBW);
+                if isempty(obj.modelEditHandle.handlePicBW)
                     %No image is loaded into the program.
                     %disable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                    set(obj.viewEditHandle.B_CheckMask,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
                     set(obj.viewEditHandle.B_Threshold,'Enable','off');
@@ -346,11 +360,15 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 else
                     %One image is already loaded into the program.
                     %enable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+                    set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                     set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -361,6 +379,9 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                    
+                    % check wich morphOp buttons must be enabled
+                    obj.morphOpEvent();
                 end
             end
             set(obj.viewEditHandle.B_NewPic,'Enable','on');
@@ -404,7 +425,7 @@ classdef controllerEdit < handle
         function checkPlanesEvent(obj,~,~)
             % Callback function of the Check planes button in the GUI.
             % Opens a new figure that shows all color plane pictures
-            % identified by the program. Thee figure also shows the
+            % identified by the program. The figure also shows the
             % origianal RGB image and an RGB image that is created by the
             % color plane images.
             % Set the callback functions for the buttons and the close
@@ -428,6 +449,78 @@ classdef controllerEdit < handle
             h = findobj('Tag','CheckPlanesFigure');
             % set the close request functio of the figure h
             set(h,'CloseRequestFcn',@obj.checkPlanesBackEvent);
+        end
+        
+        function checkMaskEvent(obj,src,evnt)
+            % Callback function of the Check mask button in the GUI.
+            %
+            %   checkPlanesEvent(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerEdit object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
+            
+            if src.Value == 1
+                obj.modelEditHandle.InfoMessage = '   - check mask';
+                set(obj.mainFigure,'ButtonDownFcn','');
+                set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn','');
+                
+                set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+                set(obj.viewEditHandle.B_NewPic,'Enable','off');
+                set(obj.viewEditHandle.B_Undo,'Enable','off');
+                set(obj.viewEditHandle.B_Redo,'Enable','off');
+                set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                set(obj.viewEditHandle.B_Invert,'Enable','off');
+                set(obj.viewEditHandle.B_Color,'Enable','off');
+                set(obj.viewEditHandle.B_MorphOP,'Enable','off');
+                set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+                set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+                set(obj.viewEditHandle.B_NoIteration,'Enable','off');
+                
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                
+                obj.modelEditHandle.checkMask(src.Value);
+                
+            elseif src.Value == 0
+                
+                obj.modelEditHandle.InfoMessage = '   - close check mask';
+                obj.addWindowCallbacks();
+                set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragFcn);
+                
+                obj.modelEditHandle.checkMask(src.Value);
+                
+                set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
+                set(obj.viewEditHandle.B_NewPic,'Enable','on');
+                set(obj.viewEditHandle.B_Undo,'Enable','on');
+                set(obj.viewEditHandle.B_Redo,'Enable','on');
+                set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                        obj.viewEditHandle.B_ThresholdMode.Value == 3 )
+                    %activate only if threshold is nessesary
+                    set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                end
+                set(obj.viewEditHandle.B_Invert,'Enable','on');
+                set(obj.viewEditHandle.B_Color,'Enable','on');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                
+                % check wich morphOp buttons must be enabled
+                obj.morphOpEvent();
+            end
+            
+            
+            
         end
         
         function checkPlanesOKEvent(obj,~,~)
@@ -591,6 +684,45 @@ classdef controllerEdit < handle
                 
                 %Create binary image with threshold value in model
                 obj.modelEditHandle.createBinary();
+                
+            elseif Mode == 4
+                % Use Automatic setup for binarization
+                set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                
+                set(obj.viewEditHandle.B_NewPic,'Enable','off');
+                set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                set(obj.viewEditHandle.B_CheckMask,'Enable','off');
+                set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                set(obj.viewEditHandle.B_Color,'Enable','off');
+                set(obj.viewEditHandle.B_Invert,'Enable','off');
+                set(obj.viewEditHandle.B_Alpha,'Enable','off');
+                set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                
+                obj.modelEditHandle.ThresholdMode = Mode;
+                obj.modelEditHandle.InfoMessage = '      - Automatic setup has been selected';
+                
+                
+                %Create binary image with threshold value in model
+                obj.modelEditHandle.createBinary();
+                
+                set(obj.viewEditHandle.B_NewPic,'Enable','on');
+                set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+                set(obj.viewEditHandle.B_CheckMask,'Enable','on');
+                set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                set(obj.viewEditHandle.B_Color,'Enable','on');
+                set(obj.viewEditHandle.B_Invert,'Enable','on');
+                set(obj.viewEditHandle.B_Alpha,'Enable','on');
+                set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                
             else
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in thresholdModeEvent() FUNCTION !';
@@ -861,6 +993,12 @@ classdef controllerEdit < handle
             elseif evnt.Source.Value == 2
                 % Black Color
                 obj.modelEditHandle.ColorValue = 0;
+            elseif evnt.Source.Value == 3
+                % White Color fill region
+                obj.modelEditHandle.ColorValue = 1;
+            elseif evnt.Source.Value == 4
+                % Black Color fill region
+                obj.modelEditHandle.ColorValue = 0;
             else
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in lineWidthEvent() FUNCTION !';
@@ -902,7 +1040,8 @@ classdef controllerEdit < handle
             %
             
             %check wich morph operation is selected
-            String = src.String{src.Value};
+            Strings = obj.viewEditHandle.B_MorphOP.String;
+            String = Strings{obj.viewEditHandle.B_MorphOP.Value};
             
             switch String
                 
@@ -952,12 +1091,16 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
                     set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                     set(obj.viewEditHandle.B_NoIteration,'Enable','off')
-                    obj.modelEditHandle.morphOP = '';
+                    obj.viewEditHandle.B_MorphOP.Value = 1;
+                    obj.modelEditHandle.morphOP = 'choose operation';
+                    set(obj.viewEditHandle.B_MorphOP,'Enable','on')
                     
             end
             
             % Check wich morph option is selectet to turn off/on the
             % corresponding operating elements
+            
+            set(obj.viewEditHandle.B_MorphOP,'Enable','on');
             
             % get morphological operation string
             tempMorpStr = obj.modelEditHandle.morphOP;
@@ -967,7 +1110,6 @@ classdef controllerEdit < handle
             % Check wich operation is selected
             if strcmp(tempMorpStr,'choose operation') || strcmp(tempMorpStr,'')
                 % No operation is selected
-                
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
@@ -1187,12 +1329,26 @@ classdef controllerEdit < handle
             %       - Input
             %           obj:    Handle to controllerEdit object
             %
-            if ~isempty(obj.modelEditHandle.handlePicBW);
+            if ~isempty(obj.modelEditHandle.handlePicBW)
                 
+                if (obj.viewEditHandle.B_Color.Value == 1 || ...
+                     obj.viewEditHandle.B_Color.Value == 2 )   
+                % Color Black or white is selected to use free hand draw
+                % mode.
                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
                 Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
                 obj.modelEditHandle.startDragFcn(Pos);
+                
+                elseif (obj.viewEditHandle.B_Color.Value == 3 || ...
+                     obj.viewEditHandle.B_Color.Value == 4 ) 
+                % Color Black or white is selected to use region fill
+                % mode. 
+                Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
+                obj.modelEditHandle.fillRegion(Pos);
+                else
+                    
+                end
                 
             end
         end

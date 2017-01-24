@@ -559,6 +559,9 @@ classdef modelEdit < handle
                             obj.PicBW = PicBW1 | PicBW2;
                             obj.handlePicBW.CData = obj.PicBW;
                             
+                        case 4 % Use automatic setup for binarization 
+                            obj.autoSetupBinarization();
+                            
                     end
                 else
                     % Binary pictur is invert
@@ -583,6 +586,8 @@ classdef modelEdit < handle
                             obj.PicBW = ~(temp1 | temp2);
                             obj.handlePicBW.CData = obj.PicBW;
                             
+                        case 4 % Use automatic setup for binarization     
+                            obj.autoSetupBinarization();
                     end
                     
                 end
@@ -637,9 +642,44 @@ classdef modelEdit < handle
             obj.addToBuffer();
         end
         
+        function fillRegion(obj,CurPos)
+            % Called by the controller when a user clicked into the binary
+            % image. Get the position of the click and fill the region,
+            % defined by the connected zeros or ones, depending on the
+            % selected color, in the binary image
+            %
+            %   fillRegion(obj,CurPos)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %           CurPos: current cursor position in the binary image
+            %
+            
+            x = round(CurPos(1,1));
+            y = round(CurPos(1,2));
+            if obj.ColorValue == 1
+                %white fill
+            BW1 = obj.handlePicBW.CData;
+            BW2 = imfill(BW1,[y x]);
+            BW3 = ~eq(BW1,BW2);
+
+            obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
+            elseif obj.ColorValue == 0
+               BW1 = ~obj.handlePicBW.CData; 
+               BW2 = imfill(BW1,[y x]);
+               BW3 = ~eq(BW1,BW2);
+               obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
+            else
+            end
+            
+            obj.addToBuffer();
+        end
+        
         function startDragFcn(obj,CurPos)
             % Called by the controller when a user clicked into the binary
-            % image. Get the position of the ckick and draw a circle with
+            % image. Get the position of the click and draw a circle with
             % the color and the radius depending on the linewidth value
             % that the user has selected at that position in the binary
             % image.
@@ -661,7 +701,7 @@ classdef modelEdit < handle
             [columnsInImage rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
             radius = obj.LineWidthValue;
             
-            if obj.ColorValue;
+            if obj.ColorValue == 1
                 % create white circle
                 circlePixels = ((rowsInImage - double(obj.y1)).^2 + (columnsInImage - double(obj.x1)).^2 <= radius.^2);
                 obj.handlePicBW.CData = obj.handlePicBW.CData | circlePixels;
@@ -817,6 +857,49 @@ classdef modelEdit < handle
             obj.addToBuffer();
         end
         
+        function checkMask(obj,check)
+            
+            if check == 1
+                if strcmp(obj.PicBWisInvert,'true')
+                    obj.InfoMessage = '      - image is in inverted form';
+                    obj.InfoMessage = '      - labeling objects';
+                    
+                    temp = obj.handlePicBW.CData; 
+                    % Fill holes in the binary image
+                    temp = imfill(temp,8,'holes');
+                    % Remove single pixels
+                    temp = bwareaopen(temp,1,4);
+                    L = bwlabel(temp,4);
+                    obj.InfoMessage = ['      - ' num2str(max(max(L))) 'objects was found'];
+                    
+                    temp = label2rgb(L, 'jet', 'w', 'shuffle');
+                    obj.InfoMessage = ['      - objects will be highlighted in RGB colors'];
+                    obj.handlePicBW.CData = temp;
+                    obj.InfoMessage = ['      - press "Check mask" button to quit check mask'];
+                else
+                    temp = ~obj.handlePicBW.CData;
+                    obj.InfoMessage = '      - image is in normal form';
+                    obj.InfoMessage = '      - labeling objects';
+                    % Fill holes in the binary image
+                    temp = imfill(temp,8,'holes');
+                    % Remove single pixels
+                    temp = bwareaopen(temp,1,4);
+                    L = bwlabel(temp,4);
+                    obj.InfoMessage = ['      - ' num2str(max(max(L))) 'objects was found'];
+                    temp = label2rgb(L, 'jet', 'w', 'shuffle');
+                    obj.InfoMessage = ['      - objects will be highlighted in RGB colors'];
+                    obj.handlePicBW.CData = temp;
+                    obj.InfoMessage = ['      - press "Check mask" button to quit check mask'];
+                end
+                
+            elseif check == 0
+                obj.handlePicBW.CData = obj.PicBW;
+            else
+                obj.InfoMessage = '! ERROR in checkMask() FUNCTION !';
+            end
+            
+        end
+        
         function runMorphOperation(obj)
             % Performs the selected mophological operation when a user
             % press the run morph button in the GUI.
@@ -933,6 +1016,278 @@ classdef modelEdit < handle
             obj.addToBuffer();
         end
         
+        function autoSetupBinarization(obj)
+            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+            obj.PicBWisInvert = 'false';
+            se = strel('disk',5);
+            imTopHatGreen = imtophat(obj.PicPlaneGreen_adj,se);
+            imTopHatGreen = imadjust(imTopHatGreen);
+            imCompGreen = imcomplement(obj.PicPlaneGreen_adj);
+%             figure(11)
+%             imshow(imCompGreen);
+            
+            %             imOpenGreen = imopen(imCompGreen, se);
+            %             figure(12)
+            %             imshow(imOpenGreen);
+            %
+            %             imErodeGreen = imerode(imCompGreen, se);
+            %             figure(13)
+            %             imshow(imErodeGreen);
+            %
+            %             Iobr = imreconstruct(imErodeGreen, imCompGreen);
+            %             figure(14)
+            %             imshow(Iobr);
+            %
+            %             Ioc = imclose(imOpenGreen, se);
+            
+            I = imCompGreen;
+            
+            hy = fspecial('sobel');
+            hx = hy';
+            Iy = imfilter(double(I), hy, 'replicate');
+            Ix = imfilter(double(I), hx, 'replicate');
+            gradmag = sqrt(Ix.^2 + Iy.^2);
+            
+%             figure(10)
+%             imshow(gradmag,[],'InitialMagnification','fit'), title('gradmag');
+            Io = imopen(I, se);
+%             figure(12)
+%             imshow(Io), title('Opening (Io)')
+            
+            Ie = imerode(I, se);
+            Iobr = imreconstruct(Ie, I);
+%             figure(13)
+%             imshow(Iobr), title('Opening-by-reconstruction (Iobr)')
+            
+            Ioc = imclose(Io, se);
+%             figure(14)
+%             imshow(Ioc), title('Opening-closing (Ioc)')
+            
+            Iobrd = imdilate(Iobr, se);
+            Iobrcbr = imreconstruct(imcomplement(Iobrd), imcomplement(Iobr));
+            Iobrcbr = imcomplement(Iobrcbr);
+%             figure(15)
+%             imshow(Iobrcbr), title('Opening-closing by reconstruction (Iobrcbr)')
+            
+            fgm = imregionalmax(Iobrcbr);
+%             figure(16)
+%             imshow(fgm,[],'InitialMagnification','fit'), title('Regional maxima of opening-closing by reconstruction (fgm)')
+            
+            I2 = I;
+            I2(fgm) = 255;
+%             figure(17)
+%             imshow(I2,[],'InitialMagnification','fit'), title('Regional maxima superimposed on original image (I2)')
+            
+            se2 = strel(ones(3,3));
+            fgm2 = imclose(fgm, se2);
+            fgm3 = imerode(fgm2, se2);
+            
+            fgm4 = bwareaopen(fgm3, 10); %%%%%%%%%%%%%%%%
+            fgm4 = imfill(fgm4,'holes');
+            
+            I3 = I;
+            I3(fgm4) = 255;
+%             figure(18)
+%             imshow(I3,[],'InitialMagnification','fit')
+%             title('Modified regional maxima superimposed on original image (fgm4)')
+            
+            bw = imbinarize(Iobrcbr);
+%             figure(19)
+%             imshow(bw,[],'InitialMagnification','fit'), title('Thresholded opening-closing by reconstruction (bw)')
+            
+            D = bwdist(bw);
+            DL = watershed(D);
+            bgm = DL == 0;
+%             figure(20)
+%             imshow(DL,[],'InitialMagnification','fit'), title('Watershed ridge lines (bgm)')
+            
+            gradmag2 = imimposemin(gradmag, bgm | fgm4);
+            
+            L = watershed(gradmag2);
+            
+            I4 = obj.PicPlaneGreen_adj;
+            I4(imdilate(L == 0, ones(1, 1),1) | bgm | fgm4) = 255;
+%             
+%             figure(21)
+%             imshow(I4,[],'InitialMagnification','fit')
+%             title('Markers and object boundaries superimposed on original image (I4)')
+            
+            Lrgb = label2rgb(L, 'jet', 'w', 'shuffle');
+%             figure(22)
+%             imshow(Lrgb,[],'InitialMagnification','fit')
+%             title('Colored watershed label matrix (Lrgb)')
+            
+%             figure(23)
+%             imshow(obj.PicRGB)
+%             hold on
+%             himage = imshow(Lrgb,[],'InitialMagnification','fit');
+%             himage.AlphaData = 0.2;
+%             title('Lrgb superimposed transparently on original image')
+            
+            f2=zeros(size(L));
+            f2(L==0)=1;
+            se = strel('disk',1);
+            f2 = imdilate(f2,se);
+            
+            obj.PicBW = obj.PicBW | f2;
+            obj.handlePicBW.CData = obj.PicBW | f2;
+            
+            %             [x,y]=size(imTopHatGreen);
+            %             X=1:x;
+            %             Y=1:y;
+            %             [xx,yy]=meshgrid(Y,X);
+            %             i=im2double(imTopHatGreen);
+            %             figure(12);mesh(xx,yy,i);
+            %             colorbar
+            %             figure;imshow(i)
+        end
+        
+%         function autoSetupBinarization(obj)
+%                    %Set invert status to false
+%                    obj.PicBWisInvert = 'false';
+%             
+%                    %create binary image
+%                    obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+%                    
+%                    f = obj.PicPlaneGreen_adj;
+%                    h = fspecial('sobel');
+%                    fd = double(f);
+%                    g = sqrt(imfilter(fd,h,'replicate').^2 + imfilter(fd,h','replicate').^2);
+%                    g2 = imclose(imopen(g, ones(3,3)), ones(3,3));
+%                    figure(11)
+%                    imshow(g,[],'InitialMagnification','fit');
+%                    figure(12)
+%                    imshow(g2,[],'InitialMagnification','fit');
+%                    L = watershed(g2);
+%                    figure(13)
+%                    rgb = label2rgb(L,'jet',[.5 .5 .5]);
+%                    imshow(rgb,[],'InitialMagnification','fit');
+%                    
+%                    wr = L == 0;
+%                    
+%                    rm = imregionalmin(f);
+%                    im = imextendedmin(f,5);
+%                    fim = f;
+%                    fim(im) = 175;
+%                    figure(14)
+%                    imshow(fim,[],'InitialMagnification','fit');
+%                    
+%                    Lim = watershed(bwdist(im));
+%                    em = Lim == 0;
+%                    figure(15)
+%                    imshow(em,[],'InitialMagnification','fit');
+%                    
+%                    g3 = imimposemin(g2,im | em);
+%                    L2 = watershed(g3);
+%                    f2 = zeros(size(L2));
+%                    f2(L2 == 0) = 255;
+%                    rgb = label2rgb(L2,'jet',[.5 .5 .5]);
+%                     figure(16)
+%                     imshow(rgb,[],'InitialMagnification','fit');
+%                    
+%                    tempPic = ~imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',0.5);
+%                    
+%                    figure
+%                    imshow(f2);
+%                    
+%                    
+%                    imDistMarker = bwdist(~tempPic,'cityblock');
+%                    figure(7)
+%                    imshow(imDistMarker,[],'InitialMagnification','fit');
+%                    imDistMarkerBW = imbinarize(imDistMarker,'adaptive','ForegroundPolarity','bright','Sensitivity',0.00001);
+%                    figure(6)
+%                    imshow(imDistMarkerBW,[],'InitialMagnification','fit');
+% %                    tempPic = ~tempPic;
+% %                    tempPic = imfill(tempPic,8,'holes');
+% %                    tempPic = ~tempPic;
+% 
+%                    %Set invert status to false
+%                    obj.PicBWisInvert = 'false';
+%                     
+%                    
+%                    
+% %                     %create small structering element
+% %                     se = strel('disk',1);
+% %                     
+% %                     tempPic = bwmorph(tempPic,'diag');
+% %                     tempPic = bwmorph(tempPic,'skel',Inf);
+% %                     
+% %                     %perform n times a dilate with small SE
+% %                     for i = 1:1:5
+% %                         tempPic = imdilate(tempPic , se);
+% %                         if mod(i,2)==0
+% %                             tempPic = bwmorph(tempPic,'majority',1);
+% %                         end
+% %                     end
+% %                     
+% %                     %skel the temp binary image again
+% %                     tempPic = bwmorph(tempPic,'skel',Inf);
+% %                     %perform one times a dilate with small SE to make the
+% %                     %skeleton thicker
+% %                     tempPic = imdilate(tempPic , se);
+% %                     %remove pixels with a small neighborhood
+% % %                     tempPic = bwmorph(tempPic,'majority',1);
+% %                     tempPic = tempPic | obj.PicBW;
+% %                     
+%                     
+% %                     figure
+% %                     imshow(D,[],'InitialMagnification','fit');
+%                     figure(8)
+%                     imshow(tempPic);
+%                     imDist = -bwdist(~tempPic,'cityblock');
+%                     imDist(~tempPic)=-inf;
+%                     figure(9)
+%                     imshow(imDist,[],'InitialMagnification','fit');
+%                     BW = imregionalmax(imDistMarker);
+%                     figure(10)
+%                     imshow(BW);
+%                     I3 = imhmin(imDist,30);
+%                     L = watershed(I3);
+%                     rgb = label2rgb(L,'jet',[.5 .5 .5]);
+%                     figure(11)
+%                     imshow(rgb,[],'InitialMagnification','fit');
+%                     
+%                     tempPic(L==0)=1;
+% %                     D_BW = imbinarize(D,'adaptive','ForegroundPolarity','bright','Sensitivity',1);
+% % %                     
+% % %                     D = -D;
+% % %                     figure
+% % %                     imshow(D,[],'InitialMagnification','fit');
+% % %                     D(~tempPic) = Inf;
+% %                     L = watershed(D);
+% %                     rgb = label2rgb(L,'jet',[.5 .5 .5]);
+% %                     figure
+% %                     imshow(rgb,'InitialMagnification','fit');
+% % %                     tempPic(L==0)=1;
+% % %                     tempPic(L>0)=0;
+% % %                     se = strel('disk',1);
+% % %                     tempPic = imdilate(tempPic , se);
+% %                     Y=D./max(max(D));
+% %                     X=im2bw(Y,graythresh(Y));
+% %                     X= bwareaopen(X,4,4);
+% %                     [LOld,numOld] = bwlabel(X);
+% %                     numNew = numOld;
+% %                     Xnew = X;
+% %                     se = strel('disk',1);
+% %                     while numOld == numNew
+% %                         [LNew,numNew] = bwlabel(Xnew);
+% % %                         figure
+% % %                         imshow(X,'InitialMagnification','fit');
+% %                         if numOld == numNew
+% %                             X = Xnew;
+% %                             
+% %                             Xnew = imdilate(Xnew , se); 
+% %                         end  
+% %                     end
+% %                     X = ~X;
+% %                     X = bwmorph(X,'skel',Inf);
+% %                     X = imdilate(X , se);
+%                     
+%                     obj.PicBW = obj.PicBW | f2;
+%                     obj.handlePicBW.CData = obj.PicBW | f2;
+% 
+%         end
+        
         function [xOut yOut] = checkPosition(obj,PosX,PosY)
             % Check whether the positon of the cursor is in the binary
             % image while drawing a line. If the positon is out if range
@@ -993,6 +1348,8 @@ classdef modelEdit < handle
             if obj.PicBufferPointer > 1 && obj.PicBufferPointer <= obj.BufferSize
                 obj.PicBufferPointer = obj.PicBufferPointer-1;
                 obj.handlePicBW.CData = obj.PicBuffer{1,obj.PicBufferPointer};
+                obj.PicBWisInvert = obj.PicBuffer{2,obj.PicBufferPointer};
+                obj.PicBW = obj.handlePicBW.CData;
                 
             end
         end
@@ -1012,6 +1369,8 @@ classdef modelEdit < handle
             if obj.PicBufferPointer >= 1 && obj.PicBufferPointer < obj.BufferSize && obj.PicBufferPointer < size(obj.PicBuffer,2)
                 obj.PicBufferPointer = obj.PicBufferPointer+1;
                 obj.handlePicBW.CData = obj.PicBuffer{1,obj.PicBufferPointer};
+                obj.PicBWisInvert = obj.PicBuffer{2,obj.PicBufferPointer};
+                obj.PicBW = obj.handlePicBW.CData;
                 
             end
         end
@@ -1036,9 +1395,13 @@ classdef modelEdit < handle
                 end
                 obj.PicBufferPointer = obj.BufferSize;
                 obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
+                obj.PicBW = obj.handlePicBW.CData;
+                obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
             else
                 obj.PicBufferPointer =obj.PicBufferPointer+1;
                 obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
+                obj.PicBW = obj.handlePicBW.CData;
+                obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
             end
         end
         

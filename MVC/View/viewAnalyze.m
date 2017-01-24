@@ -73,9 +73,20 @@ classdef viewAnalyze < handle
     methods
         function obj = viewAnalyze(mainCard)
             
-            fontSizeS = 10; % Font size small
-            fontSizeM = 12; % Font size medium
-            fontSizeB = 14; % Font size big
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+                
+            end
             
             mainPanelBox = uix.HBox( 'Parent', mainCard ,'Spacing',5,'Padding',5);
             
@@ -273,9 +284,20 @@ classdef viewAnalyze < handle
             %                       informations and images
             %
             
-            fontSizeS = 10; % Font size small
-            fontSizeM = 12; % Font size medium
-            fontSizeB = 14; % Font size big
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+                
+            end
             
             
             
