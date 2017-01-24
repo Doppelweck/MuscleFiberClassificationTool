@@ -36,13 +36,13 @@ mainCard = uix.CardPanel('Parent', mainFig,'Selection',0);
 %Init VIEW's
 viewEditHandle = viewEdit(mainCard);
 mainCard.Selection = 1;
-drawnow;
+drawnow;pause(0.5);
 viewAnalyzeHandle = viewAnalyze(mainCard);
 mainCard.Selection = 2;
-drawnow;
+drawnow;pause(0.5);
 viewResultsHandle = viewResults(mainCard);
 mainCard.Selection = 3;
-drawnow;
+drawnow;pause(0.5);
 mainCard.Selection = 1;
 drawnow;
 

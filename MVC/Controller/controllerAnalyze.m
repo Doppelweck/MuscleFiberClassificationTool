@@ -1029,14 +1029,16 @@ classdef controllerAnalyze < handle
             
             switch choice
                 case 'Yes'
-                    delete(obj.viewAnalyzeHandle);
-                    delete(obj.modelAnalyzeHandle);
+                    delete(obj.viewEditHandle);
+                    delete(obj.modelEditHandle);
                     delete(obj.mainCardPanel);
-
-                    figHandles = findall(0,'Type','figure');
-                    object_handles = findall(figHandles);
+                    
+                    %find all objects
+                    object_handles = findall(obj.mainFigure);
+                    %delete objects
                     delete(object_handles);
-                    delete(figHandles)
+                    %delete main figure
+                    delete(obj.mainFigure);
                 case 'No'
                     obj.modelAnalyzeHandle.InfoMessage = '   - closing program canceled';
                 otherwise
