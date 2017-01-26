@@ -124,7 +124,7 @@ classdef controllerEdit < handle
             
             set(obj.viewEditHandle.B_Undo,'Callback',@obj.undoEvent);
             set(obj.viewEditHandle.B_Redo,'Callback',@obj.redoEvent);
-            set(obj.viewEditHandle.B_NewPic,'Callback',@obj.newPictureEvent);
+            set(obj.viewEditHandle.B_NewPic,'Callback',@obj.newFileEvent);
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Callback',@obj.startAnalyzeModeEvent);
             set(obj.viewEditHandle.B_CheckPlanes,'Callback',@obj.checkPlanesEvent);
             set(obj.viewEditHandle.B_CheckMask,'Callback',@obj.checkMaskEvent);
@@ -188,7 +188,7 @@ classdef controllerEdit < handle
             %
             
             % get Pics from the model
-            PicRGB = obj.modelEditHandle.PicRGB;
+            PicRGB = obj.modelEditHandle.PicRGBFRPlanes;
             PicBW = obj.modelEditHandle.PicBW;
             
             % set axes in the GUI as the current axes
@@ -221,16 +221,16 @@ classdef controllerEdit < handle
             axis on
             axis image
             hold off
-            Titel = [obj.modelEditHandle.PathNames obj.modelEditHandle.FileNamesRGB];
+            Titel = [obj.modelEditHandle.PathName obj.modelEditHandle.FileName];
             obj.viewEditHandle.panelPicture.Title = Titel;
             
            
-            mainTitel = ['Fiber types classification tool: ' obj.modelEditHandle.FileNamesRGB];
+            mainTitel = ['Fiber types classification tool: ' obj.modelEditHandle.FileName];
             set(obj.mainFigure,'Name', mainTitel);
             
         end
         
-        function newPictureEvent(obj,~,~)
+        function newFileEvent(obj,~,~)
             % Callback function of the NewPic-Button in the GUI. Opens a
             % input dialog where the user can select a new image for
             % further processing. Identify the color planes and create the
@@ -262,24 +262,150 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_SizeSE,'Enable','off');
             set(obj.viewEditHandle.B_NoIteration,'Enable','off');
             
-            %select a new image
-            succsesNewPic = obj.openNewPic();
+            %select a new file
+            format = obj.openNewFile();
             
-            if succsesNewPic
+            if strcmp(format,'image')
                 %selecting a new image was successfully
                 
                 % clear info text log
-                set(obj.viewEditHandle.B_InfoText, 'String','*** New Picture selected ***')
+                set(obj.viewEditHandle.B_InfoText, 'String','*** New Image selected ***')
                 
-                % search and load the color plane images .zvi file
-                sucsessLoadPic = obj.modelEditHandle.loadPics();
+                % search and load for the bioformat images (.zvi ,.. ect.)
+                successLoadBio = obj.modelEditHandle.searchBioformat();
                 
-                if sucsessLoadPic
+                if successLoadBio
                     %loading color plane images was successfully
                     
-                    %Identify color planes
-                    obj.modelEditHandle.planeIdentifier();
+                    %open bio Format
+                    statusBio = obj.modelEditHandle.openBioformat();
                     
+                    if strcmp(statusBio,'false')
+                        
+                    %loading color plane images was not successfully
+                    %disable GUI objects
+                    
+                    obj.modelEditHandle.InfoMessage = 'ERROR opening file';
+                    
+                    set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+                    set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                    set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                    set(obj.viewEditHandle.B_Color,'Enable','off');
+                    set(obj.viewEditHandle.B_Invert,'Enable','off');
+                    set(obj.viewEditHandle.B_Alpha,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_MorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_NoIteration,'Enable','off');
+                        
+                    else
+                        %create RGB images
+                        obj.modelEditHandle.createRGBImages();
+                        
+                        %brightness adjustment of color plane images
+                        obj.modelEditHandle.brightnessAdjustment();
+                        
+                        %reset invert status of binary pic
+                        obj.modelEditHandle.PicBWisInvert = 'false';
+                        
+                        %create binary pic
+                        obj.modelEditHandle.createBinary();
+                        
+                        %reset pic buffer for undo redo functionality
+                        obj.modelEditHandle.PicBuffer = {};
+                        %load binary pic in the buffer
+                        obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+                        %reset buffer pointer
+                        obj.modelEditHandle.PicBufferPointer = 1;
+                        
+                        %show images in GUI
+                        obj.setInitPicsGUI();
+                        
+                        if strcmp(statusBio,'SucsessIndentify')
+                            obj.modelEditHandle.InfoMessage = '- opening images completed';
+                        else
+                          obj.modelEditHandle.InfoMessage = '- opening images completed';
+                          obj.modelEditHandle.InfoMessage = '- planes could not be idetified'; 
+                          obj.modelEditHandle.InfoMessage = '- check planes'; 
+                        end
+
+                        %enable GUI objects
+                        set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
+                        set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+                        set(obj.viewEditHandle.B_CheckMask,'Enable','on');
+                        set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                        set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                        set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                        set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                        set(obj.viewEditHandle.B_Color,'Enable','on');
+                        set(obj.viewEditHandle.B_Invert,'Enable','on');
+                        set(obj.viewEditHandle.B_Alpha,'Enable','on');
+                        set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                        set(obj.viewEditHandle.B_MorphOP,'Enable','on');
+                        set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                        
+                        % check wich morphOp buttons must be enabled
+                        obj.morphOpEvent();
+                    end
+                    
+                else
+                    %loading color plane images was not successfully
+                    %disable GUI objects
+                    
+                    obj.modelEditHandle.InfoMessage = 'ERROR opening file';
+                    
+                    set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+                    set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                    set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                    set(obj.viewEditHandle.B_Color,'Enable','off');
+                    set(obj.viewEditHandle.B_Invert,'Enable','off');
+                    set(obj.viewEditHandle.B_Alpha,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_MorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_NoIteration,'Enable','off');
+                end
+                
+            elseif strcmp(format,'bioformat')
+                
+                set(obj.viewEditHandle.B_InfoText, 'String','*** New Bioformat file selected ***')
+                
+                statusBio = obj.modelEditHandle.openBioformat();
+                
+                if strcmp(statusBio,'false')
+                        
+                    %loading color plane images was not successfully
+                    %disable GUI objects
+                    
+                    obj.modelEditHandle.InfoMessage = 'ERROR opening file';
+                    
+                    set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+                    set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+                    set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                    set(obj.viewEditHandle.B_Color,'Enable','off');
+                    set(obj.viewEditHandle.B_Invert,'Enable','off');
+                    set(obj.viewEditHandle.B_Alpha,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_MorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_SizeSE,'Enable','off');
+                    set(obj.viewEditHandle.B_NoIteration,'Enable','off');
+                        
+                else
+                    %create RGB images
+                    obj.modelEditHandle.createRGBImages();
+                
                     %brightness adjustment of color plane images
                     obj.modelEditHandle.brightnessAdjustment();
                     
@@ -298,7 +424,15 @@ classdef controllerEdit < handle
                     
                     %show images in GUI
                     obj.setInitPicsGUI();
-                    obj.modelEditHandle.InfoMessage = '- opening images completed';
+
+                    if strcmp(statusBio,'SucsessIndentify')
+                        obj.modelEditHandle.InfoMessage = '- opening images completed';
+                    else
+                        obj.modelEditHandle.InfoMessage = '- opening images completed';
+                        obj.modelEditHandle.InfoMessage = '- planes could not be idetified';
+                        obj.modelEditHandle.InfoMessage = '- check planes';
+                    end
+                    
                     %enable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
@@ -316,24 +450,6 @@ classdef controllerEdit < handle
                     
                     % check wich morphOp buttons must be enabled
                     obj.morphOpEvent();
-                    
-                else
-                    %loading color plane images was not successfully
-                    %disable GUI objects
-                    set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
-                    set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
-                    set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
-                    set(obj.viewEditHandle.B_Threshold,'Enable','off');
-                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
-                    set(obj.viewEditHandle.B_Color,'Enable','off');
-                    set(obj.viewEditHandle.B_Invert,'Enable','off');
-                    set(obj.viewEditHandle.B_Alpha,'Enable','off');
-                    set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
-                    set(obj.viewEditHandle.B_MorphOP,'Enable','off');
-                    set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
-                    set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
-                    set(obj.viewEditHandle.B_SizeSE,'Enable','off');
-                    set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 end
                 
             elseif isa(obj.modelEditHandle.handlePicRGB,'struct')
@@ -385,9 +501,10 @@ classdef controllerEdit < handle
                 end
             end
             set(obj.viewEditHandle.B_NewPic,'Enable','on');
+             
         end
         
-        function succses = openNewPic(obj)
+        function format = openNewFile(obj)
             % Opens a file select dialog box where the user can select a
             % new RGB image for further processing. Only allows to select
             % one image .tif file. If a new picture was selected all old
@@ -405,20 +522,47 @@ classdef controllerEdit < handle
             %               selected, otherwise flase.
             
             %Get filename and path of the new image
-            [tempFileNamesRGB,tempPathNames] = uigetfile('*.tif','Select the image','MultiSelect', 'off');
+            [tempFileNames,tempPathNames] = uigetfile('*.*','Select new file','MultiSelect', 'off');
             
-            if isequal(tempFileNamesRGB ,0) && isequal(tempPathNames,0)
+            
+            
+            if isequal(tempFileNames ,0) && isequal(tempPathNames,0)
                 %no image was selected
-                obj.modelEditHandle.InfoMessage = '   - open image canceled';
-                succses = false;
+                obj.modelEditHandle.InfoMessage = '   - open file canceled';
+                format = 'false';
             else
                 % clear old Pic Data if a new one is selected
                 obj.modelEditHandle.clearPicData();
                 
-                %save filename and path in the properties
-                obj.modelEditHandle.FileNamesRGB = tempFileNamesRGB;
-                obj.modelEditHandle.PathNames = tempPathNames;
-                succses = true;
+                [pathstr,name,ext] = fileparts(tempFileNames);
+                
+                if  strcmp(ext,'.bmp') || strcmp(ext,'.png') || ...
+                        strcmp(ext,'.tiff') || strcmp(ext,'.tif') || ...
+                        strcmp(ext,'.jpeg') || strcmp(ext,'.jpg')
+                    
+                    %Image file was selected. Searching for bio format files
+                    %and try to identify the plane images.
+                    
+                    %save filename and path in the properties
+                    obj.modelEditHandle.FileName = tempFileNames;
+                    obj.modelEditHandle.PathName = tempPathNames;
+                    format = 'image';
+                    
+                elseif strcmp(ext,'.lsm') || strcmp(ext,'.zvi') || ...
+                        strcmp(ext,'.ics') || strcmp(ext,'.nd2') || ...
+                        strcmp(ext,'.pic') || strcmp(ext,'.dv') || ...
+                        strcmp(ext,'.img') || strcmp(ext,'.dv')
+                    
+                    % .lsm files produced by Zeiss LSM 510 confocal microscopes
+                    % .nd2 files produced by Nikon ND2  
+                    
+                    % Bioformat file was selected.
+                    obj.modelEditHandle.FileName = tempFileNames;
+                    obj.modelEditHandle.PathName = tempPathNames;
+                    format = 'bioformat';
+                end
+                
+                
             end
         end
         
