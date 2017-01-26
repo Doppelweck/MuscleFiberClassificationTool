@@ -420,7 +420,7 @@ classdef modelEdit < handle
             end
             
             % Searching for brightness adjustment Pics
-                obj.InfoMessage = '      - searching for brightness adjustment images';
+                obj.InfoMessage = '   - searching for brightness adjustment images';
                 
                 %Save currebt folder
                 currentFolder = pwd;
@@ -430,10 +430,10 @@ classdef modelEdit < handle
                 %search for brightness adjustment images
                 [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
                 
-                FileNamePicA4 = dir(['A4*' ext]);
-                FileNamePicL5 = dir(['L5*' ext]);
+                FileNamePicA4 = dir(['A*' ext]);
+                FileNamePicL5 = dir(['L*' ext]);
                 FileNamePicTX = dir(['TX*' ext]);
-                FileNamePicY5 = dir(['Y5*' ext]);
+                FileNamePicY5 = dir(['Y*' ext]);
                 
                 cd(currentFolder);
                 

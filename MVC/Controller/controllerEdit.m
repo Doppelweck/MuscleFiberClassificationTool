@@ -710,10 +710,7 @@ classdef controllerEdit < handle
                     
                     % Create Picture generated from Red Green and Blue
                     % Planes
-                    obj.modelEditHandle.PicRGBPlanes(:,:,1) = obj.modelEditHandle.PicPlaneRed;
-                    obj.modelEditHandle.PicRGBPlanes(:,:,2) = obj.modelEditHandle.PicPlaneGreen;
-                    obj.modelEditHandle.PicRGBPlanes(:,:,3) = obj.modelEditHandle.PicPlaneBlue;
-                    obj.modelEditHandle.PicRGBPlanes = uint8(obj.modelEditHandle.PicRGBPlanes);
+                    obj.modelEditHandle.createRGBImages();
                     
                     %brightness adjustment of color plane image
                     obj.modelEditHandle.brightnessAdjustment();
@@ -737,6 +734,7 @@ classdef controllerEdit < handle
                     obj.viewEditHandle.B_AxesCheckPlaneRed.Children.CData = obj.modelEditHandle.PicPlaneRed;
                     obj.viewEditHandle.B_AxesCheckPlaneFarRed.Children.CData = obj.modelEditHandle.PicPlaneFarRed;
                     obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
+                    obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                     
                     %reset the color popupmenus
                     obj.viewEditHandle.B_ColorPlaneGreen.Value = 1;
