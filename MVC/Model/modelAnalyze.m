@@ -34,16 +34,16 @@ classdef modelAnalyze < handle
         
         controllerAnalyzeHandle; %hande to controllerAnalyze instance.
         
-        FileNamesRGB; %Filename of the selected RGB image.
-        PathNames; %Directory path of the selected RGB image.
-        PicRGB; %RGB image.
+        FileName; %Filename of the selected file.
+        PathName; %Directory path of the selected file.
+        PicPRGBFRPlanes; %RGB image created from the red blue green and far red color plane images.
         handlePicRGB; %handle to RGB image.
         PicBW; %Binary image.
         PicPlaneGreen; %Green identified color plane image.
         PicPlaneBlue; %Blue identified color plane image.
         PicPlaneRed; %Red identified color plane image.
         PicPlaneFarRed; %Farred identified color plane image.
-        PicPRGBPlanes; %RGB image created from the color plane images.
+        PicPRGBPlanes; %RGB image created from the red blue and green color plane images.
         
         FiberInfo = {}; %Cell array that contains the data that are shown in the fiber information table.
         BoundarieMat; %Array that contains all boundaries of the fiber objects.
@@ -321,7 +321,7 @@ classdef modelAnalyze < handle
             nObjects = size(obj.Stats,1);
             
             % convert original RGB image to HSV colormodel
-            PicRGB_HSV = rgb2hsv(obj.PicRGB);
+            PicRGB_HSV = rgb2hsv(obj.handlePicRGB.CData);
             PicRGB_H = PicRGB_HSV(:,:,1); % H-channel of HSV image
             PicRGB_V = PicRGB_HSV(:,:,3); % V-channel of HSV image
             
@@ -711,9 +711,9 @@ classdef modelAnalyze < handle
             %               Data{19}: ColorValuee value
             %               
             
-            Data{1} = obj.FileNamesRGB;
-            Data{2} = obj.PathNames;
-            Data{3} = obj.PicRGB;
+            Data{1} = obj.FileName;
+            Data{2} = obj.PathName;
+            Data{3} = obj.PicPRGBFRPlanes;
             Data{4} = obj.PicPRGBPlanes;
             Data{5} = obj.Stats;
             Data{6} = obj.LabelMat;
@@ -778,7 +778,7 @@ classdef modelAnalyze < handle
                     
                     BoundBox =   round(obj.Stats(Label).BoundingBox);
                     
-                    [y origPos]= imcrop(obj.PicRGB,[BoundBox(1) BoundBox(2) BoundBox(3) BoundBox(4)]);
+                    [y origPos]= imcrop(obj.PicPRGBFRPlanes,[BoundBox(1) BoundBox(2) BoundBox(3) BoundBox(4)]);
                     Bound = obj.Stats(Label).Boundarie;
                     Bound{1,1}(:,1) = Bound{1,1}(:,1)-origPos(2);
                     Bound{1,1}(:,2) = Bound{1,1}(:,2)-origPos(1);
@@ -828,11 +828,11 @@ classdef modelAnalyze < handle
                 PosY = NaN;
             end
             
-            if PosX > size(obj.PicRGB,2)
+            if PosX > size(obj.PicPRGBFRPlanes,2)
                 PosX = NaN;
             end
             
-            if PosY > size(obj.PicRGB,1)
+            if PosY > size(obj.PicPRGBFRPlanes,1)
                 PosY = NaN;
             end
             

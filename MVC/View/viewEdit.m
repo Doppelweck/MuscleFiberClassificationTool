@@ -58,7 +58,7 @@ classdef viewEdit < handle
         B_StartMorphOP; %Button, runs the morpological operations.
         B_InfoText; %Shows the info log text.
         
-        B_AxesCheckRGB; %axes handle that contains the RGB image in the check planes figure.
+        B_AxesCheckRGBFRPlane; %axes handle that contains the RGB image in the check planes figure.
         B_AxesCheckRGBPlane; %axes handle that contains the RGB image in the check planes figure.
         B_AxesCheckPlaneGreen; %axes handle that contains the green plane in the imagecheck planes figure.
         B_AxesCheckPlaneBlue; %axes handle that contains the blue plane image in the check planes figure.
@@ -124,7 +124,7 @@ classdef viewEdit < handle
             obj.B_Redo = uicontrol( 'Parent', HBoxControl1, 'String', 'Redo ->','FontSize',fontSizeB );
             
             HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',5);
-            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'New image' );
+            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'New file' );
             obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'Check planes' ,'Enable','off');
             
             HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Spacing',5);
@@ -267,6 +267,22 @@ classdef viewEdit < handle
             %                   images and the original RGB image
             %
             
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+                
+            end
+            
+            
             obj.hFCP = figure('NumberTitle','off','ToolBar','none','MenuBar','none','Name','Check Color Planes','Units','normalized','Visible','off','Tag','CheckPlanesFigure');
             set(obj.hFCP, 'position', [0.1 0.1 0.8 0.8]);
             set(obj.hFCP,'WindowStyle','modal');
@@ -275,45 +291,45 @@ classdef viewEdit < handle
             MainGrid = uix.Grid('Parent',MainVBox,'Padding',5);
             
             VBox1 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckRGB = axes('Parent',VBox1,'ActivePositionProperty','position');
+            obj.B_AxesCheckRGBFRPlane = axes('Parent',VBox1,'ActivePositionProperty','position');
             imshow(Pics{3})
             axis image
-            uicontrol( 'Parent', VBox1,'Style','text', 'String', 'Original Picture');
+            uicontrol( 'Parent', VBox1,'Style','text', 'String', 'RGB Image generated from Red Green Blue and FarRed plane','FontSize',fontSizeM);
             set(VBox1,'Heights',[-10 -1])
             
             VBox2 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckRGBPlane = axes('Parent',VBox2,'ActivePositionProperty','position');
             imshow(Pics{9})
             axis image
-            uicontrol( 'Parent', VBox2,'Style','text', 'String', 'Image generated from Red Green and Blue Plane');
+            uicontrol( 'Parent', VBox2,'Style','text', 'String', 'RGB Image generated from Red Green and Blue Plane (no FarRed)','FontSize',fontSizeM);
             set(VBox2,'Heights',[-10 -1])
             
             VBox3 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneGreen = axes('Parent',VBox3,'ActivePositionProperty','position');
             axis image
             imshow(Pics{5})
-            obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,1);
+            obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,1,'FontSize',fontSizeM);
             set(VBox3,'Heights',[-10 -1])
             
             VBox4 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneBlue = axes('Parent',VBox4,'ActivePositionProperty','position');
             axis image
             imshow(Pics{6})
-            obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,2);
+            obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,2,'FontSize',fontSizeM);
             set(VBox4,'Heights',[-10 -1])
             
             VBox5 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneRed = axes('Parent',VBox5,'ActivePositionProperty','position');
             axis image
             imshow(Pics{7})
-            obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,3);
+            obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,3,'FontSize',fontSizeM);
             set(VBox5,'Heights',[-10 -1])
             
             VBox6 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneFarRed = axes('Parent',VBox6,'ActivePositionProperty','position');
             axis image
             imshow(Pics{8})
-            obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,4);
+            obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,4,'FontSize',fontSizeM);
             set(VBox6,'Heights',[-10 -1])
             
             set( MainGrid, 'Heights', [-1 -1], 'Widths', [-1 -1] ,'Spacing',10);
@@ -321,13 +337,13 @@ classdef viewEdit < handle
             HBox = uix.HBox('Parent',MainVBox,'Spacing', 5,'Padding',5);
             
             HButtonBox1 = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPText = uicontrol( 'Parent', HButtonBox1,'Style','text', 'String', 'Confirm the changes with OK.','FontSize',16);
+            obj.B_CheckPText = uicontrol( 'Parent', HButtonBox1,'Style','text', 'String', 'Confirm the changes with OK.','FontSize',fontSizeB);
             
             HButtonBox2 = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPBack = uicontrol( 'Parent', HButtonBox2,'String', 'Back to Edit-Mode','FontSize',20);
+            obj.B_CheckPBack = uicontrol( 'Parent', HButtonBox2,'String', 'Back to Edit-Mode','FontSize',fontSizeB);
             
             HButtonBox3 = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPOK = uicontrol( 'Parent', HButtonBox3,'String', 'OK','FontSize',20);
+            obj.B_CheckPOK = uicontrol( 'Parent', HButtonBox3,'String', 'OK','FontSize',fontSizeB);
             
             set( MainGrid, 'Heights', [-1 -1 ], 'Widths', [-1 -1 -1] ,'Spacing',10);
             set(MainVBox,'Heights',[-10 -1])

@@ -498,9 +498,9 @@ classdef controllerAnalyze < handle
             
             
             % Set PicData Properties in the Analyze Model
-            obj.modelAnalyzeHandle.FileNamesRGB = PicData{1};
-            obj.modelAnalyzeHandle.PathNames = PicData{2};
-            obj.modelAnalyzeHandle.PicRGB = PicData{3};
+            obj.modelAnalyzeHandle.FileName = PicData{1};
+            obj.modelAnalyzeHandle.PathName = PicData{2};
+            obj.modelAnalyzeHandle.PicPRGBFRPlanes = PicData{3};
             obj.modelAnalyzeHandle.PicBW = PicData{4};
             obj.modelAnalyzeHandle.PicPlaneGreen = PicData{5};
             obj.modelAnalyzeHandle.PicPlaneBlue = PicData{6};
@@ -517,7 +517,7 @@ classdef controllerAnalyze < handle
             axis image
             
             % set panel title to filename and path
-            Titel = [obj.modelAnalyzeHandle.PathNames obj.modelAnalyzeHandle.FileNamesRGB];
+            Titel = [obj.modelAnalyzeHandle.PathName obj.modelAnalyzeHandle.FileName];
             obj.viewAnalyzeHandle.panelPicture.Title = Titel;
             
             % get axes for zoomed Pic in Analyze GUI FIber Information Panel
@@ -571,7 +571,7 @@ classdef controllerAnalyze < handle
                 delete(OldFig);
                 %refresh WindowButtonMotionFcn. If a Figure Manipulate
                 %exist, than the WindowButtonMotionFcn is deleted
-                set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
+                obj.addWindowCallbacks()
             end
             
             % If a Higlight Boundarie Box already exists,
@@ -581,7 +581,7 @@ classdef controllerAnalyze < handle
                 delete(OldBox);
                 %refresh WindowButtonMotionFcn. If a Higlight Boundarie Box
                 %exist, than the WindowButtonMotionFcn is deleted
-                set(obj.viewAnalyzeHandle.hFP,'WindowButtonMotionFcn',@obj.showFiberInfo);
+                obj.addWindowCallbacks()
             end
             
             % send selected analyze mode to the model.

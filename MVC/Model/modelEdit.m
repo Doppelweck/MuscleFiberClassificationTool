@@ -34,9 +34,10 @@ classdef modelEdit < handle
         
         controllerEditHandle; %hande to controllerEdit instance.
         
-        FileNamesRGB; %Filename of the selected RGB image.
-        PathNames; %Directory path of the selected RGB image.
-        PicRGB; %RGB image.
+        FileName; %Filename of the selected file.
+        PathName; %Directory path of the selected RGB image.
+        PicRGBFRPlanes;  %RGB image created from the color plane images red green blue and FarRed.
+        PicRGBPlanes; %RGB image created from the color plane images red green and blue.
         PicBW; %Binary image.
         handlePicRGB; %handle to RGB image.
         handlePicBW; %handle to binary image.
@@ -48,7 +49,6 @@ classdef modelEdit < handle
         PicPlaneBlue; %Blue identified color plane image.
         PicPlaneRed; %Red identified color plane image.
         PicPlaneFarRed; %Farred identified color plane image.
-        PicRGBPlanes; %RGB image created from the color plane images.
         PicPlaneGreen_adj; %Green color plane image after brightness adjustment.
         PicPlaneBlue_adj; %Blue color plane image after brightness adjustment.
         PicPlaneRed_adj; %Red color plane image after brightness adjustment.
@@ -133,9 +133,9 @@ classdef modelEdit < handle
             
             obj.InfoMessage = '- clear all picture data';
             
-            obj.FileNamesRGB = '';
-            obj.PathNames = '';
-            obj.PicRGB = [];
+            obj.FileName = '';
+            obj.PathName = '';
+            obj.PicRGBFRPlanes = [];
             obj.PicBW = [];
             obj.handlePicRGB.CData = [];
             obj.handlePicBW.CData = [];
@@ -173,24 +173,26 @@ classdef modelEdit < handle
             %
             %       - Output
             %           PicData:    Cell Array that contains the file- and
-            %               pathnames of the RGB image. Also contains the
+            %               PathName of the RGB image. Also contains the
             %               RGB and the color plane images:
             %
             %               PicData{1}: filename RGB image
             %               PicData{2}: path RGB image
-            %               PicData{3}: RGB image
+            %               PicData{3}: RGB image create from color plane
+            %               Red Green Far Red and Blue
             %               PicData{4}: binary image
             %               PicData{5}: green plane image
             %               PicData{6}: blue plane image
             %               PicData{7}: red plane image
             %               PicData{8}: farred plane image
             %               PicData{9}: RGB image create from color plane
+            %               Red Green and Blue
             %               images
             %
             
-            PicData{1} = obj.FileNamesRGB;
-            PicData{2} = obj.PathNames;
-            PicData{3} = obj.PicRGB;   %RGB
+            PicData{1} = obj.FileName;
+            PicData{2} = obj.PathName;
+            PicData{3} = obj.PicRGBFRPlanes;   %RGB
             
             % send binary pic to controller only in the normal non-inverted
             % form
@@ -207,12 +209,13 @@ classdef modelEdit < handle
             PicData{9} = obj.PicRGBPlanes;
         end
         
-        function sucsess = loadPics(obj)
-            % Search for the .zvi file that contains the color plane images
+        function success = searchBioformat(obj)
+            % When the user select a RGB image this function searches 
+            % for the bioformt file that contains the color plane images
             % and the brightness adjustment images in the same directory as
             % the selected RGB image.
             %
-            %   PicData = sucsess = loadPics(obj)
+            %   PicData = sucsess = searchLoadBioformat(obj)
             %
             %   ARGUMENTS:
             %
@@ -224,115 +227,299 @@ classdef modelEdit < handle
             %               was founded, otherwise false.
             %
             
-            obj.InfoMessage = '   - open image';
-            obj.InfoMessage = ['      - ' obj.FileNamesRGB ' was selected'];
+            obj.InfoMessage = ['  - ' obj.FileName ' was selected'];
             
-            obj.InfoMessage = '   - searching for color plane images';
+            obj.InfoMessage = '   - searching for bio format file';
             
-            %The .zvi file has always the same name as the RGB image.
-            LFN = length(obj.FileNamesRGB);
-            FileNamesZIV = obj.FileNamesRGB;
-            FileNamesZIV(LFN)='i';
-            FileNamesZIV(LFN-1)='v';
-            FileNamesZIV(LFN-2)='z';
+            [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
+            f = fullfile(pathstr,name);
             
-            if exist([obj.PathNames FileNamesZIV], 'file') == 2
-                %.zvi file was found
-                
-                obj.InfoMessage = '      - loading color plane images';
-                
-                %open .zvi file
-                reader = bfGetReader([obj.PathNames FileNamesZIV]);
-                
-                %read and save RGB image
-                obj.PicRGB = imread([obj.PathNames, obj.FileNamesRGB]);
-                
-                %read and save plane color images (unidentified)
-                obj.PicPlane1 = bfGetPlane(reader,1);
-                obj.PicPlane2 = bfGetPlane(reader,2);
-                obj.PicPlane3 = bfGetPlane(reader,3);
-                obj.PicPlane4 = bfGetPlane(reader,4);
-                
-                % Searching for brightness adjustment Pics
-                obj.InfoMessage = '      - searching for brightness adjustment images';
-                
-                %Save currebt folder
-                currentFolder = pwd;
-                %go to the directory of the RGB image
-                cd(obj.PathNames);
-                
-                %search for brightness adjustment images
-                FileNamePicA4 = dir('A4*.zvi');
-                FileNamePicL5 = dir('L5*.zvi');
-                FileNamePicTX = dir('TX*.zvi');
-                FileNamePicY5 = dir('Y5*.zvi');
-                
-                cd(currentFolder);
-                
-                if ~isempty(FileNamePicA4)
-                    %A4*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathNames FileNamePicA4(1).name]);
-                    obj.PicA4 = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicA4(1).name ' were found'];
-                else
-                    obj.InfoMessage = ['      - A4*.zvi file were not found'];
-                    obj.PicA4 = [];
-                end
-                
-                if ~isempty(FileNamePicL5)
-                    %L5*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathNames FileNamePicL5(1).name]);
-                    obj.PicL5 = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicL5(1).name ' were found'];
-                else
-                    obj.InfoMessage = ['      - L5*.zvi file were not found'];
-                    obj.PicL5 = [];
-                end
-                
-                if ~isempty(FileNamePicTX)
-                    %TX*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathNames FileNamePicTX(1).name]);
-                    obj.PicTX = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicTX(1).name ' were found'];
-                else
-                    obj.InfoMessage = ['      - TX*.zvi file were not found'];
-                    obj.PicTX = [];
-                end
-                
-                if ~isempty(FileNamePicY5)
-                    %Y5*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathNames FileNamePicY5(1).name]);
-                    obj.PicY5 = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicY5(1).name ' were found'];
-                else
-                    obj.InfoMessage = ['      - Y5*.zvi file were not found'];
-                    obj.PicY5 = [];
-                end
-                
-                cd(currentFolder);
-                
-                sucsess = true;
+            % Searching for supported bio foramt files with the same name
+            % as the selectd image
+            FileNameBio = [];
+            if isempty(FileNameBio)
+                FileNameBio = dir([f '.lsm']);
+            end
+            if isempty(FileNameBio)
+                FileNameBio = dir([f '.zvi']);
+            end
+            if isempty(FileNameBio)
+                FileNameBio = dir([f '.zvi']);
+            end
+            
+            
+            if exist([obj.PathName FileNameBio.name], 'file') == 2
+                %bioformat file was found
+                obj.FileName = FileNameBio.name;
+                obj.InfoMessage = '      - bio format file found';
+
+                success = true;
             else
-                obj.InfoMessage = '   - Error color plane pictures';
-                obj.InfoMessage = '      - color plane pictures (.zvi file) not found';
-                obj.InfoMessage = ['      - ' FileNamesZIV ' dont exist'];
-                obj.InfoMessage = ['      - ' FileNamesZIV ' must be in the same path as the selected RGB.tif image'];
+                obj.InfoMessage = '   - ERROR searching for bio format file';
+                obj.InfoMessage = '      - bio format file not found';
                 
                 infotext = {'Error while opening color plane pictures!',...
                     '',...
-                    'Color plane pictures (.zvi file) not found.',...
-                    FileNamesZIV ' dont exist.',...
-                    FileNamesZIV ' must be in the same path as the selected RGB.tif image.'};
-                
-                sucsess = false;
+                    'Color plane pictures (bioformat file (.zvi ; .lsm ; ...) ) not found.',...
+                    '',...
+                    'Bioformat file must be in the same path as the selected RGB image.',...
+                    'Bioformat file must be named as the selected RGB image.',...
+                    '',...
+                    'You can open supported bioformat files directly.',...
+                    '',...
+                    'See MANUAL for more details.',...
+                        };
+                success = false;
                 
                 obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
             end
         end
         
-        function planeIdentifier(obj)
-            % Identifies which plane image (1 2 3 4) belongs to which color
-            % (green red blue farred).
+        function status = openBioformat(obj)
+            % When the user select a bioformat file this function opens 
+            % the bioformt file that contains the color plane images.
+            % The funcion also searches for the brightness adjustment
+            % images in the same directory as the selected file.
+            %
+            %   PicData = sucsess = searchLoadBioformat(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to modelEdit object
+            %
+            %       - Output
+            %           status:    returns 'SuccessIndentify' if the color 
+            %               plane images were founded and identified.
+            %               Returns 'ErrorIndentify' if the images were
+            %               foundet but not identified. Returns 'false' if
+            %               no images were found.
+            %
+            % See: http://www.openmicroscopy.org/site/support/bio-formats5.3/developers/matlab-dev.html
+            
+            %Open bioformat file
+            data = bfopen([obj.PathName obj.FileName]);
+            reader = bfGetReader([obj.PathName obj.FileName]);
+            
+            %Number of Series in file
+            seriesCount = size(data, 1);
+            series1 = data{1, 1};
+            series1_planeCount = size(series1, 1);
+            series1_label1 = series1{1, 2};
+            %get meta Data
+            metadata = data{1, 2};
+            %The OME metadata is always stored the same way, regardless of input file format.
+            omeMeta = data{1, 4};
+            
+            metadata = data{1, 2};
+            subject = metadata.get('Subject');
+            title = metadata.get('Title');
+            
+            metadataKeys = metadata.keySet().iterator();
+            for i=1:metadata.size()
+                key = metadataKeys.nextElement();
+                value = metadata.get(key);
+                fprintf('%s = %s\n', key, value)
+            end
+            
+            %get Number of Color Planes
+            NumberOfPlanes = size(data{1,1},1);
+            
+            if NumberOfPlanes == 4
+                
+                obj.PicPlane1 = bfGetPlane(reader,1);
+                obj.PicPlane2 = bfGetPlane(reader,2);
+                obj.PicPlane3 = bfGetPlane(reader,3);
+                obj.PicPlane4 = bfGetPlane(reader,4);
+                
+                obj.InfoMessage = '   - indentifing planes';
+                
+                %get ColorPlane Info from metaData
+                [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
+                
+
+                if size(ch_wave_name,2) ~= 4
+                    
+                    obj.InfoMessage = '   -ERROR while indentifing planes';
+                            obj.InfoMessage = '      -can not indentifing planes';
+                            obj.InfoMessage = '      -no channel color name were found in meta data';
+                            
+                            %find RGB image with the same file name and use
+                            %this for plane identification
+                            sucsess = obj.planeIdentifier();
+                            
+                            if sucsess
+                                status = 'SuccessIndentify';
+                            else
+                                obj.InfoMessage = 'ERROR while indentifing planes';
+                                obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                                status = 'ErrorIndentify';
+                            end
+                    
+                    
+                else
+                    foundBlue = 0;
+                    foundGreen = 0;
+                    foundRed = 0;
+                    foundFarRed = 0;
+                    
+                    for i=1:1:NumberOfPlanes
+                        
+                        if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
+                                ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
+                            
+                            obj.PicPlaneBlue = bfGetPlane(reader,i);
+                            obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                            foundBlue = 1;
+                            
+                        elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
+                                ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
+                            
+                            obj.PicPlaneRed = bfGetPlane(reader,i);
+                            obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                            foundRed = 1;
+                            
+                        elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
+                                ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
+                            
+                            obj.PicPlaneGreen = bfGetPlane(reader,i);
+                            obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                            foundGreen = 1;
+                            
+                        elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
+                                ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
+                            
+                            obj.PicPlaneFarRed = bfGetPlane(reader,i);
+                            obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                            foundFarRed = 1;
+                            
+                        else
+                            
+                            obj.InfoMessage = '   -ERROR while indentifing planes';
+                            obj.InfoMessage = '      -can not indentifing planes';
+                            obj.InfoMessage = '      -no channel color name were found in meta data';
+                            
+                            %find RGB image with the same file name and use
+                            %this for plane identification
+                            sucsess = obj.planeIdentifier();
+                            
+                            if sucsess
+                                status = 'SucsessIndentify';
+                            else
+                                obj.InfoMessage = 'ERROR while indentifing planes';
+                                obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                                status = 'ErrorIndentify';
+                            end
+                            
+                        end
+                    end
+                end
+            
+            if foundBlue && foundRed && foundGreen && foundFarRed
+                status = 'SucsessIndentify';
+            end
+            
+            % Searching for brightness adjustment Pics
+                obj.InfoMessage = '   - searching for brightness adjustment images';
+                
+                %Save currebt folder
+                currentFolder = pwd;
+                %go to the directory of the RGB image
+                cd(obj.PathName);
+                
+                %search for brightness adjustment images
+                [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
+                
+                FileNamePicA4 = dir(['A*' ext]);
+                FileNamePicL5 = dir(['L*' ext]);
+                FileNamePicTX = dir(['TX*' ext]);
+                FileNamePicY5 = dir(['Y*' ext]);
+                
+                cd(currentFolder);
+                
+                if ~isempty(FileNamePicA4)
+                    %A4*.zvi brightness adjustment image were found
+                    readertemp = bfGetReader([obj.PathName FileNamePicA4(1).name]);
+                    obj.PicA4 = bfGetPlane(readertemp,1);
+                    obj.InfoMessage = ['      - ' FileNamePicA4(1).name ' were found'];
+                else
+                    obj.InfoMessage = ['      - A4*' ext ' file were not found'];
+                    obj.PicA4 = [];
+                end
+                
+                if ~isempty(FileNamePicL5)
+                    %L5*.zvi brightness adjustment image were found
+                    readertemp = bfGetReader([obj.PathName FileNamePicL5(1).name]);
+                    obj.PicL5 = bfGetPlane(readertemp,1);
+                    obj.InfoMessage = ['      - ' FileNamePicL5(1).name ' were found'];
+                else
+                    obj.InfoMessage = ['      - L5*' ext ' file were not found'];
+                    obj.PicL5 = [];
+                end
+                
+                if ~isempty(FileNamePicTX)
+                    %TX*.zvi brightness adjustment image were found
+                    readertemp = bfGetReader([obj.PathName FileNamePicTX(1).name]);
+                    obj.PicTX = bfGetPlane(readertemp,1);
+                    obj.InfoMessage = ['      - ' FileNamePicTX(1).name ' were found'];
+                else
+                    obj.InfoMessage = ['      - TX*' ext ' file were not found'];
+                    obj.PicTX = [];
+                end
+                
+                if ~isempty(FileNamePicY5)
+                    %Y5*.zvi brightness adjustment image were found
+                    readertemp = bfGetReader([obj.PathName FileNamePicY5(1).name]);
+                    obj.PicY5 = bfGetPlane(readertemp,1);
+                    obj.InfoMessage = ['      - ' FileNamePicY5(1).name ' were found'];
+                else
+                    obj.InfoMessage = ['      - Y5*' ext ' file were not found'];
+                    obj.PicY5 = [];
+                end
+                
+                cd(currentFolder);
+            
+                
+            else
+                % no 4 planes founded
+                status = 'false';
+            end
+            
+        end
+        
+        function createRGBImages(obj)
+                tempR = obj.PicPlaneRed;
+                tempB = obj.PicPlaneBlue;
+                tempG = obj.PicPlaneGreen;
+                tempFR = obj.PicPlaneFarRed;
+            
+                tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,2) = double(1*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,3) = double(1*ones(size(tempR))).*(double(tempR)/255);
+                
+                tempG3D(:,:,1) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,3) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                
+                tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
+                tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
+                tempB3D(:,:,3) = double(255*ones(size(tempB))).*(double(tempB)/255);
+                
+                tempY3D(:,:,1) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+                tempY3D(:,:,2) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+                tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
+                
+                obj.PicRGBFRPlanes = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
+                
+                obj.PicRGBPlanes = uint8(tempR3D + tempG3D + tempB3D );
+            
+        end
+        
+        function success = planeIdentifier(obj)
+            % If the indetification with the meta data of the bio format
+            % file failed, this fuction searches for an RGB image with the
+            % same name as the selected file. If the program find a image
+            % file than the identification will be executed.
             %
             %   planeIdentifier(obj)
             %
@@ -341,108 +528,138 @@ classdef modelEdit < handle
             %       - Input
             %           obj:    Handle to modelEdit object
             %
-            
-            if isequal(obj.FileNamesRGB ,0) && isequal(obj.PathNames,0)
+            %       - Output:
+            %           success: returns 'true' if the identification was
+            %                    successful otherwise 'false'.
+            %
+            obj.InfoMessage = '   - trying to identify color planes with RGB image';
+            if isequal(obj.FileName ,0) && isequal(obj.PathName,0)
+                success = 'false';
                 obj.InfoMessage = '   - indentifing planes canceled';
             else
-                obj.InfoMessage = '   - indentifing planes';
+                obj.InfoMessage = '      - searching for RGB image';
+                obj.InfoMessage = '         - must have the same filename as the bioformat file';
                 
-                %Save unidentified plane images in one array
-                Pic= cat(3,obj.PicPlane1 ,obj.PicPlane2 ,obj.PicPlane3 ,obj.PicPlane4 );
+                %searching for RGB image
+                [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
                 
-                %Dismantling the RGB image into its color channels
-                R=imadjust( obj.PicRGB(:,:,1) ); %Red channel
-                G=imadjust( obj.PicRGB(:,:,2) ); %Green channel
-                B=imadjust( obj.PicRGB(:,:,3) ); %Blue channel
-                
-                %Save unidentified plane images and RGB-channel images in
-                %one array.
-                PicRGB_P = cat(3,R, G, B);
-                
-                r=[]; %Array for the correlation coefficients
-                
-                for i=1:1:length(PicRGB_P(1,1,:))
-                    for j=1:1:length(Pic(1,1,:))
-                        % correlation between R G B Planes and unknown Planes
-                        % r contains correlation coefficients
-                        r(j,i) = corr2(PicRGB_P(:,:,i) , Pic(:,:,j));
-                    end
+                RGBimageName = [];
+                if isempty(RGBimageName)
+                    RGBimageName = dir([obj.PathName name '.jpg']);
+                end
+                if isempty(RGBimageName)
+                    RGBimageName = dir([obj.PathName name '.tif']);
+                end
+                if isempty(RGBimageName)
+                    RGBimageName = dir([obj.PathName name '.jpeg']);
+                end
+                if isempty(RGBimageName)
+                    RGBimageName = dir([obj.PathName name '.png']);
                 end
                 
-                tempR = [];
-                tempFR=[];
-                tempG=[];
-                tempB=[];
-                
-                
-                for i=1:1:4
-                    %search for the highest correlation coefficient. Plane
-                    %and color are the indices of the correlation array r
-                    [plane color] = ind2sub( size(r) , find( r==max(max(r)) ) );
+                if ~isempty(RGBimageName)
                     
-                    switch color
+                    RGBimage = imread([obj.PathName RGBimageName.name]);
+                    
+                    obj.InfoMessage = '      - found RGB image';
+                    obj.InfoMessage = '      - identify color plane...';
+                    
+                    %Save unidentified plane images in one array
+                    Pic= cat(3,obj.PicPlane1 ,obj.PicPlane2 ,obj.PicPlane3 ,obj.PicPlane4 );
+                    
+                    %Dismantling the RGB image into its color channels
+                    R=imadjust( RGBimage(:,:,1) ); %Red channel
+                    G=imadjust( RGBimage(:,:,2) ); %Green channel
+                    B=imadjust( RGBimage(:,:,3) ); %Blue channel
+                    
+                    %Save unidentified plane images and RGB-channel images in
+                    %one array.
+                    PicRGB_P = cat(3,R, G, B);
+                    
+                    r=[]; %Array for the correlation coefficients
+                    
+                    for i=1:1:length(PicRGB_P(1,1,:))
+                        for j=1:1:length(Pic(1,1,:))
+                            % correlation between R G B Planes and unknown Planes
+                            % r contains correlation coefficients
+                            r(j,i) = corr2(PicRGB_P(:,:,i) , Pic(:,:,j));
+                        end
+                    end
+                    
+                    tempR = [];
+                    tempFR=[];
+                    tempG=[];
+                    tempB=[];
+                    
+                    
+                    for i=1:1:4
+                        %search for the highest correlation coefficient. Plane
+                        %and color are the indices of the correlation array r
+                        [plane color] = ind2sub( size(r) , find( r==max(max(r)) ) );
                         
-                        case 1  %Red and FarRed
-                            % Red value should have two max values in the r
-                            % array. For red and farred plane
+                        switch color
                             
-                            %The first and highest correlation value in the
-                            %red color channel will be identified as red.
-                            %The second one as farred.
-                            
-                            if isempty(tempR)
-                                %red plane was identified
-                                %save red plane temporary
-                                tempR = Pic(:,:,plane);
-                                %clear foundet plane in the r array
+                            case 1  %Red and FarRed
+                                % Red value should have two max values in the r
+                                % array. For red and farred plane
+                                
+                                %The first and highest correlation value in the
+                                %red color channel will be identified as red.
+                                %The second one as farred.
+                                
+                                if isempty(tempR)
+                                    %red plane was identified
+                                    %save red plane temporary
+                                    tempR = Pic(:,:,plane);
+                                    %clear foundet plane in the r array
+                                    r(plane,:) = [];
+                                    Pic(:,:,plane) = [];
+                                    obj.InfoMessage = '         - red-plane was identified';
+                                else
+                                    %farred plane was identified
+                                    %save farred plane temporary
+                                    tempFR = Pic(:,:,plane);
+                                    %clear foundet plane and color in the r array
+                                    r(plane,:) = [];
+                                    Pic(:,:,plane) = [];
+                                    r(:,color) = 0;
+                                    obj.InfoMessage = '         - farred-plane was identified';
+                                end
+                                
+                            case 2  %Green
+                                %green plane was identified
+                                %save green plane temporary
+                                tempG = Pic(:,:,plane);
                                 r(plane,:) = [];
+                                r(:,color) = 0;
                                 Pic(:,:,plane) = [];
-                                obj.InfoMessage = '      - red-plane was identified';
-                            else
-                                %farred plane was identified
-                                %save farred plane temporary
-                                tempFR = Pic(:,:,plane);
+                                obj.InfoMessage = '         - green-plane was identified';
+                                
+                            case 3  %Blue
+                                %blue plane was identified
+                                %save blue plane temporary
+                                tempB = Pic(:,:,plane);
                                 %clear foundet plane and color in the r array
                                 r(plane,:) = [];
-                                Pic(:,:,plane) = [];
                                 r(:,color) = 0;
-                                obj.InfoMessage = '      - farred-plane was identified';
-                            end
-                            
-                        case 2  %Green
-                            %green plane was identified
-                            %save green plane temporary
-                            tempG = Pic(:,:,plane);
-                            r(plane,:) = [];
-                            r(:,color) = 0;
-                            Pic(:,:,plane) = [];
-                            obj.InfoMessage = '      - green-plane was identified';
-                            
-                        case 3  %Blue
-                            %blue plane was identified
-                            %save blue plane temporary
-                            tempB = Pic(:,:,plane);
-                            %clear foundet plane and color in the r array
-                            r(plane,:) = [];
-                            r(:,color) = 0;
-                            Pic(:,:,plane) = [];
-                            obj.InfoMessage = '      - blue-plane was identified';
+                                Pic(:,:,plane) = [];
+                                obj.InfoMessage = '         - blue-plane was identified';
+                        end
                     end
+                    
+                    %Save identified planes in the properties
+                    obj.PicPlaneGreen = tempG;
+                    obj.PicPlaneBlue = tempB;
+                    obj.PicPlaneRed = tempR;
+                    obj.PicPlaneFarRed = tempFR;
+ 
+                else
+                    % no RGB image were found
+                    success = 'false';
+                    
                 end
                 
-                %Save identified planes in the properties
-                obj.PicPlaneGreen = tempG;
-                obj.PicPlaneBlue = tempB;
-                obj.PicPlaneRed = tempR;
-                obj.PicPlaneFarRed = tempFR;
                 
-                %Create an RGB image consisting of the identified red green
-                %and blue color planes. The user can check with that
-                %picture whether the planes were identified correctly.
-                obj.PicRGBPlanes(:,:,1) = tempR;
-                obj.PicRGBPlanes(:,:,2) = tempG;
-                obj.PicRGBPlanes(:,:,3) = tempB;
-                obj.PicRGBPlanes = uint8(obj.PicRGBPlanes);
                 
             end
         end
@@ -462,7 +679,7 @@ classdef modelEdit < handle
             %
             
             obj.InfoMessage = '   - brightness adjustment';
-            if isequal(obj.FileNamesRGB ,0) && isequal(obj.PathNames,0)
+            if isequal(obj.FileName ,0) && isequal(obj.PathName,0)
                 obj.InfoMessage = '   - pictures brightness adjustment canceled';
             else
                 %brightness adjustment PicPlaneGreen
@@ -1118,7 +1335,7 @@ classdef modelEdit < handle
 %             title('Colored watershed label matrix (Lrgb)')
             
 %             figure(23)
-%             imshow(obj.PicRGB)
+%             imshow(obj.PicRGBFRPlanes)
 %             hold on
 %             himage = imshow(Lrgb,[],'InitialMagnification','fit');
 %             himage.AlphaData = 0.2;
@@ -1320,12 +1537,12 @@ classdef modelEdit < handle
                 PosY = 1;
             end
             
-            if PosX > size(obj.PicRGB,2)
-                PosX = size(obj.PicRGB,2);
+            if PosX > size(obj.PicRGBFRPlanes,2)
+                PosX = size(obj.PicRGBFRPlanes,2);
             end
             
-            if PosY > size(obj.PicRGB,1)
-                PosY = size(obj.PicRGB,1);
+            if PosY > size(obj.PicRGBFRPlanes,1)
+                PosY = size(obj.PicRGBFRPlanes,1);
             end
             
             xOut = PosX;
