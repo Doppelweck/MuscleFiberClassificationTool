@@ -90,12 +90,19 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
             obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
             
-            obj.modelAnalyzeHandle.ColorDistanceActive = obj.viewAnalyzeHandle.B_ColorDistanceActive.Value;
-            obj.modelAnalyzeHandle.MinColorDistance = str2double(obj.viewAnalyzeHandle.B_ColorDistance.String);
-            
             obj.modelAnalyzeHandle.AspectRatioActive = obj.viewAnalyzeHandle.B_AspectRatioActive.Value;
             obj.modelAnalyzeHandle.MinAspectRatio = str2double(obj.viewAnalyzeHandle.B_MinAspectRatio.String);
             obj.modelAnalyzeHandle.MaxAspectRatio = str2double(obj.viewAnalyzeHandle.B_MaxAspectRatio.String);
+            
+            obj.modelAnalyzeHandle.BlueRedThreshActive = obj.viewAnalyzeHandle.B_BlueRedThreshActive.Value;
+            obj.modelAnalyzeHandle.BlueRedThresh = str2double(obj.viewAnalyzeHandle.B_BlueRedThresh.String);
+            obj.modelAnalyzeHandle.BlueRedDistBlue = str2double(obj.viewAnalyzeHandle.B_BlueRedDistBlue.String);
+            obj.modelAnalyzeHandle.BlueRedDistRed = str2double(obj.viewAnalyzeHandle.B_BlueRedDistRed.String);
+            
+            obj.modelAnalyzeHandle.FarredRedThreshActive = obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value;
+            obj.modelAnalyzeHandle.FarredRedThresh = str2double(obj.viewAnalyzeHandle.B_FarredRedThresh.String);
+            obj.modelAnalyzeHandle.FarredRedDistFarred = str2double(obj.viewAnalyzeHandle.B_FarredRedDistFarred.String);
+            obj.modelAnalyzeHandle.FarredRedDistRed = str2double(obj.viewAnalyzeHandle.B_FarredRedDistRed.String);
             
             obj.modelAnalyzeHandle.ColorValueActive = obj.viewAnalyzeHandle.B_ColorValueActive.Value;
             obj.modelAnalyzeHandle.ColorValue = str2double(obj.viewAnalyzeHandle.B_ColorValue.String);
@@ -123,7 +130,8 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_AreaActive,'Callback',@obj.activeParaEvent);
             set(obj.viewAnalyzeHandle.B_RoundnessActive,'Callback',@obj.activeParaEvent);
             set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Callback',@obj.activeParaEvent);
-            set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Callback',@obj.activeParaEvent);
+            set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Callback',@obj.activeParaEvent);
+            set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Callback',@obj.activeParaEvent);
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Callback',@obj.activeParaEvent);
         end
         
@@ -161,11 +169,21 @@ classdef controllerAnalyze < handle
             % listeners VIEW
             addlistener(obj.viewAnalyzeHandle.B_MinArea,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_MaxArea,'String','PostSet',@obj.valueUpdateEvent);
+            
             addlistener(obj.viewAnalyzeHandle.B_MinRoundness,'String','PostSet',@obj.valueUpdateEvent);
-            addlistener(obj.viewAnalyzeHandle.B_ColorDistance,'String','PostSet',@obj.valueUpdateEvent);
+            
             addlistener(obj.viewAnalyzeHandle.B_MinAspectRatio,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_MaxAspectRatio,'String','PostSet',@obj.valueUpdateEvent);
+            
             addlistener(obj.viewAnalyzeHandle.B_ColorValue,'String','PostSet',@obj.valueUpdateEvent);
+            
+            addlistener(obj.viewAnalyzeHandle.B_BlueRedThresh,'String','PostSet',@obj.valueUpdateEvent);
+            addlistener(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'String','PostSet',@obj.valueUpdateEvent);
+            addlistener(obj.viewAnalyzeHandle.B_BlueRedDistRed,'String','PostSet',@obj.valueUpdateEvent);
+            
+            addlistener(obj.viewAnalyzeHandle.B_FarredRedThresh,'String','PostSet',@obj.valueUpdateEvent);
+            addlistener(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String','PostSet',@obj.valueUpdateEvent);
+            addlistener(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','PostSet',@obj.valueUpdateEvent);
             
             % listeners MODEL
             addlistener(obj.modelAnalyzeHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
@@ -252,27 +270,7 @@ classdef controllerAnalyze < handle
                         % Value is not numerical. Set value to 0
                         set(obj.viewAnalyzeHandle.B_MinRoundness,'String','0');
                     end
-                    
-                case obj.viewAnalyzeHandle.B_ColorDistance.Tag
-                    % ColorDistance has changed. Can only be between 0
-                    % and 1
-                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
-                        % Value is numerical
-                        if Value < 0
-                            % If Value < 0 set ColorDistance = 0
-                            set(obj.viewAnalyzeHandle.B_ColorDistance,'String','0');
-                        elseif Value > 1
-                            % If Value > 1 setColorDistance = 1
-                            set(obj.viewAnalyzeHandle.B_ColorDistance,'String','1');
-                        else
-                            % Set ColorDistance value
-                            set(obj.viewAnalyzeHandle.B_ColorDistance,'String',num2str(Value));
-                        end
-                    else
-                        % Value is not numerical. Set Value to 0
-                        set(obj.viewAnalyzeHandle.B_ColorDistance,'String','0');
-                    end
-                    
+                   
                 case obj.viewAnalyzeHandle.B_MinAspectRatio.Tag
                     % MinAspectRatio has changed. Can only be positiv
                     % Integer >= 1. Must be smaller than MaxAspectRatio
@@ -326,10 +324,129 @@ classdef controllerAnalyze < handle
                             set(obj.viewAnalyzeHandle.B_ColorValue,'String',num2str(Value));
                         end
                     else
-                        % Value is not numerical. Dont change value.
+                        % Value is not numerical. Set value to 0
                         set(obj.viewAnalyzeHandle.B_ColorValue,'String','0');
                     end
                     
+                case obj.viewAnalyzeHandle.B_BlueRedThresh.Tag
+                    % BlueRedThresh value has changed. Can only be between 0
+                    % and +Inf
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set BlueRedThresh = 0
+                            set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String','0');
+                        elseif Value > Inf
+                            % If Value > Inf BlueRedThresh = 0
+                            set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String','0');
+                        else
+                            % Set BlueRedThresh to Value
+                            set(obj.viewAnalyzeHandle.BlueRedThresh,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 0
+                        set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String','0');
+                    end
+                 
+                case obj.viewAnalyzeHandle.B_BlueRedDistBlue.Tag
+                    % BlueRedDistBlue value has changed. Can only be between 0
+                    % and 1
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set BlueRedDistBlue = 0
+                            set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'String','0');
+                        elseif Value > 1
+                            % If Value > 1 BlueRedDistBlue = 1
+                            set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'String','1');
+                        else
+                            % Set BlueRedDistBlue to Value
+                            set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 0
+                        set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'String','0');
+                    end  
+                    
+                case obj.viewAnalyzeHandle.B_BlueRedDistRed.Tag
+                    % BlueRedDistRed value has changed. Can only be between 0
+                    % and 1
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set BlueRedDistRed = 0
+                            set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'String','0');
+                        elseif Value > 1
+                            % If Value > 1 BlueRedDistRed = 1
+                            set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'String','1');
+                        else
+                            % Set BlueRedDistRed to Value
+                            set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 0
+                        set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'String','0');
+                    end   
+                    
+                case obj.viewAnalyzeHandle.B_FarredRedThresh.Tag
+                    % BlueRedThresh value has changed. Can only be between 0
+                    % and +Inf
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set BlueRedThresh = 0
+                            set(obj.viewAnalyzeHandle.B_FarredRedThresh,'String','0');
+                        elseif Value > Inf
+                            % If Value > 1 BlueRedThresh = 0
+                            set(obj.viewAnalyzeHandle.B_FarredRedThresh,'String','0');
+                        else
+                            % Set BlueRedThresh to Value
+                            set(obj.viewAnalyzeHandle.B_FarredRedThresh,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 0
+                        set(obj.viewAnalyzeHandle.B_FarredRedThresh,'String','0');
+                    end
+                 
+                case obj.viewAnalyzeHandle.B_FarredRedDistFarred.Tag
+                    % FarredRedDistFarred value has changed. Can only be between 0
+                    % and 1
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set B_FarredRedDistFarred = 0
+                            set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String','0');
+                        elseif Value > 1
+                            % If Value > 1 B_FarredRedDistFarred = 1
+                            set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String','1');
+                        else
+                            % Set ColorDistance to Value
+                            set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 0
+                        set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String','0');
+                    end  
+                    
+                case obj.viewAnalyzeHandle.B_FarredRedDistRed.Tag
+                    % FarredRedDistRed value has changed. Can only be between 0
+                    % and 1
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set B_FarredRedDistFarred = 0
+                            set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','0');
+                        elseif Value > 1
+                            % If Value > 1 B_FarredRedDistFarred = 1
+                            set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','1');
+                        else
+                            % Set B_FarredRedDistFarred to Value
+                            set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 0
+                        set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','0');
+                    end     
                 otherwise
                     % Error Code
                     obj.modelAnalyzeHandle.InfoMessage = '! ERROR in valueUpdateEvent() FUNCTION !';
@@ -353,35 +470,35 @@ classdef controllerAnalyze < handle
             %
             
             if src.Value == 1
-                % Colordistance-Based classification
+                % Color-Based triple labeling classification
                 
-                obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
-                obj.modelAnalyzeHandle.InfoMessage = '      - Colordistance-Based classification were selected';
-                obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 1;
-                set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','on')
+%                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - Colordistance-Based classification were selected';
+%                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 1;
+%                 set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','on')
+%                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','on')
                 
             elseif src.Value == 2
-                % Cluster-Based  classification 2 Fiber Type cluster
+                % Color-Based quad labeling classification
                 
-                obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
-                obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
-                obj.modelAnalyzeHandle.InfoMessage = '      - searching for 2 Fiber Type cluster';
-                obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 0;
-                set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
-                set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
-                obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
+%                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - searching for 2 Fiber Type cluster';
+%                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 0;
+%                 set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
+%                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
                 
             elseif src.Value == 3
                 % Cluster-Based  classification 3 Fiber Type cluster
                 
-                obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
-                obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
-                obj.modelAnalyzeHandle.InfoMessage = '      - searching for 3 Fiber Type cluster';
-                obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 0;
-                set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
-                set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
-                obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
+%                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - searching for 3 Fiber Type cluster';
+%                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 0;
+%                 set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
+%                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
+%                 obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
                 
             end
             
@@ -442,15 +559,32 @@ classdef controllerAnalyze < handle
                         set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
                         set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
                     end
-                    
-                case obj.viewAnalyzeHandle.B_ColorDistanceActive.Tag
-                    % ColorDistanceActive has changed. If it is zero ColorDistance parameters
+                
+                case obj.viewAnalyzeHandle.B_BlueRedThreshActive.Tag
+                    % BlueRedThreshActive has changed. If it is zero AspectRatio parameters
                     % won't be used for classification.
                     if Value == 0
-                        set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
+                        set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+                        set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+                        set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
                     elseif Value == 1
-                        set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','on')
-                    end
+                        set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
+                        set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
+                        set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
+                    end    
+
+                case obj.viewAnalyzeHandle.B_FarredRedThreshActive.Tag
+                    % BlueRedThreshActive has changed. If it is zero AspectRatio parameters
+                    % won't be used for classification.
+                    if Value == 0
+                        set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                        set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                        set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                    elseif Value == 1
+                        set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
+                        set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
+                        set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
+                    end 
                     
                 case obj.viewAnalyzeHandle.B_ColorValueActive.Tag
                     % ColorValueActive has changed. If it is zero ColorValue parameters
@@ -584,28 +718,29 @@ classdef controllerAnalyze < handle
                 obj.addWindowCallbacks()
             end
             
-            % send selected analyze mode to the model.
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
-            % send selected area parameters to the model.
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
             obj.modelAnalyzeHandle.MinAreaPixel = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
             obj.modelAnalyzeHandle.MaxAreaPixel = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
             
-            % send selected aspect ratio parameters to the model.
+            obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
+            obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
+            
             obj.modelAnalyzeHandle.AspectRatioActive = obj.viewAnalyzeHandle.B_AspectRatioActive.Value;
             obj.modelAnalyzeHandle.MinAspectRatio = str2double(obj.viewAnalyzeHandle.B_MinAspectRatio.String);
             obj.modelAnalyzeHandle.MaxAspectRatio = str2double(obj.viewAnalyzeHandle.B_MaxAspectRatio.String);
             
-            % send selected roundness parameters to the model.
-            obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
-            obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
+            obj.modelAnalyzeHandle.BlueRedThreshActive = obj.viewAnalyzeHandle.B_BlueRedThreshActive.Value;
+            obj.modelAnalyzeHandle.BlueRedThresh = str2double(obj.viewAnalyzeHandle.B_BlueRedThresh.String);
+            obj.modelAnalyzeHandle.BlueRedDistBlue = str2double(obj.viewAnalyzeHandle.B_BlueRedDistBlue.String);
+            obj.modelAnalyzeHandle.BlueRedDistRed = str2double(obj.viewAnalyzeHandle.B_BlueRedDistRed.String);
             
-            % send selected color distance parameters to the model.
-            obj.modelAnalyzeHandle.ColorDistanceActive = obj.viewAnalyzeHandle.B_ColorDistanceActive.Value;
-            obj.modelAnalyzeHandle.MinColorDistance = str2double(obj.viewAnalyzeHandle.B_ColorDistance.String);
+            obj.modelAnalyzeHandle.FarredRedThreshActive = obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value;
+            obj.modelAnalyzeHandle.FarredRedThresh = str2double(obj.viewAnalyzeHandle.B_FarredRedThresh.String);
+            obj.modelAnalyzeHandle.FarredRedDistFarred = str2double(obj.viewAnalyzeHandle.B_FarredRedDistFarred.String);
+            obj.modelAnalyzeHandle.FarredRedDistRed = str2double(obj.viewAnalyzeHandle.B_FarredRedDistRed.String);
             
-            % send selected color value parameters to the model.
             obj.modelAnalyzeHandle.ColorValueActive = obj.viewAnalyzeHandle.B_ColorValueActive.Value;
             obj.modelAnalyzeHandle.ColorValue = str2double(obj.viewAnalyzeHandle.B_ColorValue.String);
             
@@ -622,8 +757,8 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
             set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
             set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
             
@@ -657,9 +792,18 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
             end
             
-            set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_ColorDistanceActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
+            if obj.viewAnalyzeHandle.B_BlueRedThreshActive.Value == 1
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
+            end
+            
+            set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
+            if obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value == 1
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
             end
             
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
@@ -1029,8 +1173,8 @@ classdef controllerAnalyze < handle
             
             switch choice
                 case 'Yes'
-                    delete(obj.viewEditHandle);
-                    delete(obj.modelEditHandle);
+                    delete(obj.viewAnalyzeHandle);
+                    delete(obj.modelAnalyzeHandle);
                     delete(obj.mainCardPanel);
                     
                     %find all objects

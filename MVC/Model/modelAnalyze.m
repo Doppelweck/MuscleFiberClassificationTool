@@ -65,11 +65,18 @@ classdef modelAnalyze < handle
         RoundnessActive; %Indicates if Roundness parameter is used for classification.
         MinRoundness; %Minimal allowed Roundness. Is used for classification. Objects with smaller Roundness will be classified as Type 0.
         
-        ColorDistanceActive; %Indicates if ColorDistance parameter is used for classification.
-        MinColorDistance; %Minimal allowed ColorDistance. Is used for classification. Objects with smaller ColorDistance will be classified as Type 3.
-        
         ColorValueActive; %Indicates if ColorValue parameter is used for classification.
         ColorValue; %Minimal allowed ColorValue. Is used for classification. Objects with smaller ColorValue will be classified as Type 0.
+        
+        BlueRedThreshActive; %Indicates if Blue/Red Threshold parameter is used for classification.
+        BlueRedThresh;
+        BlueRedDistBlue;
+        BlueRedDistRed;
+        
+        FarredRedThreshActive; %Indicates if Farred/Red Threshold parameter is used for classification.
+        FarredRedThresh;
+        FarredRedDistFarred;
+        FarredRedDistRed;
         
         CalculationRunning; %Indicates if any caluclation is still running.
         
@@ -316,7 +323,7 @@ classdef modelAnalyze < handle
             [obj.Stats(:).ColorBlue] = deal(0);
             [obj.Stats(:).ColorFarRed] = deal(0);
             [obj.Stats(:).ColorRatioBlueRed] = deal(0);
-            [obj.Stats(:).ColorDistBlueRed] = deal(0);
+            [obj.Stats(:).ColorRatioFarredRed] = deal(0);
             
             nObjects = size(obj.Stats,1);
             
@@ -335,20 +342,13 @@ classdef modelAnalyze < handle
                 meanBlue = mean( obj.PicPlaneBlue(obj.LabelMat == i) );
                 meanGreen = mean( obj.PicPlaneGreen(obj.LabelMat == i) );
                 
-                maxC = max([meanRed meanBlue]);
-                
-                if maxC == 0
-                    % Dividing by 0 is uncool
-                    maxC = 1;
-                end
-                
                 obj.Stats(i).ColorRed = meanRed;
                 obj.Stats(i).ColorGreen = meanGreen;
                 obj.Stats(i).ColorBlue = meanBlue;
                 obj.Stats(i).ColorFarRed = meanFarRed;
                 obj.Stats(i).ColorHue = meanColorH;
                 obj.Stats(i).ColorValue = meanColorV;
-                obj.Stats(i).ColorDistBlueRed = (meanBlue - meanRed)/maxC;
+                obj.Stats(i).ColorRatioFarredRed = meanFarRed/meanRed;
                 obj.Stats(i).ColorRatioBlueRed = meanBlue/meanRed;
                 
                 percent =   i/nObjects;
@@ -384,13 +384,19 @@ classdef modelAnalyze < handle
             for i=1:1:nObjects
                 %select boundarie color for diffrent fiber types
                 switch obj.Stats(i).FiberType
-                    case 0
+                    case 'undefined'
+                        % Type 0
                         Color = 'w';
-                    case 1
+                    case 'Type 1'
                         Color = 'b';
-                    case 2
+                    case 'Type 2x'
                         Color = 'r';
-                    case 3
+                    case 'Type 2a'
+                        Color = 'y';    
+                    case 'Type 2ax'
+                        Color = [255,165,0]; %orange
+                    case 'Type 1 2 hybrid'
+                        % Type 3
                         Color = 'm';
                     otherwise
                         Color = 'b';
@@ -429,67 +435,227 @@ classdef modelAnalyze < handle
             
             nObjects = size(obj.Stats,1);
             
-            %Number of fiber types
-            fibtype1 = 0; % (blue)
-            fibtype2 = 0; % (red)
-            fibtype3 = 0; % (magenta)
-            fibtype0 = 0; % (white)
+            %Number of main fiber types (numerical)
+            NoMainFibtype1 = 0; % (blue) type 1 fiber
+            NoMainFibtype2 = 0; % (red) type 2x and 2a combined
+            NoMainFibtype3 = 0; % (magenta) type 12h fiber (1 2 hybrid)
+            NoMainFibtype0 = 0; % (white) undefind fiber types
             
-            % Add Field FiberType to Stats Struct and set all values to
+            %Number of specific fiber types
+            NoFibtype1 = 0; % (blue) type 1 fiber
+            NoFibtype2x = 0; % (red) type 2x fiber (no far red)
+            NoFibtype2a = 0; % (yellow) type 2a fiber (far red)
+            NoFibtype2ax = 0; % (orange)type 2ax fiber (2a 2x hybrid)
+            NoFibtype12h = 0; % (magenta)type 12h fiber (1 2x hybrid)
+            NoFibtype0 = 0; % (white) undefind fiber
+            
+            % Add Fields for FiberTypes to Stats Struct and set all values to
             % zero
-            [obj.Stats(:).FiberType] = deal(0);
+            [obj.Stats(:).FiberTypeMainGroup] = deal(0);
             
-            if obj.AnalyzeMode == 1 % Color-Based classification
+            [obj.Stats(:).FiberType] = deal('');
+
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%% Color-Based triple labeling
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            if obj.AnalyzeMode == 1 
+                % Color-Based triple labeling
+                %Use gren red and blue plane for fiber type classification.
+                %seaarch for type 1 2x and 12h (type 1 2 hybrid) fibers
                 
                 for i=1:1:nObjects
-                    %
+                    
                     if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxAreaPixel )
                         
                         % Object Area is to big. FiberType 0: No Fiber (white)
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
                             obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
                         
                         % ApsectRatio is to small or to great.
                         % FiberType 0: No Fiber (white)
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
                         
                         % Object Roundness is to small. FiberType 0: No Fiber (white))
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
                         
-                        % Color Value (V-Channel of HSV color room) is to samll
-                        % FiberType 0: No Fiber (white)
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        % Object ColorValue is to small. FiberType 0: No Fiber (white))
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+                        NoFibtype0 = NoFibtype0+1;
                         
-                    elseif obj.ColorDistanceActive && ( abs(obj.Stats(i).ColorDistBlueRed) < obj.MinColorDistance )
+                    elseif obj.BlueRedThreshActive
+                        %Blue Red thresh is active. Searchinf for Type 1 2
+                        %and 12 hybrid fibers
+                        if obj.Stats(i).ColorRatioBlueRed >= obj.BlueRedThresh
+                            
+                            %Check for Limit Blue
+                            if obj.Stats(i).ColorRatioBlueRed  < obj.BlueRedThresh/(1 - obj.BlueRedDistBlue)
+                                % Type 1 2 hybrid
+                                obj.Stats(i).FiberTypeMainGroup = 3;
+                                obj.Stats(i).FiberType = 'Type 1 2 hybrid';
+                                NoFibtype12h = NoFibtype12h+1;
+                            else
+                                % Type 1 fiber
+                                obj.Stats(i).FiberTypeMainGroup = 1;
+                                obj.Stats(i).FiberType = 'Type 1';
+                                NoFibtype1 = NoFibtype1+1;
+                                
+                            end
+                            
+                        elseif obj.Stats(i).ColorRatioBlueRed < obj.BlueRedThresh
+                            
+                            %Check for Limit Blue
+                            if obj.Stats(i).ColorRatioBlueRed  > obj.BlueRedThresh*(1 - obj.BlueRedDistRed)
+                                % Type 1 2 hybrid (magenta)
+                                obj.Stats(i).FiberTypeMainGroup = 3;
+                                obj.Stats(i).FiberType = 'Type 1 2 hybrid';
+                                NoFibtype12h = NoFibtype12h+1;
+                            else
+                                % Type 2 fiber (red)
+                                % If Color-based quad labeling is active 
+                                % check type 2 fibers
+                                if obj.AnalyzeMode == 2
+                                    % Color-Based quad labeling is active
+                                    %Use green red farred and blue plane for fiber type classification.
+                                    %seaarch for type 1 2x 2a 12h (type 1 2 hybrid) fibers and
+                                    %2ax (type 2a 2x hybrid)
+                                    if obj.FarredRedThreshActive
+                                        % Farred/Red Thresh is active 
+                                        if obj.Stats(i).ColorRatioFarredRed >= obj.FarredRedThresh
+                                            %Check for Limit FarRed
+                                            if obj.Stats(i).ColorRatioBlueRed  < obj.FarredRedThresh/(1 - obj.FarredRedDistFarred)
+                                                % Type 2ax fiber (orange hybrid 2a 2x fiber)
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2ax';
+                                                NoFibtype2ax = NoFibtype2ax+1;
+                                            else
+                                                % Type 2a fiber 
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2a';
+                                                NoFibtype2a = NoFibtype2a+1;
+                                                
+                                            end
+                                        elseif obj.Stats(i).ColorRatioFarredRed < obj.FarredRedThresh
+                                            if obj.Stats(i).ColorRatioFarredRed  > obj.FarredRedThresh*(1 - obj.FarredRedDistFarred)
+                                                % Type 2ax fiber (orange hybrid 2a 2x fiber)
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2ax';
+                                                NoFibtype2ax = NoFibtype2ax+1;
+                                            else
+                                                % Type 2x fiber 
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2x';
+                                                NoFibtype2x = NoFibtype2x+1;
+                                                
+                                            end
+                                        end
+                                    else % Farred/Red Thresh is not active
+                                        if obj.Stats(i).ColorRatioBlueRed  <= 1
+                                            % Type 2x fiber 
+                                            obj.Stats(i).FiberTypeMainGroup = 2;
+                                            obj.Stats(i).FiberType = 'Type 2x';
+                                            NoFibtype2x = NoFibtype2x+1;
+                                        elseif obj.Stats(i).ColorRatioBlueRed  > 1
+                                            % Type 2a fiber
+                                            obj.Stats(i).FiberTypeMainGroup = 2;
+                                            obj.Stats(i).FiberType = 'Type 2a';
+                                            NoFibtype2a = NoFibtype2a+1;
+                                            
+                                        end
+                                    end
+                                else
+                                    obj.Stats(i).FiberTypeMainGroup = 2;
+                                    obj.Stats(i).FiberType = 'Type 2x';
+                                    NoFibtype2a = NoFibtype2a+1;
+                                end
+                            end
+                        end
                         
-                        % Absolute Value of color distance between Blue and Red is to small.
-                        % FiberType 3 (magenta): Fiber between Typ 1 and Typ 2
-                        obj.Stats(i).FiberType = 3;
-                        fibtype3 = fibtype3+1;
-                        
-                    elseif obj.Stats(i).ColorDistBlueRed > 0
-                        
-                        % Color distance is smaller than 0. Negative values
-                        % means Red Color is greater. Fiber Type 1 (blue)
-                        obj.Stats(i).FiberType = 1;
-                        fibtype1 = fibtype1+1;
-                        
-                    elseif obj.Stats(i).ColorDistBlueRed < 0
-                        
-                        % Color distance is greater than 0. Positive values
-                        % means Blue Color is greater. FIber Type 2 (red)
-                        obj.Stats(i).FiberType = 2;
-                        fibtype2 = fibtype2+1;
+                    elseif ~obj.BlueRedThreshActive
+                        %Blue Red thresh is not active. Searching for Type
+                        %1 and 2 fibers
+                        if obj.Stats(i).ColorRatioBlueRed >= 1
+                            % Type 1 fiber (blue)
+                            obj.Stats(i).FiberTypeMainGroup = 1;
+                            obj.Stats(i).FiberType = 'Type 1';
+                            NoFibtype1 = NoFibtype1+1;
+                        elseif obj.Stats(i).ColorRatioBlueRed < 1
+                            % Type 2 fiber (red)
+                                % If Color-based quad labeling is active 
+                                % check type 2 fibers
+                                if obj.AnalyzeMode == 2
+                                    % Color-Based quad labeling is active
+                                    %Use green red farred and blue plane for fiber type classification.
+                                    %seaarch for type 1 2x 2a 12h (type 1 2 hybrid) fibers and
+                                    %2ax (type 2a 2x hybrid)
+                                    if obj.FarredRedThreshActive
+                                        % Farred/Red Thresh is active 
+                                        if obj.Stats(i).ColorRatioFarredRed >= obj.FarredRedThresh
+                                            %Check for Limit FarRed
+                                            if obj.Stats(i).ColorRatioBlueRed  < obj.FarredRedThresh/(1 - obj.FarredRedDistFarred)
+                                                % Type 2ax fiber (orange hybrid 2a 2x fiber)
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2ax';
+                                                NoFibtype2ax = NoFibtype2ax+1;
+                                            else
+                                                % Type 2a fiber 
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2a';
+                                                NoFibtype2a = NoFibtype2a+1;
+                                                
+                                            end
+                                        elseif obj.Stats(i).ColorRatioFarredRed < obj.FarredRedThresh
+                                            if obj.Stats(i).ColorRatioFarredRed  > obj.FarredRedThresh*(1 - obj.FarredRedDistFarred)
+                                                % Type 2ax fiber (orange hybrid 2a 2x fiber)
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2ax';
+                                                NoFibtype2ax = NoFibtype2ax+1;
+                                            else
+                                                % Type 2x fiber 
+                                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                                obj.Stats(i).FiberType = 'Type 2x';
+                                                NoFibtype2x = NoFibtype2x+1;
+                                                
+                                            end
+                                        end
+                                    else % Farred/Red Thresh is not active
+                                        if obj.Stats(i).ColorRatioBlueRed  <= 1
+                                            % Type 2x fiber 
+                                            obj.Stats(i).FiberTypeMainGroup = 2;
+                                            obj.Stats(i).FiberType = 'Type 2x';
+                                            NoFibtype2x = NoFibtype2x+1;
+                                        elseif obj.Stats(i).ColorRatioBlueRed  > 1
+                                            % Type 2a fiber
+                                            obj.Stats(i).FiberTypeMainGroup = 2;
+                                            obj.Stats(i).FiberType = 'Type 2a';
+                                            NoFibtype2a = NoFibtype2a+1;
+                                            
+                                        end
+                                    end
+                                else
+                                    obj.Stats(i).FiberTypeMainGroup = 2;
+                                    obj.Stats(i).FiberType = 'Type 2x';
+                                    NoFibtype2a = NoFibtype2a+1;
+                                end
+                        else
+                            obj.Stats(i).FiberTypeMainGroup = 0;
+                            obj.Stats(i).FiberType = 'undefined';
+                            NoFibtype0 = NoFibtype0+1;
+                        end
                         
                     else
                         %Error Code
@@ -501,9 +667,14 @@ classdef modelAnalyze < handle
                     workbar(percent,'Please Wait...specifing Fiber-Type','Fiber-Type');
                     
                 end
+            
                 
-            elseif obj.AnalyzeMode == 2 || obj.AnalyzeMode == 3 % Cluster-Based classification
-                % Search for 2 or 3 Clusters
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %%% Custer-Based quad labeling
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                
+            elseif obj.AnalyzeMode == 3    
+                
                 NoOfClusters = obj.AnalyzeMode;
                 
                 Data(:,1) = [obj.Stats.ColorBlue];
@@ -596,13 +767,13 @@ classdef modelAnalyze < handle
             
             obj.InfoMessage = ['      - ' num2str(nObjects) ' objects were found'];
             
-            obj.InfoMessage = ['         - ' num2str(fibtype1) ' Type-1 fibers were found (blue)'];
+            obj.InfoMessage = ['         - ' num2str(NoFibtype1) ' Type-1 fibers were found (blue)'];
             
-            obj.InfoMessage = ['         - ' num2str(fibtype2) ' Type-2 fibers were found (red)'];
+            obj.InfoMessage = ['         - ' num2str(NoFibtype2a) ' Type-2 fibers were found (red)'];
             
-            obj.InfoMessage = ['         - ' num2str(fibtype3) ' Type-3 fibers were found (magenta)'];
+            obj.InfoMessage = ['         - ' num2str(NoFibtype2x) ' Type-3 fibers were found (magenta)'];
             
-            obj.InfoMessage = ['         - ' num2str(fibtype0) ' Type-0 fibers were found (white)'];
+            obj.InfoMessage = ['         - ' num2str(NoFibtype0) ' Type-0 fibers were found (white)'];
             
         end
         
@@ -705,10 +876,16 @@ classdef modelAnalyze < handle
             %               Data{13}: Aspect ratio max value
             %               Data{14}: Roundness active parameter
             %               Data{15}: Roundness value
-            %               Data{16}: ColorDistance active parameter
-            %               Data{17}: ColorDistance value
-            %               Data{18}: ColorValue active parameter
-            %               Data{19}: ColorValuee value
+            %               Data{16}: BlueRedThreshActive
+            %               Data{17}: BlueRedThresh
+            %               Data{18}: BlueRedDistBlue
+            %               Data{19}: BlueRedDistRed
+            %               Data{20}: FarredRedThreshActive
+            %               Data{21}: FarredRedThresh
+            %               Data{22}: FarredRedDistFarred
+            %               Data{23}: oFarredRedDistRed
+            %               Data{24}: ColorValueActive
+            %               Data{25}: ColorValue
             %               
             
             Data{1} = obj.FileName;
@@ -731,11 +908,18 @@ classdef modelAnalyze < handle
             Data{14} = obj.RoundnessActive;
             Data{15} = obj.MinRoundness;
             
-            Data{16} = obj.ColorDistanceActive;
-            Data{17} = obj.MinColorDistance;
+            Data{16} = obj.BlueRedThreshActive;
+            Data{17} = obj.BlueRedThresh;
+            Data{18} = obj.BlueRedDistBlue;
+            Data{19} = obj.BlueRedDistRed;
             
-            Data{18} = obj.ColorValueActive;
-            Data{19} = obj.ColorValue;
+            Data{20} = obj.FarredRedThreshActive;
+            Data{21} = obj.FarredRedThresh;
+            Data{22} = obj.FarredRedDistFarred;
+            Data{23} = obj.FarredRedDistRed;
+            
+            Data{24} = obj.ColorValueActive;
+            Data{25} = obj.ColorValue;
             
         end
         
@@ -757,12 +941,17 @@ classdef modelAnalyze < handle
             %               Info{1}: Label
             %               Info{2}: Area
             %               Info{3}: AspectRatio
-            %               Info{4}: Roundness
-            %               Info{5}: ColorDistBlueRed
-            %               Info{6}: ColorValue
-            %               Info{7}: FiberType
-            %               Info{8}: Cropped image of fiber type
-            %               Info{9}: Boundarie of object
+            %               Info{4}: ColorValue
+            %               Info{5}: Roundness
+            %               Info{6}: BlueRed ratio
+            %               Info{7}: FarredRed ratio
+            %               Info{8}: mean Red
+            %               Info{9}: mean Green
+            %               Info{10}: mean Blue
+            %               Info{11}: mean Farred
+            %               Info{12}: FiberType
+            %               Info{13}: Cropped image of fiber type
+            %               Info{14}: Boundarie of object
             
             PosOut = obj.checkPosition(Pos);
             
@@ -786,13 +975,18 @@ classdef modelAnalyze < handle
                     obj.FiberInfo{1} = num2str(Label);
                     obj.FiberInfo{2} = num2str(obj.Stats(Label).Area);
                     obj.FiberInfo{3} = num2str(obj.Stats(Label).AspectRatio);
-                    obj.FiberInfo{4} = num2str(obj.Stats(Label).Roundness);
-                    obj.FiberInfo{5} = num2str(obj.Stats(Label).ColorDistBlueRed);
-                    obj.FiberInfo{6} = num2str(obj.Stats(Label).ColorValue);
-                    obj.FiberInfo{7} = num2str(obj.Stats(Label).FiberType);
+                    obj.FiberInfo{4} = num2str(obj.Stats(Label).ColorValue);
+                    obj.FiberInfo{5} = num2str(obj.Stats(Label).Roundness);
+                    obj.FiberInfo{6} = num2str(obj.Stats(Label).ColorRatioBlueRed);
+                    obj.FiberInfo{7} = num2str(obj.Stats(Label).ColorRatioFarredRed);
+                    obj.FiberInfo{8} = num2str(obj.Stats(Label).ColorRed);
+                    obj.FiberInfo{9} = num2str(obj.Stats(Label).ColorGreen);
+                    obj.FiberInfo{10} = num2str(obj.Stats(Label).ColorBlue);
+                    obj.FiberInfo{11} = num2str(obj.Stats(Label).ColorFarRed);
+                    obj.FiberInfo{12} = obj.Stats(Label).FiberType;
                     
-                    obj.FiberInfo{8} = y;
-                    obj.FiberInfo{9} = Bound;
+                    obj.FiberInfo{13} = y;
+                    obj.FiberInfo{14} = Bound;
                     Info = obj.FiberInfo;
 
                 else
@@ -802,15 +996,22 @@ classdef modelAnalyze < handle
                 end
                 
             else
-                obj.FiberInfo{1} = ' - ';
-                obj.FiberInfo{2} = ' - ';
-                obj.FiberInfo{3} = ' - ';
-                obj.FiberInfo{4} = ' - ';
-                obj.FiberInfo{5} = ' - ';
-                obj.FiberInfo{6} = ' - ';
-                obj.FiberInfo{7} = ' - ';
-                obj.FiberInfo{8} = [];
-                obj.FiberInfo{9} = [];
+                obj.FiberInfo{1} = '-';
+                obj.FiberInfo{2} = '-';
+                obj.FiberInfo{3} = '-';
+                obj.FiberInfo{4} = '-';
+                obj.FiberInfo{5} = '-';
+                obj.FiberInfo{6} = '-';
+                obj.FiberInfo{7} = '-';
+                obj.FiberInfo{8} = '-';
+                obj.FiberInfo{9} = '-';
+                obj.FiberInfo{10} = '-';
+                obj.FiberInfo{11} = '-';
+                obj.FiberInfo{12} = '-';
+                
+                obj.FiberInfo{13} = [];
+                obj.FiberInfo{14} = [];
+                
                 Info = obj.FiberInfo;
                 
             end

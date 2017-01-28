@@ -48,8 +48,15 @@ classdef viewAnalyze < handle
         B_MinAspectRatio; %TextEditBox, minimal allowed fiber aspect ratio.
         B_MaxAspectRatio; %TextEditBox, maximal allowed fiber aspect ratio.
         
-        B_ColorDistanceActive; %Checkbox, select if color distance parameter is used for classificaton.
-        B_ColorDistance; %TextEditBox, minimal allowed fiber color distance.
+        B_BlueRedThreshActive; %Checkbox, select if Blue/Red threshold parameter is used for classificaton.
+        B_BlueRedThresh; %TextEditBox, Blue/Red threshold to indentify type 1 and type 2 fibers.
+        B_BlueRedDistBlue; %TextEditBox, distance from Blue/Red threshold line in Blue direction to indentify type 12 hybrid fibers.
+        B_BlueRedDistRed; %TextEditBox, distance from Blue/Red threshold line in Red direction to indentify type 12 hybrid fibers.
+        
+        B_FarredRedThreshActive; %Checkbox, select if FarRed/Red threshold parameter is used for classificaton.
+        B_FarredRedThresh; %TextEditBox, FarRed/Red threshold to indentify type 2a and type 2x fibers.
+        B_FarredRedDistFarred; %TextEditBox, distance from FarRed/Red threshold line in FarRed direction to indentify type 2ax fibers.
+        B_FarredRedDistRed; %TextEditBox, distance from FarRed/Red threshold line in Red direction to indentify type 2ax fibers.
         
         B_ColorValueActive; %Checkbox, select if color value parameter is used for classificaton.
         B_ColorValue; %TextEditBox, minimal allowed fiber color value (HSV).
@@ -57,10 +64,15 @@ classdef viewAnalyze < handle
         B_TextObjNo; %TextBox, shows label number of selected fiber in the fiber information panel.
         B_TextArea; %TextBox, shows area of selected fiber in the fiber information panel.
         B_TextRoundness; %TextBox, shows roundness of selected fiber in the fiber information panel.
-        B_TextFiberType; %TextBox, shows fiber type of selected fiber in the fiber information panel.
         B_TextAspectRatio; %TextBox, shows aspect ratio of selected fiber in the fiber information panel.
+        B_TextMeanRed; %TextBox, shows mean Red value of selected fiber in the fiber information panel.
+        B_TextMeanGreen; %TextBox, shows mean Green value of selected fiber in the fiber information panel.
+        B_TextMeanBlue; %TextBox, shows mean Blue value of selected fiber in the fiber information panel.
+        B_TextMeanFarred; %TextBox, shows mean Farred value of selected fiber in the fiber information panel.
+        B_TextBlueRedRatio; %TextBox, shows Blue/Red ratio value of selected fiber in the fiber information panel.
+        B_TextFarredRedRatio; %TextBox, shows Farred/Red ratio value of selected fiber in the fiber information panel.
         B_TextColorValue; %TextBox, shows color value (HSV) of selected fiber in the fiber information panel.
-        B_TextColorDistance; %TextBox, shows color distance of selected fiber in the fiber information panel.
+        B_TextFiberType; %TextBox, shows fiber type of selected fiber in the fiber information panel.
         B_AxesInfo; %handle to axes with image of selected fiber in the fiber information panel.
         B_InfoText; %Shows the info log text.
         
@@ -71,7 +83,7 @@ classdef viewAnalyze < handle
     end
     
     methods
-        function obj = viewAnalyze(mainCard)
+        function obj = viewAnalyze()
             
             if ismac
                 fontSizeS = 10; % Font size small
@@ -88,12 +100,13 @@ classdef viewAnalyze < handle
                 
             end
             
+            mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             mainPanelBox = uix.HBox( 'Parent', mainCard ,'Spacing',5,'Padding',5);
             
             obj.panelPicture = uix.Panel( 'Title', 'Picture', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
             obj.panelControl = uix.Panel( 'Title', 'Control Panel', 'Parent', mainPanelBox,'FontSize',fontSizeB );
             set( mainPanelBox, 'MinimumWidths', [1 320] );
-            set( mainPanelBox, 'Widths', [-4 -1] );
+            set( mainPanelBox, 'Widths', [-80 -20] );
             
             obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture));
             axis image
@@ -107,7 +120,7 @@ classdef viewAnalyze < handle
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
             
             
-            set( PanelVBox, 'Heights', [-4 -5 -11 -4], 'Spacing', 1 );
+            set( PanelVBox, 'Heights', [-3 -6 -11 -4], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,7 +143,8 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontSize',fontSizeM, 'String', 'Analyze Classification Mode :' );
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontSize',fontSizeM, 'String', {'Colordistance-Based' , 'Color-Cluster-Based ; 2 Types', 'Color-Cluster-Based ; 3 Types'} );
+            String = {'Color-Based triple labeling (types: 1 12h 2x)' , 'Color-Based quad labelling (types: 1 12h 2a 2x 2ax)', 'Cluster-Based ; 3 Types'}
+            obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontSize',fontSizeM, 'String', String );
             
             set( HBoxPara1, 'Widths', [-1 -1] );
             
@@ -174,85 +188,216 @@ classdef viewAnalyze < handle
             
             set( HBoxPara3, 'Widths', [-1 -3 -2 -1 -2] );
             
-            %%%%%%%%%%%%%%%% 4. Row: Roundness
+            %%%%%%%%%%%%%%%% 4. Row Color Value HSV ColorRoom
             HBoxPara4 = uix.HBox('Parent', mainVBoxPara);
             
             HButtonBoxPara41 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_RoundnessActive = uicontrol( 'Parent', HButtonBoxPara41,'Style','checkbox','Value',1,'Tag','RoundnessActive');
+            obj.B_ColorValueActive = uicontrol( 'Parent', HButtonBoxPara41,'Style','checkbox','Value',1,'Tag','ColorValueActive');
             
             HButtonBoxPara42 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara42,'Style','text','FontSize',fontSizeM, 'String', 'Minimal roundness ratio :' );
+            uicontrol( 'Parent', HButtonBoxPara42,'Style','text','FontSize',fontSizeM, 'String', 'Minimal color value :' );
             
             HButtonBoxPara43 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_MinRoundness = uicontrol( 'Parent', HButtonBoxPara43,'Style','edit','FontSize',fontSizeM,'Tag','MinRoundValue', 'String', '0.15' );
+            obj.B_ColorValue = uicontrol( 'Parent', HButtonBoxPara43,'Style','edit','FontSize',fontSizeM,'Tag','ColorValue', 'String', '0.1' );
             
             set( HBoxPara4, 'Widths', [-1 -4 -4] );
             
-            
-            %%%%%%%%%%%%%%%% 5. Row Color Distans
+            %%%%%%%%%%%%%%%% 5. Row: Roundness
             HBoxPara5 = uix.HBox('Parent', mainVBoxPara);
             
             HButtonBoxPara51 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_ColorDistanceActive = uicontrol( 'Parent', HButtonBoxPara51,'style','checkbox','Value',1,'Tag','ColorDistanceActive');
+            obj.B_RoundnessActive = uicontrol( 'Parent', HButtonBoxPara51,'Style','checkbox','Value',1,'Tag','RoundnessActive');
             
             HButtonBoxPara52 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara52,'Style','text','FontSize',fontSizeM, 'String', 'Minimal color distance :' );
+            uicontrol( 'Parent', HButtonBoxPara52,'Style','text','FontSize',fontSizeM, 'String', 'Minimal roundness ratio :' );
             
             HButtonBoxPara53 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_ColorDistance = uicontrol( 'Parent', HButtonBoxPara53,'Style','edit','FontSize',fontSizeM,'Tag','ColorDistanceValue', 'String', '0.2' );
+            obj.B_MinRoundness = uicontrol( 'Parent', HButtonBoxPara53,'Style','edit','FontSize',fontSizeM,'Tag','MinRoundValue', 'String', '0.15' );
             
             set( HBoxPara5, 'Widths', [-1 -4 -4] );
             
-            %%%%%%%%%%%%%%%% 5. Row Color Value HSV ColorRoom
+            
+            %%%%%%%%%%%%%%%% 6. Row Blue Red thresh
             HBoxPara6 = uix.HBox('Parent', mainVBoxPara);
             
             HButtonBoxPara61 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_ColorValueActive = uicontrol( 'Parent', HButtonBoxPara61,'Style','checkbox','Value',1,'Tag','ColorValueActive');
+            obj.B_BlueRedThreshActive = uicontrol( 'Parent', HButtonBoxPara61,'style','checkbox','Value',1,'Tag','BlueRedThreshActive');
             
             HButtonBoxPara62 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara62,'Style','text','FontSize',fontSizeM, 'String', 'Minimal color value :' );
+            uicontrol( 'Parent', HButtonBoxPara62,'Style','text','FontSize',fontSizeM, 'String', 'B/R thresh:' );
             
             HButtonBoxPara63 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            obj.B_ColorValue = uicontrol( 'Parent', HButtonBoxPara63,'Style','edit','FontSize',fontSizeM,'Tag','ColorValue', 'String', '0.1' );
+            obj.B_BlueRedThresh = uicontrol( 'Parent', HButtonBoxPara63,'Style','edit','FontSize',fontSizeM,'Tag','BlueRedThresh', 'String', '1' );
             
-            set( HBoxPara6, 'Widths', [-1 -4 -4] );
+            HButtonBoxPara64 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara64,'Style','text','FontSize',fontSizeM, 'String', 'Blue dist:' );
+            
+            HButtonBoxPara65 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_BlueRedDistBlue = uicontrol( 'Parent', HButtonBoxPara65,'Style','edit','FontSize',fontSizeM,'Tag','BlueRedDistBlue', 'String', '0.1' );
+            
+            HButtonBoxPara66 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara66,'Style','text','FontSize',fontSizeM, 'String', 'Red dist:' );
+            
+            HButtonBoxPara67 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_BlueRedDistRed = uicontrol( 'Parent', HButtonBoxPara67,'Style','edit','FontSize',fontSizeM,'Tag','BlueRedDistRed', 'String', '0.1' );
+            
+            set( HBoxPara6, 'Widths', [-10 -20 -10 -20 -10 -20 -10] );
+            
+            %%%%%%%%%%%%%%%% 7. Row FarRed Red thresh
+            HBoxPara7 = uix.HBox('Parent', mainVBoxPara);
+            
+            HButtonBoxPara71 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_FarredRedThreshActive = uicontrol( 'Parent', HButtonBoxPara71,'style','checkbox','Value',1,'Tag','FarredRedThreshActive');
+            
+            HButtonBoxPara72 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara72,'Style','text','FontSize',fontSizeM, 'String', 'FR/R thresh:' );
+            
+            HButtonBoxPara73 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_FarredRedThresh = uicontrol( 'Parent', HButtonBoxPara73,'Style','edit','FontSize',fontSizeM,'Tag','FarredRedThresh', 'String', '1' );
+            
+            HButtonBoxPara74 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara74,'Style','text','FontSize',fontSizeM, 'String', 'Farred dist:' );
+            
+            HButtonBoxPara75 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_FarredRedDistFarred = uicontrol( 'Parent', HButtonBoxPara75,'Style','edit','FontSize',fontSizeM,'Tag','FarredRedDistFarred', 'String', '0.1' );
+            
+            HButtonBoxPara76 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara76,'Style','text','FontSize',fontSizeM, 'String', 'Red dist:' );
+            
+            HButtonBoxPara77 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_FarredRedDistRed = uicontrol( 'Parent', HButtonBoxPara77,'Style','edit','FontSize',fontSizeM,'Tag','FarredRedDistRed', 'String', '0.1' );
+            
+            set( HBoxPara7, 'Widths', [-10 -20 -10 -20 -10 -20 -10] );
+            
+            
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%% Panel FiberInformation %%%%%%%%%%%%%%%%%%%%%
             VBoxMainInfoFiber = uix.VBox('Parent', PanelFiberInformation);
-            HBBoxInfoFiber = uix.HBox('Parent', VBoxMainInfoFiber);
-            VButtonBoxleftFiber = uix.VButtonBox('Parent', HBBoxInfoFiber,'ButtonSize',[6000 50]);
-            VButtonBoxrightFiber = uix.VButtonBox('Parent', HBBoxInfoFiber,'ButtonSize',[6000 50]);
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Object Label No.:' );
-            obj.B_TextObjNo = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HBoxInfo1 = uix.HBox('Parent', VBoxMainInfoFiber);
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel:' );
-            obj.B_TextArea = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HButtonBoxInfo11 = uix.HButtonBox('Parent', HBoxInfo1,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo11,'Style','text','FontSize',fontSizeM, 'String', 'Label No.:' );
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Aspect Ratio:' );
-            obj.B_TextAspectRatio = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HButtonBoxInfo12 = uix.HButtonBox('Parent', HBoxInfo1,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextObjNo = uicontrol( 'Parent', HButtonBoxInfo12,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Roundness:' );
-            obj.B_TextRoundness = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HButtonBoxInfo13 = uix.HButtonBox('Parent', HBoxInfo1,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo13,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel:' );
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color distance Blue/Red:' );
-            obj.B_TextColorDistance = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HButtonBoxInfo14 = uix.HButtonBox('Parent', HBoxInfo1,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextArea = uicontrol( 'Parent', HButtonBoxInfo14,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color value (HSV):' );
-            obj.B_TextColorValue = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HBoxInfo2 = uix.HBox('Parent', VBoxMainInfoFiber);
             
-            uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Fiber-Type:' );
-            obj.B_TextFiberType = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            HButtonBoxInfo21 = uix.HButtonBox('Parent', HBoxInfo2,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo21,'Style','text','FontSize',fontSizeM, 'String', 'Aspect Ratio:' );
             
+            HButtonBoxInfo22 = uix.HButtonBox('Parent', HBoxInfo2,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextAspectRatio = uicontrol( 'Parent', HButtonBoxInfo22,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
-            HBBoxInfoFiberAxes = uix.HBox('Parent', VBoxMainInfoFiber);
-            obj.B_AxesInfo = axes('Parent',HBBoxInfoFiberAxes);
+            HButtonBoxInfo23 = uix.HButtonBox('Parent', HBoxInfo2,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo23,'Style','text','FontSize',fontSizeM, 'String', 'Roundness:' );
+            
+            HButtonBoxInfo24 = uix.HButtonBox('Parent', HBoxInfo2,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextRoundness = uicontrol( 'Parent', HButtonBoxInfo24,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HBoxInfo3 = uix.HBox('Parent', VBoxMainInfoFiber);
+            
+            HButtonBoxInfo31 = uix.HButtonBox('Parent', HBoxInfo3,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo31,'Style','text','FontSize',fontSizeM, 'String', 'mean Red:' );
+            
+            HButtonBoxInfo32 = uix.HButtonBox('Parent', HBoxInfo3,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextMeanRed = uicontrol( 'Parent', HButtonBoxInfo32,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HButtonBoxInfo33 = uix.HButtonBox('Parent', HBoxInfo3,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo33,'Style','text','FontSize',fontSizeM, 'String', 'mean Green:' );
+            
+            HButtonBoxInfo34 = uix.HButtonBox('Parent', HBoxInfo3,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextMeanGreen = uicontrol( 'Parent', HButtonBoxInfo34,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HBoxInfo4 = uix.HBox('Parent', VBoxMainInfoFiber);
+            
+            HButtonBoxInfo41 = uix.HButtonBox('Parent', HBoxInfo4,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo41,'Style','text','FontSize',fontSizeM, 'String', 'mean Blue:' );
+            
+            HButtonBoxInfo42 = uix.HButtonBox('Parent', HBoxInfo4,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextMeanBlue = uicontrol( 'Parent', HButtonBoxInfo42,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HButtonBoxInfo43 = uix.HButtonBox('Parent', HBoxInfo4,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo43,'Style','text','FontSize',fontSizeM, 'String', 'mean Farred:' );
+            
+            HButtonBoxInfo44 = uix.HButtonBox('Parent', HBoxInfo4,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextMeanFarred = uicontrol( 'Parent', HButtonBoxInfo44,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HBoxInfo5 = uix.HBox('Parent', VBoxMainInfoFiber);
+            
+            HButtonBoxInfo51 = uix.HButtonBox('Parent', HBoxInfo5,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo51,'Style','text','FontSize',fontSizeM, 'String', 'Blue/Red:' );
+            
+            HButtonBoxInfo52 = uix.HButtonBox('Parent', HBoxInfo5,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextBlueRedRatio = uicontrol( 'Parent', HButtonBoxInfo52,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HButtonBoxInfo53 = uix.HButtonBox('Parent', HBoxInfo5,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo53,'Style','text','FontSize',fontSizeM, 'String', 'Farred/Red:' );
+            
+            HButtonBoxInfo54 = uix.HButtonBox('Parent', HBoxInfo5,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextFarredRedRatio = uicontrol( 'Parent', HButtonBoxInfo54,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HBoxInfo6 = uix.HBox('Parent', VBoxMainInfoFiber);
+            
+            HButtonBoxInfo61 = uix.HButtonBox('Parent', HBoxInfo6,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo61,'Style','text','FontSize',fontSizeM, 'String', 'Color Value:' );
+            
+            HButtonBoxInfo62 = uix.HButtonBox('Parent', HBoxInfo6,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextColorValue = uicontrol( 'Parent', HButtonBoxInfo62,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HButtonBoxInfo63 = uix.HButtonBox('Parent', HBoxInfo6,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxInfo63,'Style','text','FontSize',fontSizeM, 'String', 'Fiber Type:' );
+            
+            HButtonBoxInfo64 = uix.HButtonBox('Parent', HBoxInfo6,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_TextFiberType = uicontrol( 'Parent', HButtonBoxInfo64,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+            
+            HBoxInfo7 = uix.HBox('Parent', VBoxMainInfoFiber);
+            obj.B_AxesInfo = axes('Parent',HBoxInfo7);
             axis image
             
-            set( HBBoxInfoFiber, 'Widths', [-1 -1], 'Spacing', 2 );
-            set( VBoxMainInfoFiber, 'Heights', [-2 -4], 'Spacing', 1 );
+            set( VBoxMainInfoFiber, 'Heights', [-5 -5 -5 -5 -5 -5 -70], 'Spacing', 1 );
+%             VBoxMainInfoFiber = uix.VBox('Parent', PanelFiberInformation);
+%             HBBoxInfoFiber = uix.HBox('Parent', VBoxMainInfoFiber);
+%             VButtonBoxleftFiber = uix.VButtonBox('Parent', HBBoxInfoFiber,'ButtonSize',[6000 50]);
+%             VButtonBoxrightFiber = uix.VButtonBox('Parent', HBBoxInfoFiber,'ButtonSize',[6000 50]);
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Object Label No.:' );
+%             obj.B_TextObjNo = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel:' );
+%             obj.B_TextArea = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Aspect Ratio:' );
+%             obj.B_TextAspectRatio = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Roundness:' );
+%             obj.B_TextRoundness = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color distance Blue/Red:' );
+%             obj.B_TextColorDistance = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Color value (HSV):' );
+%             obj.B_TextColorValue = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             uicontrol( 'Parent', VButtonBoxleftFiber,'Style','text','FontSize',fontSizeM, 'String', 'Fiber-Type:' );
+%             obj.B_TextFiberType = uicontrol( 'Parent', VButtonBoxrightFiber,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
+%             
+%             
+%             HBBoxInfoFiberAxes = uix.HBox('Parent', VBoxMainInfoFiber);
+%             obj.B_AxesInfo = axes('Parent',HBBoxInfoFiberAxes);
+%             axis image
+%             
+%             set( HBBoxInfoFiber, 'Widths', [-1 -1], 'Spacing', 2 );
+%             set( VBoxMainInfoFiber, 'Heights', [-2 -4], 'Spacing', 1 );
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -261,7 +406,7 @@ classdef viewAnalyze < handle
             obj.B_InfoText = uicontrol('Parent',PanelInfo,'Style','listbox','FontSize',fontSizeM,'String',{});
             
             %%%%%%%%%%%%%%% call edit functions for GUI
-            obj.setToolTipStrings();
+%             obj.setToolTipStrings();
 
         end
         
