@@ -36,11 +36,10 @@ classdef modelResults < handle
     end
     
     properties
-        FileNamesRGB; %Filename of the selected RGB image.
-        PathNames; %Directory path of the selected RGB image.
-        PicRGB; %RGB image.
-        handlePicRGB; %handle to RGB image.
-        PicPRGBPlanes; %RGB image created from the color plane images.
+        FileName; %Filename of the selected file.
+        PathName; %Directory path of the selected file.
+        PicPRGBFRPlanes; %RGB image create from color plane images red green blue and farred.
+        PicPRGBPlanes; %RGB image create from color plane images red green and blue.
         
         SaveFiberTable; %Indicates whether the fiber type table should be saved.
         SaveStatisticTable; %Indicates whether the statistics table should be saved.
@@ -54,36 +53,54 @@ classdef modelResults < handle
         
         %Analyze parameters
         AnalyzeMode; %Indicates the selected analyze mode.
+        
         AreaActive; %Indicates if Area parameter is used for classification.
         MinAreaPixel; %Minimal allowed Area. Is used for classification. Smaller Objects will be removed from binary mask.
         MaxAreaPixel; %Maximal allowed Area. Is used for classification. Larger Objects will be classified as Type 0.
+        
         AspectRatioActive; %Indicates if AspectRatio parameter is used for classification.
         MinAspectRatio; %Minimal allowed AspectRatio. Is used for classification. Objects with smaller AspectRatio will be classified as Type 0.
         MaxAspectRatio; %Minimal allowed AspectRatio. Is used for classification. Objects with larger AspectRatio will be classified as Type 0.
+        
         RoundnessActive; %Indicates if Roundness parameter is used for classification.
         MinRoundness; %Minimal allowed Roundness. Is used for classification. Objects with smaller Roundness will be classified as Type 0.
-        ColorDistanceActive; %Indicates if ColorDistance parameter is used for classification.
-        MinColorDistance; %Minimal allowed ColorDistance. Is used for classification. Objects with smaller ColorDistance will be classified as Type 3.
+        
+        BlueRedThreshActive; %Indicates if Blue/Red Threshold parameter is used for classification.
+        BlueRedThresh;
+        BlueRedDistBlue;
+        BlueRedDistRed;
+        
+        FarredRedThreshActive; %Indicates if Farred/Red Threshold parameter is used for classification.
+        FarredRedThresh;
+        FarredRedDistFarred;
+        FarredRedDistRed;
+        
         ColorValueActive; %Indicates if ColorValue parameter is used for classification.
         ColorValue; %Minimal allowed ColorValue. Is used for classification. Objects with smaller ColorValue will be classified as Type 0.
         
         NoOfObjects; %Number of objects.
         NoTyp1; %Number of Type 1 fibers.
-        NoTyp2; %Number of Type 2 fibers.
-        NoTyp3; %Number of Type 3 fibers.
-        NoTyp0; %Number of Type 0 fibers.
+        NoTyp12h; %Number of Type 12 hybeid fibers.
+        NoTyp2a; %Number of Type 2a fibers.
+        NoTyp2x; %Number of Type 2x fibers.
+        NoTyp2ax; %Number of Type 2ax fibers.
+        NoTyp0; %Number of Type 0 fibers (undefind).
         
         AreaPic; % Total area of the RGB image.
         AreaType1; % Total area of all type 1 fibers.
-        AreaType2; % Total area of all type 2 fibers.
-        AreaType3; % Total area of all type 3 fibers.
+        AreaType2a; % Total area of all type 2a fibers.
+        AreaType2x; % Total area of all type 2x fibers.
+        AreaType2ax; % Total area of all type 2ax (2a 2x hybrid) fibers.
+        AreaType12h; % Total area of all type 3 (1 2 hybrid) fibers.
         AreaType0; % Total area of all type 0 fibers.
         AreaFibers; % Total area of all fiber objects.
-        AreaNoneObj % Total area that contains no objects.
+        AreaNoneObj; % Total area that contains no objects (Collagen).
         
         AreaType1PC; % Area of all type 1 fibers in percent.
-        AreaType2PC; % Aarea of all type 2 fibers in percent.
-        AreaType3PC; % Area of all type 3 fibers in percent.
+        AreaType12hPC; % Aarea of all type 12 hybrid fibers in percent.
+        AreaType2aPC; % Area of all type 1 fibers in percent.
+        AreaType2xPC; % Area of all type 1 fibers in percent.
+        AreaType2axPC; % Area of all type 1 fibers in percent.
         AreaType0PC; % Area of all type 0 fibers in percent.
         AreaFibersPC; % Area of all fiber objects in percent.
         AreaNoneObjPC; % Area that contains no objects in percent.
@@ -92,23 +109,27 @@ classdef modelResults < handle
         AreaMinMaxObj; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of all objects.
         AreaMinMaxT1; %Vector, contains the [min max] area in pixel of Type 1 fibers.
         AreaMinMaxObjT1; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 1 fibers.
-        AreaMinMaxT2; %Vector, contains the [min max] area in pixel of Type 2 fibers.
-        AreaMinMaxObjT2; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2 fibers.
-        AreaMinMaxT3; %Vector, contains the [min max] area in pixel of Type 3 fibers.
-        AreaMinMaxObjT3; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 3 fibers.
-        AreaMinMaxT0; %Vector, contains the [min max] area in pixel of Type 0 fibers.
-        AreaMinMaxObjT0; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 0 fibers.
+        AreaMinMaxT12h; %Vector, contains the [min max] area in pixel of Type 12 hybrid fibers.
+        AreaMinMaxObjT12h; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 12 hybrid fibers.
+        AreaMinMaxT2a; %Vector, contains the [min max] area in pixel of Type 2a fibers.
+        AreaMinMaxObjT2a; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2a fibers.
+        AreaMinMaxT2x; %Vector, contains the [min max] area in pixel of Type 2x fibers.
+        AreaMinMaxObjT2x; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2x fibers.
+        AreaMinMaxT2ax; %Vector, contains the [min max] area in pixel of Type 2ax fibers.
+        AreaMinMaxObjT2ax; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2ax fibers.
         
-        Stats; % Data struct of all fiber objets
+        Stats; % Data struct of all fiber objets and all fiber datas
         
-        StatsMatData; % Contains the numerical data of all fiber objets.
-        % [LabelNO Area XPos YPos MinorAxis MajorAxis Perimeter Roundness ...
-        %  AspectRatio meanRed meanGreen meanBlue meanFarRed meanColorValue ...
-        %  meanColorHue RationBlueRed DistBlueRed FiberType]
-        StatsMatDataT1; % Contains the numerical data of all type 1 fiber objets.
-        StatsMatDataT2; % Contains the numerical data of all type 2 fiber objets.
-        StatsMatDataT3; % Contains the numerical data of all type 3 fiber objets.
-        StatsMatDataT0; % Contains the numerical data of all type 0 fiber objets.
+        StatsMatData; % Cell Array, Contains the data of all fiber objets that are shown in the object table in the GUI.
+        % [Label Area XPos YPos MinorAxis MajorAxis Perimeter Roundness ...
+        %  AspectRatio ColorHue VolorValue Red Green Blue FarRed ...
+        %  Blue/Red Farred/Red MainType Type]
+        StatsMatDataT1; % Contains the data of all type 1 fiber objets.
+        StatsMatDataT12h; % Contains the data of all type 12 hybrid fiber objets.
+        StatsMatDataT2a; % Contains the data of all type 2a fiber objets.
+        StatsMatDataT2x; % Contains the data of all type 2x fiber objets.
+        StatsMatDataT2ax; % Contains the data of all type 2ax fiber objets.
+        StatsMatDataT0; % Contains the data of all type 0 undefined fiber objets.
         
         StatisticMat; % Contains the statistc data af the ruslts.
         
@@ -163,9 +184,9 @@ classdef modelResults < handle
             
             obj.transformDataStructToMatrix();
             
-            obj.calculateAreaFeatures();
+            obj.calculateFiberNubers();
             
-            obj.calculateFiberFeatures();
+            obj.calculateAreaFeatures();
             
             obj.createMatStatisticTable();
             
@@ -182,7 +203,8 @@ classdef modelResults < handle
         end
         
         function transformDataStructToMatrix(obj)
-            % Ttransforms the Stats table in numerical data array.
+            % Ttransforms the Stats table in numerical data array. Creates
+            % Array for each fiber type.
             %
             %   transformDataStructToMatrix(obj);
             %
@@ -191,53 +213,69 @@ classdef modelResults < handle
             %       - Input
             %           obj:    Handle to modelResults object.
             %
-            obj.InfoMessage = '   - Transform data to Matrix';
+            obj.InfoMessage = '   - transform data struct to Cell Array';
+            obj.InfoMessage = '      - prepare data for GUI table';
             
-            LabelNo = [1:1:length(obj.Stats)]';
-            StatsArea = [obj.Stats.Area]';
-            StatsAspectRatio = [obj.Stats.AspectRatio]';
-            StatsRoundness = [obj.Stats.Roundness]';
-            StatsColorRed = [obj.Stats.ColorRed]';
-            StatsColorFarRed = [obj.Stats.ColorFarRed]';
-            StatsColorBlue = [obj.Stats.ColorBlue]';
-            StatsColorGreen = [obj.Stats.ColorGreen]';
-            StatsColorHue = [obj.Stats.ColorHue]';
-            StatsColorValue = [obj.Stats.ColorValue]';
-            StatsColorRatioBlueRed = [obj.Stats.ColorRatioBlueRed]';
-            StatsColorDistBlueRed = [obj.Stats.ColorDistBlueRed]';
-            StatsFiberType = [obj.Stats.FiberType]';
-            StatsMinorAxis = [obj.Stats.MinorAxisLength]';
-            StatsMajorAxis = [obj.Stats.MajorAxisLength]';
-            StatsPerimeter = [obj.Stats.Perimeter]';
+            tempCell = obj.Stats;
             
-            for i=1:1:length(obj.Stats)
-                StatsFCPX(i,1) = round(obj.Stats(i).Centroid(1));
-                StatsFCPY(i,1) = round(obj.Stats(i).Centroid(2));
+            %remove field BoundingBox
+            tempCell = rmfield(tempCell,'BoundingBox');
+            %remove field Boundarie
+            tempCell = rmfield(tempCell,'Boundarie');
+            %remove field Centroid
+            tempCell = rmfield(tempCell,'Centroid');
+            %remove field Solidity
+            tempCell = rmfield(tempCell,'Solidity');
+            
+            %transform struct to temporary cellarray
+            tempCell = struct2cell(tempCell)';
+            
+            for i=1:1:size(obj.Stats,1)
+                % seperate centroid in X and Y values
+                FCPX(i,1) = round(obj.Stats(i).Centroid(1));
+                FCPY(i,1) = round(obj.Stats(i).Centroid(2));
             end
             
-            obj.StatsMatData = cat(2,LabelNo,StatsArea,StatsFCPX,StatsFCPY,...
-                StatsMinorAxis,StatsMajorAxis,StatsPerimeter,...
-                StatsRoundness,StatsAspectRatio,...
-                StatsColorRed,StatsColorGreen,StatsColorBlue,StatsColorFarRed,...
-                StatsColorValue,StatsColorHue,...
-                StatsColorRatioBlueRed,StatsColorDistBlueRed,StatsFiberType);
+            % Create X and Y Cell-Vector
+            FCPX = mat2cell(FCPX,ones(size(obj.Stats,1),1),1);
+            FCPY = mat2cell(FCPY,ones(size(obj.Stats,1),1),1);
             
-            % Create DataMat only for Type 1 Fiber objects
-            ind = find(obj.StatsMatData(:,18)==1);
-            obj.StatsMatDataT1 = obj.StatsMatData(ind,:);
+            % Create Label No Cell-Vector
+            LabelNo = [1:1:size(obj.Stats,1)]';
+            LabelNo = mat2cell(LabelNo,ones(size(obj.Stats,1),1),1);
             
-            % Create DataMat only for Type 2 Fiber objects
-            ind = find(obj.StatsMatData(:,18)==2);
-            obj.StatsMatDataT2 = obj.StatsMatData(ind,:);
+            %create Cell array
+            obj.StatsMatData = cat(2, LabelNo,tempCell(:,1),FCPX,FCPY,tempCell(:,2:end) );
             
-            % Create DataMat only for Type 3 Fiber objects
-            ind = find(obj.StatsMatData(:,18)==3);
-            obj.StatsMatDataT3 = obj.StatsMatData(ind,:);
+            % Create CellArray only for Type 1 Fiber objects
+            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 1');
+            Index = find(IndexC==1);
+            obj.StatsMatDataT1 = obj.StatsMatData(Index,:);
             
-            % Create DataMat only for Type 0 Fiber objects
-            ind = find(obj.StatsMatData(:,18)==0);
-            obj.StatsMatDataT0 = obj.StatsMatData(ind,:);
+            % Create CellArray only for Type 12h Fiber objects
+            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 1 2 hybrid');
+            Index = find(IndexC==1);
+            obj.StatsMatDataT12h = obj.StatsMatData(Index,:);
             
+            % Create CellArray only for Type 2a Fiber objects
+            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 2a');
+            Index = find(IndexC==1);
+            obj.StatsMatDataT2a = obj.StatsMatData(Index,:);
+            
+            % Create CellArray only for Type 2a Fiber objects
+            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 2x');
+            Index = find(IndexC==1);
+            obj.StatsMatDataT2x = obj.StatsMatData(Index,:);
+            
+            % Create CellArray only for Type 2a Fiber objects
+            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 2ax');
+            Index = find(IndexC==1);
+            obj.StatsMatDataT2ax = obj.StatsMatData(Index,:);
+          
+            % Create CellArray only for Type 0 undifined Fiber objects
+            IndexC = strcmp(obj.StatsMatData(:,19), 'undefined');
+            Index = find(IndexC==1);
+            obj.StatsMatDataT0 = obj.StatsMatData(Index,:);
             
         end
         
@@ -253,69 +291,76 @@ classdef modelResults < handle
             %
             
             obj.InfoMessage = '   - Calculate fiber type areas';
-            obj.AreaPic = size(obj.PicRGB,1) * size(obj.PicRGB,2);
+            obj.AreaPic = size(obj.PicPRGBFRPlanes,1) * size(obj.PicPRGBFRPlanes,2);
             obj.AreaType1 = 0;
-            obj.AreaType2 = 0;
-            obj.AreaType3 = 0;
+            obj.AreaType2a = 0;
+            obj.AreaType2x = 0;
+            obj.AreaType2ax = 0;
+            obj.AreaType12h = 0;
             obj.AreaType0 = 0;
             obj.AreaFibers = 0;
             
-            obj.NoOfObjects = length(obj.Stats);
+            obj.NoOfObjects = size(obj.Stats,1);
             
             for i=1:1:obj.NoOfObjects;
                 
-                %Calculate total area of exh Fiber type
-                if obj.Stats(i).FiberType == 1
-                    % Blue Fiber
-                    
-                    % Total area of all type 1 fibers
-                    obj.AreaType1 = obj.AreaType1 + obj.Stats(i).Area;
-                    
-                elseif obj.Stats(i).FiberType == 2
-                    % Red Fiber
-                    
-                    % Total area of all type 2 fibers
-                    obj.AreaType2 = obj.AreaType2 + obj.Stats(i).Area;
-                    
-                elseif obj.Stats(i).FiberType == 3
-                    % between Red and Blue
-                    
-                    % Total area of all type 3 fibers
-                    obj.AreaType3 = obj.AreaType3 + obj.Stats(i).Area;
-                    
-                elseif obj.Stats(i).FiberType == 0
-                    % No Fiber
-                    
-                    % Total area of all type 0 fibers
-                    obj.AreaType0 = obj.AreaType0 + obj.Stats(i).Area;
-                    
-                else
-                    % Error Code
+                switch obj.Stats(i).FiberType
+                    case 'Type 1'
+                        % Type1 Fiber (blue)
+                        % Total area of all type 1 fibers
+                        obj.AreaType1 = obj.AreaType1 + obj.Stats(i).Area;
+                    case 'Type 1 2 hybrid'
+                        %Type 12 hybrid fiber (between Red and Blue)
+                        % Total area of all type 3 fibers
+                        obj.AreaType12h = obj.AreaType12h + obj.Stats(i).Area;
+                    case 'Type 2x'
+                        % Type 2x fiber (red)
+                        % Total area of all type 2x fibers
+                        obj.AreaType2x = obj.AreaType2x + obj.Stats(i).Area;
+                    case 'Type 2a'
+                        % Type 2a fiber (yellow)
+                        % Total area of all type 2a fibers
+                        obj.AreaType2a = obj.AreaType2a + obj.Stats(i).Area;
+                    case 'Type 2ax'
+                        % Type 2ax fiber (orange)
+                        % Total area of all type 2ax fibers
+                        obj.AreaType2ax = obj.AreaType2ax + obj.Stats(i).Area;
+                    case 'undefined'
+                        % Type 0 fiber (white, no fiber)
+                        % Total area of all undefined fibers
+                        obj.AreaType0 = obj.AreaType0 + obj.Stats(i).Area;
+                    otherwise
+                        obj.InfoMessage = 'ERROR in calculateAreaFeatures() Fcn';
                 end
                 
             end
             
             % Total area of all fiber objects including Type 0
-            obj.AreaFibers = obj.AreaType1+obj.AreaType2+obj.AreaType3+obj.AreaType0;
-            % Total area that consots no Objects
+            obj.AreaFibers = obj.AreaType1+obj.AreaType12h+obj.AreaType2x+obj.AreaType2a+obj.AreaType2ax+obj.AreaType0;
+            % Total area that consists no Objects. Collagen (green)
             obj.AreaNoneObj = obj.AreaPic - obj.AreaFibers;
             
             % Calculate area in percent of Fibertypes related to the original image
             obj.AreaType1PC = obj.AreaType1/obj.AreaPic * 100;
             obj.InfoMessage = ['      - ' num2str(obj.AreaType1PC) ' % of the image consists of Type 1 fibers'];
             
-            obj.AreaType2PC = obj.AreaType2/obj.AreaPic * 100;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaType2PC) ' % of the image consists of Type 2 fibers'];
+            obj.AreaType12hPC = obj.AreaType12h/obj.AreaPic * 100;
+            obj.InfoMessage = ['      - ' num2str(obj.AreaType12hPC) ' % of the image consists of Type 12 hybrid fibers'];
             
-            obj.AreaType3PC = obj.AreaType3/obj.AreaPic * 100;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaType3PC) ' % of the image consists of Type 3 fibers'];
+            obj.AreaType2xPC = obj.AreaType2x/obj.AreaPic * 100;
+            obj.InfoMessage = ['      - ' num2str(obj.AreaType2xPC) ' % of the image consists of Type 2x fibers'];
+            
+            obj.AreaType2aPC = obj.AreaType2a/obj.AreaPic * 100;
+            obj.InfoMessage = ['      - ' num2str(obj.AreaType2aPC) ' % of the image consists of Type 2a fibers'];
+            
+            obj.AreaType2axPC = obj.AreaType2ax/obj.AreaPic * 100;
+            obj.InfoMessage = ['      - ' num2str(obj.AreaType2axPC) ' % of the image consists of Type 2ax fibers'];
             
             obj.AreaType0PC = obj.AreaType0/obj.AreaPic * 100;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaType0PC) ' % of the image consists of Type 0 fibers'];
+            obj.InfoMessage = ['      - ' num2str(obj.AreaType0PC) ' % of the image consists undefined fibers'];
             
-            obj.AreaNoneObjPC = 100 - obj.AreaType1PC - obj.AreaType2PC - obj.AreaType3PC - obj.AreaType0PC;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaNoneObjPC) '% of the image consists no Objects'];
-            pause(0.01);
+            obj.AreaNoneObjPC = obj.AreaNoneObj/obj.AreaPic * 100;
+            obj.InfoMessage = ['      - ' num2str(obj.AreaNoneObjPC) '% of the image consists Collagen'];
             
             % Find object with the smallest area
             obj.AreaMinMax(1) = min([obj.Stats.Area]);
@@ -330,57 +375,64 @@ classdef modelResults < handle
             % Find samlest and largest Fiber of each Type
             
             if ~isempty(obj.StatsMatDataT1)
-                obj.AreaMinMaxT1(1) = min(obj.StatsMatDataT1(:,2));
-                obj.AreaMinMaxObjT1(1) = obj.StatsMatDataT1( find(obj.StatsMatDataT1(:,2)==obj.AreaMinMaxT1(1),1) ,1);
-                obj.AreaMinMaxT1(2) = max(obj.StatsMatDataT1(:,2));
-                obj.AreaMinMaxObjT1(2) = obj.StatsMatDataT1( find(obj.StatsMatDataT1(:,2)==obj.AreaMinMaxT1(2),1) ,1);
+                obj.AreaMinMaxT1(1) = min(cell2mat(obj.StatsMatDataT1(:,2)));
+                obj.AreaMinMaxObjT1(1) = cell2mat(obj.StatsMatDataT1( find([obj.StatsMatDataT1{:,2}]==obj.AreaMinMaxT1(1),1) ,1));
+                obj.AreaMinMaxT1(2) = max(cell2mat(obj.StatsMatDataT1(:,2)));
+                obj.AreaMinMaxObjT1(2) = cell2mat(obj.StatsMatDataT1( find([obj.StatsMatDataT1{:,2}]==obj.AreaMinMaxT1(2),1) ,1));
             else
-                obj.AreaMinMaxT1(1) = 0;
-                obj.AreaMinMaxObjT1(1) = 0;
-                obj.AreaMinMaxT1(2) = 0;
-                obj.AreaMinMaxObjT1(2) = 0;
+                obj.AreaMinMaxT1 = '--';
+                obj.AreaMinMaxObjT1 = '--';
+
             end
             
-            if ~isempty(obj.StatsMatDataT2)
-                obj.AreaMinMaxT2(1) = min(obj.StatsMatDataT2(:,2));
-                obj.AreaMinMaxObjT2(1) = obj.StatsMatDataT2( find(obj.StatsMatDataT2(:,2)==obj.AreaMinMaxT2(1),1) ,1);
-                obj.AreaMinMaxT2(2) = max(obj.StatsMatDataT2(:,2));
-                obj.AreaMinMaxObjT2(2) = obj.StatsMatDataT2( find(obj.StatsMatDataT2(:,2)==obj.AreaMinMaxT2(2),1) ,1);
+            if ~isempty(obj.StatsMatDataT12h)
+                obj.AreaMinMaxT12h(1) = min(cell2mat(obj.StatsMatDataT12h(:,2)));
+                obj.AreaMinMaxObjT12h(1) = cell2mat(obj.StatsMatDataT12h( find([obj.StatsMatDataT12h{:,2}]==obj.AreaMinMaxT12h(1),1) ,1));
+                obj.AreaMinMaxT12h(2) = max(cell2mat(obj.StatsMatDataT12h(:,2)));
+                obj.AreaMinMaxObjT12h(2) = cell2mat(obj.StatsMatDataT12h( find([obj.StatsMatDataT12h{:,2}]==obj.AreaMinMaxT12h(2),1) ,1));
             else
-                obj.AreaMinMaxT2(1) = 0;
-                obj.AreaMinMaxObjT2(1) = 0;
-                obj.AreaMinMaxT2(2) = 0;
-                obj.AreaMinMaxObjT2(2) = 0;
+                obj.AreaMinMaxT12h = '--';
+                obj.AreaMinMaxObjT12h = '--';
+
             end
             
-            if ~isempty(obj.StatsMatDataT3)
-                obj.AreaMinMaxT3(1) = min(obj.StatsMatDataT3(:,2));
-                obj.AreaMinMaxObjT3(1) = obj.StatsMatDataT3( find(obj.StatsMatDataT3(:,2)==obj.AreaMinMaxT3(1),1) ,1);
-                obj.AreaMinMaxT3(2) = max(obj.StatsMatDataT3(:,2));
-                obj.AreaMinMaxObjT3(2) = obj.StatsMatDataT3( find(obj.StatsMatDataT3(:,2)==obj.AreaMinMaxT3(2),1) ,1);
+            if ~isempty(obj.StatsMatDataT2a)
+                obj.AreaMinMaxT2a(1) = min(cell2mat(obj.StatsMatDataT2a(:,2)));
+                obj.AreaMinMaxObjT2a(1) = cell2mat(obj.StatsMatDataT2a( find([obj.StatsMatDataT2a{:,2}]==obj.AreaMinMaxT2a(1),1) ,1));
+                obj.AreaMinMaxT2a(2) = max(cell2mat(obj.StatsMatDataT2a(:,2)));
+                obj.AreaMinMaxObjT2a(2) = cell2mat(obj.StatsMatDataT2a( find([obj.StatsMatDataT2a{:,2}]==obj.AreaMinMaxT2a(2),1) ,1));
             else
-                obj.AreaMinMaxT3(1) = 0;
-                obj.AreaMinMaxObjT3(1) = 0;
-                obj.AreaMinMaxT3(2) = 0;
-                obj.AreaMinMaxObjT3(2) = 0;
+                obj.AreaMinMaxT2a = '--';
+                obj.AreaMinMaxObjT2a = '--';
+
             end
             
-            if ~isempty(obj.StatsMatDataT0)
-                obj.AreaMinMaxT0(1) = min(obj.StatsMatDataT0(:,2));
-                obj.AreaMinMaxObjT0(1) = obj.StatsMatDataT0( find(obj.StatsMatDataT0(:,2)==obj.AreaMinMaxT0(1),1) ,1);
-                obj.AreaMinMaxT0(2) = max(obj.StatsMatDataT0(:,2));
-                obj.AreaMinMaxObjT0(2) = obj.StatsMatDataT0( find(obj.StatsMatDataT0(:,2)==obj.AreaMinMaxT0(2),1) ,1);
+            if ~isempty(obj.StatsMatDataT2x)
+                obj.AreaMinMaxT2x(1) = min(cell2mat(obj.StatsMatDataT2x(:,2)));
+                obj.AreaMinMaxObjT2x(1) = cell2mat(obj.StatsMatDataT2x( find([obj.StatsMatDataT2x{:,2}]==obj.AreaMinMaxT2x(1),1) ,1));
+                obj.AreaMinMaxT2x(2) = max(cell2mat(obj.StatsMatDataT2x(:,2)));
+                obj.AreaMinMaxObjT2x(2) = cell2mat(obj.StatsMatDataT2x( find([obj.StatsMatDataT2x{:,2}]==obj.AreaMinMaxT2x(2),1) ,1));
             else
-                obj.AreaMinMaxT0(1) = 0;
-                obj.AreaMinMaxObjT0(1) = 0;
-                obj.AreaMinMaxT0(2) = 0;
-                obj.AreaMinMaxObjT0(2) = 0;
+                obj.AreaMinMaxT2x = '--';
+                obj.AreaMinMaxObjT2x = '--';
+
             end
             
+            if ~isempty(obj.StatsMatDataT2ax)
+                obj.AreaMinMaxT2ax(1) = min(cell2mat(obj.StatsMatDataT2ax(:,2)));
+                obj.AreaMinMaxObjT2ax(1) = cell2mat(obj.StatsMatDataT2ax( find([obj.StatsMatDataT2ax{:,2}]==obj.AreaMinMaxT2ax(1),1) ,1));
+                obj.AreaMinMaxT2ax(2) = max(cell2mat(obj.StatsMatDataT2ax(:,2)));
+                obj.AreaMinMaxObjT2ax(2) = cell2mat(obj.StatsMatDataT2ax( find([obj.StatsMatDataT2ax{:,2}]==obj.AreaMinMaxT2ax(2),1) ,1));
+            else
+                obj.AreaMinMaxT2ax = '--';
+                obj.AreaMinMaxObjT2ax = '--';
+
+            end
+
         end
         
-        function calculateFiberFeatures(obj)
-            % Claculate all fiber features.
+        function calculateFiberNubers(obj)
+            % Claculate all fiber numbers.
             %
             %   calculateFiberFeatures(obj);
             %
@@ -391,17 +443,31 @@ classdef modelResults < handle
             %
             
             obj.InfoMessage = '   - Calculate fiber type numbers';
+            
             % Number of Fiber Objects
+            obj.NoOfObjects = size(obj.Stats,1); %all objects
+
             obj.NoTyp1 = size(obj.StatsMatDataT1,1); % Type 1
-            obj.NoTyp2 = size(obj.StatsMatDataT2,1); % Type 2
-            obj.NoTyp3 = size(obj.StatsMatDataT3,1); % Type 3
-            obj.NoTyp0 = size(obj.StatsMatDataT0,1); % Type 0
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp1) ' Type 1 fibers'];
             
+            obj.NoTyp12h = size(obj.StatsMatDataT12h,1); % Type 12h
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp12h) ' Type 12 hybrid fibers'];
             
+            obj.NoTyp2a = size(obj.StatsMatDataT2a,1); % Type 2a
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2a) ' Type 2a fibers'];
+            
+            obj.NoTyp2x = size(obj.StatsMatDataT2x,1); % Type 2x
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2x) ' Type 2x fibers'];
+            
+            obj.NoTyp2ax = size(obj.StatsMatDataT2ax,1); % Type 2ax
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2ax) ' Type 2ax fibers'];
+            
+            obj.NoTyp0 = size(obj.StatsMatDataT0,1); % Type 0 undefined
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp0) ' undefined fibers'];
         end
         
         function createMatStatisticTable(obj)
-            % Create table that is shown in the statistic tab in the GUI.
+            % Create Cellarray that is shown in the statistic tab in the GUI.
             %
             %   createMatStatisticTable(obj);
             %
@@ -413,97 +479,231 @@ classdef modelResults < handle
             
             obj.StatisticMat = {}; 
             
-            obj.StatisticMat = {'Analyze Mode','Para min area','Para max area',...
-                'Para min Asp.Ratio','Para max Asp.Ratio',...
-                'Para min Roundn.','Para min Colordist.',...
-                'Para min ColorVal.',...
-                'Number Objects',...
-                'Number Type 1','Number Type 2','Number Type 3','Number Type 0',...
-                'Area Type 1','Area Type 2','Area Type 3','Area Type 0',...
-                'Area Type 1 in %','Area Type 2 in %','Area Type 3 in %','Area Type 0 in %',...
-                'Smallest Area','Smalest Fiber','Largest Area','Largest Fiber',...
-                'Smallest Area T1','Smalest Fiber T1','Largest Area T1','Largest Fiber T1',...
-                'Smallest Area T2','Smalest Fiber T2','Largest Area T2','Largest Fiber T2',...
-                'Smallest Area T3','Smalest Fiber T3','Largest Area T3','Largest Fiber T3'}';
-            
+            % 1. Row
+            obj.StatisticMat{1,1} = 'Analyze Mode:';
             switch obj.AnalyzeMode
                 case 1
-                    obj.StatisticMat{1,2} =  'Colordistance';
+                    obj.StatisticMat{1,2} =  'Color-Based triple labeling';
                 case 2
-                    obj.StatisticMat{1,2} =  'Cluster 2 Types';
+                    obj.StatisticMat{1,2} =  'Color-Based quad labeling';
                 case 3
-                    obj.StatisticMat{1,2} =  'Cluster 3 Types';
+                    obj.StatisticMat{1,2} =  'Cluster-Based';
             end
-
+            
+            % 2. Row
+            obj.StatisticMat{2,1} = 'Searching for:';
+            switch obj.AnalyzeMode
+                case 1
+                    obj.StatisticMat{2,2} =  '1 2 12h 2x fibers';
+                case 2
+                    obj.StatisticMat{2,2} =  '1 2 12h 2x 2a 2ax fibers';
+                case 3
+                    obj.StatisticMat{2,2} =  '1 2 fibers';
+            end
+            
+            % 3. and 4. Row
+            obj.StatisticMat{3,1} = 'Para min area:';
+            obj.StatisticMat{4,1} = 'Para max area:';
             if obj.AreaActive
-                obj.StatisticMat{2,2} =  obj.MinAreaPixel;
-                obj.StatisticMat{3,2} =  obj.MaxAreaPixel;
+                obj.StatisticMat{3,2} =  obj.MinAreaPixel;
+                obj.StatisticMat{4,2} =  obj.MaxAreaPixel;
             else
-                obj.StatisticMat{2,2} =  'not active';
                 obj.StatisticMat{3,2} =  'not active';
-            end
-            
-            if obj.AspectRatioActive
-                obj.StatisticMat{4,2} =  obj.MinAspectRatio;
-                obj.StatisticMat{5,2} =  obj.MaxAspectRatio;
-            else
                 obj.StatisticMat{4,2} =  'not active';
-                obj.StatisticMat{5,2} =  'not active';
             end
             
-            if obj.RoundnessActive
-                obj.StatisticMat{6,2} =  obj.MinRoundness;
+            % 5. and 6. Row
+            obj.StatisticMat{5,1} = 'Para min Asp.Ratio:';
+            obj.StatisticMat{6,1} = 'Para max Asp.Ratio:';
+            if obj.AspectRatioActive
+                obj.StatisticMat{5,2} =  obj.MinAspectRatio;
+                obj.StatisticMat{6,2} =  obj.MaxAspectRatio;
             else
+                obj.StatisticMat{5,2} =  'not active';
                 obj.StatisticMat{6,2} =  'not active';
             end
             
-            if obj.ColorDistanceActive
-                obj.StatisticMat{7,2} =  obj.MinColorDistance;
+            % 7. Row
+            obj.StatisticMat{7,1} = 'Para min Roundn.:';
+            if obj.RoundnessActive
+                obj.StatisticMat{7,2} =  obj.MinRoundness;
             else
                 obj.StatisticMat{7,2} =  'not active';
             end
             
-            if obj.ColorValueActive
-                obj.StatisticMat{8,2} =  obj.ColorValue;
+            % 8. 9. 10. Row
+            obj.StatisticMat{8,1} = 'Para Blue/Red thresh:';
+            obj.StatisticMat{9,1} = 'Para Blue dist:';
+            obj.StatisticMat{10,1} = 'Para Red dist::';
+            if obj.BlueRedThreshActive
+                obj.StatisticMat{8,2} =  obj.BlueRedThresh;
+                obj.StatisticMat{9,2} =  obj.BlueRedDistBlue;
+                obj.StatisticMat{10,2} =  obj.BlueRedDistRed;
             else
                 obj.StatisticMat{8,2} =  'not active';
+                obj.StatisticMat{9,2} =  'not active';
+                obj.StatisticMat{10,2} =  'not active';
             end
             
-            obj.StatisticMat{9,2} =  obj.NoOfObjects;
-            obj.StatisticMat{10,2} =  obj.NoTyp1;
-            obj.StatisticMat{11,2} =  obj.NoTyp2;
-            obj.StatisticMat{12,2} =  obj.NoTyp3;
-            obj.StatisticMat{13,2} =  obj.NoTyp0;
+            % 11. 12. 13. Row
+            obj.StatisticMat{11,1} = 'Para Farred/Red thresh:';
+            obj.StatisticMat{12,1} = 'Para Farred dist:';
+            obj.StatisticMat{13,1} = 'Para Red dist::';
+            if obj.BlueRedThreshActive
+                obj.StatisticMat{11,2} =  obj.FarredRedThresh;
+                obj.StatisticMat{12,2} =  obj.FarredRedDistFarred;
+                obj.StatisticMat{13,2} =  obj.FarredRedDistRed;
+            else
+                obj.StatisticMat{11,2} =  'not active';
+                obj.StatisticMat{12,2} =  'not active';
+                obj.StatisticMat{13,2} =  'not active';
+            end
             
-            obj.StatisticMat{14,2} =  obj.AreaType1;
-            obj.StatisticMat{15,2} =  obj.AreaType2;
-            obj.StatisticMat{16,2} =  obj.AreaType3;
-            obj.StatisticMat{17,2} =  obj.AreaType0;
+             % 14 Row
+            obj.StatisticMat{14,1} = 'Para min ColorValue';
+            if obj.ColorValueActive
+                obj.StatisticMat{14,2} =  obj.ColorValue;
+            else
+                obj.StatisticMat{14,2} =  'not active';
+            end
             
-            obj.StatisticMat{18,2} =  obj.AreaType1PC;
-            obj.StatisticMat{19,2} =  obj.AreaType2PC;
-            obj.StatisticMat{20,2} =  obj.AreaType3PC;
-            obj.StatisticMat{21,2} =  obj.AreaType0PC;
+            % 15 Row
+            obj.StatisticMat{15,1} = 'Number objects';
+            obj.StatisticMat{15,2} =  obj.NoOfObjects;
+            % 16 Row
+            obj.StatisticMat{16,1} = 'Number Type 1';
+            obj.StatisticMat{16,2} =  obj.NoTyp1;
+            % 17 Row
+            obj.StatisticMat{17,1} = 'Number Type 12h';
+            obj.StatisticMat{17,2} =  obj.NoTyp12h;
+            % 18 Row
+            obj.StatisticMat{18,1} = 'Number Type 2a';
+            obj.StatisticMat{18,2} =  obj.NoTyp2a;
+            % 19 Row
+            obj.StatisticMat{19,1} = 'Number Type 2x';
+            obj.StatisticMat{19,2} =  obj.NoTyp2x;
+            % 20 Row
+            obj.StatisticMat{20,1} = 'Number Type 2ax';
+            obj.StatisticMat{20,2} =  obj.NoTyp2ax;
+            % 21 Row
+            obj.StatisticMat{21,1} = 'Number undefined';
+            obj.StatisticMat{21,2} =  obj.NoTyp0;
             
-            obj.StatisticMat{22,2} =  obj.AreaMinMax(1);
-            obj.StatisticMat{23,2} =  obj.AreaMinMaxObj(1);
-            obj.StatisticMat{24,2} =  obj.AreaMinMax(2);
-            obj.StatisticMat{25,2} =  obj.AreaMinMaxObj(2);
+            % 22 Row
+            obj.StatisticMat{22,1} = 'Area Type 1 (pixel):';
+            obj.StatisticMat{22,2} =  obj.AreaType1;
+            % 23 Row
+            obj.StatisticMat{23,1} = 'Area Type 12h (pixel):';
+            obj.StatisticMat{23,2} =  obj.AreaType12h;
+            % 24 Row
+            obj.StatisticMat{24,1} = 'Area Type 2a (pixel):';
+            obj.StatisticMat{24,2} =  obj.AreaType2a;
+            % 25 Row
+            obj.StatisticMat{25,1} = 'Area Type 2x (pixel):';
+            obj.StatisticMat{25,2} =  obj.AreaType2x;
+            % 26 Row
+            obj.StatisticMat{26,1} = 'Area Type 2ax (pixel):';
+            obj.StatisticMat{26,2} =  obj.AreaType2ax;
+            % 27 Row
+            obj.StatisticMat{27,1} = 'Area Collagen (pixel):';
+            obj.StatisticMat{27,2} =  obj.AreaNoneObj;
             
-            obj.StatisticMat{26,2} =  obj.AreaMinMaxT1(1);
-            obj.StatisticMat{27,2} =  obj.AreaMinMaxObjT1(1);
-            obj.StatisticMat{28,2} =  obj.AreaMinMaxT1(2);
-            obj.StatisticMat{29,2} =  obj.AreaMinMaxObjT1(2);
+            % 28 Row
+            obj.StatisticMat{28,1} = 'Area Type 1 (%):';
+            obj.StatisticMat{28,2} =  obj.AreaType1PC;
+            % 29 Row
+            obj.StatisticMat{29,1} = 'Area Type 12h (%):';
+            obj.StatisticMat{29,2} =  obj.AreaType12hPC;
+            % 30 Row
+            obj.StatisticMat{30,1} = 'Area Type 2a (%):';
+            obj.StatisticMat{30,2} =  obj.AreaType2aPC;
+            % 31 Row
+            obj.StatisticMat{31,1} = 'Area Type 2x (%):';
+            obj.StatisticMat{31,2} =  obj.AreaType2xPC;
+            % 32 Row
+            obj.StatisticMat{32,1} = 'Area Type 2ax (%):';
+            obj.StatisticMat{32,2} =  obj.AreaType2axPC;
+            % 33 Row
+            obj.StatisticMat{33,1} = 'Area Collagen (%):';
+            obj.StatisticMat{33,2} =  obj.AreaNoneObjPC;
             
-            obj.StatisticMat{30,2} =  obj.AreaMinMaxT2(1);
-            obj.StatisticMat{31,2} =  obj.AreaMinMaxObjT2(1);
-            obj.StatisticMat{32,2} =  obj.AreaMinMaxT2(2);
-            obj.StatisticMat{33,2} =  obj.AreaMinMaxObjT2(2);
+            % 34 Row
+            obj.StatisticMat{34,1} = 'Smallest Area:';
+            obj.StatisticMat{34,2} =  obj.AreaMinMax(1);
+            % 35 Row
+            obj.StatisticMat{35,1} = 'Smallest Fiber:';
+            obj.StatisticMat{35,2} =  obj.AreaMinMaxObj(1);
+            % 36 Row
+            obj.StatisticMat{36,1} = 'Largest Area:';
+            obj.StatisticMat{36,2} =  obj.AreaMinMax(2);
+            % 37 Row
+            obj.StatisticMat{37,1} = 'Largest Fiber:';
+            obj.StatisticMat{37,2} =  obj.AreaMinMaxObj(2);
             
-            obj.StatisticMat{34,2} =  obj.AreaMinMaxT3(1);
-            obj.StatisticMat{35,2} =  obj.AreaMinMaxObjT3(1);
-            obj.StatisticMat{36,2} =  obj.AreaMinMaxT3(2);
-            obj.StatisticMat{37,2} =  obj.AreaMinMaxObjT3(2);
+            % 38 Row
+            obj.StatisticMat{38,1} = 'Smallest T1 Area:';
+            obj.StatisticMat{38,2} =  obj.AreaMinMaxT1(1);
+            % 39 Row
+            obj.StatisticMat{39,1} = 'Smallest T1 Fiber:';
+            obj.StatisticMat{39,2} =  obj.AreaMinMaxObjT1(1);
+            % 40 Row
+            obj.StatisticMat{40,1} = 'Largest T1 Area:';
+            obj.StatisticMat{40,2} =  obj.AreaMinMaxT1(2);
+            % 41 Row
+            obj.StatisticMat{41,1} = 'Largest T1 Fiber:';
+            obj.StatisticMat{41,2} =  obj.AreaMinMaxObjT1(2);
+            
+            % 42 Row
+            obj.StatisticMat{42,1} = 'Smallest T12h Area:';
+            obj.StatisticMat{42,2} =  obj.AreaMinMaxT12h(1);
+            % 43 Row
+            obj.StatisticMat{43,1} = 'Smallest T12h Fiber:';
+            obj.StatisticMat{43,2} =  obj.AreaMinMaxObjT12h(1);
+            % 44 Row
+            obj.StatisticMat{44,1} = 'Largest T12h Area:';
+            obj.StatisticMat{44,2} =  obj.AreaMinMaxT12h(2);
+            % 45 Row
+            obj.StatisticMat{45,1} = 'Largest T12h Fiber:';
+            obj.StatisticMat{45,2} =  obj.AreaMinMaxObjT12h(2);
+            
+            % 46 Row
+            obj.StatisticMat{46,1} = 'Smallest T2a Area:';
+            obj.StatisticMat{46,2} =  obj.AreaMinMaxT2a(1);
+            % 47 Row
+            obj.StatisticMat{47,1} = 'Smallest T2a Fiber:';
+            obj.StatisticMat{47,2} =  obj.AreaMinMaxObjT2a(1);
+            % 48 Row
+            obj.StatisticMat{48,1} = 'Largest T2a Area:';
+            obj.StatisticMat{48,2} =  obj.AreaMinMaxT2a(2);
+            % 49 Row
+            obj.StatisticMat{49,1} = 'Largest T2a Fiber:';
+            obj.StatisticMat{49,2} =  obj.AreaMinMaxObjT2a(2);
+            
+            % 50 Row
+            obj.StatisticMat{50,1} = 'Smallest T2x Area:';
+            obj.StatisticMat{50,2} =  obj.AreaMinMaxT2x(1);
+            % 51 Row
+            obj.StatisticMat{51,1} = 'Smallest T2x Fiber:';
+            obj.StatisticMat{51,2} =  obj.AreaMinMaxObjT2x(1);
+            % 52 Row
+            obj.StatisticMat{52,1} = 'Largest T2x Area:';
+            obj.StatisticMat{52,2} =  obj.AreaMinMaxT2x(2);
+            % 53 Row
+            obj.StatisticMat{53,1} = 'Largest T2x Fiber:';
+            obj.StatisticMat{53,2} =  obj.AreaMinMaxObjT2x(2);
+            
+            % 54 Row
+            obj.StatisticMat{54,1} = 'Smallest T2ax Area:';
+            obj.StatisticMat{54,2} =  obj.AreaMinMaxT2ax(1);
+            % 55 Row
+            obj.StatisticMat{55,1} = 'Smallest T2ax Fiber:';
+            obj.StatisticMat{55,2} =  obj.AreaMinMaxObjT2ax(1);
+            % 56 Row
+            obj.StatisticMat{56,1} = 'Largest T2ax Area:';
+            obj.StatisticMat{56,2} =  obj.AreaMinMaxT2ax(2);
+            % 57 Row
+            obj.StatisticMat{57,1} = 'Largest T2ax Fiber:';
+            obj.StatisticMat{57,2} =  obj.AreaMinMaxObjT2ax(2);
             
         end
         
@@ -569,7 +769,7 @@ classdef modelResults < handle
                 
                 % save picture as tif file
                 f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
-                h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,f);
+                h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGBFR,f);
                 SizeFig = size(obj.PicRGB)/max(size(obj.PicRGB));
                 set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
                 set(h,'Units','normalized');
@@ -590,7 +790,7 @@ classdef modelResults < handle
                 % save picture as vector graphics
                 fileName = [fileNameRGB '_image_processed' time '.pdf'];
                 fullFileName = fullfile(SaveDir,fileName);
-                saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fullFileName);
+                saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGBFR,fullFileName);
                 obj.InfoMessage = '         - image has been saved as .pdf vector grafic'; 
             end
             
@@ -646,7 +846,7 @@ classdef modelResults < handle
                
                fTemp = figure('Visible','off');
                lTemp = findobj('Tag','LegendScatterPlot');
-               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatter],fTemp);
+               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterBlueRed],fTemp);
                set(lTemp,'Location','best')
                
                saveTightFigureOrAxes(fTemp,fullFileName);
@@ -659,7 +859,7 @@ classdef modelResults < handle
                
                fTemp = figure('Visible','off','position',[100 100 600 400]);
                lTemp = findobj('Tag','LegendScatterAllPlot');
-               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterAll],fTemp);
+               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterFarredRed],fTemp);
                set(lTemp,'Location','best')
                
                saveTightFigureOrAxes(fTemp,fullFileName);
@@ -911,7 +1111,7 @@ classdef modelResults < handle
             %make axes results the current axes
             axes(axesResults);
             
-            %sjow RGB image in GUI
+            %show RGB image in GUI
             imshow(ones(size(obj.PicRGB)));
             obj.InfoMessage = '      - load image processed into GUI...';
             

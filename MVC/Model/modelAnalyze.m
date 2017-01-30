@@ -394,17 +394,18 @@ classdef modelAnalyze < handle
                     case 'Type 2a'
                         Color = 'y';    
                     case 'Type 2ax'
-                        Color = [255,165,0]; %orange
+                        Color = [255/255 165/255 0]; %orange
                     case 'Type 1 2 hybrid'
                         % Type 3
                         Color = 'm';
                     otherwise
-                        Color = 'b';
+                        % error
+                        Color = 'k';
                 end
                 
                 hold on
                 
-                htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',0.1);
+                htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
                 % Tag every Boundarie Line Object with his own Label number
                 % to find them later for manipualtion
                 set(htemp,'Tag',['boundLabel ' num2str(i)])
@@ -460,7 +461,7 @@ classdef modelAnalyze < handle
             %%% Color-Based triple labeling
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
-            if obj.AnalyzeMode == 1 
+            if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 2
                 % Color-Based triple labeling
                 %Use gren red and blue plane for fiber type classification.
                 %seaarch for type 1 2x and 12h (type 1 2 hybrid) fibers
@@ -537,7 +538,7 @@ classdef modelAnalyze < handle
                                         % Farred/Red Thresh is active 
                                         if obj.Stats(i).ColorRatioFarredRed >= obj.FarredRedThresh
                                             %Check for Limit FarRed
-                                            if obj.Stats(i).ColorRatioBlueRed  < obj.FarredRedThresh/(1 - obj.FarredRedDistFarred)
+                                            if obj.Stats(i).ColorRatioFarredRed  < obj.FarredRedThresh/(1 - obj.FarredRedDistFarred)
                                                 % Type 2ax fiber (orange hybrid 2a 2x fiber)
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2ax';
@@ -861,9 +862,10 @@ classdef modelAnalyze < handle
             %
             %               Data{1}: filename RGB image.
             %               Data{2}: path RGB image.
-            %               Data{3}: RGB image.
+            %               Data{3}: RGB image create from color plane
+            %               images red green blue and farred.  
             %               Data{4}: RGB image create from color plane
-            %               images.            
+            %               images red green and blue.            
             %               Data{5}: Stats table that contains all fiber
             %               informations.
             %               Data{6}: Label array of all fiber objects.

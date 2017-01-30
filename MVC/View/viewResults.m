@@ -28,13 +28,13 @@ classdef viewResults < handle
         hFR; %handle to figure with Results and controls.
         panelControl; %handle to panel with controls.
         panelResults; %handle to panel with results.
-        hAPProcessed; %handle to axes with processed image in the picture Panel.
-        hAPColorPlane; %handle to axes with image created from the Red Green and Blue color-planes.
+        hAPProcessedRGBFR; %handle to axes with processed image in the picture Panel all planes.
+        hAPProcessedRGB; %handle to axes with image created from the Red Green and Blue color-planes.
         
         hAArea; %handle to axes with area plot.  
         hACount %handle to axes with counter plot.
-        hAScatterAll %handle to axes with scatterplot that contains all objects.
-        hAScatter %handle to axes with scatterplot that contains fiber objects.
+        hAScatterFarredRed %handle to axes with scatterplot that contains all objects.
+        hAScatterBlueRed %handle to axes with scatterplot that contains fiber objects.
         
         B_BackAnalyze; %Button, close the ResultsMode and opens the the AnalyzeMode.
         B_Save; %Button, save data into the RGB image folder.
@@ -182,7 +182,7 @@ classdef viewResults < handle
             tableTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             
             
-            tabPanel.TabTitles = {'Statistics','Original image processed','RGB Plane-Image', 'Object Table'};
+            tabPanel.TabTitles = {'Statistics','Image with Farred processed','Image without Farred processed', 'Object Table'};
             
             %%%%%%%%%%%%%%%%%%% Tab 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
@@ -200,10 +200,10 @@ classdef viewResults < handle
             set(obj.hAArea, 'LooseInset', [0,0,0,0]);
             obj.hACount= axes('Parent',uicontainer('Parent',PanelCount));
             set(obj.hACount, 'LooseInset', [0,0,0,0]);
-            obj.hAScatterAll = axes('Parent',uicontainer('Parent',PanelDia));
-            set(obj.hAScatterAll, 'LooseInset', [0,0,0,0]);
-            obj.hAScatter = axes('Parent',uicontainer('Parent',PanelScatter));
-            set(obj.hAScatter, 'LooseInset', [0,0,0,0]);
+            obj.hAScatterFarredRed = axes('Parent',uicontainer('Parent',PanelDia));
+            set(obj.hAScatterFarredRed, 'LooseInset', [0,0,0,0]);
+            obj.hAScatterBlueRed = axes('Parent',uicontainer('Parent',PanelScatter));
+            set(obj.hAScatterBlueRed, 'LooseInset', [0,0,0,0]);
             
             
             PanelStatisticTabel = uix.Panel('Parent',statisticTabHBox,'Padding',5,'Title', 'Fiber-Type statistics','FontSize',fontSizeM);
@@ -220,46 +220,42 @@ classdef viewResults < handle
             
             set(obj.hACount,'Units','normalized','OuterPosition',[0 0 1 1]);
             
-            set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
+            set(obj.hAScatterFarredRed,'Units','normalized','OuterPosition',[0 0 1 1]);
 
-            set(obj.hAScatter,'Units','normalized','OuterPosition',[0 0 1 1]);
+            set(obj.hAScatterBlueRed,'Units','normalized','OuterPosition',[0 0 1 1]);
 
-            obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeB);
-            obj.B_TableStatistic.RowName = [];
-            obj.B_TableStatistic.ColumnName = {'Name of parameter                   ','Value of parameter                   '};
+            obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeM);
+            
             
            
             %%%%%%%%%%%%%%%%%%%%%%%% Tab 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
-            mainPicPanel = uix.Panel('Parent',pictureTabPanel,'Padding',35,'Title', 'Image processed with object boundaries and label numbers','FontSize',fontSizeM);
+            mainPicPanel = uix.Panel('Parent',pictureTabPanel,'Padding',35,'Title', 'RGB Image (all Planes) processed with object boundaries and label numbers','FontSize',fontSizeM);
             
-            obj.hAPProcessed = axes('Parent',mainPicPanel,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAPProcessedRGBFR = axes('Parent',mainPicPanel,'Units','normalized','Position',[0 0 1 1]);
             axis image
             
             %%%%%%%%%%%%%%%%%%%%%%%% Tab 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
-            mainPicPlanePanel = uix.Panel('Parent',pictureRGBPlaneTabPanel,'Padding',35,'Title', 'Image created from the Red Green and Blue color-planes','FontSize',fontSizeM);
+            mainPicPlanePanel = uix.Panel('Parent',pictureRGBPlaneTabPanel,'Padding',35,'Title', 'RGB Image (Red Green and Blue Plane)processed with object boundaries and label numbers','FontSize',fontSizeM);
             
-            obj.hAPColorPlane = axes('Parent',mainPicPlanePanel,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAPProcessedRGB = axes('Parent',mainPicPlanePanel,'Units','normalized','Position',[0 0 1 1]);
             axis image
             
             %%%%%%%%%%%%%%%%%%%%%%%% Tab 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             mainTablePanel = uix.Panel('Parent',tableTabPanel,'Padding',5,'Title', 'Table object information','FontSize',fontSizeM);
             obj.B_TableMain = uitable('Parent',mainTablePanel,'FontSize',fontSizeB);
-            obj.B_TableMain.RowName = [];
-            obj.B_TableMain.ColumnName = {'LabelNO' 'Area' 'XPos' 'YPos' 'MinorAxis' 'MajorAxis' 'Perimeter' 'Roundness' ...
-                'AspectRatio' 'meanRed' 'meanGreen' 'meanBlue' 'meanFarRed' 'meanColorValue' ...
-                'meanColorHue' 'RationBlueRed' 'DistBlueRed' 'FiberType'};
-            obj.B_TableMain.FontSize = fontSizeM;
+            
+            obj.B_TableMain.FontSize = fontSizeS;
             obj.B_TableMain.Units = 'normalized';
             obj.B_TableMain.Position =[0 0 1 1];
             
             set(obj.hACount,'Units','normalized','OuterPosition',[0 0 1 1]);
             
-            set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
+            set(obj.hAScatterFarredRed,'Units','normalized','OuterPosition',[0 0 1 1]);
 
-            set(obj.hAScatter,'Units','normalized','OuterPosition',[0 0 1 1]);
+            set(obj.hAScatterBlueRed,'Units','normalized','OuterPosition',[0 0 1 1]);
             
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();

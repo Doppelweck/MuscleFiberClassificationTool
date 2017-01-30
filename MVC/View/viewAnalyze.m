@@ -83,7 +83,7 @@ classdef viewAnalyze < handle
     end
     
     methods
-        function obj = viewAnalyze()
+        function obj = viewAnalyze(mainCard)
             
             if ismac
                 fontSizeS = 10; % Font size small
@@ -100,7 +100,7 @@ classdef viewAnalyze < handle
                 
             end
             
-            mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
+%             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             mainPanelBox = uix.HBox( 'Parent', mainCard ,'Spacing',5,'Padding',5);
             
             obj.panelPicture = uix.Panel( 'Title', 'Picture', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);

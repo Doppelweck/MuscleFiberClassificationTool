@@ -468,9 +468,13 @@ classdef controllerAnalyze < handle
             %           src:    source of the callback.
             %           evnt:   callback event data.
             %
+            obj.modelAnalyzeHandle.InfoMessage = '-changing analyze mode';
             
             if src.Value == 1
+                obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
                 % Color-Based triple labeling classification
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
 %                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
 %                 obj.modelAnalyzeHandle.InfoMessage = '      - Colordistance-Based classification were selected';
@@ -479,7 +483,10 @@ classdef controllerAnalyze < handle
 %                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','on')
                 
             elseif src.Value == 2
+                obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
                 % Color-Based quad labeling classification
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
 %                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
 %                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
@@ -933,30 +940,42 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
             set(obj.viewAnalyzeHandle.B_TextArea,'String', Info{2} );
             set(obj.viewAnalyzeHandle.B_TextAspectRatio,'String', Info{3} );
-            set(obj.viewAnalyzeHandle.B_TextRoundness,'String', Info{4} );
-            set(obj.viewAnalyzeHandle.B_TextColorDistance,'String', Info{5} );
-            set(obj.viewAnalyzeHandle.B_TextColorValue,'String', Info{6} );
-            set(obj.viewAnalyzeHandle.B_TextFiberType,'String', Info{7} );
+            set(obj.viewAnalyzeHandle.B_TextColorValue,'String', Info{4} );
+            set(obj.viewAnalyzeHandle.B_TextRoundness,'String', Info{5} );
+            set(obj.viewAnalyzeHandle.B_TextBlueRedRatio,'String', Info{6} );
+            set(obj.viewAnalyzeHandle.B_TextFarredRedRatio,'String', Info{7} );
+            set(obj.viewAnalyzeHandle.B_TextMeanRed,'String', Info{8} );
+            set(obj.viewAnalyzeHandle.B_TextMeanGreen,'String', Info{9} );
+            set(obj.viewAnalyzeHandle.B_TextMeanBlue,'String', Info{10} );
+            set(obj.viewAnalyzeHandle.B_TextMeanFarred,'String', Info{11} );
+             set(obj.viewAnalyzeHandle.B_TextFiberType,'String', Info{12} );
             
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'image');
-            obj.modelAnalyzeHandle.handleInfoAxes.CData = Info{8};
+            obj.modelAnalyzeHandle.handleInfoAxes.CData = Info{13};
             hlines = findobj(obj.viewAnalyzeHandle.B_AxesInfo,'Type','line');
             delete(hlines);
             
-            switch Info{7}
-                case '0'
-                    Color = 'w';
-                case '1'
-                    Color = 'b';
-                case '2'
-                    Color = 'r';
-                case '3'
-                    Color = 'm';
+            switch Info{12}
+                    case 'undefined'
+                        % Type 0
+                        Color = 'w';
+                    case 'Type 1'
+                        Color = 'b';
+                    case 'Type 2x'
+                        Color = 'r';
+                    case 'Type 2a'
+                        Color = 'y';    
+                    case 'Type 2ax'
+                        Color = [255/255 165/255 0]; %orange
+                    case 'Type 1 2 hybrid'
+                        % Type 3
+                        Color = 'm';
                 otherwise
-                    Color = 'k';
+                        % error
+                        Color = 'k';
             end
             
-            visboundaries(obj.viewAnalyzeHandle.B_AxesInfo,Info{9},'Color',Color,'LineWidth',1);
+            visboundaries(obj.viewAnalyzeHandle.B_AxesInfo,Info{14},'Color',Color,'LineWidth',1);
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'tight');
             
         end
