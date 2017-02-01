@@ -329,7 +329,8 @@ classdef viewEdit < handle
             obj.B_AxesCheckPlaneFarRed = axes('Parent',VBox6,'ActivePositionProperty','position');
             axis image
             imshow(Pics{8})
-            obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,4,'FontSize',fontSizeM);
+            String = {'Green Plane - Collagen' , 'Blue Plane - Type 1 fibers', 'Red Plane - Type 2x fibers', 'FarRed Plane - Type 2a fibers'}
+            obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6,'Style','popupmenu', 'String', String , 'Value' ,4,'FontSize',fontSizeM);
             set(VBox6,'Heights',[-10 -1])
             
             set( MainGrid, 'Heights', [-1 -1], 'Widths', [-1 -1] ,'Spacing',10);

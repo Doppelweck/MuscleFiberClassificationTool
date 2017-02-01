@@ -474,6 +474,11 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
                 % Color-Based triple labeling classification
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
 %                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
@@ -486,6 +491,11 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
                 % Color-Based quad labeling classification
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',1)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
 %                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
@@ -623,16 +633,17 @@ classdef controllerAnalyze < handle
             %               pathnames of the RGB image. Also contains the
             %               RGB and the color plane images:
             %
-            %               PicData{1}: filename RGB image
-            %               PicData{2}: path RGB image
-            %               PicData{3}: RGB image
-            %               PicData{4}: binary image
-            %               PicData{5}: green plane image
-            %               PicData{6}: blue plane image
-            %               PicData{7}: red plane image
-            %               PicData{8}: farred plane image
-            %               PicData{9}: RGB image create from color plane
-            %               images
+            %               PicData{1}: name of selected file.
+            %               PicData{2}: path of selected file.
+            %               PicData{3}: RGB image created from all 4
+            %               Planes.
+            %               PicData{4}: binary mask image.
+            %               PicData{5}: green plane image.
+            %               PicData{6}: blue plane image.
+            %               PicData{7}: red plane image.
+            %               PicData{8}: farred plane image.
+            %               PicData{9}: RGB image create from red green and
+            %               blue color planeimages.           
             %
             %           InfoText:   Info text log.
             %
@@ -653,9 +664,19 @@ classdef controllerAnalyze < handle
             axes(obj.viewAnalyzeHandle.hAP);
             
             % show PicRGB in Analyze GUI
-            obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
-            axis on
-            axis image
+            if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 1
+                
+                %Show image for triple labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
+                axis on
+                axis image
+            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
+                
+                %Show image for quad labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
+                axis on
+                axis image
+            end
             
             % set panel title to filename and path
             Titel = [obj.modelAnalyzeHandle.PathName obj.modelAnalyzeHandle.FileName];
@@ -764,10 +785,21 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
             set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
-%             set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
-%             set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
             set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+
+            
             
             % start the classification
             obj.modelAnalyzeHandle.startAnalysze();
@@ -805,17 +837,19 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
             end
-            
+             if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
             set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
             if obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value == 1
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
             end
+             end
             
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
             if obj.viewAnalyzeHandle.B_ColorValueActive.Value == 1
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+           
             end
         end
         
@@ -940,14 +974,14 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
             set(obj.viewAnalyzeHandle.B_TextArea,'String', Info{2} );
             set(obj.viewAnalyzeHandle.B_TextAspectRatio,'String', Info{3} );
-            set(obj.viewAnalyzeHandle.B_TextColorValue,'String', Info{4} );
-            set(obj.viewAnalyzeHandle.B_TextRoundness,'String', Info{5} );
-            set(obj.viewAnalyzeHandle.B_TextBlueRedRatio,'String', Info{6} );
-            set(obj.viewAnalyzeHandle.B_TextFarredRedRatio,'String', Info{7} );
-            set(obj.viewAnalyzeHandle.B_TextMeanRed,'String', Info{8} );
-            set(obj.viewAnalyzeHandle.B_TextMeanGreen,'String', Info{9} );
-            set(obj.viewAnalyzeHandle.B_TextMeanBlue,'String', Info{10} );
-            set(obj.viewAnalyzeHandle.B_TextMeanFarred,'String', Info{11} );
+            set(obj.viewAnalyzeHandle.B_TextRoundness,'String', Info{4} );
+            set(obj.viewAnalyzeHandle.B_TextBlueRedRatio,'String', Info{5} );
+            set(obj.viewAnalyzeHandle.B_TextFarredRedRatio,'String', Info{6} );
+            set(obj.viewAnalyzeHandle.B_TextMeanRed,'String', Info{7} );
+            set(obj.viewAnalyzeHandle.B_TextMeanGreen,'String', Info{8} );
+            set(obj.viewAnalyzeHandle.B_TextMeanBlue,'String', Info{9} );
+            set(obj.viewAnalyzeHandle.B_TextMeanFarred,'String', Info{10} );
+            set(obj.viewAnalyzeHandle.B_TextColorValue,'String', Info{11} );
              set(obj.viewAnalyzeHandle.B_TextFiberType,'String', Info{12} );
             
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'image');
@@ -1029,7 +1063,7 @@ classdef controllerAnalyze < handle
                     % get bounding box of the fiber at the selected
                     % position and plot the box.
                     PosBoundingBox = obj.modelAnalyzeHandle.Stats(Label).BoundingBox;
-                    rectLine = rectangle('Position',PosBoundingBox,'EdgeColor','y','LineWidth',2);
+                    rectLine = rectangle('Position',PosBoundingBox,'EdgeColor','g','LineWidth',2);
                     set(rectLine,'Tag','highlightBox')
                     
                     % get object information at the selected position
@@ -1172,7 +1206,7 @@ classdef controllerAnalyze < handle
             %
             
             obj.backEditModeEvent();
-            obj.controllerEditHandle.newPictureEvent();
+            obj.controllerEditHandle.newFileEvent();
         end
         
         function closeProgramEvent(obj,~,~)

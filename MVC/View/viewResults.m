@@ -33,8 +33,10 @@ classdef viewResults < handle
         
         hAArea; %handle to axes with area plot.  
         hACount %handle to axes with counter plot.
-        hAScatterFarredRed %handle to axes with scatterplot that contains all objects.
+        hAScatterFarredRed %handle to axes with scatterplot that contains fiber objects.
         hAScatterBlueRed %handle to axes with scatterplot that contains fiber objects.
+        
+        hAScatterAll %handle to axes with scatterplot that contains all fiber objects.
         
         B_BackAnalyze; %Button, close the ResultsMode and opens the the AnalyzeMode.
         B_Save; %Button, save data into the RGB image folder.
@@ -42,10 +44,10 @@ classdef viewResults < handle
         B_CloseProgramm; %Button, to close the program.
         
         B_SaveFiberTable; %Checkbox, select if fiber table should be saved.
-        B_SaveStatisticTable; %Checkbox, select if statistic table should be saved.
+        B_SaveScatterAll; %Checkbox, select if statistic table should be saved.
         B_SavePlots; %Checkbox, select if all plots should be saved.
-        B_SaveAnaPicture; %Checkbox, select if processed image should be saved.
-        B_SavePlanePicture; %Checkbox, select if color-plane image should be saved.
+        B_SavePicRGBFRProc; %Checkbox, select if processed image should be saved.
+        B_SavePicRGBProc; %Checkbox, select if color-plane image should be saved.
         B_SaveOpenDir %Button, opens the save directory.
         
         B_TableStatistic; %Table, that shows all statistic data.
@@ -118,10 +120,10 @@ classdef viewResults < handle
             HBoxSave2 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave21 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontSize',fontSizeM, 'String', 'Save Fiber-Statistics table in Excel sheet :' );
+            uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontSize',fontSizeM, 'String', 'Save Scatter plot all fibers :' );
             
             HButtonBoxSave22 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveStatisticTable = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','SaveStatistcTable');
+            obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','SaveStatistcTable');
             
             set( HBoxSave2, 'Widths', [-10 -1] );
             
@@ -140,10 +142,10 @@ classdef viewResults < handle
             HBoxSave4 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave41 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontSize',fontSizeM, 'String', 'Save processed image :' );
+            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontSize',fontSizeM, 'String', 'Save processed with Farred plane :' );
             
             HButtonBoxSave42 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveAnaPicture = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SaveProcessedPicture');
+            obj.B_SavePicRGBFRProc = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SavePicRGBFRProc');
             
             set( HBoxSave4, 'Widths', [-10 -1] );
             
@@ -151,10 +153,10 @@ classdef viewResults < handle
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontSize',fontSizeM, 'String', 'Save image created from color-planes :' );
+            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontSize',fontSizeM, 'String', 'Save processed without Farred plane :' );
             
             HButtonBoxSave52 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePlanePicture = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SaveColorPlanePicture');
+            obj.B_SavePicRGBProc = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','B_SavePicRGBProc');
             
             set( HBoxSave5, 'Widths', [-10 -1] );
 
@@ -180,9 +182,9 @@ classdef viewResults < handle
             pictureTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             pictureRGBPlaneTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             tableTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
+            scatterAllTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             
-            
-            tabPanel.TabTitles = {'Statistics','Image with Farred processed','Image without Farred processed', 'Object Table'};
+            tabPanel.TabTitles = {'Statistics','Image with Farred processed','Image without Farred processed', 'Fiber Type Table','Scatter all Fibers'};
             
             %%%%%%%%%%%%%%%%%%% Tab 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
@@ -257,6 +259,13 @@ classdef viewResults < handle
 
             set(obj.hAScatterBlueRed,'Units','normalized','OuterPosition',[0 0 1 1]);
             
+            %%%%%%%%%%%%%%%%%%%%%%%% Tab 5 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            mainScatterallPanel = uix.Panel('Parent',scatterAllTabPanel,'Padding',35,'Title', 'RGB Image (Red Green and Blue Plane)processed with object boundaries and label numbers','FontSize',fontSizeM);
+            
+            obj.hAScatterAll = axes('Parent',uicontainer('Parent',mainScatterallPanel),'Units','normalized','OuterPosition',[0 0 1 1]);
+%             set(obj.hAScatterAll, 'LooseInset', [0,0,0,0]);
+%             set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
 

@@ -319,7 +319,8 @@ classdef modelEdit < handle
             for i=1:metadata.size()
                 key = metadataKeys.nextElement();
                 value = metadata.get(key);
-                fprintf('%s = %s\n', key, value)
+                MetaData{i,1}=sprintf('%s', key);
+                MetaData{i,2}=sprintf('%s', value);
             end
             
             %get Number of Color Planes

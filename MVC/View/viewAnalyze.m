@@ -61,6 +61,9 @@ classdef viewAnalyze < handle
         B_ColorValueActive; %Checkbox, select if color value parameter is used for classificaton.
         B_ColorValue; %TextEditBox, minimal allowed fiber color value (HSV).
         
+        B_XScale
+        B_YScale
+        
         B_TextObjNo; %TextBox, shows label number of selected fiber in the fiber information panel.
         B_TextArea; %TextBox, shows area of selected fiber in the fiber information panel.
         B_TextRoundness; %TextBox, shows roundness of selected fiber in the fiber information panel.
@@ -120,7 +123,7 @@ classdef viewAnalyze < handle
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
             
             
-            set( PanelVBox, 'Heights', [-3 -6 -11 -4], 'Spacing', 1 );
+            set( PanelVBox, 'Heights', [-3 -7 -10 -4], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -140,13 +143,13 @@ classdef viewAnalyze < handle
             HBoxPara1 = uix.HBox('Parent', mainVBoxPara);
             
             HButtonBoxPara11 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontSize',fontSizeM, 'String', 'Analyze Classification Mode :' );
+            uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontSize',fontSizeM, 'String', 'Analyze Mode :' );
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-            String = {'Color-Based triple labeling (types: 1 12h 2x)' , 'Color-Based quad labelling (types: 1 12h 2a 2x 2ax)', 'Cluster-Based ; 3 Types'}
-            obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontSize',fontSizeM, 'String', String );
+            String = {'Color-Based triple labeling (T: 1 12h 2x)          ' , 'Color-Based quad labeling (T: 1 12h 2a 2x 2ax)', 'Cluster-Based ; 3 Types'};
+            obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontSize',fontSizeM, 'String', String ,'Value',2);
             
-            set( HBoxPara1, 'Widths', [-1 -1] );
+            set( HBoxPara1, 'Widths', [-2 -5] );
             
             %%%%%%%%%%%%%%%% 2. Row: Area
             HBoxPara2 = uix.HBox('Parent', mainVBoxPara);
@@ -241,7 +244,7 @@ classdef viewAnalyze < handle
             HButtonBoxPara67 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_BlueRedDistRed = uicontrol( 'Parent', HButtonBoxPara67,'Style','edit','FontSize',fontSizeM,'Tag','BlueRedDistRed', 'String', '0.1' );
             
-            set( HBoxPara6, 'Widths', [-10 -20 -10 -20 -10 -20 -10] );
+            set( HBoxPara6, 'Widths', [-8 -22 -10 -20 -10 -20 -10] );
             
             %%%%%%%%%%%%%%%% 7. Row FarRed Red thresh
             HBoxPara7 = uix.HBox('Parent', mainVBoxPara);
@@ -267,9 +270,27 @@ classdef viewAnalyze < handle
             HButtonBoxPara77 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_FarredRedDistRed = uicontrol( 'Parent', HButtonBoxPara77,'Style','edit','FontSize',fontSizeM,'Tag','FarredRedDistRed', 'String', '0.1' );
             
-            set( HBoxPara7, 'Widths', [-10 -20 -10 -20 -10 -20 -10] );
+            set( HBoxPara7, 'Widths', [-8 -22 -10 -20 -10 -20 -10] );
             
             
+            %%%%%%%%%%%%%%%% 8. Pixel Scale
+            HBoxPara8 = uix.HBox('Parent', mainVBoxPara);
+            
+            HButtonBoxPara81 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
+%             ui = uibuttongroup('Parent', HButtonBoxPara81);
+%             t = text('Parent', ui,'Interpreter','LaTex','string','$\alpha_{0}$','FontSize',13)
+            uicontrol( 'Parent', HButtonBoxPara81,'Style','text','FontSize',fontSizeM, 'String',sprintf('X: \x3BCm/pixel'));
+            
+            HButtonBoxPara82 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_XScale = uicontrol( 'Parent', HButtonBoxPara82,'Style','edit','FontSize',fontSizeM,'Tag','XScale', 'String', '1' );
+            
+            HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara83,'Style','text','FontSize',fontSizeM, 'String',sprintf('Y: \x3BCm/pixel') );
+            
+            HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
+            obj.B_YScale = uicontrol( 'Parent', HButtonBoxPara83,'Style','edit','FontSize',fontSizeM,'Tag','YScale', 'String', '1' );
+            
+             set( HBoxPara8, 'Widths', [-1 -1 -1 -1] );
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -449,7 +470,7 @@ classdef viewAnalyze < handle
             PosCurrent(1) = PosCurrent(1)+PosMainFig(1);
             PosCurrent(2) = PosCurrent(2)+PosMainFig(2);
             
-            SizeInfoFigure = [300 200]; %[width height]
+            SizeInfoFigure = [400 250]; %[width height]
             
             obj.hFM = figure('NumberTitle','off','Units','pixels','Name','Change fiber informations','Visible','off','MenuBar','none','ToolBar','none');
             set(obj.hFM,'Tag','FigureManipulate')
@@ -464,49 +485,79 @@ classdef viewAnalyze < handle
             mainVBoxInfo = uix.VBox('Parent', obj.hFM);
             HBBoxInfo = uix.HBox('Parent', mainVBoxInfo,'Spacing', 5,'Padding',5);
             VButtonBoxleftInfo = uix.VButtonBox('Parent', HBBoxInfo,'ButtonSize',[6000 200],'Spacing', 5 );
+            VButtonBoxleftValue = uix.VButtonBox('Parent', HBBoxInfo,'ButtonSize',[6000 200],'Spacing', 5 );
             VButtonBoxrightInfo = uix.VButtonBox('Parent', HBBoxInfo,'ButtonSize',[6000 200], 'Spacing', 5);
+            VButtonBoxrightValue = uix.VButtonBox('Parent', HBBoxInfo,'ButtonSize',[6000 200], 'Spacing', 5);
             
-            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Object Label No. :' );
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', Info{1} );
+            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Label No. :' );
+            uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{1} );
             
-            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel :' );
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', Info{2} );
+            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel :' );
+            uicontrol( 'Parent', VButtonBoxrightValue,'Style','text','FontSize',fontSizeM, 'String', Info{2} );
             
             uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Aspect Ratio :' );
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', Info{3} );
+            uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{3} );
             
-            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Roundness :' );
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', Info{4} );
+            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', 'Roundness :' );
+            uicontrol( 'Parent', VButtonBoxrightValue,'Style','text','FontSize',fontSizeM, 'String', Info{4} );
             
-            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Color distance :' );
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', Info{5} );
+            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'mean Red :' );
+            uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{7} );
+            
+            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', 'mean Green :' );
+            uicontrol( 'Parent', VButtonBoxrightValue,'Style','text','FontSize',fontSizeM, 'String', Info{8} );
+            
+            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'mean Blue :' );
+            uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{9} );
+            
+            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', 'mean Farred :' );
+            uicontrol( 'Parent', VButtonBoxrightValue,'Style','text','FontSize',fontSizeM, 'String', Info{10} );
+            
+            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Blue/red :' );
+            uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{5} );
+            
+            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', 'Farred/Red :' );
+            uicontrol( 'Parent', VButtonBoxrightValue,'Style','text','FontSize',fontSizeM, 'String', Info{6} );
             
             uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Color Value :' );
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', Info{6} );
+            uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{11} );
             
-            uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Fiber type :' );
-            obj.B_FiberTypeManipulate = uicontrol( 'Parent', VButtonBoxrightInfo,'Style','popupmenu','FontSize',fontSizeM );
-            set(obj.B_FiberTypeManipulate,'String',{'Type 1 (blue)' , 'Type 2 (red)', 'Type 3 (magenta, between Type 1 ond 2)', 'Type 0 (white, no fiber)'})
-            
-            uix.Empty( 'Parent', VButtonBoxleftInfo);
             uix.Empty( 'Parent', VButtonBoxrightInfo);
+            uix.Empty( 'Parent', VButtonBoxrightValue);
             
-            obj.B_ManipulateCancel = uicontrol( 'Parent', VButtonBoxleftInfo, 'String', 'Cancel','FontSize',fontSizeB );
-            obj.B_ManipulateOK = uicontrol( 'Parent', VButtonBoxrightInfo, 'String', 'Change Info','FontSize',fontSizeB );
+            HBBoxType = uix.HBox('Parent', mainVBoxInfo,'Spacing', 5,'Padding',5);
             
-            switch Info{7} %Fiber Type
-                case '1'
+            uicontrol( 'Parent', HBBoxType,'Style','text','FontSize',fontSizeM, 'String', 'Fiber type :' );
+            obj.B_FiberTypeManipulate = uicontrol( 'Parent', HBBoxType,'Style','popupmenu','FontSize',fontSizeM );
+            set(obj.B_FiberTypeManipulate,'String',{'Type 1 (blue)' , 'Type 12h (magenta)', 'Type 2x (red)', 'Type 2a (yellow)', 'Type 2ax (orange)' ,'undefined (white)' })
+            
+%             uix.Empty( 'Parent', VButtonBoxleftInfo);
+%             uix.Empty( 'Parent', VButtonBoxleftValue);
+            
+            HBBoxCont = uix.HBox('Parent', mainVBoxInfo,'Spacing', 5,'Padding',5);
+            obj.B_ManipulateCancel = uicontrol( 'Parent', HBBoxCont, 'String', 'Cancel','FontSize',fontSizeB );
+            obj.B_ManipulateOK = uicontrol( 'Parent', HBBoxCont, 'String', 'Change Info','FontSize',fontSizeB );
+            set( mainVBoxInfo, 'Heights', [-4 -1 -1], 'Spacing', 1 );
+            
+            switch Info{12} %Fiber Type
+                case 'Type 1'
                     %Fiber Type 1 (blue)
                     set(obj.B_FiberTypeManipulate,'Value',1);
-                case '2'
+                case 'Type 12h'
                     %Fiber Type 2 (red)
                     set(obj.B_FiberTypeManipulate,'Value',2);
-                case '3'
+                case 'Type 2x'
                     %Fiber Type 3 (magenta)
                     set(obj.B_FiberTypeManipulate,'Value',3);
-                case '0'
-                    %Fiber Type 0 (white)
+                case 'Type 2a'
+                    %Fiber Type 3 (magenta)
                     set(obj.B_FiberTypeManipulate,'Value',4);
+                case 'Type 2ax'
+                    %Fiber Type 3 (magenta)
+                    set(obj.B_FiberTypeManipulate,'Value',5);       
+                case 'undefined'
+                    %Fiber Type 0 (white)
+                    set(obj.B_FiberTypeManipulate,'Value',6);
             end
             
             

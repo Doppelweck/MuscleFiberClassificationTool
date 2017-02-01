@@ -42,10 +42,10 @@ classdef modelResults < handle
         PicPRGBPlanes; %RGB image create from color plane images red green and blue.
         
         SaveFiberTable; %Indicates whether the fiber type table should be saved.
-        SaveStatisticTable; %Indicates whether the statistics table should be saved.
+        SaveScatterAll; %Indicates whether the scatter plot with for all fibers should be saved.
         SavePlots; %Indicates whether the statistics plots should be saved.
-        SavePicProcessed; %Indicates whether the processed image should be saved.
-        SavePlanePicture; %Indicates whether the color-plane image should be saved.
+        SavePicRGBFRProcessed; %Indicates whether the processed image should be saved.
+        SavePicRGBProcessed; %Indicates whether the color-plane image should be saved.
         SavePath; % Save Path, same as the selected RGB image path.
         ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
@@ -253,7 +253,7 @@ classdef modelResults < handle
             obj.StatsMatDataT1 = obj.StatsMatData(Index,:);
             
             % Create CellArray only for Type 12h Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 1 2 hybrid');
+            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 12h');
             Index = find(IndexC==1);
             obj.StatsMatDataT12h = obj.StatsMatData(Index,:);
             
@@ -309,7 +309,7 @@ classdef modelResults < handle
                         % Type1 Fiber (blue)
                         % Total area of all type 1 fibers
                         obj.AreaType1 = obj.AreaType1 + obj.Stats(i).Area;
-                    case 'Type 1 2 hybrid'
+                    case 'Type 12h'
                         %Type 12 hybrid fiber (between Red and Blue)
                         % Total area of all type 3 fibers
                         obj.AreaType12h = obj.AreaType12h + obj.Stats(i).Area;
@@ -721,27 +721,21 @@ classdef modelResults < handle
             %
             
             obj.InfoMessage = ' ';
-            obj.InfoMessage = '   - saving data in the same dir than the RGB image was selected';
+            obj.InfoMessage = '   - saving data in the same dir than the file was selected';
             
             %Cell arrays for saving data in excel sheet
-            CellStatisticTable = {}; 
+            CellStatisticTable = {};
             CellFiberTable = {};
             
             %Current date and time
-            time = datestr(now,'_yyyy-mm-dd_HHMM');
+            time = datestr(now,'_yyyy_mm_dd_HHMM');
             
-            % Dlete file extension .tif before save
-            fileNameRGB = obj.FileNamesRGB;
-            LFN = length(obj.FileNamesRGB);
-            fileNameRGB(LFN)='';
-            fileNameRGB(LFN-1)='';
-            fileNameRGB(LFN-2)='';
-            fileNameRGB(LFN-3)='';
+            % Dlete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
             
-           
             % Save dir is the same as the dir from the selected Pic
-            SaveDir = [obj.PathNames obj.FileNamesRGB '_RESULTS']; 
-            obj.InfoMessage = ['   -' obj.PathNames obj.FileNamesRGB '_RESULTS']; 
+            SaveDir = [obj.PathName obj.FileName '_RESULTS'];
+            obj.InfoMessage = ['   -' obj.PathName obj.FileName '_RESULTS'];
             
             % Check if reslut folder already exist.
             if exist( SaveDir ,'dir') == 7
@@ -758,115 +752,155 @@ classdef modelResults < handle
             end
             
             %Add folder with time and date in the main result folder.
-            SaveDir = fullfile(SaveDir,[obj.FileNamesRGB '_RESULTS' time]);
+            SaveDir = fullfile(SaveDir,[obj.FileName '_RESULTS' time]);
             mkdir(SaveDir);
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save image processed with boudaries
-            if obj.SavePicProcessed
-                obj.InfoMessage = '      - saving image processed with boundaries...';
+            % save image all color planes processed with boudaries
+            if obj.SavePicRGBFRProcessed
+                obj.InfoMessage = '      - saving image processed with Farred Plane...';
                 
                 % save picture as tif file
                 f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
                 h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGBFR,f);
-                SizeFig = size(obj.PicRGB)/max(size(obj.PicRGB));
+                SizeFig = size(obj.PicPRGBFRPlanes)/max(size(obj.PicPRGBFRPlanes));
                 set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
                 set(h,'Units','normalized');
                 h.Position = [0 0 1 1];
                 h.DataAspectRatioMode = 'auto';
                 
+                picName ='';
                 frame = getframe(f);
                 frame=frame.cdata;
-                picName = [fileNameRGB '_image_processed' time '.tif'];
+                picName = [fileName '_image_processed_withFR' time '.tif'];
                 oldPath = pwd;
                 cd(SaveDir)
                 imwrite(frame,picName)
                 cd(oldPath)
-                
+                picName ='';
                 close(f);
                 obj.InfoMessage = '         - image has been saved as .tif';
                 
                 % save picture as vector graphics
-                fileName = [fileNameRGB '_image_processed' time '.pdf'];
-                fullFileName = fullfile(SaveDir,fileName);
+                picName = [fileName '_image_processed_withFR' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
                 saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGBFR,fullFileName);
-                obj.InfoMessage = '         - image has been saved as .pdf vector grafic'; 
+                picName ='';
+                obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
             end
             
-             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save color plane image as tif file
-            if obj.SavePlanePicture
-                obj.InfoMessage = '      - saving color plane image...';
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % save image all color planes processed with boudaries
+            if obj.SavePicRGBProcessed
+                obj.InfoMessage = '      - saving image processed without Farred Plane...';
                 
-                fileName = [fileNameRGB '_image_colorPlane' time '.tif'];
+                % save picture as tif file
+                f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
+                h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGB,f);
+                SizeFig = size(obj.PicPRGBPlanes)/max(size(obj.PicPRGBPlanes));
+                set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
+                set(h,'Units','normalized');
+                h.Position = [0 0 1 1];
+                h.DataAspectRatioMode = 'auto';
                 
+                picName ='';
+                frame = getframe(f);
+                frame=frame.cdata;
+                picName = [fileName '_image_processed_withoutFR' time '.tif'];
                 oldPath = pwd;
                 cd(SaveDir)
-                imwrite(obj.PicPRGBPlanes,fileName)
+                imwrite(frame,picName)
                 cd(oldPath)
-                
+                picName ='';
+                close(f);
                 obj.InfoMessage = '         - image has been saved as .tif';
+                
+                % save picture as vector graphics
+                picName = [fileName '_image_processed_withoutFR' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGB,fullFileName);
+                picName ='';
+                obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save axes StatisticsTab
             if obj.SavePlots
-               obj.InfoMessage = '      - saving axes with statistics plots...';
-
-               obj.InfoMessage = '         - saving area plot as .pdf'; 
-               fileName = [fileNameRGB '_processed_AreaPlot' time '.pdf'];
-               fullFileName = fullfile(SaveDir,fileName);
-               
-               fTemp = figure('Visible','off');
-               lTemp = findobj('Tag','LegendAreaPlot');
-               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAArea],fTemp);
-               set(lTemp,'Location','best')
-               
-               saveTightFigureOrAxes(fTemp,fullFileName);
-               
-               delete(fTemp)
-               
-               obj.InfoMessage = '         - saving number of Fiber-Types as .pdf'; 
-               fileName = [fileNameRGB '_processed_NumberPlot' time '.pdf'];
-               fullFileName = fullfile(SaveDir,fileName);
-               
-               fTemp = figure('Visible','off');
-               lTemp = findobj('Tag','LegendNumberPlot');
-               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hACount],fTemp);
-               set(lTemp,'Location','best')
-
-               saveTightFigureOrAxes(fTemp,fullFileName);
-               
-               delete(fTemp)
-
-               obj.InfoMessage = '         - saving Scatter plot Classification as .pdf'; 
-               fileName = [fileNameRGB '_processed_ScatterClassificationPlot' time '.pdf'];
-               fullFileName = fullfile(SaveDir,fileName);
-               
-               fTemp = figure('Visible','off');
-               lTemp = findobj('Tag','LegendScatterPlot');
-               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterBlueRed],fTemp);
-               set(lTemp,'Location','best')
-               
-               saveTightFigureOrAxes(fTemp,fullFileName);
-               
-               delete(fTemp)
-               
-               obj.InfoMessage = '         - saving Scatter plot All-Objects as .pdf';
-               fileName = [fileNameRGB '_processed_ScatterAllPlot' time '.pdf'];
-               fullFileName = fullfile(SaveDir,fileName);
-               
-               fTemp = figure('Visible','off','position',[100 100 600 400]);
-               lTemp = findobj('Tag','LegendScatterAllPlot');
-               copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterFarredRed],fTemp);
-               set(lTemp,'Location','best')
-               
-               saveTightFigureOrAxes(fTemp,fullFileName);
-               
-               delete(fTemp)
-               
-               obj.InfoMessage = '   - saving axes complete';
+                obj.InfoMessage = '      - saving axes with statistics plots...';
+                
+                obj.InfoMessage = '         - saving area plot as .pdf';
+                picName = [fileName '_processed_AreaPlot' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendAreaPlot');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAArea],fTemp);
+                set(lTemp,'Location','best')
+                
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '         - saving number of Fiber-Types as .pdf';
+                picName = [fileName '_processed_NumberPlot' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendNumberPlot');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hACount],fTemp);
+                set(lTemp,'Location','best')
+                
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '         - saving Scatter plot Blue over Red as .pdf';
+                picName = [fileName '_processed_ScatterPlotBlueRed' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendScatterPlotBlueRed');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterBlueRed],fTemp);
+                set(lTemp,'Location','best')
+                
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
+                picName = [fileName '_processed_ScatterPlotFarredRed' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendScatterPlotFarredRed');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterFarredRed],fTemp);
+                set(lTemp,'Location','best')
+                
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '   - saving plots complete';
+            end
+            
+            if obj.SaveScatterAll
+                obj.InfoMessage = '      - saving Scatter all Fibers...';
+                obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
+                picName = [fileName '_processed_ScatterPlotAll' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendScatterPlotAll');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterAll],fTemp);
+                set(lTemp,'Location','best')
+                
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '   - saving Scatter complete';
+                
             end
             
             
@@ -875,105 +909,30 @@ classdef modelResults < handle
             if obj.SaveFiberTable
                 obj.InfoMessage = '      - creating Fiber-Type struct';
                 
-                HeaderTable = {'Number' 'Code' 'Muscle' 'Count' 'Area_(pixel)' 'FCP_x' 'FCP_y' ...
-                    'MinorAxis' 'MajorAxis' 'Perimeter_(pixel)'  'Roundness' ...
-                    'AspectRatio' 'meanRed' 'meanGreen' 'meanBlue' 'meanFaraRed',...
-                    'ColorValue (HSV)' 'colorHue (HSV)' 'RatioBlueRed' 'DistanceBlueRed' 'Type'};
-                for i=1:1:length(HeaderTable)
-                    newFile{2,i} = HeaderTable{i};
-                end
+                Header = {'Label' 'Area' ...
+                    'XPos' 'YPos' 'MajorAxis' 'MinorAxis' 'Perimeter' 'Roundness' ...
+                    'AspectRatio' 'ColorHue' 'ColorValue' 'meanRed' 'meanGreen' ...
+                    'meanBlue' 'meanFarred' 'Blue/Red' 'Farred/Red'...
+                    'FiberMainGroup' 'FiberType'};
                 
-                StringFileName = strsplit(obj.FileNamesRGB);
+                CellFiberTable = cat(1,Header,obj.StatsMatData);
+                CellFiberTableT1 = cat(1,Header,obj.StatsMatDataT1);
+                CellFiberTableT12h = cat(1,Header,obj.StatsMatDataT12h);
+                CellFiberTableT2x = cat(1,Header,obj.StatsMatDataT2x);
+                CellFiberTableT2a = cat(1,Header,obj.StatsMatDataT2a);
+                CellFiberTableT2ax = cat(1,Header,obj.StatsMatDataT2ax);
                 
-                if length(StringFileName) < 4
-                    StringFileName = strsplit(obj.FileNamesRGB,'-');
-                end
-                
-                if length(StringFileName) < 4
-                    StringFileName = strsplit(obj.FileNamesRGB,'_');
-                end
-                
-                if length(StringFileName) >= 4
-                    
-                    MuscleInfo = cell(size(obj.StatsMatData,1),3);
-                    
-                    [MuscleInfo{:,1}] = deal(StringFileName{2});
-                    [MuscleInfo{:,2}] = deal(StringFileName{3});
-                    [MuscleInfo{:,3}] = deal(StringFileName{4});
-                else
-                    MuscleInfo = cell(size(obj.StatsMatData,1),1);
-                    
-                    [MuscleInfo{:,1}] = deal(StringFileName{1});
-                    HeaderTable = {'Number' 'FileName' 'Area_(pixel)' 'FCP_x' 'FCP_y' ...
-                    'MinorAxis' 'MajorAxis' 'Perimeter_(pixel)'  'Roundness' ...
-                    'AspectRatio' 'meanRed' 'meanGreen' 'meanBlue' 'meanFaraRed',...
-                    'ColorValue (HSV)' 'colorHue (HSV)' 'RatioBlueRed' 'DistanceBlueRed' 'Type'};
-                end
-                
-                CellTable = mat2cell(obj.StatsMatData,ones(1,size(obj.StatsMatData,1)),ones(1,size(obj.StatsMatData,2)));
-                
-                temp1 = mat2cell(obj.StatsMatData(:,1),ones(1,size(obj.StatsMatData(:,1),1)),ones(1,size(obj.StatsMatData(:,1),2)));
-                temp2 = mat2cell(obj.StatsMatData(:,2:end),ones(1,size(obj.StatsMatData(:,2:end),1)),ones(1,size(obj.StatsMatData(:,2:end),2)));
-                
-                CellTable = cat(2,temp1,MuscleInfo,temp2);
-                
-                CellFiberTable = cat(1,HeaderTable,CellTable);
             end
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % create Cell Array with Fiber-Statistics Table
-            if obj.SaveStatisticTable
-                obj.InfoMessage = '      - creating Fiber-Statistic struct';
-                
-                CellStatisticTable = obj.StatisticMat;  
-            end
-            
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % create DataFile for .xlsx from CellArrays
-            
-            if isempty(CellStatisticTable) && ~isempty(CellFiberTable)
-                
-                DataFile = CellFiberTable;
-                
-            elseif isempty(CellFiberTable) && ~isempty(CellStatisticTable)
-                
-                DataFile = CellStatisticTable;
-                
-            elseif ~isempty(CellFiberTable) && ~isempty(CellStatisticTable)
-                % Both Cells will be combined in one excel sheet
-                
-                % expand both Cell arrays to the same dim 
-                dimStatisticCell = size(CellStatisticTable);
-                dimFiberCell = size(CellFiberTable);
-                
-                if dimFiberCell(1) > dimStatisticCell(1)
-                    % CellFiber has bigger length
-                    % expand CellStatistic to the smae length as
-                    % CallFiber
-                CellStatisticTable{dimFiberCell(1),3} = {};
-                elseif dimFiberCell(1) < dimStatisticCell(1)
-                    % CellFiber has smaller length
-                    % expand CellFiber to the smae length as
-                    % CellStatistic
-                    CellFiberTable{dimStatisticCell(1),dimStatisticCell(2)} = {};
-                    obj.InfoMessage = '      - concatenate array structs';
-                end
-                
-                DataFile = cat(2,CellStatisticTable,CellFiberTable);
-                
-            else
-                DataFile = {};
-            end
-                
+
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Save DataFile as xls file
-            if ~isempty(DataFile)
+            
+            if ~isempty(CellFiberTable)
                 obj.InfoMessage = '      - creating .xlsx file';
                 
                 if ismac
                     % OS is macintosh. xlswrite is not supported. Use
-                    % undocumented function from the file exchange Matlab 
+                    % undocumented function from the file exchange Matlab
                     % Forum for creating .xlsx files on a macintosh OS.
                     
                     obj.InfoMessage = '         - UNIX-Systems (macOS) dont support xlswrite() MatLab function';
@@ -992,16 +951,49 @@ classdef modelResults < handle
                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
                     javaaddpath(path);
                     
-                    fileName = [fileNameRGB '_results' time '.xlsx'];
-                    sheetName = 'Fiber types';
-                    startRange = 'B2';
+                    xlsfileName = [fileName '_processed' time '.xlsx'];
+                    
                     
                     oldPath = pwd;
                     cd(SaveDir);
                     
+                    obj.InfoMessage = '            - write all fiber types ';
+                    sheetName = 'Fyber Types';
+                    startRange = 'B2';
                     % undocumented function from the file exchange Matlab Forum
                     % for creating .xlsx files on a macintosh OS
-                    status = xlwrite(fileName, DataFile, sheetName, startRange);
+                    status = xlwrite(xlsfileName, CellFiberTable , sheetName, startRange);
+                    
+                    sheetName = 'Statistics';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write statistic table ';
+                    status = xlwrite(xlsfileName, obj.StatisticMat , sheetName, startRange);
+                    
+                    
+                    sheetName = 'Type 1';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 1 fibers ';
+                    status = xlwrite(xlsfileName, CellFiberTableT1 , sheetName, startRange);
+                    
+                    sheetName = 'Type 12h';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 12h fibers ';
+                    status = xlwrite(xlsfileName, CellFiberTableT12h , sheetName, startRange);
+                    
+                    sheetName = 'Type 2x';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 2x fibers ';
+                    status = xlwrite(xlsfileName, CellFiberTableT2x , sheetName, startRange);
+                    
+                    sheetName = 'Type 2a';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 2a fibers ';
+                    status = xlwrite(xlsfileName, CellFiberTableT2a , sheetName, startRange);
+                    
+                    sheetName = 'Type 2ax';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 2ax fibers ';
+                    status = xlwrite(xlsfileName, CellFiberTableT2ax , sheetName, startRange);
                     
                     cd(oldPath);
                     
@@ -1010,10 +1002,10 @@ classdef modelResults < handle
                     else
                         obj.InfoMessage = '         - .xlxs file could not be created';
                         obj.InfoMessage = '         - creating .txt file instead...';
-                        
+                        txtfileName = [fileName '_processed' time '.txt'];
                         oldPath = pwd;
                         cd(SaveDir)
-                        fid=fopen(fileName,'a+');
+                        fid=fopen(txtfileName,'a+');
                         % undocumented function from the file exchange Matlab Forum
                         % for creating .txt files.
                         cell2file(fid,DataFile,'EndOfLine','\r\n');
@@ -1023,117 +1015,90 @@ classdef modelResults < handle
                     end
                     
                 elseif ispc
+
+                    obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
                     
-                    obj.InfoMessage = '         - trying to create excel sheet...';
-                    fileName = [fileNameRGB '_results' time '.xlsx'];
-                    sheet = 1;
+                    path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
+                    javaaddpath(path);
+                    path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-3.8-20120326.jar'];
+                    javaaddpath(path);
+                    path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-schemas-3.8-20120326.jar'];
+                    javaaddpath(path);
+                    path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/xmlbeans-2.3.0.jar'];
+                    javaaddpath(path);
+                    path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/dom4j-1.6.1.jar'];
+                    javaaddpath(path);
+                    path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
+                    javaaddpath(path);
+                    
+                    xlsfileName = [fileName '_processed' time '.xlsx'];
+                    sheetName = 'Fiber types';
                     startRange = 'B2';
-                    %delete enpty cells for xlswrite
-                    DataFileFull = DataFile;
-                    emptyIndex = cellfun('isempty',DataFileFull);
-                    DataFileFull(emptyIndex)= {' '};
                     oldPath = pwd;
                     cd(SaveDir);
-                    status = xlswrite(fileName, DataFileFull, sheet, startRange);
+                    
+                    sheetName = 'Fyber Types';
+                    startRange = 'B2';
+                    
+                    % undocumented function from the file exchange Matlab Forum
+                    % for creating .xlsx files on a macintosh OS
+                    status = xlwrite(xlsfileName, CellFiberTable , sheetName, startRange);
+                    
+                    sheetName = 'Statistics';
+                    startRange = 'B2';
+                    
+                    status = xlwrite(xlsfileName, obj.StatisticMat , sheetName, startRange);
+                    
+                    
+                    sheetName = 'Type 1';
+                    startRange = 'B2';
+                    
+                    status = xlwrite(xlsfileName, CellFiberTableT1 , sheetName, startRange);
+                    
+                    sheetName = 'Type 12h';
+                    startRange = 'B2';
+                    
+                    status = xlwrite(xlsfileName, CellFiberTableT12h , sheetName, startRange);
+                    
+                    sheetName = 'Type 2x';
+                    startRange = 'B2';
+                    
+                    status = xlwrite(xlsfileName, CellFiberTableT2x , sheetName, startRange);
+                    
+                    sheetName = 'Type 2a';
+                    startRange = 'B2';
+                    
+                    status = xlwrite(xlsfileName, CellFiberTableT2a , sheetName, startRange);
+                    
+                    sheetName = 'Type 2ax';
+                    startRange = 'B2';
+                    
+                    status = xlwrite(xlsfileName, CellFiberTableT2ax , sheetName, startRange);
+                    
                     cd(oldPath);
                     
                     if status
                         obj.InfoMessage = '         - .xlxs file has been created';
                     else
                         obj.InfoMessage = '         - .xlxs file could not be created';
-                        obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
-                        
-                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
-                        javaaddpath(path);
-                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-3.8-20120326.jar'];
-                        javaaddpath(path);
-                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-schemas-3.8-20120326.jar'];
-                        javaaddpath(path);
-                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/xmlbeans-2.3.0.jar'];
-                        javaaddpath(path);
-                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/dom4j-1.6.1.jar'];
-                        javaaddpath(path);
-                        path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
-                        javaaddpath(path);
-                        
-                        fileName = [fileNameRGB '_results' time '.xlsx'];
-                        sheetName = 'Fiber types';
-                        startRange = 'B2';
+                        obj.InfoMessage = '         - creating .txt file instead...';
+                        txtfileName = [fileName '_processed' time '.txt'];
                         oldPath = pwd;
-                        cd(SaveDir);
-                        
+                        cd(SaveDir)
+                        fid=fopen(txtfileName,'a+');
                         % undocumented function from the file exchange Matlab Forum
-                        % for creating .xlsx files on a macintosh OS
-                        status = xlwrite(fileName, DataFile, sheetName, startRange);
-                        
-                        cd(oldPath);
-                        if status
-                            
-                            obj.InfoMessage = '         - .xlxs file could not be created';
-                            obj.InfoMessage = '         - creating .txt file instead...';
-                            fileName = [fileNameRGB '_results' time '.txt'];
-                            oldPath = pwd;
-                            cd(SaveDir)
-                            fid=fopen(fileName,'a+');
-                            % undocumented function from the file exchange Matlab Forum
-                            % for creating .txt files.
-                            cell2file(fid,DataFile,'EndOfLine','\r\n');
-                            fclose(fid);
-                            cd(oldPath)
-                            obj.InfoMessage = '         - .txt file has been created';
-                        end
+                        % for creating .txt files.
+                        cell2file(fid,DataFile,'EndOfLine','\r\n');
+                        fclose(fid);
+                        cd(oldPath)
+                        obj.InfoMessage = '         - .txt file has been created';
                     end
-                    
                 end
                 
-                
             end
-            
             obj.InfoMessage = '   - Saving data complete';
+        end
 
-        end
-        
-        function showPicProcessedGUI(obj,axesPicAnalyze,axesResults)
-            % Copys the boundarie objects from the axes in
-            % the analyze GUI and paste them into the results GUI.
-            %
-            %   showPicProcessedGUI(obj,axesPicAnalyze,axesResults);
-            %
-            %   ARGUMENTS:
-            %
-            %       - Input
-            %           obj:            Handle to modelResults object.
-            %           axesPicAnalyze: Handle to axes with image in
-            %               analyze GUI.
-            %           axesResults:    Handle to axes in result GUI.
-            %
-            
-            %make axes results the current axes
-            axes(axesResults);
-            
-            %show RGB image in GUI
-            imshow(ones(size(obj.PicRGB)));
-            obj.InfoMessage = '      - load image processed into GUI...';
-            
-            %copy boundaries from analyze to result GUI.
-            copyobj(axesPicAnalyze.Children ,axesResults);
-            axes(axesResults);
-            hold on
-            obj.InfoMessage = '         - show labels...';
-            
-            %plot labels in the image
-            for k = 1:size(obj.Stats,1)
-                hold on
-                c = obj.Stats(k).Centroid;
-                text(c(1), c(2), sprintf('%d', k),'Color','y', ...
-                    'HorizontalAlignment', 'center', ...
-                    'VerticalAlignment', 'middle');
-            end
-            hold off
-            
-            
-        end
-        
         function delete(obj)
             %deconstructor
         end

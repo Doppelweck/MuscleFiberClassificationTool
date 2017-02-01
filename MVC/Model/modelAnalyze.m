@@ -144,6 +144,8 @@ classdef modelAnalyze < handle
                 % label all objects in the binary mask
                 obj.labelingObjects();
                 
+                obj.calculateDiameters();
+                
                 % calculate roundness for each fiber objects
                 obj.calculateRoundness();
                 
@@ -264,6 +266,53 @@ classdef modelAnalyze < handle
                 % Roundenss. Normalized distance between Ratiomax and Ratiomin
                 obj.Stats(i).Roundness = 1 - (abs( Ratiomax -  Ratiomin))/max([Ratiomax  Ratiomin]);
             end
+        end
+        
+        function calculateDiameters(obj)
+%             [obj.Stats(:).minDia] = deal(0);
+%             [obj.Stats(:).maxDia] = deal(0);
+            
+            noObjects = size(obj.Stats,1);
+            tempPicBW = size(obj.LabelMat);
+            minDia =[];
+            maxDia = [];
+            
+%             figure(10)
+%             fig = imshow([]);
+            for i=1:1:noObjects
+                 tic;
+                % get oject for diameter measurment
+                BoundBox =   obj.Stats(i).BoundingBox;
+                t1(i) = toc;
+                % create image that contains current object
+                tempPicBW = obj.LabelMat==i;
+                tic;
+                [y origPos]= imcrop(tempPicBW,[BoundBox(1) BoundBox(2) BoundBox(3) BoundBox(4)]);
+                t2(i) = toc;
+                %extend y mat
+%                 lext = max(origPos);
+%                 yext = wextend(2,'zpd',uint8(y),lext);
+%                 yext = logical(yext);
+%                 figure(10);
+%                 h = imshow(y);
+                tic;
+                for j=0:1:180/5
+                    maskRot = imrotate(y,j*5,'nearest','loose');
+                    stats = regionprops(maskRot,'BoundingBox');
+%                     h.CData = maskRot;
+                    boundBox = stats.BoundingBox;
+                    minDia(j+1)= min([boundBox(3) boundBox(4)]);
+                    maxDia(j+1)= max([boundBox(3) boundBox(4)]);
+%                     disp(j);
+                end
+                t3(i) = toc;
+            obj.Stats(i).MinorAxisLength = min(minDia);
+            obj.Stats(i).MajorAxisLength = max(minDia);
+            
+            percent = i/noObjects;
+            workbar(percent,'Please Wait...calculating diameters','Diameters');
+            end
+            
         end
         
         function calculateAspectRatio(obj)
@@ -395,7 +444,7 @@ classdef modelAnalyze < handle
                         Color = 'y';    
                     case 'Type 2ax'
                         Color = [255/255 165/255 0]; %orange
-                    case 'Type 1 2 hybrid'
+                    case 'Type 12h'
                         % Type 3
                         Color = 'm';
                     otherwise
@@ -507,7 +556,7 @@ classdef modelAnalyze < handle
                             if obj.Stats(i).ColorRatioBlueRed  < obj.BlueRedThresh/(1 - obj.BlueRedDistBlue)
                                 % Type 1 2 hybrid
                                 obj.Stats(i).FiberTypeMainGroup = 3;
-                                obj.Stats(i).FiberType = 'Type 1 2 hybrid';
+                                obj.Stats(i).FiberType = 'Type 12h';
                                 NoFibtype12h = NoFibtype12h+1;
                             else
                                 % Type 1 fiber
@@ -523,7 +572,7 @@ classdef modelAnalyze < handle
                             if obj.Stats(i).ColorRatioBlueRed  > obj.BlueRedThresh*(1 - obj.BlueRedDistRed)
                                 % Type 1 2 hybrid (magenta)
                                 obj.Stats(i).FiberTypeMainGroup = 3;
-                                obj.Stats(i).FiberType = 'Type 1 2 hybrid';
+                                obj.Stats(i).FiberType = 'Type 12h';
                                 NoFibtype12h = NoFibtype12h+1;
                             else
                                 % Type 2 fiber (red)
@@ -793,16 +842,32 @@ classdef modelAnalyze < handle
             %           evnt:   callback event data.
             %
             
-            if newFiberType == 4
-                % FIber-Type 0 (no Fiber) has the Value 4 in the pushup
-                % menu object
-                newFiberType = 0;
+            switch newFiberType %Fiber Type
+                case 1
+                    %Fiber Type 1 (blue)
+                    newFiberType = 'Type 1';
+                case 2
+                    %Fiber Type 12h (hybird fiber) (magenta)
+                    newFiberType = 'Type 12h';
+                case 3
+                    %Fiber Type 2x (red)
+                    newFiberType = 'Type 2x';
+                case 4
+                    %Fiber Type 2a (yellow)
+                    newFiberType = 'Type 2a';
+                case 5
+                    %Fiber Type 2ax (orange)
+                    newFiberType = 'Type 2ax'; 
+                case 6
+                    %Fiber Type 0 (white)
+                    newFiberType = 'undefined';
             end
+            
             
             %get old fiber type
             oldFiberType = obj.Stats(labelNo).FiberType;
             
-            if newFiberType == oldFiberType
+            if strcmp(newFiberType,oldFiberType)
                 % Fiber Type hasn't changed
             else
                 
@@ -818,15 +883,23 @@ classdef modelAnalyze < handle
                 
                 %select boundarie color depending on the new fiber type
                 switch newFiberType
-                    case 0
+                    case 'undefined'
+                        % Type 0
                         Color = 'w';
-                    case 1
+                    case 'Type 1'
                         Color = 'b';
-                    case 2
+                    case 'Type 2x'
                         Color = 'r';
-                    case 3
+                    case 'Type 2a'
+                        Color = 'y';    
+                    case 'Type 2ax'
+                        Color = [255/255 165/255 0]; %orange
+                    case 'Type 12h'
+                        % Type 3
                         Color = 'm';
                     otherwise
+                        % error
+                        Color = 'k';
                 end
                 
                 % change finer type
@@ -837,7 +910,7 @@ classdef modelAnalyze < handle
                 delete(htemp);
                 
                 % plot new boundarie
-                htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color,'LineWidth',0.1);
+                htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color,'LineWidth',2);
                 set(htemp,'Tag',['boundLabel ' num2str(labelNo)])
                 obj.InfoMessage = ['   - Fiber-Type object No. ' num2str(labelNo) ' changed by user'];
             end
@@ -943,14 +1016,14 @@ classdef modelAnalyze < handle
             %               Info{1}: Label
             %               Info{2}: Area
             %               Info{3}: AspectRatio
-            %               Info{4}: ColorValue
-            %               Info{5}: Roundness
-            %               Info{6}: BlueRed ratio
-            %               Info{7}: FarredRed ratio
-            %               Info{8}: mean Red
-            %               Info{9}: mean Green
-            %               Info{10}: mean Blue
-            %               Info{11}: mean Farred
+            %               Info{4}: Roundness
+            %               Info{5}: BlueRed ratio
+            %               Info{6}: FarredRed ratio
+            %               Info{7}: mean Red
+            %               Info{8}: mean Green
+            %               Info{9}: mean Blue
+            %               Info{10}: mean Farred
+            %               Info{11}: color Value
             %               Info{12}: FiberType
             %               Info{13}: Cropped image of fiber type
             %               Info{14}: Boundarie of object
@@ -977,14 +1050,14 @@ classdef modelAnalyze < handle
                     obj.FiberInfo{1} = num2str(Label);
                     obj.FiberInfo{2} = num2str(obj.Stats(Label).Area);
                     obj.FiberInfo{3} = num2str(obj.Stats(Label).AspectRatio);
-                    obj.FiberInfo{4} = num2str(obj.Stats(Label).ColorValue);
-                    obj.FiberInfo{5} = num2str(obj.Stats(Label).Roundness);
-                    obj.FiberInfo{6} = num2str(obj.Stats(Label).ColorRatioBlueRed);
-                    obj.FiberInfo{7} = num2str(obj.Stats(Label).ColorRatioFarredRed);
-                    obj.FiberInfo{8} = num2str(obj.Stats(Label).ColorRed);
-                    obj.FiberInfo{9} = num2str(obj.Stats(Label).ColorGreen);
-                    obj.FiberInfo{10} = num2str(obj.Stats(Label).ColorBlue);
-                    obj.FiberInfo{11} = num2str(obj.Stats(Label).ColorFarRed);
+                    obj.FiberInfo{4} = num2str(obj.Stats(Label).Roundness);
+                    obj.FiberInfo{5} = num2str(obj.Stats(Label).ColorRatioBlueRed);
+                    obj.FiberInfo{6} = num2str(obj.Stats(Label).ColorRatioFarredRed);
+                    obj.FiberInfo{7} = num2str(obj.Stats(Label).ColorRed);
+                    obj.FiberInfo{8} = num2str(obj.Stats(Label).ColorGreen);
+                    obj.FiberInfo{9} = num2str(obj.Stats(Label).ColorBlue);
+                    obj.FiberInfo{10} = num2str(obj.Stats(Label).ColorFarRed);
+                    obj.FiberInfo{11} = num2str(obj.Stats(Label).ColorValue);
                     obj.FiberInfo{12} = obj.Stats(Label).FiberType;
                     
                     obj.FiberInfo{13} = y;
