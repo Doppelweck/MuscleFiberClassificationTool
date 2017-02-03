@@ -61,8 +61,8 @@ classdef viewAnalyze < handle
         B_ColorValueActive; %Checkbox, select if color value parameter is used for classificaton.
         B_ColorValue; %TextEditBox, minimal allowed fiber color value (HSV).
         
-        B_XScale
-        B_YScale
+        B_XScale;
+        B_YScale;
         
         B_TextObjNo; %TextBox, shows label number of selected fiber in the fiber information panel.
         B_TextArea; %TextBox, shows area of selected fiber in the fiber information panel.
@@ -385,7 +385,7 @@ classdef viewAnalyze < handle
             obj.B_AxesInfo = axes('Parent',HBoxInfo7);
             axis image
             
-            set( VBoxMainInfoFiber, 'Heights', [-5 -5 -5 -5 -5 -5 -70], 'Spacing', 1 );
+            set( VBoxMainInfoFiber, 'Heights', [-6 -6 -6 -6 -6 -6 -64], 'Spacing', 1 );
 %             VBoxMainInfoFiber = uix.VBox('Parent', PanelFiberInformation);
 %             HBBoxInfoFiber = uix.HBox('Parent', VBoxMainInfoFiber);
 %             VButtonBoxleftFiber = uix.VButtonBox('Parent', HBBoxInfoFiber,'ButtonSize',[6000 50]);

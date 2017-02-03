@@ -78,6 +78,8 @@ classdef modelAnalyze < handle
         FarredRedDistFarred;
         FarredRedDistRed;
         
+        XScale; %Inicates the ?m/pixels in X direction to change values in micro meter
+        YScale; %Inicates the ?m/pixels in Y direction to change values in micro meter
         CalculationRunning; %Indicates if any caluclation is still running.
         
         Stats; % Data struct of all fiber objets.
@@ -211,6 +213,13 @@ classdef modelAnalyze < handle
             % calculate all region properties
             obj.Stats = regionprops('struct',obj.LabelMat,'Area','Perimeter','Centroid','BoundingBox','MajorAxisLength','MinorAxisLength','Solidity');
             
+            obj.InfoMessage = ['         - transform Area from pixel^2 in ' sprintf(' \x3BCm') '^2'];
+            obj.InfoMessage = ['            -XScale: ' num2str(obj.XScale) sprintf(' \x3BCm/pixel')];
+            obj.InfoMessage = ['            -YScale: ' num2str(obj.YScale) sprintf(' \x3BCm/pixel')];
+            for i=1:1:size(obj.Stats,1)
+                % save Boundaries in Stats Struct
+                obj.Stats(i).Area = obj.Stats(i).Area *obj.XScale *obj.YScale;
+            end
             % Add Field Boundarie to Stats Struct and set all Values to
             % zero
             [obj.Stats(:).Boundarie] = deal(0);
@@ -269,48 +278,67 @@ classdef modelAnalyze < handle
         end
         
         function calculateDiameters(obj)
-%             [obj.Stats(:).minDia] = deal(0);
-%             [obj.Stats(:).maxDia] = deal(0);
+            %             [obj.Stats(:).minDia] = deal(0);
+            %             [obj.Stats(:).maxDia] = deal(0);
             
             noObjects = size(obj.Stats,1);
-            tempPicBW = size(obj.LabelMat);
+%             tempPicBW = size(obj.LabelMat);
             minDia =[];
             maxDia = [];
             
-%             figure(10)
-%             fig = imshow([]);
-            for i=1:1:noObjects
-                 tic;
-                % get oject for diameter measurment
-                BoundBox =   obj.Stats(i).BoundingBox;
-                t1(i) = toc;
-                % create image that contains current object
-                tempPicBW = obj.LabelMat==i;
-                tic;
-                [y origPos]= imcrop(tempPicBW,[BoundBox(1) BoundBox(2) BoundBox(3) BoundBox(4)]);
-                t2(i) = toc;
-                %extend y mat
-%                 lext = max(origPos);
-%                 yext = wextend(2,'zpd',uint8(y),lext);
-%                 yext = logical(yext);
-%                 figure(10);
-%                 h = imshow(y);
-                tic;
-                for j=0:1:180/5
-                    maskRot = imrotate(y,j*5,'nearest','loose');
-                    stats = regionprops(maskRot,'BoundingBox');
-%                     h.CData = maskRot;
-                    boundBox = stats.BoundingBox;
-                    minDia(j+1)= min([boundBox(3) boundBox(4)]);
-                    maxDia(j+1)= max([boundBox(3) boundBox(4)]);
-%                     disp(j);
-                end
-                t3(i) = toc;
-            obj.Stats(i).MinorAxisLength = min(minDia);
-            obj.Stats(i).MajorAxisLength = max(minDia);
+            %             figure(10)
+            %             fig = imshow([]);
             
-            percent = i/noObjects;
-            workbar(percent,'Please Wait...calculating diameters','Diameters');
+            
+            % get oject for diameter measurment
+%             BoundBox =   obj.Stats(i).BoundingBox;
+%             
+%             % create image that contains current object
+%             tempPicBW = obj.LabelMat==i;
+%             tic;
+%             [y origPos]= imcrop(tempPicBW,[BoundBox(1) BoundBox(2) BoundBox(3) BoundBox(4)]);
+            
+            %                 ind = find(y);
+            %                 [yind,xind]=ind2sub(size(y),ind);
+            %                 v = cat(1,xind',yind');
+            %                 c=minBoundingBox(v);
+            
+            %                 figure(42);
+            %                 hold off,  imshow(y);
+            %                 hold on,   plot(c(1,[1:end 1]),c(2,[1:end 1]),'r');
+            
+            %extend y mat
+            %                 lext = max(origPos);
+            %                 yext = wextend(2,'zpd',uint8(y),lext);
+            %                 yext = logical(yext);
+            %                 figure(10);
+            %                 h = imshow(y);
+            %                 rectLine=[];
+            y = obj.LabelMat;
+            for j=0:1:180/5
+                
+                maskRot = imrotate(y,j*5,'nearest','loose');
+                stats = regionprops(y,'BoundingBox');
+                
+                for i=1:1:noObjects
+                    boundBox = stats(i).BoundingBox;
+                    minDia(i,j+1)= min([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
+                    maxDia(i,j+1)= max([boundBox(3)*obj.XScale boundBox(4*obj.YScale)]);
+%                     rectLine = rectangle('Position',[stats.BoundingBox],'EdgeColor','r','LineWidth',2);
+                end
+                
+                %             obj.Stats(i).MinorAxisLength = min(minDia);
+                %             obj.Stats(i).MajorAxisLength = max(minDia);
+                
+                percent = j/(180/5);
+                workbar(percent,'Please Wait...calculating diameters','Diameters');
+            end
+            
+            for k=1:1:noObjects
+                obj.Stats(k).MinorAxisLength = min(minDia(k,:));
+                obj.Stats(k).MajorAxisLength = max(maxDia(k,:));
+                percent = k/noObjects;
+                workbar(percent,'Please Wait...saving diameters','Find min and max Diameters');
             end
             
         end

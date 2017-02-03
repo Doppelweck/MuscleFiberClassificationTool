@@ -102,7 +102,7 @@ classdef viewEdit < handle
             set( mainPanelBox, 'Widths', [-4 -1] );
             set(obj.panelPicture,'Title','Picture');
             
-            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture));
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontSize',fontSizeM);
             axis image
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
@@ -308,28 +308,31 @@ classdef viewEdit < handle
             obj.B_AxesCheckPlaneGreen = axes('Parent',VBox3,'ActivePositionProperty','position');
             axis image
             imshow(Pics{5})
-            obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,1,'FontSize',fontSizeM);
+            String = {'Green Plane - Collagen' , 'Blue Plane - Type 1 fibers', 'Red Plane - Type 2x fibers', 'FarRed Plane - Type 2a fibers'};
+            obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3,'Style','popupmenu', 'String', String, 'Value' ,1,'FontSize',fontSizeM);
             set(VBox3,'Heights',[-10 -1])
             
             VBox4 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneBlue = axes('Parent',VBox4,'ActivePositionProperty','position');
             axis image
             imshow(Pics{6})
-            obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,2,'FontSize',fontSizeM);
+            String = {'Green Plane - Collagen' , 'Blue Plane - Type 1 fibers', 'Red Plane - Type 2x fibers', 'FarRed Plane - Type 2a fibers'};
+            obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4,'Style','popupmenu', 'String', String , 'Value' ,2,'FontSize',fontSizeM);
             set(VBox4,'Heights',[-10 -1])
             
             VBox5 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneRed = axes('Parent',VBox5,'ActivePositionProperty','position');
             axis image
             imshow(Pics{7})
-            obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,3,'FontSize',fontSizeM);
+            String = {'Green Plane - Collagen' , 'Blue Plane - Type 1 fibers', 'Red Plane - Type 2x fibers', 'FarRed Plane - Type 2a fibers'};
+            obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5,'Style','popupmenu', 'String', String , 'Value' ,3,'FontSize',fontSizeM);
             set(VBox5,'Heights',[-10 -1])
             
             VBox6 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
             obj.B_AxesCheckPlaneFarRed = axes('Parent',VBox6,'ActivePositionProperty','position');
             axis image
             imshow(Pics{8})
-            String = {'Green Plane - Collagen' , 'Blue Plane - Type 1 fibers', 'Red Plane - Type 2x fibers', 'FarRed Plane - Type 2a fibers'}
+            String = {'Green Plane - Collagen' , 'Blue Plane - Type 1 fibers', 'Red Plane - Type 2x fibers', 'FarRed Plane - Type 2a fibers'};
             obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6,'Style','popupmenu', 'String', String , 'Value' ,4,'FontSize',fontSizeM);
             set(VBox6,'Heights',[-10 -1])
             

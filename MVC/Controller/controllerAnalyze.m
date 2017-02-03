@@ -107,6 +107,8 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.ColorValueActive = obj.viewAnalyzeHandle.B_ColorValueActive.Value;
             obj.modelAnalyzeHandle.ColorValue = str2double(obj.viewAnalyzeHandle.B_ColorValue.String);
             
+            obj.modelAnalyzeHandle.XScale = str2double(obj.viewAnalyzeHandle.B_XScale.String);
+            obj.modelAnalyzeHandle.YScale = str2double(obj.viewAnalyzeHandle.B_YScale.String);
         end
         
         function addMyCallbacks(obj)
@@ -133,6 +135,7 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Callback',@obj.activeParaEvent);
             set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Callback',@obj.activeParaEvent);
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Callback',@obj.activeParaEvent);
+            
         end
         
         function addWindowCallbacks(obj)
@@ -184,6 +187,9 @@ classdef controllerAnalyze < handle
             addlistener(obj.viewAnalyzeHandle.B_FarredRedThresh,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','PostSet',@obj.valueUpdateEvent);
+            
+            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.activeParaEvent);
+            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.activeParaEvent);
             
             % listeners MODEL
             addlistener(obj.modelAnalyzeHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
@@ -446,7 +452,48 @@ classdef controllerAnalyze < handle
                     else
                         % Value is not numerical. Set value to 0
                         set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','0');
-                    end     
+                    end
+                    
+                case obj.viewAnalyzeHandle.B_XScale.Tag
+                    %XScale value has changed. Can only be between 0
+                    % and +Inf
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set XScale = 1
+                            set(obj.viewAnalyzeHandle.B_XScale,'String','1');
+                        elseif Value > Inf
+                            % If Value > 1 set XScale = 1
+                            set(obj.viewAnalyzeHandle.B_XScale,'String','1');
+                        else
+                            % Set XScale to Value
+                            set(obj.viewAnalyzeHandle.B_XScale,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 1
+                        set(obj.viewAnalyzeHandle.B_XScale,'String','1');
+                    end
+                    
+                case obj.viewAnalyzeHandle.B_YScale.Tag
+                    %YScale value has changed. Can only be between 0
+                    % and +Inf
+                    if isscalar(Value) && isreal(Value) && ~isnan(Value)
+                        % Value is numerical
+                        if Value < 0
+                            % If Value < 0 set YScale = 1
+                            set(obj.viewAnalyzeHandle.B_YScale,'String','1');
+                        elseif Value > Inf
+                            % If Value > 1 set YScale = 1
+                            set(obj.viewAnalyzeHandle.B_YScale,'String','1');
+                        else
+                            % Set YScale to Value
+                            set(obj.viewAnalyzeHandle.B_YScale,'String',num2str(Value));
+                        end
+                    else
+                        % Value is not numerical. Set value to 1
+                        set(obj.viewAnalyzeHandle.B_YScale,'String','1');
+                    end
+                    
                 otherwise
                     % Error Code
                     obj.modelAnalyzeHandle.InfoMessage = '! ERROR in valueUpdateEvent() FUNCTION !';
@@ -746,6 +793,8 @@ classdef controllerAnalyze < handle
                 obj.addWindowCallbacks()
             end
             
+            % Set all Vlaues form the GUI objects in the correspondending
+            % model properties.
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
@@ -771,6 +820,9 @@ classdef controllerAnalyze < handle
             
             obj.modelAnalyzeHandle.ColorValueActive = obj.viewAnalyzeHandle.B_ColorValueActive.Value;
             obj.modelAnalyzeHandle.ColorValue = str2double(obj.viewAnalyzeHandle.B_ColorValue.String);
+            
+            obj.modelAnalyzeHandle.XScale = str2double(obj.viewAnalyzeHandle.B_XScale.String);
+            obj.modelAnalyzeHandle.YScale = str2double(obj.viewAnalyzeHandle.B_YScale.String);
             
             % Disable all GUI buttons during classification
             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')

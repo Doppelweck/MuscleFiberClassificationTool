@@ -153,7 +153,7 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
-            set(obj.mainFigure,'ButtonDownFcn',@obj.startDragFcn);
+            set(obj.mainFigure,'ButtonDownFcn','');
             set(obj.mainFigure,'WindowButtonMotionFcn','');
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
         end
