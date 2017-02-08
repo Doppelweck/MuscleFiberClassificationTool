@@ -36,8 +36,9 @@ classdef modelEdit < handle
         
         FileName; %Filename of the selected file.
         PathName; %Directory path of the selected RGB image.
-        PicRGBFRPlanes;  %RGB image created from the color plane images red green blue and FarRed.
-        PicRGBPlanes; %RGB image created from the color plane images red green and blue.
+        PicRGBFRPlanes;  %RGB image created from the color plane images red green blue and FarRed after brightness correction.
+        PicRGBPlanes; %RGB image created from the color plane images red green and blue after brightness correction.
+        PicRGBFRPlanesNoBC; %RGB image created from the color plane images red green blue and FarRed without brightness correction.
         PicBW; %Binary image.
         handlePicRGB; %handle to RGB image.
         handlePicBW; %handle to binary image.
@@ -49,14 +50,22 @@ classdef modelEdit < handle
         PicPlaneBlue; %Blue identified color plane image.
         PicPlaneRed; %Red identified color plane image.
         PicPlaneFarRed; %Farred identified color plane image.
-        PicPlaneGreen_adj; %Green color plane image after brightness adjustment.
-        PicPlaneBlue_adj; %Blue color plane image after brightness adjustment.
-        PicPlaneRed_adj; %Red color plane image after brightness adjustment.
-        PicPlaneFarRed_adj; %Farred color plane image after brightness adjustment.
-        PicA4; %Brightness adjustment image for Blue color plane image.
-        PicL5; %Brightness adjustment image for Green color plane image.
-        PicTX; %Brightness adjustment image for Red color plane image.
-        PicY5; %Brightness adjustment image for FarRed color plane image.
+        PicPlaneGreen_adj; %Green color plane image after brightness adjustment. Used for classification.
+        PicPlaneBlue_adj; %Blue color plane image after brightness adjustment. Used for classification.
+        PicPlaneRed_adj; %Red color plane image after brightness adjustment. Used for classification.
+        PicPlaneFarRed_adj; %Farred color plane image after brightness adjustment. Used for classification.
+        PicPlaneGreen_BC; %Green color plane image after brightness adjustment, filtering and BackGround correction. Used for binarization only.
+        PicPlaneBlue_BC; %Blue color plane image after brightness adjustment, filtering and BackGround correction. Used for binarization only.
+        PicPlaneRed_BC; %Red color plane image after brightness adjustment, filtering and BackGround correction. Used for binarization only.
+        PicPlaneFarRed_BC; %Farred color plane image after brightness adjustment, filtering and BackGround correction. Used for binarization only.
+        PicBCBlue; %Brightness adjustment image for Blue color plane image.
+        PicBCGreen; %Brightness adjustment image for Green color plane image.
+        PicBCRed; %Brightness adjustment image for Red color plane image.
+        PicBCFarRed; %Brightness adjustment image for FarRed color plane image.
+        FilenameBCBlue; %FileName of the brightness adjustment image for Blue color plane image.
+        FilenameBCGreen; %FileName of the brightness adjustment image for Green color plane image.
+        FilenameBCRed; %FileName of the brightness adjustment image for Red color plane image.
+        FilenameBCFarRed; %FileName of the brightness adjustment image for FarRed color plane image.
         
         PicBWisInvert = 'false'; %Invert staus of binary image.
         
@@ -152,10 +161,10 @@ classdef modelEdit < handle
             obj.PicPlaneBlue_adj = [];
             obj.PicPlaneRed_adj = [];
             obj.PicPlaneFarRed_adj = [];
-            obj.PicA4 = [];
-            obj.PicL5 = [];
-            obj.PicTX = [];
-            obj.PicY5 = [];
+            obj.PicBCBlue = [];
+            obj.PicBCGreen = [];
+            obj.PicBCRed = [];
+            obj.PicBCFarRed = [];
             obj.PicBuffer = cell(1,obj.BufferSize);
             obj.PicBufferPointer = 1;
         end
@@ -187,6 +196,9 @@ classdef modelEdit < handle
             %               PicData{8}: farred plane image
             %               PicData{9}: RGB image create from color plane
             %               Red Green and Blue
+            %               PicData{10}: RGB image create from color plane
+            %               Red Green Blue and Farred without brightness
+            %               correction
             %               images
             %
             
@@ -207,6 +219,15 @@ classdef modelEdit < handle
             PicData{7} = obj.PicPlaneRed;
             PicData{8} = obj.PicPlaneFarRed;
             PicData{9} = obj.PicRGBPlanes;
+            PicData{10} = obj.PicRGBFRPlanesNoBC;
+            PicData{11} = obj.PicBCGreen;
+            PicData{12} = obj.FilenameBCGreen;
+            PicData{13} = obj.PicBCBlue;
+            PicData{14} = obj.FilenameBCBlue;
+            PicData{15} = obj.PicBCRed;
+            PicData{16} = obj.FilenameBCRed;
+            PicData{17} = obj.PicBCFarRed;
+            PicData{18} = obj.FilenameBCFarRed;
         end
         
         function success = searchBioformat(obj)
@@ -343,10 +364,6 @@ classdef modelEdit < handle
                     
                     %get ColorPlane Info from metaData
                     [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
-                    
-                    %get ColorPlane Info from metaData
-                    [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
-                    
                     
                     if size(ch_wave_name,2) ~= 3
                         
@@ -522,7 +539,7 @@ classdef modelEdit < handle
                 
             % Searching for brightness adjustment Pics
                 obj.InfoMessage = '   - searching for brightness adjustment images';
-                
+                regexp(ch_wave_name,'A4')
                 %Save currebt folder
                 currentFolder = pwd;
                 %go to the directory of the RGB image
@@ -531,51 +548,99 @@ classdef modelEdit < handle
                 %search for brightness adjustment images
                 [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
                 
-                FileNamePicA4 = dir(['A*' ext]);
-                FileNamePicL5 = dir(['L*' ext]);
-                FileNamePicTX = dir(['TX*' ext]);
-                FileNamePicY5 = dir(['Y*' ext]);
+                %find filenemes that started with the letter A for filter A
+                %images
+                filesA= dir(['A*' ext]);
+                filesAname = {filesA.name};
+                
+                %find filenemes that started with the letter L for filter L
+                %images
+                filesL= dir(['L*' ext]);
+                filesLname = {filesA.name};
+                
+                %find filenemes that started with the letter T for filter T
+                %images
+                filesT= dir(['T*' ext]);
+                filesTname = {filesA.name};
+                
+                %find filenemes that started with the letter Y for filter Y
+                %images
+                filesY= dir(['Y*' ext]);
+                filesYname = {filesA.name};
+                
+                if any(~cellfun(@isempty,regexp(ch_wave_name,'A[0-9]')))
+                    FN = regexp(filesAname,'A[0-9]');
+                    if any(~cellfun(@isempty,FN))
+                        name = filesAname{find(~cellfun(@isempty,FN))};
+                        FileNamePicBCBlue = dir(name);
+                    else
+                        FileNamePicBCBlue = [];
+                    end
+                elseif any(~cellfun(@isempty,regexp(ch_wave_name,'A[^0-9]')))
+                    FN = regexp(filesAname,'A[^0-9]');
+                    if any(~cellfun(@isempty,FN))
+                        name = filesAname{find(~cellfun(@isempty,FN))};
+                        FileNamePicBCBlue = dir(name);
+                    else
+                        FileNamePicBCBlue = [];
+                    end
+                    
+                else
+                    FileNamePicBCBlue = [];
+                end
+                
+                FileNamePicBCGreen = dir(['L*' ext]);
+                FileNamePicBCRed = dir(['TX*' ext]);
+                FileNamePicBCFarRed = dir(['Y*' ext]);
                 
                 cd(currentFolder);
                 
-                if ~isempty(FileNamePicA4)
+                if ~isempty(FileNamePicBCBlue)
                     %A4*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathName FileNamePicA4(1).name]);
-                    obj.PicA4 = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicA4(1).name ' were found'];
+                    readertemp = bfGetReader([obj.PathName FileNamePicBCBlue(1).name]);
+                    obj.PicBCBlue = bfGetPlane(readertemp,1);
+                    obj.FilenameBCBlue = FileNamePicBCBlue(1).name;
+                    obj.InfoMessage = ['      - ' FileNamePicBCBlue(1).name ' were found'];
                 else
                     obj.InfoMessage = ['      - A*' ext ' file were not found'];
-                    obj.PicA4 = [];
+                    obj.FilenameBCBlue = '-';
+                    obj.PicBCBlue = [];
                 end
                 
-                if ~isempty(FileNamePicL5)
+                if ~isempty(FileNamePicBCGreen)
                     %L5*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathName FileNamePicL5(1).name]);
-                    obj.PicL5 = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicL5(1).name ' were found'];
+                    readertemp = bfGetReader([obj.PathName FileNamePicBCGreen(1).name]);
+                    obj.PicBCGreen = bfGetPlane(readertemp,1);
+                    obj.FilenameBCGreen = FileNamePicBCGreen(1).name;
+                    obj.InfoMessage = ['      - ' FileNamePicBCGreen(1).name ' were found'];
                 else
                     obj.InfoMessage = ['      - L5*' ext ' file were not found'];
-                    obj.PicL5 = [];
+                    obj.FilenameBCGreen = '-';
+                    obj.PicBCGreen = [];
                 end
                 
-                if ~isempty(FileNamePicTX)
+                if ~isempty(FileNamePicBCRed)
                     %TX*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathName FileNamePicTX(1).name]);
-                    obj.PicTX = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicTX(1).name ' were found'];
+                    readertemp = bfGetReader([obj.PathName FileNamePicBCRed(1).name]);
+                    obj.PicBCRed = bfGetPlane(readertemp,1);
+                    obj.FilenameBCRed = FileNamePicBCRed(1).name;
+                    obj.InfoMessage = ['      - ' FileNamePicBCRed(1).name ' were found'];
                 else
                     obj.InfoMessage = ['      - TX*' ext ' file were not found'];
-                    obj.PicTX = [];
+                    obj.FilenameBCRed = '-';
+                    obj.PicBCRed = [];
                 end
                 
-                if ~isempty(FileNamePicY5)
+                if ~isempty(FileNamePicBCFarRed)
                     %Y5*.zvi brightness adjustment image were found
-                    readertemp = bfGetReader([obj.PathName FileNamePicY5(1).name]);
-                    obj.PicY5 = bfGetPlane(readertemp,1);
-                    obj.InfoMessage = ['      - ' FileNamePicY5(1).name ' were found'];
+                    readertemp = bfGetReader([obj.PathName FileNamePicBCFarRed(1).name]);
+                    obj.PicBCFarRed = bfGetPlane(readertemp,1);
+                    obj.FilenameBCFarRed = FileNamePicBCFarRed(1).name;
+                    obj.InfoMessage = ['      - ' FileNamePicBCFarRed(1).name ' were found'];
                 else
                     obj.InfoMessage = ['      - Y5*' ext ' file were not found'];
-                    obj.PicY5 = [];
+                    obj.FilenameBCFarRed = '-';
+                    obj.PicBCFarRed = [];
                 end
                 
                 cd(currentFolder);
@@ -589,10 +654,10 @@ classdef modelEdit < handle
         end
         
         function createRGBImages(obj)
-                tempR = obj.PicPlaneRed;
-                tempB = obj.PicPlaneBlue;
-                tempG = obj.PicPlaneGreen;
-                tempFR = obj.PicPlaneFarRed;
+                tempR = obj.PicPlaneRed_adj;
+                tempB = obj.PicPlaneBlue_adj;
+                tempG = obj.PicPlaneGreen_adj;
+                tempFR = obj.PicPlaneFarRed_adj;
             
                 tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
                 tempR3D(:,:,2) = double(1*ones(size(tempR))).*(double(tempR)/255);
@@ -613,7 +678,30 @@ classdef modelEdit < handle
                 obj.PicRGBFRPlanes = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
                 
                 obj.PicRGBPlanes = uint8(tempR3D + tempG3D + tempB3D );
-            
+                
+                % Create RGB image without brightness correction
+                tempR = obj.PicPlaneRed;
+                tempB = obj.PicPlaneBlue;
+                tempG = obj.PicPlaneGreen;
+                tempFR = obj.PicPlaneFarRed;
+                
+                tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,2) = double(1*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,3) = double(1*ones(size(tempR))).*(double(tempR)/255);
+                
+                tempG3D(:,:,1) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,3) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                
+                tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
+                tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
+                tempB3D(:,:,3) = double(255*ones(size(tempB))).*(double(tempB)/255);
+                
+                tempY3D(:,:,1) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+                tempY3D(:,:,2) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+                tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
+                
+                obj.PicRGBFRPlanesNoBC = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
         end
         
         function success = planeIdentifier(obj)
@@ -769,7 +857,10 @@ classdef modelEdit < handle
             % Perform a brightness correction with the brightness
             % adjustment images on the color plane pictures. If no brightness
             % adjustment images were found than the fuction performs the
-            % imadjust() function from the image processing toolbox.
+            % imadjust() function from the image processing toolbox. Trys
+            % to seperate the foreground from the background. Adjustment
+            % images will not be used for classification.
+            % 
             %
             %   brightnessAdjustment(obj)
             %
@@ -784,60 +875,124 @@ classdef modelEdit < handle
                 obj.InfoMessage = '   - pictures brightness adjustment canceled';
             else
                 %brightness adjustment PicPlaneGreen
-                if ~isempty(obj.PicL5)
+                if ~isempty(obj.PicBCGreen)
                     %Divide the color plane image through the adjustment image
-                    Mat1 = double(obj.PicPlaneGreen)./double(obj.PicL5);
-                    Mat1 = uint8(Mat1./max(max(Mat1)).*255);
-                    obj.PicPlaneGreen_adj = imadjust(Mat1);
+%                     Mat1 = double(obj.PicPlaneGreen)./double(obj.PicBCGreen);
+%                     Mat1 = uint8(Mat1./max(max(Mat1)).*255);
+%                     obj.PicPlaneGreen_adj = imadjust(Mat1);
                     obj.InfoMessage = '      - adjust green plane';
+                    
+%                     Pmax = max(max(obj.PicPlaneGreen));
+%                     Mat1 = double(obj.PicPlaneGreen)./double(obj.PicBCGreen);
+%                     Mat1max = max(max(Mat1)); 
+%                     Mat1 = (Mat1*double(Pmax));
+%                     obj.PicPlaneGreen_adj = uint8((Mat1));
+
+                      div = double(obj.PicBCGreen)/double(max(max(obj.PicBCGreen)));
+                      Mat1 = double(obj.PicPlaneGreen)./double(div);
+                      obj.PicPlaneGreen_adj = uint8(Mat1);
                 else
                     %no adjustment image were found
-                    obj.InfoMessage = '      - PicL5 not found';
-                    obj.PicPlaneGreen_adj = imadjust(obj.PicPlaneGreen);
+                    obj.InfoMessage = '      - PicBCGreen not found';
+                    obj.PicPlaneGreen_adj = obj.PicPlaneGreen;
                 end
                 
                 %brightness adjustment PicPlaneRed
-                if ~isempty(obj.PicTX)
+                if ~isempty(obj.PicBCRed)
                     %Divide the color plane image through the adjustment image
-                    Mat2 = double(obj.PicPlaneRed)./double(obj.PicTX);
-                    Mat2 = uint8(Mat2./max(max(Mat2)).*255);
-                    obj.PicPlaneRed_adj = imadjust(Mat2);
+%                     Mat2 = double(obj.PicPlaneRed)./double(obj.PicBCRed);
+%                     Mat2 = uint8(Mat2./max(max(Mat2)).*255);
+%                     obj.PicPlaneRed_adj = imadjust(Mat2);
                     obj.InfoMessage = '      - adjust red plane';
+                    
+%                     Pmax = max(max(obj.PicPlaneRed));
+%                     Mat1 = double(obj.PicPlaneRed)./double(obj.PicBCRed);
+%                     Mat1max = max(max(Mat1)); 
+%                     Mat1 = (Mat1*double(Pmax));
+%                     obj.PicPlaneRed_adj = uint8((Mat1));
+
+                      Psum = sum(sum(obj.PicPlaneRed));
+                      div = double(obj.PicBCRed)/double(max(max(obj.PicBCRed)));
+                      Mat1 = double(obj.PicPlaneRed)./double(div);
+                      SumMat = sum(sum(Mat1));
+                      factor = Psum/SumMat;
+                      Plane_adj = Mat1;
+                      obj.PicPlaneRed_adj = uint8(Mat1);
                 else
                     %no adjustment image were found
-                    obj.InfoMessage = '      - PicTX not found';
-                    obj.PicPlaneRed_adj = imadjust(obj.PicPlaneRed);
+                    obj.InfoMessage = '      - PicBCRed not found';
+                    obj.PicPlaneRed_adj = obj.PicPlaneRed;
                 end
                 
                 %brightness adjustment PicPlaneBlue
-                if ~isempty(obj.PicA4)
+                if ~isempty(obj.PicBCBlue)
                     %Divide the color plane image through the adjustment image
-                    Mat3 = double(obj.PicPlaneBlue)./double(obj.PicA4);
-                    Mat3 = uint8(Mat3./max(max(Mat3)).*255);
-                    obj.PicPlaneBlue_adj = imadjust(Mat3);
+%                     Mat3 = double(obj.PicPlaneBlue)./double(obj.PicBCBlue);
+%                     Mat3 = uint8(Mat3./max(max(Mat3)).*255);
+%                     obj.PicPlaneBlue_adj = imadjust(Mat3);
                     obj.InfoMessage = '      - adjust blue plane';
+                    
+%                     Pmax = max(max(obj.PicPlaneBlue));
+%                     Mat1 = double(obj.PicPlaneBlue)./double(obj.PicBCBlue);
+%                     Mat1max = max(max(Mat1)); 
+%                     Mat1 = (Mat1*double(Pmax));
+%                     obj.PicPlaneBlue_adj = uint8((Mat1));
+
+                      Psum = sum(sum(obj.PicPlaneBlue));
+                      div = double(obj.PicBCBlue)/double(max(max(obj.PicBCBlue)));
+                      Mat1 = double(obj.PicPlaneBlue)./double(div);
+                      SumMat = sum(sum(Mat1));
+                      factor = Psum/SumMat;
+                      Plane_adj = Mat1;
+                      obj.PicPlaneBlue_adj = uint8(Mat1);
                 else
                     %no adjustment image were found
-                    obj.InfoMessage = '      - PicA4 not found';
-                    obj.PicPlaneBlue_adj = imadjust(obj.PicPlaneBlue);
+                    obj.InfoMessage = '      - PicBCBlue not found';
+                    obj.PicPlaneBlue_adj = obj.PicPlaneBlue;
                 end
                 
                 %brightness adjustment PicPlaneFarRed
-                if ~isempty(obj.PicY5)
+                if ~isempty(obj.PicBCFarRed)
                     %Divide the color plane image through the adjustment image
-                    Mat4 = double(obj.PicPlaneFarRed)./double(obj.PicY5);
-                    Mat4 = uint8(Mat4./max(max(Mat4)).*255);
-                    obj.PicPlaneFarRed_adj = imadjust(Mat4);
+%                     Mat4 = double(obj.PicPlaneFarRed)./double(obj.PicBCFarRed);
+%                     Mat4 = uint8(Mat4./max(max(Mat4)).*255);
+%                     obj.PicPlaneFarRed_adj = imadjust(Mat4);
                     obj.InfoMessage = '      - adjust farred plane';
+                    
+%                     Pmax = max(max(obj.PicPlaneFarRed));
+%                     Mat1 = double(obj.PicPlaneFarRed)./double(obj.PicBCFarRed);
+%                     Mat1max = max(max(Mat1)); 
+%                     Mat1 = (Mat1*double(Pmax));
+%                     obj.PicPlaneFarRed_adj = uint8((Mat1));
+
+                    Psum = sum(sum(obj.PicPlaneFarRed));
+                      div = double(obj.PicBCFarRed)/double(max(max(obj.PicBCFarRed)));
+                      Mat1 = double(obj.PicPlaneFarRed)./double(div);
+                      SumMat = sum(sum(Mat1));
+                      factor = Psum/SumMat;
+                      Plane_adj = Mat1;
+                      obj.PicPlaneFarRed_adj = uint8(Mat1);
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicY4 not found';
-                    obj.PicPlaneFarRed_adj = imadjust(obj.PicPlaneFarRed);
+                    obj.PicPlaneFarRed_adj = obj.PicPlaneFarRed;
                 end
-                
-                
+
             end
             obj.InfoMessage = '   - brightness adjustment finished';
+        end
+        
+        function imagePreBinarization(obj)
+            % 
+            % 
+            %
+            %   brightnessAdjustment(obj)
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelEdit object
+            %
         end
         
         function createBinary(obj)
@@ -879,6 +1034,7 @@ classdef modelEdit < handle
                             
                         case 4 % Use automatic setup for binarization 
                             obj.autoSetupBinarization();
+                            obj.addToBuffer();
                             
                     end
                 else
@@ -906,6 +1062,7 @@ classdef modelEdit < handle
                             
                         case 4 % Use automatic setup for binarization     
                             obj.autoSetupBinarization();
+                            obj.addToBuffer();
                     end
                     
                 end
@@ -1337,7 +1494,7 @@ classdef modelEdit < handle
         function autoSetupBinarization(obj)
             obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
             obj.PicBWisInvert = 'false';
-            se = strel('disk',5);
+            se = strel('disk',4);
             imTopHatGreen = imtophat(obj.PicPlaneGreen_adj,se);
             imTopHatGreen = imadjust(imTopHatGreen);
             imCompGreen = imcomplement(obj.PicPlaneGreen_adj);

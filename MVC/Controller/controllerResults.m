@@ -163,7 +163,8 @@ classdef controllerResults < handle
             %               Data{23}: oFarredRedDistRed
             %               Data{24}: ColorValueActive
             %               Data{25}: ColorValue
-            %
+            %               Data{26}: XScale in ?m/pixel
+            %               Data{27}: YScale in ?m/pixel
             %           InfoText:   Info text log.
             %
             
@@ -201,6 +202,9 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle.ColorValueActive = Data{24};
             obj.modelResultsHandle.ColorValue = Data{25};
+            
+            obj.modelResultsHandle.XScale = Data{26};
+            obj.modelResultsHandle.YScale = Data{27};
 
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));

@@ -84,8 +84,8 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
-            obj.modelAnalyzeHandle.MinAreaPixel = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
-            obj.modelAnalyzeHandle.MaxAreaPixel = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
+            obj.modelAnalyzeHandle.MinArea = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
+            obj.modelAnalyzeHandle.MaxArea = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
             
             obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
             obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
@@ -188,8 +188,8 @@ classdef controllerAnalyze < handle
             addlistener(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'String','PostSet',@obj.valueUpdateEvent);
             addlistener(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','PostSet',@obj.valueUpdateEvent);
             
-            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.activeParaEvent);
-            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.activeParaEvent);
+            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.valueUpdateEvent);
+            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.valueUpdateEvent);
             
             % listeners MODEL
             addlistener(obj.modelAnalyzeHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
@@ -798,8 +798,8 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
-            obj.modelAnalyzeHandle.MinAreaPixel = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
-            obj.modelAnalyzeHandle.MaxAreaPixel = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
+            obj.modelAnalyzeHandle.MinArea = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
+            obj.modelAnalyzeHandle.MaxArea = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
             
             obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
             obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
@@ -850,8 +850,8 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
             set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
             set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
-
-            
+            set(obj.viewAnalyzeHandle.B_XScale,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_YScale,'Enable','off')
             
             % start the classification
             obj.modelAnalyzeHandle.startAnalysze();
@@ -889,20 +889,22 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
             end
-             if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
-            set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
+            if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
+                if obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value == 1
+                    set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
+                    set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
+                    set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
+                end
             end
-             end
             
             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
             if obj.viewAnalyzeHandle.B_ColorValueActive.Value == 1
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
-           
             end
+            
+            set(obj.viewAnalyzeHandle.B_XScale,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_YScale,'Enable','on')
         end
         
         function backEditModeEvent(obj,~,~)
@@ -1053,7 +1055,7 @@ classdef controllerAnalyze < handle
                         Color = 'y';    
                     case 'Type 2ax'
                         Color = [255/255 165/255 0]; %orange
-                    case 'Type 1 2 hybrid'
+                    case 'Type 12h'
                         % Type 3
                         Color = 'm';
                 otherwise

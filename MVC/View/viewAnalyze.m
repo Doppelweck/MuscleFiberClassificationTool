@@ -158,7 +158,7 @@ classdef viewAnalyze < handle
             obj.B_AreaActive = uicontrol( 'Parent', HButtonBoxPara21,'Style','checkbox','Value',1,'Tag','AreaActive');
             
             HButtonBoxPara22 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara22,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel from:' );
+            uicontrol( 'Parent', HButtonBoxPara22,'Style','text','FontSize',fontSizeM, 'String', ['Area in ' sprintf(' \x3BCm^2') ' from:'] );
             
             HButtonBoxPara23 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_MinArea = uicontrol( 'Parent', HButtonBoxPara23,'Style','edit','FontSize',fontSizeM,'Tag','MinAreaValue', 'String', '100' );
@@ -279,13 +279,13 @@ classdef viewAnalyze < handle
             HButtonBoxPara81 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
 %             ui = uibuttongroup('Parent', HButtonBoxPara81);
 %             t = text('Parent', ui,'Interpreter','LaTex','string','$\alpha_{0}$','FontSize',13)
-            uicontrol( 'Parent', HButtonBoxPara81,'Style','text','FontSize',fontSizeM, 'String',sprintf('X: \x3BCm/pixel'));
+            uicontrol( 'Parent', HButtonBoxPara81,'Style','text','FontSize',fontSizeM, 'String',sprintf('Xs: \x3BCm/pixel'));
             
             HButtonBoxPara82 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_XScale = uicontrol( 'Parent', HButtonBoxPara82,'Style','edit','FontSize',fontSizeM,'Tag','XScale', 'String', '1' );
             
             HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara83,'Style','text','FontSize',fontSizeM, 'String',sprintf('Y: \x3BCm/pixel') );
+            uicontrol( 'Parent', HButtonBoxPara83,'Style','text','FontSize',fontSizeM, 'String',sprintf('Ys: \x3BCm/pixel') );
             
             HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_YScale = uicontrol( 'Parent', HButtonBoxPara83,'Style','edit','FontSize',fontSizeM,'Tag','YScale', 'String', '1' );
@@ -306,7 +306,7 @@ classdef viewAnalyze < handle
             obj.B_TextObjNo = uicontrol( 'Parent', HButtonBoxInfo12,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
             
             HButtonBoxInfo13 = uix.HButtonBox('Parent', HBoxInfo1,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxInfo13,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel:' );
+            uicontrol( 'Parent', HButtonBoxInfo13,'Style','text','FontSize',fontSizeM, 'String', ['Area in ' sprintf(' \x3BCm^2') ':'] );
             
             HButtonBoxInfo14 = uix.HButtonBox('Parent', HBoxInfo1,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_TextArea = uicontrol( 'Parent', HButtonBoxInfo14,'Style','text','FontSize',fontSizeM, 'String', ' - ' );
@@ -492,7 +492,7 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Label No. :' );
             uicontrol( 'Parent', VButtonBoxleftValue,'Style','text','FontSize',fontSizeM, 'String', Info{1} );
             
-            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', 'Area in pixel :' );
+            uicontrol( 'Parent', VButtonBoxrightInfo,'Style','text','FontSize',fontSizeM, 'String', ['Area in ' sprintf(' \x3BCm^2') ' :'] );
             uicontrol( 'Parent', VButtonBoxrightValue,'Style','text','FontSize',fontSizeM, 'String', Info{2} );
             
             uicontrol( 'Parent', VButtonBoxleftInfo,'Style','text','FontSize',fontSizeM, 'String', 'Aspect Ratio :' );

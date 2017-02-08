@@ -303,11 +303,13 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                         
                     else
-                        %create RGB images
-                        obj.modelEditHandle.createRGBImages();
+                        
                         
                         %brightness adjustment of color plane images
                         obj.modelEditHandle.brightnessAdjustment();
+                        
+                        %create RGB images
+                        obj.modelEditHandle.createRGBImages();
                         
                         %reset invert status of binary pic
                         obj.modelEditHandle.PicBWisInvert = 'false';
@@ -403,11 +405,13 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                         
                 else
-                    %create RGB images
-                    obj.modelEditHandle.createRGBImages();
+                    
                 
                     %brightness adjustment of color plane images
                     obj.modelEditHandle.brightnessAdjustment();
+                    
+                    %create RGB images
+                    obj.modelEditHandle.createRGBImages();
                     
                     %reset invert status of binary pic
                     obj.modelEditHandle.PicBWisInvert = 'false';
@@ -586,9 +590,18 @@ classdef controllerEdit < handle
             PicData = obj.modelEditHandle.sendPicsToController();
             obj.viewEditHandle.checkPlanes(PicData);
             
-            % set Callbacks of the cancel and Ok button.
+            % set Callbacks of the cancel and Ok button color planes.
             set(obj.viewEditHandle.B_CheckPOK,'Callback',@obj.checkPlanesOKEvent);
             set(obj.viewEditHandle.B_CheckPBack,'Callback',@obj.checkPlanesBackEvent);
+            % set Callbacks of the brightness change buttons.
+            set(obj.viewEditHandle.B_SelectBrightImGreen,'Callback',@obj.selectNewBrightnessImage);
+            set(obj.viewEditHandle.B_SelectBrightImBlue,'Callback',@obj.selectNewBrightnessImage);
+            set(obj.viewEditHandle.B_SelectBrightImRed,'Callback',@obj.selectNewBrightnessImage);
+            set(obj.viewEditHandle.B_SelectBrightImFarRed,'Callback',@obj.selectNewBrightnessImage);
+            set(obj.viewEditHandle.B_DeleteBrightImGreen,'Callback',@obj.deleteBrightnessImage);
+            set(obj.viewEditHandle.B_DeleteBrightImBlue,'Callback',@obj.deleteBrightnessImage);
+            set(obj.viewEditHandle.B_DeleteBrightImRed,'Callback',@obj.deleteBrightnessImage);
+            set(obj.viewEditHandle.B_DeleteBrightImFarRed,'Callback',@obj.deleteBrightnessImage);
             % find the handle h of the checkplanes figure
             h = findobj('Tag','CheckPlanesFigure');
             % set the close request functio of the figure h
@@ -708,12 +721,12 @@ classdef controllerEdit < handle
                     obj.modelEditHandle.PicPlaneRed = temp{Values(3)};
                     obj.modelEditHandle.PicPlaneFarRed = temp{Values(4)};
                     
+                    %brightness adjustment of color plane image
+                    obj.modelEditHandle.brightnessAdjustment();
+                    
                     % Create Picture generated from Red Green and Blue
                     % Planes
                     obj.modelEditHandle.createRGBImages();
-                    
-                    %brightness adjustment of color plane image
-                    obj.modelEditHandle.brightnessAdjustment();
                     
                     %reset invert status of binary pic
                     obj.modelEditHandle.PicBWisInvert = 'false';
@@ -735,6 +748,11 @@ classdef controllerEdit < handle
                     obj.viewEditHandle.B_AxesCheckPlaneFarRed.Children.CData = obj.modelEditHandle.PicPlaneFarRed;
                     obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
                     obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+                    
+                    %show new color planes images in the brightness
+                    %correction tab
+                    obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
+                    obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                     
                     %reset the color popupmenus
                     obj.viewEditHandle.B_ColorPlaneGreen.Value = 1;
@@ -772,6 +790,234 @@ classdef controllerEdit < handle
             h = findobj('Tag','CheckPlanesFigure');
             delete(h);
             
+        end
+        
+        function selectNewBrightnessImage(obj,src,evnt)
+            
+            %Get file extension of the current bioformat file. Brightness
+            %adjusment images must have the same extension, that means that
+            %they must made with the same microscope.
+            [pathstr,name,BioExt] = fileparts(obj.modelEditHandle.FileName); 
+            
+            oldPath = pwd;
+            cd(obj.modelEditHandle.PathName)
+            
+            switch evnt.Source.Tag
+                
+                case obj.viewEditHandle.B_SelectBrightImGreen.Tag
+                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Green Plane','MultiSelect','off');
+                    
+                    if isequal(FileName ,0)
+                        %No file was selected
+                        createNew = 0;
+                    else
+                        data = bfopen([PathName FileName]);
+                        reader = bfGetReader([PathName FileName]);
+                        seriesCount = size(data, 1);
+                        NumberOfPlanes = size(data{1,1},1);
+                        
+                        if seriesCount == 1 && NumberOfPlanes == 1
+                            obj.modelEditHandle.PicBCGreen = bfGetPlane(reader,1);
+                            obj.modelEditHandle.FilenameBCGreen = FileName;
+                            createNew = 1;
+                        else
+                            obj.modelEditHandle.InfoMessage = '   - Error changing BC image';
+                            obj.modelEditHandle.InfoMessage = '   - image has more than 1 plane or series';
+                            createNew = 0;
+                        end
+                    end
+                    
+                case obj.viewEditHandle.B_SelectBrightImBlue.Tag
+                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Blue Plane','MultiSelect','off');
+                    
+                    if isequal(FileName ,0)
+                        %No file was selected
+                        createNew = 0;
+                    else
+                        data = bfopen([PathName FileName]);
+                        reader = bfGetReader([PathName FileName]);
+                        seriesCount = size(data, 1);
+                        NumberOfPlanes = size(data{1,1},1);
+                        
+                        if seriesCount == 1 && NumberOfPlanes == 1
+                            obj.modelEditHandle.PicBCBlue = bfGetPlane(reader,1);
+                            obj.modelEditHandle.FilenameBCBlue = FileName;
+                            createNew = 1;
+                        else
+                            obj.modelEditHandle.InfoMessage = '   - Error changing BC image';
+                            obj.modelEditHandle.InfoMessage = '   - image has more than 1 plane or series';
+                            createNew = 0;
+                        end
+                    end
+                    
+                case obj.viewEditHandle.B_SelectBrightImRed.Tag
+                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Red Plane','MultiSelect','off');
+                    
+                    if isequal(FileName ,0)
+                        %No file was selected
+                        createNew = 0;
+                    else
+                        data = bfopen([PathName FileName]);
+                        reader = bfGetReader([PathName FileName]);
+                        seriesCount = size(data, 1);
+                        NumberOfPlanes = size(data{1,1},1);
+                        
+                        if seriesCount == 1 && NumberOfPlanes == 1
+                            obj.modelEditHandle.PicBCRed = bfGetPlane(reader,1);
+                            obj.modelEditHandle.FilenameBCRed = FileName;
+                            createNew = 1;
+                        else
+                            obj.modelEditHandle.InfoMessage = '   - Error changing BC image';
+                            obj.modelEditHandle.InfoMessage = '   - image has more than 1 plane or series';
+                            createNew = 0;
+                        end
+                    end
+                    
+                case obj.viewEditHandle.B_SelectBrightImFarRed.Tag
+                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Farred Plane','MultiSelect','off');
+                    
+                    if isequal(FileName ,0)
+                        %No file was selected
+                        createNew = 0;
+                    else
+                        data = bfopen([PathName FileName]);
+                        reader = bfGetReader([PathName FileName]);
+                        seriesCount = size(data, 1);
+                        NumberOfPlanes = size(data{1,1},1);
+                        
+                        if seriesCount == 1 && NumberOfPlanes == 1
+                            obj.modelEditHandle.PicBCFarRed = bfGetPlane(reader,1);
+                            obj.modelEditHandle.FilenameBCFarRed = FileName;
+                            createNew = 1;
+                        else
+                            obj.modelEditHandle.InfoMessage = '   - Error changing BC image';
+                            obj.modelEditHandle.InfoMessage = '   - image has more than 1 plane or series';
+                            createNew = 0;
+                        end
+                    end
+                    
+                otherwise
+                   createNew = 0; 
+            end
+            
+            cd(oldPath);
+            
+            if createNew
+                %brightness adjustment of color plane image
+                obj.modelEditHandle.brightnessAdjustment();
+                
+                % Create Picture generated from Red Green and Blue
+                % Planes
+                obj.modelEditHandle.createRGBImages();
+                
+                %reset invert status of binary pic
+                obj.modelEditHandle.PicBWisInvert = 'false';
+                
+                %create binary pic
+                obj.modelEditHandle.createBinary();
+                
+                %reset pic buffer for undo redo functionality
+                obj.modelEditHandle.PicBuffer = {};
+                %load binary pic in the buffer
+                obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+                %reset buffer pointer
+                obj.modelEditHandle.PicBufferPointer = 1;
+                
+                obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
+                obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                imshow(obj.modelEditHandle.PicBCGreen);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                imshow(obj.modelEditHandle.PicBCBlue);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                imshow(obj.modelEditHandle.PicBCRed);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
+                imshow(obj.modelEditHandle.PicBCFarRed);
+                
+                obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
+                obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
+                obj.viewEditHandle.B_CurBrightImRed.String = obj.modelEditHandle.FilenameBCRed;
+                obj.viewEditHandle.B_CurBrightImFarRed.String = obj.modelEditHandle.FilenameBCFarRed;
+                
+                %show new images in the COlor Plane Tab
+                obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
+                obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+
+            end
+        end
+        
+        function deleteBrightnessImage(obj,src,evnt)
+            switch evnt.Source.Tag
+                
+                case obj.viewEditHandle.B_DeleteBrightImGreen.Tag
+                    
+                    obj.modelEditHandle.PicBCGreen = [];
+                    obj.modelEditHandle.FilenameBCGreen = '-';
+                    
+                case obj.viewEditHandle.B_DeleteBrightImBlue.Tag
+                    
+                    obj.modelEditHandle.PicBCBlue = [];
+                    obj.modelEditHandle.FilenameBCBlue = '-';
+                    
+                case obj.viewEditHandle.B_DeleteBrightImRed.Tag
+                    
+                    obj.modelEditHandle.PicBCRed = [];
+                    obj.modelEditHandle.FilenameBCRed = '-';
+                    
+                case obj.viewEditHandle.B_DeleteBrightImFarRed.Tag
+                    
+                    obj.modelEditHandle.PicBCFarRed = [];
+                    obj.modelEditHandle.FilenameBCFarRed = '-';
+                    
+                otherwise
+
+            end
+            %brightness adjustment of color plane image
+                obj.modelEditHandle.brightnessAdjustment();
+                
+                % Create Picture generated from Red Green and Blue
+                % Planes
+                obj.modelEditHandle.createRGBImages();
+                
+                %reset invert status of binary pic
+                obj.modelEditHandle.PicBWisInvert = 'false';
+                
+                %create binary pic
+                obj.modelEditHandle.createBinary();
+                
+                %reset pic buffer for undo redo functionality
+                obj.modelEditHandle.PicBuffer = {};
+                %load binary pic in the buffer
+                obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+                %reset buffer pointer
+                obj.modelEditHandle.PicBufferPointer = 1;
+                
+                obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
+                obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                imshow(obj.modelEditHandle.PicBCGreen);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                imshow(obj.modelEditHandle.PicBCBlue);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                imshow(obj.modelEditHandle.PicBCRed);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
+                imshow(obj.modelEditHandle.PicBCFarRed);
+                
+                obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
+                obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
+                obj.viewEditHandle.B_CurBrightImRed.String = obj.modelEditHandle.FilenameBCRed;
+                obj.viewEditHandle.B_CurBrightImFarRed.String = obj.modelEditHandle.FilenameBCFarRed;
+                
+                obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
+                obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
         end
         
         function thresholdModeEvent(obj,src,evnt)

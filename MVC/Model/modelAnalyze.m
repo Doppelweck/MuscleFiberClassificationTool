@@ -51,12 +51,14 @@ classdef modelAnalyze < handle
         PicInvertBW; %iInverted binary image. Used for labeling the objects.
         handleInfoAxes; %Handle to axes that is shown in the fiber information panel.
         oldValueMinArea; %Min area from previous calculation. If the value changed the objects must be labeled again.
+        oldValueXScale; %XScale from previous calculation. If the value changed the objects must be labeled again.
+        oldValueYScale; %XScale from previous calculation. If the value changed the objects must be labeled again.
         
         AnalyzeMode; %Indicates the selected analyze mode.
         
         AreaActive; %Indicates if Area parameter is used for classification.
-        MinAreaPixel; %Minimal allowed Area. Is used for classification. Smaller Objects will be removed from binary mask.
-        MaxAreaPixel; %Maximal allowed Area. Is used for classification. Larger Objects will be classified as Type 0.
+        MinArea; %Minimal allowed Area in ?m^2 based on th X and YScale factors. Is used for classification. Smaller Objects will be removed from binary mask.
+        MaxArea; %Maximal allowed Area in ?m^2 based on th X and YScale factors. Is used for classification. Larger Objects will be classified as Type 0.
         
         AspectRatioActive; %Indicates if AspectRatio parameter is used for classification.
         MinAspectRatio; %Minimal allowed AspectRatio. Is used for classification. Objects with smaller AspectRatio will be classified as Type 0.
@@ -78,8 +80,8 @@ classdef modelAnalyze < handle
         FarredRedDistFarred;
         FarredRedDistRed;
         
-        XScale; %Inicates the ?m/pixels in X direction to change values in micro meter
-        YScale; %Inicates the ?m/pixels in Y direction to change values in micro meter
+        XScale; %Inicates the um/pixels in X direction to change values in micro meter
+        YScale; %Inicates the um/pixels in Y direction to change values in micro meter
         CalculationRunning; %Indicates if any caluclation is still running.
         
         Stats; % Data struct of all fiber objets.
@@ -139,7 +141,8 @@ classdef modelAnalyze < handle
             
             obj.InfoMessage = '- start analyzing';
             
-            if isempty(obj.Stats) || ~isequal(obj.oldValueMinArea,obj.MinAreaPixel)
+            if isempty(obj.Stats) || ~isequal(obj.oldValueMinArea,obj.MinArea) ...
+                    || ~isequal(obj.oldValueXScale,obj.XScale) || ~isequal(obj.oldValueYScale,obj.YScale)
                 % Calculation runs the first time or changes at binary
                 % mask by user
                 
@@ -158,9 +161,10 @@ classdef modelAnalyze < handle
                 obj.calculatingFiberColor();
             else
                 obj.InfoMessage = '   - object labeling alreaey done';
-                obj.InfoMessage = '   - calculating Roundness alreaey done';
-                obj.InfoMessage = '   - calculating Aspect Ratio alreaey done';
-                obj.InfoMessage = '   - calculating Fiber Color alreaey done';
+                obj.InfoMessage = '   - calculating Diameters already done';
+                obj.InfoMessage = '   - calculating Roundness already done';
+                obj.InfoMessage = '   - calculating Aspect Ratio already done';
+                obj.InfoMessage = '   - calculating Fiber Color already done';
             end
             
             % classify all fiber objects
@@ -187,6 +191,9 @@ classdef modelAnalyze < handle
             %           obj:    Handle to modelAnalyze object
             %
             
+            obj.oldValueXScale = obj.XScale;
+            obj.oldValueYScale = obj.YScale;
+            
             obj.InfoMessage = '   - labeling objects...';
             
             obj.PicInvertBW = ~obj.PicBW;
@@ -197,10 +204,13 @@ classdef modelAnalyze < handle
             if obj.AreaActive
                 % Remove all objects that are smaller than the MinArea
                 % value
-                obj.InfoMessage = ['      - remove objects smaller than ' num2str(obj.MinAreaPixel) ' pixels'];
-                obj.oldValueMinArea = obj.MinAreaPixel;
+                obj.InfoMessage = ['      - remove objects smaller than ' num2str(obj.MinArea) ' ' sprintf(' \x3BCm') '^2'];
+                obj.oldValueMinArea = obj.MinArea;
                 
-                obj.PicInvertBW = bwareaopen(obj.PicInvertBW,obj.MinAreaPixel,4);
+                %convert area in ?m^2 to pixels. must be a positiv integer
+                AreaPixel = ceil(obj.MinArea/(obj.XScale*obj.YScale));
+                
+                obj.PicInvertBW = bwareaopen(obj.PicInvertBW,AreaPixel,4);
             else
                 % Remove single pixels
                 obj.PicInvertBW = bwareaopen(obj.PicInvertBW,1,4);
@@ -323,7 +333,7 @@ classdef modelAnalyze < handle
                 for i=1:1:noObjects
                     boundBox = stats(i).BoundingBox;
                     minDia(i,j+1)= min([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
-                    maxDia(i,j+1)= max([boundBox(3)*obj.XScale boundBox(4*obj.YScale)]);
+                    maxDia(i,j+1)= max([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
 %                     rectLine = rectangle('Position',[stats.BoundingBox],'EdgeColor','r','LineWidth',2);
                 end
                 
@@ -457,7 +467,7 @@ classdef modelAnalyze < handle
             delete(hBounds);
             
             nObjects = size(obj.Stats,1);
-            
+            hold on
             for i=1:1:nObjects
                 %select boundarie color for diffrent fiber types
                 switch obj.Stats(i).FiberType
@@ -480,21 +490,21 @@ classdef modelAnalyze < handle
                         Color = 'k';
                 end
                 
-                hold on
+                
                 
                 htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
                 % Tag every Boundarie Line Object with his own Label number
                 % to find them later for manipualtion
                 set(htemp,'Tag',['boundLabel ' num2str(i)])
                 
-                percent =   i/nObjects;
+                percent = i/nObjects;
                 if i == 1
                     % get workbar in foreground
                     pause(0.1)
                 end
                 workbar(percent,'Please Wait...ploting boundaries','Boundaries');
             end
-            
+            hold off
         end
         
         function specifyFiberType(obj)
@@ -535,7 +545,7 @@ classdef modelAnalyze < handle
 
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %%% Color-Based triple labeling
+            %%% Color-Based labeling
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 2
@@ -545,7 +555,7 @@ classdef modelAnalyze < handle
                 
                 for i=1:1:nObjects
                     
-                    if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxAreaPixel )
+                    if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
                         
                         % Object Area is to big. FiberType 0: No Fiber (white)
                         obj.Stats(i).FiberTypeMainGroup = 0;
@@ -793,7 +803,7 @@ classdef modelAnalyze < handle
                 
                 for i=1:1:nObjects
                     
-                    if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxAreaPixel )
+                    if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
                         
                         % Object Area is to big. FiberType 0: No Fiber (white)
                         obj.Stats(i).FiberType = 0;
@@ -989,6 +999,8 @@ classdef modelAnalyze < handle
             %               Data{23}: oFarredRedDistRed
             %               Data{24}: ColorValueActive
             %               Data{25}: ColorValue
+            %               Data{26}: XScale in ?m/pixel
+            %               Data{27}: YScale in ?m/pixel
             %               
             
             Data{1} = obj.FileName;
@@ -1001,8 +1013,8 @@ classdef modelAnalyze < handle
             % Analyze Parameter
             Data{7} = obj.AnalyzeMode;
             Data{8} = obj.AreaActive;
-            Data{9} = obj.MinAreaPixel;
-            Data{10} = obj.MaxAreaPixel;
+            Data{9} = obj.MinArea;
+            Data{10} = obj.MaxArea;
             
             Data{11} = obj.AspectRatioActive;
             Data{12} = obj.MinAspectRatio;
@@ -1023,6 +1035,9 @@ classdef modelAnalyze < handle
             
             Data{24} = obj.ColorValueActive;
             Data{25} = obj.ColorValue;
+            
+            Data{26} = obj.XScale;
+            Data{27} = obj.YScale;
             
         end
         

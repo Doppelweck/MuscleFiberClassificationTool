@@ -118,6 +118,9 @@ classdef modelResults < handle
         AreaMinMaxT2ax; %Vector, contains the [min max] area in pixel of Type 2ax fibers.
         AreaMinMaxObjT2ax; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2ax fibers.
         
+        XScale; %Inicates the um/pixels in X direction to change values in micro meter.
+        YScale; %Inicates the um/pixels in Y direction to change values in micro meter.
+        
         Stats; % Data struct of all fiber objets and all fiber datas
         
         StatsMatData; % Cell Array, Contains the data of all fiber objets that are shown in the object table in the GUI.
@@ -502,8 +505,8 @@ classdef modelResults < handle
             end
             
             % 3. and 4. Row
-            obj.StatisticMat{3,1} = 'Para min area:';
-            obj.StatisticMat{4,1} = 'Para max area:';
+            obj.StatisticMat{3,1} = sprintf('Para min area (\x3BCm^2):');
+            obj.StatisticMat{4,1} = sprintf('Para max area (\x3BCm^2):');
             if obj.AreaActive
                 obj.StatisticMat{3,2} =  obj.MinAreaPixel;
                 obj.StatisticMat{4,2} =  obj.MaxAreaPixel;
@@ -560,7 +563,7 @@ classdef modelResults < handle
             end
             
              % 14 Row
-            obj.StatisticMat{14,1} = 'Para min ColorValue';
+            obj.StatisticMat{14,1} = 'Para min ColorValue:';
             if obj.ColorValueActive
                 obj.StatisticMat{14,2} =  obj.ColorValue;
             else
@@ -568,142 +571,149 @@ classdef modelResults < handle
             end
             
             % 15 Row
-            obj.StatisticMat{15,1} = 'Number objects';
-            obj.StatisticMat{15,2} =  obj.NoOfObjects;
+            obj.StatisticMat{15,1} = sprintf('XScale in \x3BCm/pixel:');
+            obj.StatisticMat{15,2} =  obj.XScale;
             % 16 Row
-            obj.StatisticMat{16,1} = 'Number Type 1';
-            obj.StatisticMat{16,2} =  obj.NoTyp1;
+            obj.StatisticMat{16,1} = sprintf('XScale in \x3BCm/pixel:');
+            obj.StatisticMat{16,2} =  obj.YScale;
+            
             % 17 Row
-            obj.StatisticMat{17,1} = 'Number Type 12h';
-            obj.StatisticMat{17,2} =  obj.NoTyp12h;
+            obj.StatisticMat{17,1} = 'Number objects:';
+            obj.StatisticMat{17,2} =  obj.NoOfObjects;
             % 18 Row
-            obj.StatisticMat{18,1} = 'Number Type 2a';
-            obj.StatisticMat{18,2} =  obj.NoTyp2a;
+            obj.StatisticMat{18,1} = 'Number Type 1:';
+            obj.StatisticMat{18,2} =  obj.NoTyp1;
             % 19 Row
-            obj.StatisticMat{19,1} = 'Number Type 2x';
-            obj.StatisticMat{19,2} =  obj.NoTyp2x;
+            obj.StatisticMat{19,1} = 'Number Type 12h:';
+            obj.StatisticMat{19,2} =  obj.NoTyp12h;
             % 20 Row
-            obj.StatisticMat{20,1} = 'Number Type 2ax';
-            obj.StatisticMat{20,2} =  obj.NoTyp2ax;
+            obj.StatisticMat{20,1} = 'Number Type 2a:';
+            obj.StatisticMat{20,2} =  obj.NoTyp2a;
             % 21 Row
-            obj.StatisticMat{21,1} = 'Number undefined';
-            obj.StatisticMat{21,2} =  obj.NoTyp0;
-            
+            obj.StatisticMat{21,1} = 'Number Type 2x:';
+            obj.StatisticMat{21,2} =  obj.NoTyp2x;
             % 22 Row
-            obj.StatisticMat{22,1} = 'Area Type 1 (pixel):';
-            obj.StatisticMat{22,2} =  obj.AreaType1;
+            obj.StatisticMat{22,1} = 'Number Type 2ax:';
+            obj.StatisticMat{22,2} =  obj.NoTyp2ax;
             % 23 Row
-            obj.StatisticMat{23,1} = 'Area Type 12h (pixel):';
-            obj.StatisticMat{23,2} =  obj.AreaType12h;
+            obj.StatisticMat{23,1} = 'Number undefined:';
+            obj.StatisticMat{23,2} =  obj.NoTyp0;
+            
             % 24 Row
-            obj.StatisticMat{24,1} = 'Area Type 2a (pixel):';
-            obj.StatisticMat{24,2} =  obj.AreaType2a;
+            obj.StatisticMat{24,1} =  sprintf('Area Type 1 (\x3BCm^2):');
+            obj.StatisticMat{24,2} =  obj.AreaType1;
             % 25 Row
-            obj.StatisticMat{25,1} = 'Area Type 2x (pixel):';
-            obj.StatisticMat{25,2} =  obj.AreaType2x;
+            obj.StatisticMat{25,1} =  sprintf('Area Type 12h (\x3BCm^2):');
+            obj.StatisticMat{25,2} =  obj.AreaType12h;
             % 26 Row
-            obj.StatisticMat{26,1} = 'Area Type 2ax (pixel):';
-            obj.StatisticMat{26,2} =  obj.AreaType2ax;
+            obj.StatisticMat{26,1} =  sprintf('Area Type 2a (\x3BCm^2):');
+            obj.StatisticMat{26,2} =  obj.AreaType2a;
             % 27 Row
-            obj.StatisticMat{27,1} = 'Area Collagen (pixel):';
-            obj.StatisticMat{27,2} =  obj.AreaNoneObj;
-            
+            obj.StatisticMat{27,1} =  sprintf('Area Type 2x (\x3BCm^2):');
+            obj.StatisticMat{27,2} =  obj.AreaType2x;
             % 28 Row
-            obj.StatisticMat{28,1} = 'Area Type 1 (%):';
-            obj.StatisticMat{28,2} =  obj.AreaType1PC;
+            obj.StatisticMat{28,1} =  sprintf('Area Type 2ax (\x3BCm^2):');
+            obj.StatisticMat{28,2} =  obj.AreaType2ax;
             % 29 Row
-            obj.StatisticMat{29,1} = 'Area Type 12h (%):';
-            obj.StatisticMat{29,2} =  obj.AreaType12hPC;
+            obj.StatisticMat{29,1} = sprintf('Area Collagen (\x3BCm^2):');
+            obj.StatisticMat{29,2} =  obj.AreaNoneObj;
+            
             % 30 Row
-            obj.StatisticMat{30,1} = 'Area Type 2a (%):';
-            obj.StatisticMat{30,2} =  obj.AreaType2aPC;
+            obj.StatisticMat{30,1} = 'Area Type 1 (%):';
+            obj.StatisticMat{30,2} =  obj.AreaType1PC;
             % 31 Row
-            obj.StatisticMat{31,1} = 'Area Type 2x (%):';
-            obj.StatisticMat{31,2} =  obj.AreaType2xPC;
+            obj.StatisticMat{31,1} = 'Area Type 12h (%):';
+            obj.StatisticMat{31,2} =  obj.AreaType12hPC;
             % 32 Row
-            obj.StatisticMat{32,1} = 'Area Type 2ax (%):';
-            obj.StatisticMat{32,2} =  obj.AreaType2axPC;
+            obj.StatisticMat{32,1} = 'Area Type 2a (%):';
+            obj.StatisticMat{32,2} =  obj.AreaType2aPC;
             % 33 Row
-            obj.StatisticMat{33,1} = 'Area Collagen (%):';
-            obj.StatisticMat{33,2} =  obj.AreaNoneObjPC;
-            
+            obj.StatisticMat{33,1} = 'Area Type 2x (%):';
+            obj.StatisticMat{33,2} =  obj.AreaType2xPC;
             % 34 Row
-            obj.StatisticMat{34,1} = 'Smallest Area:';
-            obj.StatisticMat{34,2} =  obj.AreaMinMax(1);
+            obj.StatisticMat{34,1} = 'Area Type 2ax (%):';
+            obj.StatisticMat{34,2} =  obj.AreaType2axPC;
             % 35 Row
-            obj.StatisticMat{35,1} = 'Smallest Fiber:';
-            obj.StatisticMat{35,2} =  obj.AreaMinMaxObj(1);
+            obj.StatisticMat{35,1} = 'Area Collagen (%):';
+            obj.StatisticMat{35,2} =  obj.AreaNoneObjPC;
+            
             % 36 Row
-            obj.StatisticMat{36,1} = 'Largest Area:';
-            obj.StatisticMat{36,2} =  obj.AreaMinMax(2);
+            obj.StatisticMat{36,1} =  sprintf('Smallest Area (\x3BCm^2):');
+            obj.StatisticMat{36,2} =  obj.AreaMinMax(1);
             % 37 Row
-            obj.StatisticMat{37,1} = 'Largest Fiber:';
-            obj.StatisticMat{37,2} =  obj.AreaMinMaxObj(2);
-            
+            obj.StatisticMat{37,1} = 'Smallest Fiber:';
+            obj.StatisticMat{37,2} =  obj.AreaMinMaxObj(1);
             % 38 Row
-            obj.StatisticMat{38,1} = 'Smallest T1 Area:';
-            obj.StatisticMat{38,2} =  obj.AreaMinMaxT1(1);
+            obj.StatisticMat{38,1} =  sprintf('Largest Area (\x3BCm^2):');
+            obj.StatisticMat{38,2} =  obj.AreaMinMax(2);
             % 39 Row
-            obj.StatisticMat{39,1} = 'Smallest T1 Fiber:';
-            obj.StatisticMat{39,2} =  obj.AreaMinMaxObjT1(1);
+            obj.StatisticMat{39,1} = 'Largest Fiber:';
+            obj.StatisticMat{39,2} =  obj.AreaMinMaxObj(2);
+            
             % 40 Row
-            obj.StatisticMat{40,1} = 'Largest T1 Area:';
-            obj.StatisticMat{40,2} =  obj.AreaMinMaxT1(2);
+            obj.StatisticMat{40,1} = sprintf('Smallest Area T1 (\x3BCm^2):');
+            obj.StatisticMat{40,2} =  obj.AreaMinMaxT1(1);
             % 41 Row
-            obj.StatisticMat{41,1} = 'Largest T1 Fiber:';
-            obj.StatisticMat{41,2} =  obj.AreaMinMaxObjT1(2);
-            
+            obj.StatisticMat{41,1} = 'Smallest T1 Fiber:';
+            obj.StatisticMat{41,2} =  obj.AreaMinMaxObjT1(1);
             % 42 Row
-            obj.StatisticMat{42,1} = 'Smallest T12h Area:';
-            obj.StatisticMat{42,2} =  obj.AreaMinMaxT12h(1);
+            obj.StatisticMat{42,1} = sprintf('Largest Area T1 (\x3BCm^2):');
+            obj.StatisticMat{42,2} =  obj.AreaMinMaxT1(2);
             % 43 Row
-            obj.StatisticMat{43,1} = 'Smallest T12h Fiber:';
-            obj.StatisticMat{43,2} =  obj.AreaMinMaxObjT12h(1);
+            obj.StatisticMat{43,1} = 'Largest T1 Fiber:';
+            obj.StatisticMat{43,2} =  obj.AreaMinMaxObjT1(2);
+            
             % 44 Row
-            obj.StatisticMat{44,1} = 'Largest T12h Area:';
-            obj.StatisticMat{44,2} =  obj.AreaMinMaxT12h(2);
+            obj.StatisticMat{44,1} = sprintf('Smallest Area T12h (\x3BCm^2):');
+            obj.StatisticMat{44,2} =  obj.AreaMinMaxT12h(1);
             % 45 Row
-            obj.StatisticMat{45,1} = 'Largest T12h Fiber:';
-            obj.StatisticMat{45,2} =  obj.AreaMinMaxObjT12h(2);
-            
+            obj.StatisticMat{45,1} = 'Smallest T12h Fiber:';
+            obj.StatisticMat{45,2} =  obj.AreaMinMaxObjT12h(1);
             % 46 Row
-            obj.StatisticMat{46,1} = 'Smallest T2a Area:';
-            obj.StatisticMat{46,2} =  obj.AreaMinMaxT2a(1);
+            obj.StatisticMat{46,1} = sprintf('Largest Area T12h (\x3BCm^2):');
+            obj.StatisticMat{46,2} =  obj.AreaMinMaxT12h(2);
             % 47 Row
-            obj.StatisticMat{47,1} = 'Smallest T2a Fiber:';
-            obj.StatisticMat{47,2} =  obj.AreaMinMaxObjT2a(1);
+            obj.StatisticMat{47,1} = 'Largest T12h Fiber:';
+            obj.StatisticMat{47,2} =  obj.AreaMinMaxObjT12h(2);
+            
             % 48 Row
-            obj.StatisticMat{48,1} = 'Largest T2a Area:';
-            obj.StatisticMat{48,2} =  obj.AreaMinMaxT2a(2);
+            obj.StatisticMat{48,1} = sprintf('Smallest Area T2a (\x3BCm^2):');
+            obj.StatisticMat{48,2} =  obj.AreaMinMaxT2a(1);
             % 49 Row
-            obj.StatisticMat{49,1} = 'Largest T2a Fiber:';
-            obj.StatisticMat{49,2} =  obj.AreaMinMaxObjT2a(2);
-            
+            obj.StatisticMat{49,1} = 'Smallest T2a Fiber:';
+            obj.StatisticMat{49,2} =  obj.AreaMinMaxObjT2a(1);
             % 50 Row
-            obj.StatisticMat{50,1} = 'Smallest T2x Area:';
-            obj.StatisticMat{50,2} =  obj.AreaMinMaxT2x(1);
+            obj.StatisticMat{50,1} = sprintf('Largest Area T2a (\x3BCm^2):');
+            obj.StatisticMat{50,2} =  obj.AreaMinMaxT2a(2);
             % 51 Row
-            obj.StatisticMat{51,1} = 'Smallest T2x Fiber:';
-            obj.StatisticMat{51,2} =  obj.AreaMinMaxObjT2x(1);
-            % 52 Row
-            obj.StatisticMat{52,1} = 'Largest T2x Area:';
-            obj.StatisticMat{52,2} =  obj.AreaMinMaxT2x(2);
-            % 53 Row
-            obj.StatisticMat{53,1} = 'Largest T2x Fiber:';
-            obj.StatisticMat{53,2} =  obj.AreaMinMaxObjT2x(2);
+            obj.StatisticMat{51,1} = 'Largest T2a Fiber:';
+            obj.StatisticMat{51,2} =  obj.AreaMinMaxObjT2a(2);
             
+            % 52 Row
+            obj.StatisticMat{52,1} = sprintf('Smallest Area T2x (\x3BCm^2):');
+            obj.StatisticMat{52,2} =  obj.AreaMinMaxT2x(1);
+            % 53 Row
+            obj.StatisticMat{53,1} = 'Smallest T2x Fiber:';
+            obj.StatisticMat{53,2} =  obj.AreaMinMaxObjT2x(1);
             % 54 Row
-            obj.StatisticMat{54,1} = 'Smallest T2ax Area:';
-            obj.StatisticMat{54,2} =  obj.AreaMinMaxT2ax(1);
+            obj.StatisticMat{54,1} = sprintf('Largest Area T2x (\x3BCm^2):');
+            obj.StatisticMat{54,2} =  obj.AreaMinMaxT2x(2);
             % 55 Row
-            obj.StatisticMat{55,1} = 'Smallest T2ax Fiber:';
-            obj.StatisticMat{55,2} =  obj.AreaMinMaxObjT2ax(1);
+            obj.StatisticMat{55,1} = 'Largest T2x Fiber:';
+            obj.StatisticMat{55,2} =  obj.AreaMinMaxObjT2x(2);
+            
             % 56 Row
-            obj.StatisticMat{56,1} = 'Largest T2ax Area:';
-            obj.StatisticMat{56,2} =  obj.AreaMinMaxT2ax(2);
+            obj.StatisticMat{56,1} = sprintf('Smallest Area T2ax (\x3BCm^2):');
+            obj.StatisticMat{56,2} =  obj.AreaMinMaxT2ax(1);
             % 57 Row
-            obj.StatisticMat{57,1} = 'Largest T2ax Fiber:';
-            obj.StatisticMat{57,2} =  obj.AreaMinMaxObjT2ax(2);
+            obj.StatisticMat{57,1} = 'Smallest T2ax Fiber:';
+            obj.StatisticMat{57,2} =  obj.AreaMinMaxObjT2ax(1);
+            % 58 Row
+            obj.StatisticMat{58,1} = sprintf('Largest Area T2ax (\x3BCm^2):');
+            obj.StatisticMat{58,2} =  obj.AreaMinMaxT2ax(2);
+            % 59 Row
+            obj.StatisticMat{59,1} = 'Largest T2ax Fiber:';
+            obj.StatisticMat{59,2} =  obj.AreaMinMaxObjT2ax(2);
             
         end
         
@@ -909,8 +919,8 @@ classdef modelResults < handle
             if obj.SaveFiberTable
                 obj.InfoMessage = '      - creating Fiber-Type struct';
                 
-                Header = {'Label' 'Area' ...
-                    'XPos' 'YPos' 'MajorAxis' 'MinorAxis' 'Perimeter' 'Roundness' ...
+                Header = {'Label' sprintf('Area (\x3BCm^2)') ...
+                    'XPos (pixel)' 'YPos (pixel)' sprintf('MajorAxis (\x3BCm)') sprintf('MinorAxis (\x3BCm)') 'Perimeter (pixel)' 'Roundness' ...
                     'AspectRatio' 'ColorHue' 'ColorValue' 'meanRed' 'meanGreen' ...
                     'meanBlue' 'meanFarred' 'Blue/Red' 'Farred/Red'...
                     'FiberMainGroup' 'FiberType'};
