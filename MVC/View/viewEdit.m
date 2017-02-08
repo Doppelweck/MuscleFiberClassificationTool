@@ -319,7 +319,6 @@ classdef viewEdit < handle
             obj.B_AxesCheckRGBFRPlane = axes('Parent',VBox1ColorPlane,'ActivePositionProperty','position');
             axis image
             imshow(Pics{3})
-            
             uicontrol( 'Parent', VBox1ColorPlane,'Style','text', 'String', 'RGB Image generated from Red Green Blue and FarRed plane','FontSize',fontSizeM);
             set(VBox1ColorPlane,'Heights',[-10 -1])
             
@@ -386,19 +385,22 @@ classdef viewEdit < handle
             
             % Image befor brightness correction
             VBox1Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckRGB_noBC= axes('Parent',uicontainer('Parent', VBox1Brightness),'ActivePositionProperty','position');
+            obj.B_AxesCheckRGB_noBC= axes('Parent',VBox1Brightness,'ActivePositionProperty','position');
             imshow(Pics{10},[])
             axis image
-            uicontrol( 'Parent', VBox1Brightness,'Style','text', 'String', 'RGB Image befor brightness correction','FontSize',fontSizeM);
-            set(VBox1Brightness,'Heights',[-20 -1])
+            VButtonBox1 = uix.VButtonBox('Parent', VBox1Brightness,'ButtonSize',[2000 20]);
+            uicontrol( 'Parent', VButtonBox1,'Style','text', 'String', 'RGB Image befor brightness correction','FontSize',fontSizeM);
+%             uix.Empty( 'Parent', VButtonBox1 );
+            set(VBox1Brightness,'Heights',[-10 -1])
             
             % Image after brightness correction
             VBox2Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckRGB_BC = axes('Parent',uicontainer('Parent', VBox2Brightness),'ActivePositionProperty','position');
+            obj.B_AxesCheckRGB_BC = axes('Parent',VBox2Brightness,'ActivePositionProperty','position');
             imshow(Pics{3},[])
             axis image
-            uicontrol( 'Parent', VBox2Brightness,'Style','text', 'String', 'RGB Image after brightness correction','FontSize',fontSizeM);
-            set(VBox2Brightness,'Heights',[-20 -1])
+            VButtonBox2 = uix.VButtonBox('Parent', VBox2Brightness,'ButtonSize',[2000 20]);
+            uicontrol( 'Parent', VButtonBox2,'Style','text', 'String', 'RGB Image after brightness correction','FontSize',fontSizeM);
+            set(VBox2Brightness,'Heights',[-10 -1])
             
             % Brightness correction image for Green Plane
             VBox3Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
