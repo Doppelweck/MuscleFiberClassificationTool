@@ -368,12 +368,10 @@ classdef modelResults < handle
             % Find object with the smallest area
             obj.AreaMinMax(1) = min([obj.Stats.Area]);
             obj.AreaMinMaxObj(1) = find([obj.Stats.Area]==obj.AreaMinMax(1),1);
-            obj.InfoMessage = ['      - Fiber ' num2str(obj.AreaMinMaxObj(1)) ' has the smallest area with ' num2str(obj.AreaMinMax(1)) ' pixels'];
-            
+           
             % Find object with the largest area
             obj.AreaMinMax(2) = max([obj.Stats.Area]);
             obj.AreaMinMaxObj(2) = find([obj.Stats.Area]==obj.AreaMinMax(2),1);
-            obj.InfoMessage = ['      - Fiber ' num2str(obj.AreaMinMaxObj(2)) ' has the largest area with ' num2str(obj.AreaMinMax(2)) ' pixels'];
            
             % Find samlest and largest Fiber of each Type
             
@@ -552,7 +550,7 @@ classdef modelResults < handle
             obj.StatisticMat{11,1} = 'Para Farred/Red thresh:';
             obj.StatisticMat{12,1} = 'Para Farred dist:';
             obj.StatisticMat{13,1} = 'Para Red dist::';
-            if obj.BlueRedThreshActive
+            if obj.FarredRedThreshActive
                 obj.StatisticMat{11,2} =  obj.FarredRedThresh;
                 obj.StatisticMat{12,2} =  obj.FarredRedDistFarred;
                 obj.StatisticMat{13,2} =  obj.FarredRedDistRed;

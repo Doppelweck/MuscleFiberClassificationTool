@@ -445,20 +445,26 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.AreaType2axPC obj.modelResultsHandle.AreaType0PC ...
                 obj.modelResultsHandle.AreaNoneObjPC];
             
-            B(B==0) = 0.001; % Values of 0 cause an Error
+%             B(B==0) = 0.001; % Values of 0 cause an Error
             
             hPie = pie(B);
             
-            set(hPie(1),'facecolor',ColorMap(1,:));
-            set(hPie(3),'facecolor',ColorMap(2,:));
-            set(hPie(5),'facecolor',ColorMap(3,:));
-            set(hPie(7),'facecolor',ColorMap(4,:));
-            set(hPie(9),'facecolor',ColorMap(5,:));
-            set(hPie(11),'facecolor',ColorMap(6,:));
-            set(hPie(13),'facecolor',ColorMap(7,:));
+            No = length(B);
+            z =~(B == 0);
+            j = 1:2:2*No;
+            index = 0;
+            for i = 1:No
+                if(z(i) ~= 0)
+                    index = index +1;
+                    set(hPie(j(index)),'facecolor',ColorMap(i,:))
+                end
+            end
+            
+            StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
+            StringLegend(z==0)=[];
             
             title('Area of fiber types','FontSize',16)
-            l(2) = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen',...
+            l(2) = legend(StringLegend,...
                     'Location','Best');
             set(l(2),'Tag','LegendAreaPlot');
             
