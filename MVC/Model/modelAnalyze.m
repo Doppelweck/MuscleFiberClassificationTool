@@ -301,6 +301,11 @@ classdef modelAnalyze < handle
             %             [obj.Stats(:).minDia] = deal(0);
             %             [obj.Stats(:).maxDia] = deal(0);
             
+            obj.PicInvertBW = ~obj.PicBW;
+            
+            % Fill holes in the binary image
+            obj.PicInvertBW = imfill(obj.PicInvertBW,8,'holes');
+            
             noObjects = size(obj.Stats,1);
 %             tempPicBW = size(obj.LabelMat);
             minDia =[];
@@ -335,20 +340,26 @@ classdef modelAnalyze < handle
             %                 h = imshow(y);
             %                 rectLine=[];
             y = obj.LabelMat;
-            for j=0:1:180/5
+            angleStep = 5;
+            for j=0:1:180/angleStep
                 
-                maskRot = imrotate(y,j*5,'nearest','loose');
-                stats = regionprops(y,'BoundingBox');
+                maskRot = imrotate(y,j*angleStep,'nearest','loose');
+
+                stats = regionprops(maskRot,'BoundingBox');
+%                 figure()
+%                 imshow(maskRot)
                 
                 for i=1:1:noObjects
                     boundBox = stats(i).BoundingBox;
                     minDia(i,j+1)= min([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
                     maxDia(i,j+1)= max([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
-%                     rectLine = rectangle('Position',[stats.BoundingBox],'EdgeColor','r','LineWidth',2);
+                    
+                    
+%                     hold on 
+%                     rectLine = rectangle('Position',stats(i).BoundingBox,'EdgeColor','r','LineWidth',2);
                 end
                 
-                %             obj.Stats(i).MinorAxisLength = min(minDia);
-                %             obj.Stats(i).MajorAxisLength = max(minDia);
+                
                 
                 percent = j/(180/5);
                 workbar(percent,'Please Wait...calculating diameters','Diameters');

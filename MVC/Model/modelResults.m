@@ -743,8 +743,8 @@ classdef modelResults < handle
             [path,fileName,ext] = fileparts(obj.FileName);
             
             % Save dir is the same as the dir from the selected Pic
-            SaveDir = [obj.PathName obj.FileName '_RESULTS'];
-            obj.InfoMessage = ['   -' obj.PathName obj.FileName '_RESULTS'];
+            SaveDir = [obj.PathName fileName '_RESULTS'];
+            obj.InfoMessage = ['   -' obj.PathName fileName '_RESULTS'];
             
             % Check if reslut folder already exist.
             if exist( SaveDir ,'dir') == 7
@@ -761,7 +761,7 @@ classdef modelResults < handle
             end
             
             %Add folder with time and date in the main result folder.
-            SaveDir = fullfile(SaveDir,[obj.FileName '_RESULTS' time]);
+            SaveDir = fullfile(SaveDir,[fileName '_RESULTS' time]);
             mkdir(SaveDir);
             
             

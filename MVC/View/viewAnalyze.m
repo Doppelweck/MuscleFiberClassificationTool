@@ -111,7 +111,7 @@ classdef viewAnalyze < handle
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-80 -20] );
             
-            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture));
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture), 'FontSize',fontSizeM);
             axis image
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
