@@ -264,8 +264,9 @@ classdef controllerEdit < handle
             
             %select a new file
             format = obj.openNewFile();
-            
+            obj.busyIndicator(1);
             if strcmp(format,'image')
+                
                 %selecting a new image was successfully
                 
                 % clear info text log
@@ -505,7 +506,7 @@ classdef controllerEdit < handle
                 end
             end
             set(obj.viewEditHandle.B_NewPic,'Enable','on');
-             
+            obj.busyIndicator(0); 
         end
         
         function format = openNewFile(obj)
@@ -586,6 +587,8 @@ classdef controllerEdit < handle
             %       - Input
             %           obj:    Handle to controllerEdit object
             %
+            obj.busyIndicator(1);
+            
             obj.modelEditHandle.InfoMessage = '   - Checking planes opened';
             PicData = obj.modelEditHandle.sendPicsToController();
             obj.viewEditHandle.checkPlanes(PicData);
@@ -612,6 +615,8 @@ classdef controllerEdit < handle
             h = findobj('Tag','CheckPlanesFigure');
             % set the close request functio of the figure h
             set(h,'CloseRequestFcn',@obj.checkPlanesBackEvent);
+            
+            obj.busyIndicator(0);
         end
         
         function checkMaskEvent(obj,src,evnt)
@@ -626,6 +631,8 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
+            
+            obj.busyIndicator(1);
             
             if src.Value == 1
                 obj.modelEditHandle.InfoMessage = '   - check mask';
@@ -682,7 +689,7 @@ classdef controllerEdit < handle
                 obj.morphOpEvent();
             end
             
-            
+            obj.busyIndicator(0);
             
         end
         
@@ -699,6 +706,8 @@ classdef controllerEdit < handle
             %       - Input
             %           obj:    Handle to controllerEdit object
             %
+            
+            obj.busyIndicator(1);
             
             % get the values of the color popupmenus
             Values(1) = obj.viewEditHandle.B_ColorPlaneGreen.Value;
@@ -776,6 +785,9 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.InfoMessage = '      - No change was made';
                 
             end
+            
+            obj.busyIndicator(0);
+            
         end
         
         function checkPlanesBackEvent(obj,~,~)
@@ -791,9 +803,12 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
+            obj.busyIndicator(1);
+            
             obj.modelEditHandle.InfoMessage = '   - Checking planes closed';
             % find the handle h of the checkplanes figure
             h = findobj('Tag','CheckPlanesFigure');
+            obj.busyIndicator(0);
             delete(h);
             
         end
@@ -804,6 +819,8 @@ classdef controllerEdit < handle
             %adjusment images must have the same extension, that means that
             %they must made with the same microscope.
             [pathstr,name,BioExt] = fileparts(obj.modelEditHandle.FileName); 
+            
+            obj.busyIndicator(1);
             
             oldPath = pwd;
             cd(obj.modelEditHandle.PathName)
@@ -954,9 +971,15 @@ classdef controllerEdit < handle
                 obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
 
             end
+            
+            obj.busyIndicator(0);
+            
         end
         
         function deleteBrightnessImage(obj,src,evnt)
+            
+            obj.busyIndicator(1);
+            
             switch evnt.Source.Tag
                 
                 case obj.viewEditHandle.B_DeleteBrightImGreen.Tag
@@ -1024,9 +1047,15 @@ classdef controllerEdit < handle
                 
                 obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
                 obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+                
+                obj.busyIndicator(0);
+                
         end
         
         function calculateBrightnessImage(obj,src,evnt)
+            
+            obj.busyIndicator(1);
+            
             switch evnt.Source.Tag
                 
                 case obj.viewEditHandle.B_CreateBrightImGreen.Tag
@@ -1091,6 +1120,8 @@ classdef controllerEdit < handle
                 
                 obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
                 obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+                
+                obj.busyIndicator(0);
         end
         
         function thresholdModeEvent(obj,src,evnt)
@@ -1772,8 +1803,9 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
-            
+            obj.busyIndicator(1);
             obj.modelEditHandle.runMorphOperation();
+            obj.busyIndicator(0);
         end
         
         function startDragFcn(obj,~,~)
@@ -1958,11 +1990,15 @@ classdef controllerEdit < handle
             
             
             if status
+                %create indicator object and disable GUI elements
+                
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','watch');
                 %find all objects that are enabled and disable them
-                obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on','-and','-not','style','listbox');
+                obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+                    '-and','-not','style','listbox','-and','-not','style','text');
                 set( obj.modelEditHandle.busyObj, 'Enable', 'off')
+                
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1975,19 +2011,30 @@ classdef controllerEdit < handle
                     blackColor = java.awt.Color(0,0,0);
                     obj.modelEditHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(redColor, blackColor);
                 end
+                
                 obj.modelEditHandle.busyIndicator.setPaintsWhenStopped(false);  % default = false
                 obj.modelEditHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
                 javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelEditHandle.busyIndicator.start;
 
             else
+                %delete indicator object and disable GUI elements
+                
+                if ~isempty(obj.modelEditHandle.busyIndicator)
                 obj.modelEditHandle.busyIndicator.stop;
                 [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 delete(hContainer);
+                end
+                
                 obj.modelEditHandle.busyIndicator = [];
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
+                
+                if ~isempty(obj.modelEditHandle.busyObj)
+                    valid = isvalid(obj.modelEditHandle.busyObj);
+                    obj.modelEditHandle.busyObj(~valid)=[];
                 set( obj.modelEditHandle.busyObj, 'Enable', 'on')
+                end
             end
         end
         
@@ -2017,8 +2064,9 @@ classdef controllerEdit < handle
                     object_handles = findall(obj.mainFigure);
                     %delete objects
                     delete(object_handles);
-                    %delete main figure
-                    delete(obj.mainFigure);
+                    %find all figures and delete them
+                    figHandles = findobj('Type','figure');
+                    delete(figHandles);
                 case 'No'
                     obj.modelEditHandle.InfoMessage = '   - closing program canceled';
                 otherwise

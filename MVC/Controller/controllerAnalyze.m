@@ -793,6 +793,7 @@ classdef controllerAnalyze < handle
                 obj.addWindowCallbacks()
             end
             
+            obj.busyIndicator(1);
             % Set all Vlaues form the GUI objects in the correspondending
             % model properties.
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
@@ -859,7 +860,7 @@ classdef controllerAnalyze < handle
             %Set SavedStatus in results model to false if a new analyze
             %were running and clear old results data.
             obj.controllerResultsHandle.clearData();
-            
+            obj.busyIndicator(0);
             % Enable all GUI buttons
             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
@@ -905,6 +906,8 @@ classdef controllerAnalyze < handle
             
             set(obj.viewAnalyzeHandle.B_XScale,'Enable','on')
             set(obj.viewAnalyzeHandle.B_YScale,'Enable','on')
+            
+            
         end
         
         function backEditModeEvent(obj,~,~)
@@ -1104,6 +1107,7 @@ classdef controllerAnalyze < handle
                 Label = obj.modelAnalyzeHandle.LabelMat(PosOut(2),PosOut(1));
                 
                 if Label ~= 0
+                    obj.busyIndicator(1);
                     % If Label is zero than the click was on the background
                     % instead of a fiber object
                     
@@ -1136,6 +1140,7 @@ classdef controllerAnalyze < handle
                     set(obj.viewAnalyzeHandle.B_ManipulateOK,'Callback',@obj.manipulateFiberOKEvent);
                     set(obj.viewAnalyzeHandle.B_ManipulateCancel,'Callback',@obj.manipulateFiberCancelEvent);
                     set(obj.viewAnalyzeHandle.hFM,'closereq',@obj.manipulateFiberCancelEvent);
+                    obj.busyIndicator(0);
                 else
                 % click was on the background
                 % refresh Callback function in figure AnalyzeMode
@@ -1163,7 +1168,9 @@ classdef controllerAnalyze < handle
             LabelNumber = str2num( get(obj.viewAnalyzeHandle.B_TextObjNo, 'String') );
             
             %change fiber type
+            obj.busyIndicator(1);
             obj.modelAnalyzeHandle.manipulateFiberOK(NewFiberType, LabelNumber);
+            obj.busyIndicator(0);
             
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
             % If a window for Fibertype manipulation already exists,
@@ -1268,11 +1275,15 @@ classdef controllerAnalyze < handle
             
             
             if status
+                %create indicator object and disable GUI elements
+                
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','watch');
                 %find all objects that are enabled and disable them
-                obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on','-and','-not','style','listbox');
+                obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+                    '-and','-not','style','listbox','-and','-not','style','text');
                 set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
+                
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1285,19 +1296,30 @@ classdef controllerAnalyze < handle
                     blackColor = java.awt.Color(0,0,0);
                     obj.modelAnalyzeHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(redColor, blackColor);
                 end
+                
                 obj.modelAnalyzeHandle.busyIndicator.setPaintsWhenStopped(false);  % default = false
                 obj.modelAnalyzeHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
                 javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelAnalyzeHandle.busyIndicator.start;
 
             else
+                %delete indicator object and disable GUI elements
+                
+                if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
                 obj.modelAnalyzeHandle.busyIndicator.stop;
                 [hjObj, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 delete(hContainer) ;
+                end
+                
                 obj.modelAnalyzeHandle.busyIndicator = [];
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
+                
+                if ~isempty(obj.modelAnalyzeHandle.busyObj)
+                    valid = isvalid(obj.modelAnalyzeHandle.busyObj);
+                    obj.modelAnalyzeHandle.busyObj(~valid)=[];
                 set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
+                end
             end
         end
         
@@ -1326,8 +1348,9 @@ classdef controllerAnalyze < handle
                     object_handles = findall(obj.mainFigure);
                     %delete objects
                     delete(object_handles);
-                    %delete main figure
-                    delete(obj.mainFigure);
+                    %find all figures and delete them
+                    figHandles = findobj('Type','figure');
+                    delete(figHandles);
                 case 'No'
                     obj.modelAnalyzeHandle.InfoMessage = '   - closing program canceled';
                 otherwise

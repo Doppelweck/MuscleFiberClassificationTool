@@ -217,6 +217,8 @@ classdef controllerResults < handle
             %change the card panel to selection 3: results mode
             obj.mainCardPanel.Selection = 3;
             
+            obj.busyIndicator(1);
+            
             %change the figure callbacks for the results mode
             obj.addWindowCallbacks()
             
@@ -235,6 +237,8 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_Save,'Enable','on');
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
+            
+            obj.busyIndicator(0);
             
             %Check if a resultsfolder for the file already exist
             % Dlete file extension in the results folder before save
@@ -304,7 +308,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.SavePicRGBFRProcessed = obj.viewResultsHandle.B_SavePicRGBFRProc.Value;
             obj.modelResultsHandle.SavePicRGBProcessed = obj.viewResultsHandle.B_SavePicRGBProc.Value;
             
-            
+            obj.busyIndicator(1);
             if ( obj.modelResultsHandle.SaveFiberTable || ...
                  obj.modelResultsHandle.SaveScatterAll || ...
                  obj.modelResultsHandle.SavePlots || ...
@@ -330,6 +334,7 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.InfoMessage = '- no data is selected for saving';
                 obj.modelResultsHandle.InfoMessage = '- no data has been saved';
             end
+            obj.busyIndicator(0);
         end
         
         function showInfoInTableGUI(obj)
@@ -1116,11 +1121,15 @@ classdef controllerResults < handle
             
             
             if status
+                %create indicator object and disable GUI elements
+                
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','watch');
                 %find all objects that are enabled and disable them
-                obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on','-and','-not','style','listbox');
+                obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+                    '-and','-not','style','listbox','-and','-not','style','text');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
+                
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1133,19 +1142,30 @@ classdef controllerResults < handle
                     blackColor = java.awt.Color(0,0,0);
                     obj.modelResultsHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(redColor, blackColor);
                 end
+                
                 obj.modelResultsHandle.busyIndicator.setPaintsWhenStopped(false);  % default = false
                 obj.modelResultsHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
                 javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelResultsHandle.busyIndicator.start;
 
             else
+                %delete indicator object and disable GUI elements
+                
+                if ~isempty(obj.modelResultsHandle.busyIndicator)
                 obj.modelResultsHandle.busyIndicator.stop;
                 [hjObj, hContainer] = javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 delete(hContainer) ;
+                end
+                
                 obj.modelResultsHandle.busyIndicator = [];
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
+                
+                if ~isempty(obj.modelResultsHandle.busyObj)
+                    valid = isvalid(obj.modelResultsHandle.busyObj);
+                    obj.modelResultsHandle.busyObj(~valid)=[];
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
+                end
             end
         end
         
@@ -1175,8 +1195,9 @@ classdef controllerResults < handle
                     object_handles = findall(obj.mainFigure);
                     %delete objects
                     delete(object_handles);
-                    %delete main figure
-                    delete(obj.mainFigure);
+                    %find all figures and delete them
+                    figHandles = findobj('Type','figure');
+                    delete(figHandles);
                 case 'No'
                 obj.modelResultsHandle.InfoMessage = '   - closing program canceled';
                 otherwise
