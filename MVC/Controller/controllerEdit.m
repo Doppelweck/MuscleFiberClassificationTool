@@ -598,6 +598,12 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_SelectBrightImBlue,'Callback',@obj.selectNewBrightnessImage);
             set(obj.viewEditHandle.B_SelectBrightImRed,'Callback',@obj.selectNewBrightnessImage);
             set(obj.viewEditHandle.B_SelectBrightImFarRed,'Callback',@obj.selectNewBrightnessImage);
+            
+            set(obj.viewEditHandle.B_CreateBrightImGreen,'Callback',@obj.calculateBrightnessImage);
+            set(obj.viewEditHandle.B_CreateBrightImBlue,'Callback',@obj.calculateBrightnessImage);
+            set(obj.viewEditHandle.B_CreateBrightImRed,'Callback',@obj.calculateBrightnessImage);
+            set(obj.viewEditHandle.B_CreateBrightImFarRed,'Callback',@obj.calculateBrightnessImage);
+            
             set(obj.viewEditHandle.B_DeleteBrightImGreen,'Callback',@obj.deleteBrightnessImage);
             set(obj.viewEditHandle.B_DeleteBrightImBlue,'Callback',@obj.deleteBrightnessImage);
             set(obj.viewEditHandle.B_DeleteBrightImRed,'Callback',@obj.deleteBrightnessImage);
@@ -976,6 +982,73 @@ classdef controllerEdit < handle
                 otherwise
 
             end
+                %brightness adjustment of color plane image
+                obj.modelEditHandle.brightnessAdjustment();
+                
+                % Create Picture generated from Red Green and Blue
+                % Planes
+                obj.modelEditHandle.createRGBImages();
+                
+                %reset invert status of binary pic
+                obj.modelEditHandle.PicBWisInvert = 'false';
+                
+                %create binary pic
+                obj.modelEditHandle.createBinary();
+                
+                %reset pic buffer for undo redo functionality
+                obj.modelEditHandle.PicBuffer = {};
+                %load binary pic in the buffer
+                obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+                %reset buffer pointer
+                obj.modelEditHandle.PicBufferPointer = 1;
+                
+                obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
+                obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                imshow(obj.modelEditHandle.PicBCGreen);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                imshow(obj.modelEditHandle.PicBCBlue);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                imshow(obj.modelEditHandle.PicBCRed);
+                
+                axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
+                imshow(obj.modelEditHandle.PicBCFarRed);
+                
+                obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
+                obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
+                obj.viewEditHandle.B_CurBrightImRed.String = obj.modelEditHandle.FilenameBCRed;
+                obj.viewEditHandle.B_CurBrightImFarRed.String = obj.modelEditHandle.FilenameBCFarRed;
+                
+                obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
+                obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
+        end
+        
+        function calculateBrightnessImage(obj,src,evnt)
+            switch evnt.Source.Tag
+                
+                case obj.viewEditHandle.B_CreateBrightImGreen.Tag
+                    
+                    obj.modelEditHandle.calculateBackgroundIllumination('Green')
+
+                case obj.viewEditHandle.B_CreateBrightImBlue.Tag
+                    
+                    obj.modelEditHandle.calculateBackgroundIllumination('Blue')
+                    
+                case obj.viewEditHandle.B_CreateBrightImRed.Tag
+                    
+                    obj.modelEditHandle.calculateBackgroundIllumination('Red')
+                    
+                case obj.viewEditHandle.B_CreateBrightImFarRed.Tag
+                    
+                    obj.modelEditHandle.calculateBackgroundIllumination('Farred')
+                    
+                otherwise
+
+            end
+            
             %brightness adjustment of color plane image
                 obj.modelEditHandle.brightnessAdjustment();
                 
@@ -1878,6 +1951,44 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_InfoText, 'Value' , length(obj.viewEditHandle.B_InfoText.String));
             drawnow;
             pause(0.05)
+        end
+        
+        function busyIndicator(obj,status)
+            % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
+            
+            
+            if status
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','watch');
+                %find all objects that are enabled and disable them
+                obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on','-and','-not','style','listbox');
+                set( obj.modelEditHandle.busyObj, 'Enable', 'off')
+                try
+                    % R2010a and newer
+                    iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
+                    iconsSizeEnums = javaMethod('values',iconsClassName);
+                    SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
+                    obj.modelEditHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32, 'busy...');  % icon, label
+                catch
+                    % R2009b and earlier
+                    redColor   = java.awt.Color(1,0,0);
+                    blackColor = java.awt.Color(0,0,0);
+                    obj.modelEditHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(redColor, blackColor);
+                end
+                obj.modelEditHandle.busyIndicator.setPaintsWhenStopped(false);  % default = false
+                obj.modelEditHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
+                javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                obj.modelEditHandle.busyIndicator.start;
+
+            else
+                obj.modelEditHandle.busyIndicator.stop;
+                [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                delete(hContainer);
+                obj.modelEditHandle.busyIndicator = [];
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','arrow');
+                set( obj.modelEditHandle.busyObj, 'Enable', 'on')
+            end
         end
         
         function closeProgramEvent(obj,~,~)

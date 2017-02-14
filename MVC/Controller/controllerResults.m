@@ -1111,6 +1111,44 @@ classdef controllerResults < handle
             
         end
         
+        function busyIndicator(obj,status)
+            % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
+            
+            
+            if status
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','watch');
+                %find all objects that are enabled and disable them
+                obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on','-and','-not','style','listbox');
+                set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
+                try
+                    % R2010a and newer
+                    iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
+                    iconsSizeEnums = javaMethod('values',iconsClassName);
+                    SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
+                    obj.modelResultsHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32, 'busy...');  % icon, label
+                catch
+                    % R2009b and earlier
+                    redColor   = java.awt.Color(1,0,0);
+                    blackColor = java.awt.Color(0,0,0);
+                    obj.modelResultsHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(redColor, blackColor);
+                end
+                obj.modelResultsHandle.busyIndicator.setPaintsWhenStopped(false);  % default = false
+                obj.modelResultsHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
+                javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                obj.modelResultsHandle.busyIndicator.start;
+
+            else
+                obj.modelResultsHandle.busyIndicator.stop;
+                [hjObj, hContainer] = javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                delete(hContainer) ;
+                obj.modelResultsHandle.busyIndicator = [];
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','arrow');
+                set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
+            end
+        end
+        
         function closeProgramEvent(obj,~,~)
             % Colose Request function of the main figure and callback
             % function of the close button in the GUI.

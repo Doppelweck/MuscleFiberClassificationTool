@@ -103,6 +103,9 @@ classdef modelEdit < handle
         xValues; %Vector nx1 with interpolated x values for the line to draw the binary image. Used for hand draw functionality.
         yValues; %Vector nx1 with interpolated y values for the line to draw the binary image. Used for hand draw functionality.
         index; %Index vektor to draw the line in the binary image.
+        
+        busyIndicator; %Java object in the left bottom corner that shows whether the program is busy.
+        busyObj; %All objects that are enabled during the calculation.
     end
     properties(SetObservable)
         %Properties that are observed
@@ -190,10 +193,10 @@ classdef modelEdit < handle
             %               PicData{3}: RGB image create from color plane
             %               Red Green Far Red and Blue
             %               PicData{4}: binary image
-            %               PicData{5}: green plane image
-            %               PicData{6}: blue plane image
-            %               PicData{7}: red plane image
-            %               PicData{8}: farred plane image
+            %               PicData{5}: green plane image after brightness adjustment
+            %               PicData{6}: blue plane image after brightness adjustment
+            %               PicData{7}: red plane image after brightness adjustment
+            %               PicData{8}: farred plane image after brightness adjustment
             %               PicData{9}: RGB image create from color plane
             %               Red Green and Blue
             %               PicData{10}: RGB image create from color plane
@@ -214,10 +217,10 @@ classdef modelEdit < handle
                 PicData{4} = obj.handlePicBW.CData;
             end
             
-            PicData{5} = obj.PicPlaneGreen;
-            PicData{6} = obj.PicPlaneBlue;
-            PicData{7} = obj.PicPlaneRed;
-            PicData{8} = obj.PicPlaneFarRed;
+            PicData{5} = obj.PicPlaneGreen_adj;
+            PicData{6} = obj.PicPlaneBlue_adj;
+            PicData{7} = obj.PicPlaneRed_adj;
+            PicData{8} = obj.PicPlaneFarRed_adj;
             PicData{9} = obj.PicRGBPlanes;
             PicData{10} = obj.PicRGBFRPlanesNoBC;
             PicData{11} = obj.PicBCGreen;
@@ -876,18 +879,7 @@ classdef modelEdit < handle
             else
                 %brightness adjustment PicPlaneGreen
                 if ~isempty(obj.PicBCGreen)
-                    %Divide the color plane image through the adjustment image
-%                     Mat1 = double(obj.PicPlaneGreen)./double(obj.PicBCGreen);
-%                     Mat1 = uint8(Mat1./max(max(Mat1)).*255);
-%                     obj.PicPlaneGreen_adj = imadjust(Mat1);
                     obj.InfoMessage = '      - adjust green plane';
-                    
-%                     Pmax = max(max(obj.PicPlaneGreen));
-%                     Mat1 = double(obj.PicPlaneGreen)./double(obj.PicBCGreen);
-%                     Mat1max = max(max(Mat1)); 
-%                     Mat1 = (Mat1*double(Pmax));
-%                     obj.PicPlaneGreen_adj = uint8((Mat1));
-
                       div = double(obj.PicBCGreen)/double(max(max(obj.PicBCGreen)));
                       Mat1 = double(obj.PicPlaneGreen)./double(div);
                       obj.PicPlaneGreen_adj = uint8(Mat1);
@@ -899,51 +891,20 @@ classdef modelEdit < handle
                 
                 %brightness adjustment PicPlaneRed
                 if ~isempty(obj.PicBCRed)
-                    %Divide the color plane image through the adjustment image
-%                     Mat2 = double(obj.PicPlaneRed)./double(obj.PicBCRed);
-%                     Mat2 = uint8(Mat2./max(max(Mat2)).*255);
-%                     obj.PicPlaneRed_adj = imadjust(Mat2);
                     obj.InfoMessage = '      - adjust red plane';
-                    
-%                     Pmax = max(max(obj.PicPlaneRed));
-%                     Mat1 = double(obj.PicPlaneRed)./double(obj.PicBCRed);
-%                     Mat1max = max(max(Mat1)); 
-%                     Mat1 = (Mat1*double(Pmax));
-%                     obj.PicPlaneRed_adj = uint8((Mat1));
-
-                      Psum = sum(sum(obj.PicPlaneRed));
                       div = double(obj.PicBCRed)/double(max(max(obj.PicBCRed)));
                       Mat1 = double(obj.PicPlaneRed)./double(div);
-                      SumMat = sum(sum(Mat1));
-                      factor = Psum/SumMat;
-                      Plane_adj = Mat1;
                       obj.PicPlaneRed_adj = uint8(Mat1);
                 else
-                    %no adjustment image were found
                     obj.InfoMessage = '      - PicBCRed not found';
                     obj.PicPlaneRed_adj = obj.PicPlaneRed;
                 end
                 
                 %brightness adjustment PicPlaneBlue
                 if ~isempty(obj.PicBCBlue)
-                    %Divide the color plane image through the adjustment image
-%                     Mat3 = double(obj.PicPlaneBlue)./double(obj.PicBCBlue);
-%                     Mat3 = uint8(Mat3./max(max(Mat3)).*255);
-%                     obj.PicPlaneBlue_adj = imadjust(Mat3);
                     obj.InfoMessage = '      - adjust blue plane';
-                    
-%                     Pmax = max(max(obj.PicPlaneBlue));
-%                     Mat1 = double(obj.PicPlaneBlue)./double(obj.PicBCBlue);
-%                     Mat1max = max(max(Mat1)); 
-%                     Mat1 = (Mat1*double(Pmax));
-%                     obj.PicPlaneBlue_adj = uint8((Mat1));
-
-                      Psum = sum(sum(obj.PicPlaneBlue));
                       div = double(obj.PicBCBlue)/double(max(max(obj.PicBCBlue)));
                       Mat1 = double(obj.PicPlaneBlue)./double(div);
-                      SumMat = sum(sum(Mat1));
-                      factor = Psum/SumMat;
-                      Plane_adj = Mat1;
                       obj.PicPlaneBlue_adj = uint8(Mat1);
                 else
                     %no adjustment image were found
@@ -953,24 +914,9 @@ classdef modelEdit < handle
                 
                 %brightness adjustment PicPlaneFarRed
                 if ~isempty(obj.PicBCFarRed)
-                    %Divide the color plane image through the adjustment image
-%                     Mat4 = double(obj.PicPlaneFarRed)./double(obj.PicBCFarRed);
-%                     Mat4 = uint8(Mat4./max(max(Mat4)).*255);
-%                     obj.PicPlaneFarRed_adj = imadjust(Mat4);
                     obj.InfoMessage = '      - adjust farred plane';
-                    
-%                     Pmax = max(max(obj.PicPlaneFarRed));
-%                     Mat1 = double(obj.PicPlaneFarRed)./double(obj.PicBCFarRed);
-%                     Mat1max = max(max(Mat1)); 
-%                     Mat1 = (Mat1*double(Pmax));
-%                     obj.PicPlaneFarRed_adj = uint8((Mat1));
-
-                    Psum = sum(sum(obj.PicPlaneFarRed));
                       div = double(obj.PicBCFarRed)/double(max(max(obj.PicBCFarRed)));
                       Mat1 = double(obj.PicPlaneFarRed)./double(div);
-                      SumMat = sum(sum(Mat1));
-                      factor = Psum/SumMat;
-                      Plane_adj = Mat1;
                       obj.PicPlaneFarRed_adj = uint8(Mat1);
                 else
                     %no adjustment image were found
@@ -980,6 +926,149 @@ classdef modelEdit < handle
 
             end
             obj.InfoMessage = '   - brightness adjustment finished';
+        end
+        
+        function calculateBackgroundIllumination(obj,plane)
+            obj.controllerEditHandle.busyIndicator(1);
+            switch plane
+                
+                case 'Green'
+                    
+                    obj.InfoMessage = '      - create image for Green Plane adjustment';
+                    obj.InfoMessage = '         - try to calculate the background illumination';
+                    obj.InfoMessage = '            - determine mean area of fibers';
+                    %use green plane to get Area of fibers
+                    PlaneBW = imbinarize(obj.PicPlaneGreen,'adaptive','ForegroundPolarity','bright');
+                    PlaneBW = ~PlaneBW;
+                    PlaneBW = imfill(PlaneBW,8,'holes');
+                    stats = regionprops('struct',PlaneBW,'Area');
+                    %Sort area from small to large
+                    Area = [stats(:).Area];
+                    Area = sort(Area);
+                    %mean area  value of the biggest fibers
+                    workbar(1/4,'determine fiber radius... ','Background Calculation'); 
+                    AreaBig = Area(round(length(Area)*(2/3)):end);
+                    MeanArea = mean(AreaBig);
+                    obj.InfoMessage = '            - determine fiber radius';
+                    %radius of mean area
+                    radius = sqrt(MeanArea/pi);
+                    %double radius to be sure that the structering element
+                    %is bigger than the fibers
+                    radius=ceil(radius)*3;
+                    workbar(2/4,'calculate background profile... ','Background Calculation'); 
+                    obj.InfoMessage = '            - calculate background profile';
+                    background = imopen(obj.PicPlaneGreen,strel('disk',radius));
+                    h = fspecial('disk', radius);
+                    obj.InfoMessage = '            - smoothing background profile';
+                    workbar(3/4,'smoothing background profile... ','Background Calculation'); 
+                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    %Normalized Background to 1
+                    smoothedBackground = smoothedBackground/max(max(smoothedBackground));
+                    obj.PicBCGreen = smoothedBackground;
+                    obj.FilenameBCGreen = 'calculated from Green plane background';
+                    workbar(4/4,'save data ','Background Calculation'); 
+                    
+                case 'Blue'
+                    
+                    obj.InfoMessage = '      - create image for Blue Plane adjustment';
+                    obj.InfoMessage = '         - try to calculate the background illumination';
+                    obj.InfoMessage = '            - determine mean area of fibers';
+                    %use green plane to get Area of fibers
+                    PlaneBW = imbinarize(obj.PicPlaneGreen,'adaptive','ForegroundPolarity','bright');
+                    PlaneBW = ~PlaneBW;
+                    PlaneBW = imfill(PlaneBW,8,'holes');
+                    stats = regionprops('struct',PlaneBW,'Area');
+                    %Sort area from small to large
+                    Area = [stats(:).Area];
+                    Area = sort(Area);
+                    %mean area  value of the biggest fibers
+                    AreaBig = Area(round(length(Area)*(2/3)):end);
+                    MeanArea = mean(AreaBig);
+                    obj.InfoMessage = '            - determine fiber radius';
+                    %radius of mean area
+                    radius = sqrt(MeanArea/pi);
+                    %double radius to be sure that the structering element
+                    %is bigger than the fibers
+                    radius=ceil(radius)*3;
+                    obj.InfoMessage = '            - calculate background profile';
+                    background = imopen(obj.PicPlaneBlue,strel('disk',radius));
+                    h = fspecial('disk', radius);
+                    obj.InfoMessage = '            - smoothing background profile';
+                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    %Normalized Background to 1
+                    smoothedBackground = smoothedBackground/max(max(smoothedBackground));
+                    obj.PicBCBlue = smoothedBackground;
+                    obj.FilenameBCBlue = 'calculated from Blue plane background';
+                    
+                case 'Red'
+                    
+                    obj.InfoMessage = '      - create image for Red Plane adjustment';
+                    obj.InfoMessage = '         - try to calculate the background illumination';
+                    obj.InfoMessage = '            - determine mean area of fibers';
+                    %use green plane to get Area of fibers
+                    PlaneBW = imbinarize(obj.PicPlaneGreen,'adaptive','ForegroundPolarity','bright');
+                    PlaneBW = ~PlaneBW;
+                    PlaneBW = imfill(PlaneBW,8,'holes');
+                    stats = regionprops('struct',PlaneBW,'Area');
+                    %Sort area from small to large
+                    Area = [stats(:).Area];
+                    Area = sort(Area);
+                    %mean area  value of the biggest fibers
+                    AreaBig = Area(round(length(Area)*(2/3)):end);
+                    MeanArea = mean(AreaBig);
+                    obj.InfoMessage = '            - determine fiber radius';
+                    %radius of mean area
+                    radius = sqrt(MeanArea/pi);
+                    %double radius to be sure that the structering element
+                    %is bigger than the fibers
+                    radius=ceil(radius)*3;
+                    obj.InfoMessage = '            - calculate background profile';
+                    background = imopen(obj.PicPlaneRed,strel('disk',radius));
+                    h = fspecial('disk', radius);
+                    obj.InfoMessage = '            - smoothing background profile';
+                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    %Normalized Background to 1
+                    smoothedBackground = smoothedBackground/max(max(smoothedBackground));
+                    obj.PicBCRed = smoothedBackground;
+                    obj.FilenameBCRed = 'calculated from Red plane background';
+                    
+                case 'Farred'
+                    
+                    obj.InfoMessage = '      - create image for Farred Plane adjustment';
+                    obj.InfoMessage = '         - try to calculate the background illumination';
+                    obj.InfoMessage = '            - determine mean area of fibers';
+                    %use green plane to get Area of fibers
+                    PlaneBW = imbinarize(obj.PicPlaneGreen,'adaptive','ForegroundPolarity','bright');
+                    PlaneBW = ~PlaneBW;
+                    PlaneBW = imfill(PlaneBW,8,'holes');
+                    stats = regionprops('struct',PlaneBW,'Area');
+                    %Sort area from small to large
+                    Area = [stats(:).Area];
+                    Area = sort(Area);
+                    %mean area  value of the biggest fibers
+                    AreaBig = Area(round(length(Area)*(2/3)):end);
+                    MeanArea = mean(AreaBig);
+                    obj.InfoMessage = '            - determine fiber radius';
+                    %radius of mean area
+                    radius = sqrt(MeanArea/pi);
+                    %double radius to be sure that the structering element
+                    %is bigger than the fibers
+                    radius=ceil(radius)*3;
+                    obj.InfoMessage = '            - calculate background profile';
+                    background = imopen(obj.PicPlaneFarRed,strel('disk',radius));
+                    h = fspecial('disk', radius);
+                    obj.InfoMessage = '            - smoothing background profile';
+                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    %Normalized Background to 1
+                    smoothedBackground = smoothedBackground/max(max(smoothedBackground));
+                    obj.PicBCFarRed = smoothedBackground;
+                    obj.FilenameBCFarRed = 'calculated from Farred plane background';
+                      
+                otherwise %calculate all missing images
+                    disp('all missing');
+                    
+            end
+            obj.controllerEditHandle.busyIndicator(0);
         end
         
         function imagePreBinarization(obj)

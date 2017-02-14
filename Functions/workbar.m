@@ -84,6 +84,7 @@ end
 % If task completed, close figure and clear vars, then exit
 percentdone = floor(100*fractiondone);
 if percentdone == 100 % Task completed
+   
     delete(progfig) % Close progress bar
     clear progfig progpatch starttime lastupdate % Clear persistent vars
     return

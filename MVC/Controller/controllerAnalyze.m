@@ -526,7 +526,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
-                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
 %                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
 %                 obj.modelAnalyzeHandle.InfoMessage = '      - Colordistance-Based classification were selected';
@@ -1261,6 +1261,44 @@ classdef controllerAnalyze < handle
             
             obj.backEditModeEvent();
             obj.controllerEditHandle.newFileEvent();
+        end
+        
+        function busyIndicator(obj,status)
+            % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
+            
+            
+            if status
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','watch');
+                %find all objects that are enabled and disable them
+                obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on','-and','-not','style','listbox');
+                set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
+                try
+                    % R2010a and newer
+                    iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
+                    iconsSizeEnums = javaMethod('values',iconsClassName);
+                    SIZE_32x32 = iconsSizeEnums(2);  % (1) = 16x16,  (2) = 32x32
+                    obj.modelAnalyzeHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32, 'busy...');  % icon, label
+                catch
+                    % R2009b and earlier
+                    redColor   = java.awt.Color(1,0,0);
+                    blackColor = java.awt.Color(0,0,0);
+                    obj.modelAnalyzeHandle.busyIndicator = com.mathworks.widgets.BusyAffordance(redColor, blackColor);
+                end
+                obj.modelAnalyzeHandle.busyIndicator.setPaintsWhenStopped(false);  % default = false
+                obj.modelAnalyzeHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
+                javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                obj.modelAnalyzeHandle.busyIndicator.start;
+
+            else
+                obj.modelAnalyzeHandle.busyIndicator.stop;
+                [hjObj, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                delete(hContainer) ;
+                obj.modelAnalyzeHandle.busyIndicator = [];
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','arrow');
+                set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
+            end
         end
         
         function closeProgramEvent(obj,~,~)

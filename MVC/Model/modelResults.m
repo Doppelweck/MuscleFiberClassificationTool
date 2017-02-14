@@ -136,7 +136,8 @@ classdef modelResults < handle
         
         StatisticMat; % Contains the statistc data af the ruslts.
         
-        
+        busyIndicator; %Java object in the left bottom corner that shows whether the program is busy.
+        busyObj; %All objects that are enabled during the calculation.
     end
     
     properties(SetObservable)

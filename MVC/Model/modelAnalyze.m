@@ -86,6 +86,9 @@ classdef modelAnalyze < handle
         
         Stats; % Data struct of all fiber objets.
         
+        busyIndicator; %Java object in the left bottom corner that shows whether the program is busy.
+        busyObj; %All objects that are enabled during the calculation.
+        
     end
     
     properties(SetObservable)
@@ -121,7 +124,14 @@ classdef modelAnalyze < handle
             obj.FiberInfo{5} = '-';
             obj.FiberInfo{6} = '-';
             obj.FiberInfo{7} = '-';
-            obj.FiberInfo{8} = [];
+            obj.FiberInfo{8} = '-';
+            obj.FiberInfo{9} = '-';
+            obj.FiberInfo{10} = '-';
+            obj.FiberInfo{11} = '-';
+            obj.FiberInfo{12} = '-';
+            
+            obj.FiberInfo{13} = [];
+            obj.FiberInfo{14} = [];
         end
         
         function startAnalysze(obj)

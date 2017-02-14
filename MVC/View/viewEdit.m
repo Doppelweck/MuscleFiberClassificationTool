@@ -80,17 +80,25 @@ classdef viewEdit < handle
         B_AxesCheckBrightnessBlue
         B_AxesCheckBrightnessRed
         B_AxesCheckBrightnessFarRed
+        
         B_CurBrightImGreen
         B_SelectBrightImGreen
+        B_CreateBrightImGreen
         B_DeleteBrightImGreen
+        
         B_CurBrightImBlue
         B_SelectBrightImBlue
+        B_CreateBrightImBlue
         B_DeleteBrightImBlue
+        
         B_CurBrightImRed
         B_SelectBrightImRed
+        B_CreateBrightImRed
         B_DeleteBrightImRed
+        
         B_CurBrightImFarRed
         B_SelectBrightImFarRed
+        B_CreateBrightImFarRed
         B_DeleteBrightImFarRed
     end
     
@@ -412,6 +420,7 @@ classdef viewEdit < handle
             obj.B_CurBrightImGreen = uicontrol( 'Parent', HBox31Brightness,'Style','text', 'String', Pics{12},'FontSize',fontSizeM);
             HBox32Brightness = uix.HButtonBox('Parent',VBox3Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
             obj.B_SelectBrightImGreen = uicontrol( 'Parent', HBox32Brightness,'String', 'Select new image','FontSize',fontSizeM,'Tag','SelectBCGreen');
+            obj.B_CreateBrightImGreen = uicontrol( 'Parent', HBox32Brightness,'String', 'Create image','FontSize',fontSizeM,'Tag','CreateBCGreen');
             obj.B_DeleteBrightImGreen = uicontrol( 'Parent', HBox32Brightness,'String', 'delete image','FontSize',fontSizeM,'Tag','DeleteBCGreen');
             
             set(VBox3Brightness,'Heights',[-10 -1 -1])
@@ -426,6 +435,7 @@ classdef viewEdit < handle
             obj.B_CurBrightImBlue = uicontrol( 'Parent', HBox41Brightness,'Style','text', 'String', Pics{14},'FontSize',fontSizeM);
             HBox42Brightness = uix.HButtonBox('Parent',VBox4Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
             obj.B_SelectBrightImBlue = uicontrol( 'Parent', HBox42Brightness,'String', 'Select new image','FontSize',fontSizeM,'Tag','SelectBCBlue');
+            obj.B_CreateBrightImBlue = uicontrol( 'Parent', HBox42Brightness,'String', 'Create image','FontSize',fontSizeM,'Tag','CreateBCBlue');
             obj.B_DeleteBrightImBlue = uicontrol( 'Parent', HBox42Brightness,'String', 'delete image','FontSize',fontSizeM,'Tag','DeleteBCBlue');
             
             set(VBox4Brightness,'Heights',[-10 -1 -1])
@@ -440,6 +450,7 @@ classdef viewEdit < handle
             obj.B_CurBrightImRed = uicontrol( 'Parent', HBox51Brightness,'Style','text', 'String', Pics{16},'FontSize',fontSizeM);
             HBox52Brightness = uix.HButtonBox('Parent',VBox5Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
             obj.B_SelectBrightImRed = uicontrol( 'Parent', HBox52Brightness,'String', 'Select new image','FontSize',fontSizeM,'Tag','SelectBCRed');
+            obj.B_CreateBrightImRed = uicontrol( 'Parent', HBox52Brightness,'String', 'Create image','FontSize',fontSizeM,'Tag','CreateBCRed');
             obj.B_DeleteBrightImRed = uicontrol( 'Parent', HBox52Brightness,'String', 'delete image','FontSize',fontSizeM,'Tag','DeleteBCRed');
             
             set(VBox5Brightness,'Heights',[-10 -1 -1])
@@ -454,6 +465,7 @@ classdef viewEdit < handle
             obj.B_CurBrightImFarRed = uicontrol( 'Parent', HBox61Brightness,'Style','text', 'String', Pics{18},'FontSize',fontSizeM);
             HBox62Brightness = uix.HButtonBox('Parent',VBox6Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
             obj.B_SelectBrightImFarRed = uicontrol( 'Parent', HBox62Brightness,'String', 'Select new image','FontSize',fontSizeM,'Tag','SelectBCFarRed');
+            obj.B_CreateBrightImFarRed = uicontrol( 'Parent', HBox62Brightness,'String', 'Create image','FontSize',fontSizeM,'Tag','CreateBCFarRed');
             obj.B_DeleteBrightImFarRed = uicontrol( 'Parent', HBox62Brightness,'String', 'delete image','FontSize',fontSizeM,'Tag','DeleteBCFarRed');
             
             set(VBox6Brightness,'Heights',[-10 -1 -1])
