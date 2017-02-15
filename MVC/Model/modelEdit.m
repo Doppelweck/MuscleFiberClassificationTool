@@ -295,6 +295,7 @@ classdef modelEdit < handle
                         };
                 success = false;
                 
+                %show info message on gui
                 obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
             end
         end
@@ -926,6 +927,29 @@ classdef modelEdit < handle
 
             end
             obj.InfoMessage = '   - brightness adjustment finished';
+            
+            if isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed) || ...
+                    isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed)
+                
+                infotext = {'Info! ',...
+                    '',...
+                    'Not all brightness adjustment images were found.',...
+                    '',...
+                    'Go to the "Check planes" menu to verify the images:',...
+                    'The following options are available:',...
+                    '   - you can select new brightness images from',...
+                    '     your hard drive.',...
+                    '   - you can calculate new brightness images from the',... 
+                    '     background illumination.',...
+                    '   - you can delete incorrect or unnecessary images',...
+                    '',...
+                    'See MANUAL for more details.',...
+                        };
+                %show info message on gui
+                obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
+                
+            end
+            
         end
         
         function calculateBackgroundIllumination(obj,plane)
@@ -1581,6 +1605,8 @@ classdef modelEdit < handle
         end
         
         function autoSetupBinarization(obj)
+            obj.InfoMessage = '   - running auto setup binarization';
+            
             obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
             obj.PicBWisInvert = 'false';
             se = strel('disk',4);
@@ -1667,6 +1693,7 @@ classdef modelEdit < handle
             
             gradmag2 = imimposemin(gradmag, bgm | fgm4);
             
+            obj.InfoMessage = '      - run watershed transformation';
             L = watershed(gradmag2);
             
             I4 = obj.PicPlaneGreen_adj;
@@ -1696,6 +1723,7 @@ classdef modelEdit < handle
             obj.PicBW = obj.PicBW | f2;
             obj.handlePicBW.CData = obj.PicBW | f2;
             
+            obj.InfoMessage = '   - auto setup binarization completed';
             %             [x,y]=size(imTopHatGreen);
             %             X=1:x;
             %             Y=1:y;
