@@ -350,11 +350,10 @@ classdef modelAnalyze < handle
 %                 imshow(maskRot)
                 
                 for i=1:1:noObjects
+                    
                     boundBox = stats(i).BoundingBox;
                     minDia(i,j+1)= min([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
                     maxDia(i,j+1)= max([boundBox(3)*obj.XScale boundBox(4)*obj.YScale ]);
-                    
-                    
 %                     hold on 
 %                     rectLine = rectangle('Position',stats(i).BoundingBox,'EdgeColor','r','LineWidth',2);
                 end

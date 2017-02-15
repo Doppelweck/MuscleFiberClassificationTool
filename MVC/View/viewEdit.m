@@ -34,8 +34,8 @@ classdef viewEdit < handle
         B_Undo; %Button, to undo a change in the binary image.
         B_Redo; %Button, to redo a change in the binary image.
         B_NewPic; %Button, to select a new picture.
-        B_CheckPlanes;%Button, opens a new figure to check and change the image planes.
-        B_CheckMask;
+        B_CheckPlanes; %Button, opens a new figure to check and change the image planes.
+        B_CheckMask; %Button, shows all objects in RGB colors to check the binary mask.
         B_StartAnalyzeMode; %Button, close the EditMode and opens the the AnalyzeMode.
         
         B_Alpha; %Slider, to change the transperancy between the binary and the RGB picture.
@@ -133,14 +133,14 @@ classdef viewEdit < handle
             axis image
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
-            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 5,'Padding',5);
+            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 1,'Padding',1);
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelBinari = uix.Panel('Parent',PanelVBox,'Title','Binarization operations ','FontSize',fontSizeB,'Padding',2);
             PanelMorphOp = uix.Panel('Parent',PanelVBox,'Title','Morphological operations','FontSize',fontSizeB,'Padding',2);
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
             
-            set( PanelVBox, 'Heights', [-1 -1 -1 -1], 'Spacing', 5 );
+            set( PanelVBox, 'Heights', [-2 -3 -3 -4], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,7 +213,7 @@ classdef viewEdit < handle
             LineWidthText = uicontrol( 'Parent', HButtonBoxBinari41,'Style','text', 'FontSize',fontSizeM ,'String', 'LineWidth:');
             
             HButtonBoxBinari42 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_LineWidth = uicontrol( 'Parent', HButtonBoxBinari42,'Style','slider', 'String', 'LineWidth','Min',0,'Max',10,'SliderStep',[1/10,1/10],'Tag','sliderLinewidth' );
+            obj.B_LineWidth = uicontrol( 'Parent', HButtonBoxBinari42,'Style','slider', 'String', 'LineWidth','Min',0,'Max',20,'SliderStep',[1/20,1/20],'Tag','sliderLinewidth' );
             
             HButtonBoxBinari43 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_LineWidthValue = uicontrol( 'Parent', HButtonBoxBinari43,'Style','edit','FontSize',fontSizeM,'Tag','textLinewidth');
@@ -497,7 +497,7 @@ classdef viewEdit < handle
         
         function setToolTipStrings(obj)
             % Set all tooltip strings in the properties of the operationg
-            % elements that are shown in the GUI.
+            % elements that are shown in the main Edit GUI.
             %
             %   setToolTipStrings(obj);
             %
@@ -510,10 +510,13 @@ classdef viewEdit < handle
             
             RedoToolTip = sprintf('Redo binary image.');
             
-            NewPicToolTip = sprintf('Select a new image for further processing.');
+            NewPicToolTip = sprintf('Select a new file for further processing.');
             
             CheckPlanesToolTip = sprintf(['Opens a menue to check or change the color plane images: \n ',...
-                'Red, Green, Blue and Farred images']);
+                'Red, Green, Blue and Farred images.']);
+            
+            CheckMaskToolTip = sprintf(['Shows found objects in different RGB colors \n',...
+                'to check the mask for further segmentation.']);
             
             StartAnaModeToolTip = sprintf(['Starts image analyzing mode.']);
             
@@ -545,6 +548,7 @@ classdef viewEdit < handle
             set(obj.B_Redo,'tooltipstring',RedoToolTip);
             set(obj.B_NewPic,'tooltipstring',NewPicToolTip);
             set(obj.B_CheckPlanes,'tooltipstring',CheckPlanesToolTip);
+            set(obj.B_CheckMask,'tooltipstring',CheckMaskToolTip);
             set(obj.B_StartAnalyzeMode,'tooltipstring',StartAnaModeToolTip);
             
             set(obj.B_ThresholdMode,'tooltipstring',ThreshModeToolTip);
