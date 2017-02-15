@@ -639,6 +639,11 @@ classdef controllerEdit < handle
                 set(obj.mainFigure,'ButtonDownFcn','');
                 set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn','');
                 
+                
+                
+                obj.modelEditHandle.checkMask(src.Value);
+                obj.busyIndicator(0);
+                
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                 set(obj.viewEditHandle.B_NewPic,'Enable','off');
                 set(obj.viewEditHandle.B_Undo,'Enable','off');
@@ -648,16 +653,15 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                set(obj.viewEditHandle.B_LineWidth,'Enable','off');
+                set(obj.viewEditHandle.B_LineWidthValue,'Enable','off');
                 set(obj.viewEditHandle.B_Invert,'Enable','off');
                 set(obj.viewEditHandle.B_Color,'Enable','off');
                 set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
-                
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
-                
-                obj.modelEditHandle.checkMask(src.Value);
                 
             elseif src.Value == 0
                 
@@ -674,6 +678,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                set(obj.viewEditHandle.B_LineWidth,'Enable','on');
+                set(obj.viewEditHandle.B_LineWidthValue,'Enable','on');
                 if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                         obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                     %activate only if threshold is nessesary
@@ -687,9 +693,10 @@ classdef controllerEdit < handle
                 
                 % check wich morphOp buttons must be enabled
                 obj.morphOpEvent();
+                obj.busyIndicator(0);
             end
             
-            obj.busyIndicator(0);
+            
             
         end
         
@@ -1149,33 +1156,45 @@ classdef controllerEdit < handle
                 % Use manual global threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                
+                obj.busyIndicator(1);
+                
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Manual threshold mode has been selected';
                 obj.modelEditHandle.InfoMessage = '      - Use slider to change threshold';
                 
                 %Create binary image with threshold value in model
                 obj.modelEditHandle.createBinary();
+                obj.busyIndicator(0);
                 
             elseif Mode == 2
                 % Use automatic adaptive threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                
+                obj.busyIndicator(1);
+                
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Adaptive threshold mode has been selected';
                 
                 %Create binary image with threshold value in model
                 obj.modelEditHandle.createBinary();
+                obj.busyIndicator(0);
                 
             elseif Mode == 3
                 % Use automatic adaptive and manual global threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                
+                obj.busyIndicator(1);
+                
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Combined threshold has been selected';
                 obj.modelEditHandle.InfoMessage = '      - Use slider to change threshold';
                 
                 %Create binary image with threshold value in model
                 obj.modelEditHandle.createBinary();
+                obj.busyIndicator(0);
                 
             elseif Mode == 4
                 % Use Automatic setup for binarization
@@ -1196,12 +1215,14 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 
+                obj.busyIndicator(1);
+                
                 obj.modelEditHandle.ThresholdMode = Mode;
                 obj.modelEditHandle.InfoMessage = '      - Automatic setup has been selected';
                 
-                
-                %Create binary image with threshold value in model
+                %Create binary image 
                 obj.modelEditHandle.createBinary();
+                obj.busyIndicator(0);
                 
                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
