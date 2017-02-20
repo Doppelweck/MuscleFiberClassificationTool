@@ -918,18 +918,64 @@ classdef modelResults < handle
             if obj.SaveFiberTable
                 obj.InfoMessage = '      - creating Fiber-Type struct';
                 
+                %Get infos from the file name
+                [pathstr,name,ext] = fileparts(obj.FileName);
+                %split string into parts
+
+                strComp = strsplit(name,{' ','-','_'});
+                
+                %dialog input box parameter
+                prompt = {'Date','Animal code','Muscle code','Image number','Microscope magnification','treated/control'};
+                dlg_title = 'Completion of the Excel table';
+                num_lines = [1 100];
+                defaultans = {};
+                for i=1:1:size(prompt,2)
+                    if i <= size(strComp,2)
+                        defaultans{1,i}=strComp{1,i};
+                    else
+                        defaultans{1,i}='';
+                    end
+                end
+                options.Resize='on';
+                answer = inputdlg(prompt,dlg_title,num_lines,defaultans,options)';
+                
+                if isempty(answer)
+                    answer = cell(1,size(prompt,2));
+                end
+                
+                InfoAnimal = cell(size(obj.StatsMatData,1),size(prompt,2));
+                InfoAnimalT1 = cell(size(obj.StatsMatDataT1,1),size(prompt,2));
+                InfoAnimalT12h = cell(size(obj.StatsMatDataT12h,1),size(prompt,2));
+                InfoAnimalT2x = cell(size(obj.StatsMatDataT2x,1),size(prompt,2));
+                InfoAnimalT2a = cell(size(obj.StatsMatDataT2a,1),size(prompt,2));
+                InfoAnimalT2ax = cell(size(obj.StatsMatDataT2ax,1),size(prompt,2));
+
+                
+                for i=1:1:size(prompt,2)
+                    [InfoAnimal{:,i}] = deal(answer{1,i});
+                    [InfoAnimalT1{:,i}] = deal(answer{1,i});
+                    [InfoAnimalT12h{:,i}] = deal(answer{1,i});
+                    [InfoAnimalT2x{:,i}] = deal(answer{1,i});
+                    [InfoAnimalT2a{:,i}] = deal(answer{1,i});
+                    [InfoAnimalT2ax{:,i}] = deal(answer{1,i});
+                end
+                
                 Header = {'Label' sprintf('Area (\x3BCm^2)') ...
-                    'XPos (pixel)' 'YPos (pixel)' sprintf('MajorAxis (\x3BCm)') sprintf('MinorAxis (\x3BCm)') 'Perimeter (pixel)' 'Roundness' ...
+                    'XPos (pixel)' 'YPos (pixel)' sprintf('MajorAxis (\x3BCm)') ...
+                    sprintf('MinorAxis (\x3BCm)') 'Perimeter (pixel)' 'Roundness' ...
                     'AspectRatio' 'ColorHue' 'ColorValue' 'meanRed' 'meanGreen' ...
                     'meanBlue' 'meanFarred' 'Blue/Red' 'Farred/Red'...
                     'FiberMainGroup' 'FiberType'};
                 
-                CellFiberTable = cat(1,Header,obj.StatsMatData);
-                CellFiberTableT1 = cat(1,Header,obj.StatsMatDataT1);
-                CellFiberTableT12h = cat(1,Header,obj.StatsMatDataT12h);
-                CellFiberTableT2x = cat(1,Header,obj.StatsMatDataT2x);
-                CellFiberTableT2a = cat(1,Header,obj.StatsMatDataT2a);
-                CellFiberTableT2ax = cat(1,Header,obj.StatsMatDataT2ax);
+                %add animal informations to header
+                Header = cat(2,prompt,Header);
+                
+                CellFiberTable = cat(1,Header,cat(2,InfoAnimal,obj.StatsMatData));
+                CellFiberTableT1 = cat(1,Header,cat(2,InfoAnimalT1,obj.StatsMatDataT1));
+                CellFiberTableT12h = cat(1,Header,cat(2,InfoAnimalT12h,obj.StatsMatDataT12h));
+                CellFiberTableT2x = cat(1,Header,cat(2,InfoAnimalT2x,obj.StatsMatDataT2x));
+                CellFiberTableT2a = cat(1,Header,cat(2,InfoAnimalT2a,obj.StatsMatDataT2a));
+                CellFiberTableT2ax = cat(1,Header,cat(2,InfoAnimalT2ax,obj.StatsMatDataT2ax));
                 
             end
 

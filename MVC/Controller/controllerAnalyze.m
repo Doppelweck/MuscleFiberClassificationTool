@@ -958,6 +958,7 @@ classdef controllerAnalyze < handle
             obj.controllerEditHandle.addWindowCallbacks();
             
             obj.controllerEditHandle.modelEditHandle.InfoMessage = '*** Back to Edit mode ***';
+            
         end
         
         function startResultsModeEvent(obj,~,~)
@@ -1308,10 +1309,11 @@ classdef controllerAnalyze < handle
                 if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
                 obj.modelAnalyzeHandle.busyIndicator.stop;
                 [hjObj, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                obj.modelAnalyzeHandle.busyIndicator = [];
                 delete(hContainer) ;
                 end
                 
-                obj.modelAnalyzeHandle.busyIndicator = [];
+                
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
                 

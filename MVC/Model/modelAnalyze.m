@@ -569,7 +569,7 @@ classdef modelAnalyze < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 2
-                % Color-Based triple labeling
+                % Color-Based triple or quad labeling
                 %Use gren red and blue plane for fiber type classification.
                 %seaarch for type 1 2x and 12h (type 1 2 hybrid) fibers
                 
@@ -580,7 +580,6 @@ classdef modelAnalyze < handle
                         % Object Area is to big. FiberType 0: No Fiber (white)
                         obj.Stats(i).FiberTypeMainGroup = 0;
                         obj.Stats(i).FiberType = 'undefined';
-                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
                             obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
@@ -589,21 +588,18 @@ classdef modelAnalyze < handle
                         % FiberType 0: No Fiber (white)
                         obj.Stats(i).FiberTypeMainGroup = 0;
                         obj.Stats(i).FiberType = 'undefined';
-                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
                         
                         % Object Roundness is to small. FiberType 0: No Fiber (white))
                         obj.Stats(i).FiberTypeMainGroup = 0;
                         obj.Stats(i).FiberType = 'undefined';
-                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
                         
                         % Object ColorValue is to small. FiberType 0: No Fiber (white))
                         obj.Stats(i).FiberTypeMainGroup = 0;
                         obj.Stats(i).FiberType = 'undefined';
-                        NoFibtype0 = NoFibtype0+1;
                         
                     elseif obj.BlueRedThreshActive
                         %Blue Red thresh is active. Searchinf for Type 1 2
@@ -615,12 +611,11 @@ classdef modelAnalyze < handle
                                 % Type 1 2 hybrid
                                 obj.Stats(i).FiberTypeMainGroup = 3;
                                 obj.Stats(i).FiberType = 'Type 12h';
-                                NoFibtype12h = NoFibtype12h+1;
+
                             else
                                 % Type 1 fiber
                                 obj.Stats(i).FiberTypeMainGroup = 1;
                                 obj.Stats(i).FiberType = 'Type 1';
-                                NoFibtype1 = NoFibtype1+1;
                                 
                             end
                             
@@ -631,7 +626,7 @@ classdef modelAnalyze < handle
                                 % Type 1 2 hybrid (magenta)
                                 obj.Stats(i).FiberTypeMainGroup = 3;
                                 obj.Stats(i).FiberType = 'Type 12h';
-                                NoFibtype12h = NoFibtype12h+1;
+
                             else
                                 % Type 2 fiber (red)
                                 % If Color-based quad labeling is active 
@@ -649,12 +644,11 @@ classdef modelAnalyze < handle
                                                 % Type 2ax fiber (orange hybrid 2a 2x fiber)
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2ax';
-                                                NoFibtype2ax = NoFibtype2ax+1;
+
                                             else
                                                 % Type 2a fiber 
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2a';
-                                                NoFibtype2a = NoFibtype2a+1;
                                                 
                                             end
                                         elseif obj.Stats(i).ColorRatioFarredRed < obj.FarredRedThresh
@@ -662,12 +656,11 @@ classdef modelAnalyze < handle
                                                 % Type 2ax fiber (orange hybrid 2a 2x fiber)
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2ax';
-                                                NoFibtype2ax = NoFibtype2ax+1;
+                                                
                                             else
                                                 % Type 2x fiber 
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2x';
-                                                NoFibtype2x = NoFibtype2x+1;
                                                 
                                             end
                                         end
@@ -676,19 +669,19 @@ classdef modelAnalyze < handle
                                             % Type 2x fiber 
                                             obj.Stats(i).FiberTypeMainGroup = 2;
                                             obj.Stats(i).FiberType = 'Type 2x';
-                                            NoFibtype2x = NoFibtype2x+1;
+
                                         elseif obj.Stats(i).ColorRatioBlueRed  > 1
                                             % Type 2a fiber
                                             obj.Stats(i).FiberTypeMainGroup = 2;
                                             obj.Stats(i).FiberType = 'Type 2a';
-                                            NoFibtype2a = NoFibtype2a+1;
+
                                             
                                         end
                                     end
                                 else
                                     obj.Stats(i).FiberTypeMainGroup = 2;
                                     obj.Stats(i).FiberType = 'Type 2x';
-                                    NoFibtype2a = NoFibtype2a+1;
+
                                 end
                             end
                         end
@@ -700,7 +693,7 @@ classdef modelAnalyze < handle
                             % Type 1 fiber (blue)
                             obj.Stats(i).FiberTypeMainGroup = 1;
                             obj.Stats(i).FiberType = 'Type 1';
-                            NoFibtype1 = NoFibtype1+1;
+
                         elseif obj.Stats(i).ColorRatioBlueRed < 1
                             % Type 2 fiber (red)
                                 % If Color-based quad labeling is active 
@@ -718,12 +711,12 @@ classdef modelAnalyze < handle
                                                 % Type 2ax fiber (orange hybrid 2a 2x fiber)
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2ax';
-                                                NoFibtype2ax = NoFibtype2ax+1;
+
                                             else
                                                 % Type 2a fiber 
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2a';
-                                                NoFibtype2a = NoFibtype2a+1;
+
                                                 
                                             end
                                         elseif obj.Stats(i).ColorRatioFarredRed < obj.FarredRedThresh
@@ -731,12 +724,11 @@ classdef modelAnalyze < handle
                                                 % Type 2ax fiber (orange hybrid 2a 2x fiber)
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2ax';
-                                                NoFibtype2ax = NoFibtype2ax+1;
+
                                             else
                                                 % Type 2x fiber 
                                                 obj.Stats(i).FiberTypeMainGroup = 2;
                                                 obj.Stats(i).FiberType = 'Type 2x';
-                                                NoFibtype2x = NoFibtype2x+1;
                                                 
                                             end
                                         end
@@ -745,24 +737,22 @@ classdef modelAnalyze < handle
                                             % Type 2x fiber 
                                             obj.Stats(i).FiberTypeMainGroup = 2;
                                             obj.Stats(i).FiberType = 'Type 2x';
-                                            NoFibtype2x = NoFibtype2x+1;
                                         elseif obj.Stats(i).ColorRatioBlueRed  > 1
                                             % Type 2a fiber
                                             obj.Stats(i).FiberTypeMainGroup = 2;
                                             obj.Stats(i).FiberType = 'Type 2a';
-                                            NoFibtype2a = NoFibtype2a+1;
                                             
                                         end
                                     end
                                 else
                                     obj.Stats(i).FiberTypeMainGroup = 2;
                                     obj.Stats(i).FiberType = 'Type 2x';
-                                    NoFibtype2a = NoFibtype2a+1;
+
                                 end
                         else
                             obj.Stats(i).FiberTypeMainGroup = 0;
                             obj.Stats(i).FiberType = 'undefined';
-                            NoFibtype0 = NoFibtype0+1;
+
                         end
                         
                     else
@@ -778,111 +768,420 @@ classdef modelAnalyze < handle
             
                 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %%% Custer-Based quad labeling
+            %%% 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 
-            elseif obj.AnalyzeMode == 3    
+            elseif obj.AnalyzeMode == 3  || obj.AnalyzeMode == 4
+                % OPTICS-Custer-Based labeling
+                % AnalyzeMode=3: OPTICS tripple labeling
+                % AnalyzeMode=4: OPTICS quad labeling
                 
-                NoOfClusters = obj.AnalyzeMode;
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %DBSCAN clustering algorithm 
+%                 epsilon = 14;
+%                 MinPts = 3;
+%                 Cluster = 0;
+%                 
+%                 noElements = size(obj.Stats,1);
+%                 IDX=zeros(noElements,1);
+%                 X(:,1) = [obj.Stats.ColorRed]';
+%                 X(:,2) = [obj.Stats.ColorBlue]';
+% %                 Dist = pdist2(DataSet,DataSet);
+% 
+%                 
+%                 [IDX, isnoise]=DBSCAN(X,epsilon,MinPts);
+%                 figure
+%                 PlotClusterinResult(X, IDX);
                 
-                Data(:,1) = [obj.Stats.ColorBlue];
-                Data(:,2) = [obj.Stats.ColorRed];
-                Data(:,3) = [obj.Stats.ColorGreen];
-                Data(:,4) = [obj.Stats.ColorFarRed];
-                Data(:,5) = [obj.Stats.ColorHue];
-                Data(:,6) = [obj.Stats.ColorValue];
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %OPTICS clustering algorithm 
+                obj.classifyOPTICS();
+               
+
+            end
+            
+        end
+        
+        function classifyOPTICS(obj)
+            noElements = size(obj.Stats,1);
                 
-                [idx,C] = kmeans(Data,NoOfClusters,'Distance','cityblock');
-                % C contains the cluster focus points.
-                % C(1,1) meanBlue of cluster 1 focus point
-                % C(1,2) meanRed of cluster 1 focus point
-                % C(2,1) meanBlue of cluster 2 focus point
-                % C(2,2) meanRed of cluster 2 focus point
-                % and so on.
+                 
                 
-                for i=1:1:size(C,1) %No of Clusters
-                    %Gradient between red and blue  of the cluster centers.
-                    %Highest gradient should be blue cluster center, lowest
-                    %red cluster center. 
-                    colorGradient(i) = C(i,1)/C(i,2);
-                end
-                
-                % Find ClusterCenter with highest Gradient.
-                % Blue Cluster
-                [rowB colB] = find( colorGradient == max(colorGradient) );
-                
-                % Find ClusterCenter with smallest Gradient.
-                % Red Cluster
-                [rowR colR] = find( colorGradient == min(colorGradient) );
-                
-                idx = idx*10;
-                
-                idx(idx==colB*10) = 1; % FiberType 1
-                idx(idx==colR*10) = 2; % FiberType 2
-                idx(idx>9) = 3; % Fibertype 3
-                
-                for i=1:1:nObjects
+                %find all fiber types that are undefined (out of the
+                %parameter range).
+                for i=1:1:noElements
+                    
                     
                     if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
                         
                         % Object Area is to big. FiberType 0: No Fiber (white)
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+
                         
                     elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
                             obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
                         
                         % ApsectRatio is to small or to great.
                         % FiberType 0: No Fiber (white)
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+
                         
                     elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
                         
                         % Object Roundness is to small. FiberType 0: No Fiber (white))
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
+
                         
                     elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
                         
-                        % Color Value (V-Channel of HSV color room) is to samll
-                        % FiberType 0: No Fiber (white)
-                        obj.Stats(i).FiberType = 0;
-                        fibtype0 = fibtype0+1;
+                        % Object ColorValue is to small. FiberType 0: No Fiber (white))
+                        obj.Stats(i).FiberTypeMainGroup = 0;
+                        obj.Stats(i).FiberType = 'undefined';
                         
-                    elseif idx(i) == 1
-                        
-                        % Cluster Type 1
-                        obj.Stats(i).FiberType = 1;
-                        fibtype1 = fibtype1+1;
-                        
-                    elseif idx(i) == 2
-                        
-                        % Cluster Type 2
-                        obj.Stats(i).FiberType = 2;
-                        fibtype2 = fibtype2+1;
-                        
-                    elseif idx(i) == 3
-                        
-                        % Cluster Type 3
-                        obj.Stats(i).FiberType = 3;
-                        fibtype3 = fibtype3+1;
-                    end
+                    else
+                           
+                    end   
+                end
+               
+                %create temp stats with label number for further
+                %processing that contains only fibers that are not
+                %undefined
                     
+                tempStats = obj.Stats;
+                [tempStats.Label] = deal(0);
+                
+                for i=1:1:noElements
+                    tempStats(i).Label = i;
                 end
                 
-            end
-            
-            obj.InfoMessage = ['      - ' num2str(nObjects) ' objects were found'];
-            
-            obj.InfoMessage = ['         - ' num2str(NoFibtype1) ' Type-1 fibers were found (blue)'];
-            
-            obj.InfoMessage = ['         - ' num2str(NoFibtype2a) ' Type-2 fibers were found (red)'];
-            
-            obj.InfoMessage = ['         - ' num2str(NoFibtype2x) ' Type-3 fibers were found (magenta)'];
-            
-            obj.InfoMessage = ['         - ' num2str(NoFibtype0) ' Type-0 fibers were found (white)'];
-            
+                for i=noElements:-1:1
+                    if strcmp(tempStats(i).FiberType , 'undefined');
+                    tempStats(i) = [];
+                    end
+                end
+                
+                %Get Minimum amount of cluster points from User
+                inputSuccses = false;
+                while ~inputSuccses
+                    prompt = {'Minimum amount of cluster points:'};
+                    dlg_title = 'Input';
+                    num_lines = 1;
+                    defaultans = {'1'};
+                    answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
+                    
+                    if isempty(answer)
+                        inputSuccses = false;
+                    else
+                        minPoints = str2num(answer{1});
+                        
+                        if isscalar(minPoints) && isreal(minPoints) && ~isnan(minPoints) ...
+                                && minPoints < size(tempStats,1)
+                            inputSuccses = true;
+                        else
+                            inputSuccses = false;
+                        end
+                    end
+                end
+                
+                % Classify the main fiber type groups 1 2 3
+                
+                epsilon = 1;
+                X(:,1) = [tempStats.ColorRed]';
+                X(:,2) = [tempStats.ColorBlue]';
+                
+                [RD,CD,order] = optics(X,minPoints);
+                Class = zeros(size(obj.Stats,1),1);
+                Cluster = 0;
+                searchForClusters = true;
+                
+                RD(end+1)=max(RD);
+                
+                while searchForClusters
+                    Cluster = 0;
+                    for i=1:1:size(tempStats,1)
+                        
+                        if RD(order(i)) > epsilon && RD(order(i)+1) < RD(order(i))
+                            Cluster = Cluster+1;
+                            Class(order(i)) = Cluster;
+                        else
+                            Class(order(i)) = Cluster;
+                        end
+                        
+                    end
+                    
+                    if Cluster >3
+                        epsilon = epsilon + 1;
+                        searchForClusters = true;
+                    else
+                        list = unique(Class); 
+                        [n, index] = histc(Class, list);
+                        if length(n(n>=minPoints)) == length(n)
+                            searchForClusters = false;
+                        else
+                            epsilon = epsilon + 1;
+                            searchForClusters = true;
+                        end
+                        
+                    end
+                end %end while searchForClusters
+                    
+                figure
+                bar(CD(order))
+                
+                figure
+                bar(RD(order))
+                
+                cm = colormap(prism);
+               
+                figure
+                for i=1:1:size(tempStats,1)
+                    scatter(tempStats(order(i)).ColorRed,tempStats(order(i)).ColorBlue,20,cm(Class(order(i)),:))
+                    hold on
+                end
+                
+                 %Claculate cluster Core points
+                if Cluster == 1
+                    
+                elseif Cluster == 2
+                    %Core Cluster 1
+                    C1xV = [tempStats(Class==1).ColorRed]';
+                    C1yV = [tempStats(Class==1).ColorBlue]';
+                    C1x = [sum(C1xV)/length(C1xV) 1];
+                    C1y = [sum(C1yV)/length(C1yV) 1];
+                    
+                    %Core Cluster 2
+                    C2xV = [tempStats(Class==2).ColorRed]';
+                    C2yV = [tempStats(Class==2).ColorBlue]';
+                    C2x = [sum(C2xV)/length(C2xV) 2];
+                    C2y = [sum(C2yV)/length(C2yV) 2];
+                    
+                    %gradient of corepoint
+                    dC(1,:) = [C1y(1)/C1x(1) 1];
+                    dC(2,:) = [C2y(1)/C2x(1) 2];
+                    
+                    %sort from samllest to greatest gradient
+                    [values, order] = sort(dC(:,1));
+                    sortedmatrix = dC(order,:);
+                    
+                    [tempStats(Class==sortedmatrix(1,2)).FiberTypeMainGroup] = deal(2);
+                    [tempStats(Class==sortedmatrix(2,2)).FiberTypeMainGroup] = deal(1);
+                    [tempStats(Class==sortedmatrix(2,2)).FiberType] = deal('Type 1');
+                   
+                elseif Cluster == 3
+                     %Core Cluster 1
+                    C1xV = [tempStats(Class==1).ColorRed]';
+                    C1yV = [tempStats(Class==1).ColorBlue]';
+                    C1x = [sum(C1xV)/length(C1xV) 1];
+                    C1y = [sum(C1yV)/length(C1yV) 1];
+                    
+                    %Core Cluster 2
+                    C2xV = [tempStats(Class==2).ColorRed]';
+                    C2yV = [tempStats(Class==2).ColorBlue]';
+                    C2x = [sum(C2xV)/length(C2xV) 2];
+                    C2y = [sum(C2yV)/length(C2yV) 2];
+                    
+                    %Core Cluster 3
+                    C3xV = [tempStats(Class==3).ColorRed]';
+                    C3yV = [tempStats(Class==3).ColorBlue]';
+                    C3x = [sum(C3xV)/length(C3xV) 3];
+                    C3y = [sum(C3yV)/length(C3yV) 3];
+                    
+                    %gradient of corepoint
+                    dC(1,:) = [C1y(1)/C1x(1) 1];
+                    dC(2,:) = [C2y(1)/C2x(1) 2];
+                    dC(3,:) = [C3y(1)/C3x(1) 3];
+                    
+                    %sort from samllest to greatest gradient
+                    [values, order] = sort(dC(:,1));
+                    sortedmatrix = dC(order,:);
+                    
+                    [tempStats(Class==sortedmatrix(1,2)).FiberTypeMainGroup] = deal(2);
+                    [tempStats(Class==sortedmatrix(2,2)).FiberTypeMainGroup] = deal(3);
+                    [tempStats(Class==sortedmatrix(2,2)).FiberType] = deal('Type 12h');
+                    [tempStats(Class==sortedmatrix(3,2)).FiberTypeMainGroup] = deal(1);
+                    [tempStats(Class==sortedmatrix(3,2)).FiberType] = deal('Type 1');
+                    
+                else
+
+                end
+                
+                %write Data from tempStats in main Stats structure
+                for i=1:1:size(tempStats,1)
+                    obj.Stats(tempStats(i).Label).FiberTypeMainGroup = tempStats(i).FiberTypeMainGroup;
+                    obj.Stats(tempStats(i).Label).FiberType = tempStats(i).FiberType;
+                end
+                
+               
+                
+                figure
+                for i=1:1:size(tempStats,1)
+                    switch tempStats(i).FiberTypeMainGroup
+                        case 1
+                            Color = 'b';
+                        case 2
+                            Color = 'r';
+                        case 3
+                            Color = 'm';
+                    end
+                    scatter(tempStats(i).ColorRed,tempStats(i).ColorBlue,20,Color);
+                    hold on
+                end
+               
+                % Classify the Type 2 subgroups 
+                
+                if obj.AnalyzeMode == 4 && ~isempty(obj.PicPlaneFarRed) ...
+                        && max(max(obj.PicPlaneFarRed)) > 0
+                    %OPTICS quad labeling if FaredPlane exist and contains
+                    %non zero elements
+                    
+                    %create temp stats with label number for further
+                    %processing that contains only fibers that are
+                    %claasified as main fiber type 2
+                    
+                    
+                    tempStats = obj.Stats;
+                    [tempStats.Label] = deal(0);
+                    
+                    for i=1:1:noElements
+                        tempStats(i).Label = i;
+                    end
+                    
+                    for i=noElements:-1:1
+                        if tempStats(i).FiberTypeMainGroup ~= 2;
+                            tempStats(i) = [];
+                        end
+                    end
+                    
+                    % Classify the fiber types 2a 2x 2ax
+                    
+                    epsilon = 1;
+                    X=[];
+                    X(:,1) = [tempStats.ColorRed]';
+                    X(:,2) = [tempStats.ColorFarRed]';
+                    
+                    [RD,CD,order] = optics(X,minPoints);
+                    Class = zeros(size(obj.Stats,1),1);
+                    Cluster = 0;
+                    searchForClusters = true;
+                    
+                    RD(end+1)=max(RD);
+                    
+                    while searchForClusters
+                        Cluster = 0;
+                        for i=1:1:size(tempStats,1)
+                            
+                            if RD(order(i)) > epsilon && RD(order(i)+1) < RD(order(i))
+                                Cluster = Cluster+1;
+                                Class(order(i)) = Cluster;
+                            else
+                                Class(order(i)) = Cluster;
+                            end
+                            
+                        end
+                        
+                        if Cluster >3
+                            epsilon = epsilon + 1;
+                            searchForClusters = true;
+                        else
+                            list = unique(Class);
+                            [n, index] = histc(Class, list);
+                            if length(n(n>=minPoints)) == length(n)
+                                searchForClusters = false;
+                            else
+                                epsilon = epsilon + 1;
+                                searchForClusters = true;
+                            end
+                            
+                        end
+                    end %end while searchForClusters
+                    
+                    %Claculate cluster Core points
+                    if Cluster == 1
+                        
+                        if mean([tempStats.ColorFarRed]) > mean([tempStats.ColorRed])
+                            [tempStats([tempStats.FiberTypeMainGroup]==2).FiberType] = deal('Type 2a');
+                        else
+                            [tempStats([tempStats.FiberTypeMainGroup]==2).FiberType] = deal('Type 2x');
+                        end
+                        
+                    elseif Cluster == 2
+                        %Core Cluster 1
+                        C1xV = [tempStats(Class==1).ColorFarRed]';
+                        C1yV = [tempStats(Class==1).ColorRed]';
+                        C1x = [sum(C1xV)/length(C1xV) 1];
+                        C1y = [sum(C1yV)/length(C1yV) 1];
+                        
+                        %Core Cluster 2
+                        C2xV = [tempStats(Class==2).ColorFarRed]';
+                        C2yV = [tempStats(Class==2).ColorRed]';
+                        C2x = [sum(C2xV)/length(C2xV) 2];
+                        C2y = [sum(C2yV)/length(C2yV) 2];
+                        
+                        %gradient of corepoint
+                        dC(1,:) = [C1y(1)/C1x(1) 1];
+                        dC(2,:) = [C2y(1)/C2x(1) 2];
+                        
+                        %sort from samllest to greatest gradient
+                        [values, order] = sort(dC(:,1));
+                        sortedmatrix = dC(order,:);
+                        
+                        [tempStats(Class==sortedmatrix(1,2)).FiberTypeMainGroup] = deal(2);
+                        [tempStats(Class==sortedmatrix(1,2)).FiberType] = deal('Type 2x');
+                        [tempStats(Class==sortedmatrix(2,2)).FiberTypeMainGroup] = deal(2);
+                        [tempStats(Class==sortedmatrix(1,2)).FiberType] = deal('Type 2a');
+                        
+                    elseif Cluster == 3
+                        %Core Cluster 1
+                        C1xV = [tempStats(Class==1).ColorFarRed]';
+                        C1yV = [tempStats(Class==1).ColorRed]';
+                        C1x = [sum(C1xV)/length(C1xV) 1];
+                        C1y = [sum(C1yV)/length(C1yV) 1];
+                        
+                        %Core Cluster 2
+                        C2xV = [tempStats(Class==2).ColorFarRed]';
+                        C2yV = [tempStats(Class==2).ColorRed]';
+                        C2x = [sum(C2xV)/length(C2xV) 2];
+                        C2y = [sum(C2yV)/length(C2yV) 2];
+                        
+                        %Core Cluster 3
+                        C3xV = [tempStats(Class==3).ColorFarRed]';
+                        C3yV = [tempStats(Class==3).ColorRed]';
+                        C3x = [sum(C3xV)/length(C3xV) 3];
+                        C3y = [sum(C3yV)/length(C3yV) 3];
+                        
+                        %gradient of corepoint
+                        dC(1,:) = [C1y(1)/C1x(1) 1];
+                        dC(2,:) = [C2y(1)/C2x(1) 2];
+                        dC(3,:) = [C3y(1)/C3x(1) 3];
+                        
+                        %sort from samllest to greatest gradient
+                        [values, order] = sort(dC(:,1));
+                        sortedmatrix = dC(order,:);
+                        
+                        [tempStats(Class==sortedmatrix(1,2)).FiberTypeMainGroup] = deal(2);
+                        [tempStats(Class==sortedmatrix(1,2)).FiberType] = deal('Type 2x');
+                        [tempStats(Class==sortedmatrix(2,2)).FiberTypeMainGroup] = deal(2);
+                        [tempStats(Class==sortedmatrix(2,2)).FiberType] = deal('Type 2ax');
+                        [tempStats(Class==sortedmatrix(3,2)).FiberTypeMainGroup] = deal(2);
+                        [tempStats(Class==sortedmatrix(3,2)).FiberType] = deal('Type 2a');
+                    else
+                    end  %end if cluster
+                else
+                    %Quad labeling is not active. All Main Type 2 fibers
+                    %are classified as Type 2x fiber
+                    [tempStats([tempStats.FiberTypeMainGroup]==2).FiberType] = deal('Type 2x');
+                end
+                
+                %write Data from tempStats in main Stats structure
+                for i=1:1:size(tempStats,1)
+                    obj.Stats(tempStats(i).Label).FiberTypeMainGroup = tempStats(i).FiberTypeMainGroup;
+                    obj.Stats(tempStats(i).Label).FiberType = tempStats(i).FiberType;
+                end
+                
+                
         end
         
         function manipulateFiberOK(obj,newFiberType,labelNo)

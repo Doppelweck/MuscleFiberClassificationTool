@@ -1931,6 +1931,7 @@ classdef controllerEdit < handle
             %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
             obj.controllerAnalyzeHandle.startAnalyzeModeEvent(PicData,InfoText);
+            
         end
         
         function undoEvent(obj,src,evnt)
@@ -2044,10 +2045,11 @@ classdef controllerEdit < handle
                 if ~isempty(obj.modelEditHandle.busyIndicator)
                 obj.modelEditHandle.busyIndicator.stop;
                 [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                obj.modelEditHandle.busyIndicator = [];
                 delete(hContainer);
                 end
                 
-                obj.modelEditHandle.busyIndicator = [];
+                
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
                 

@@ -1155,9 +1155,9 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.busyIndicator.stop;
                 [hjObj, hContainer] = javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 delete(hContainer) ;
+                obj.modelResultsHandle.busyIndicator = [];
                 end
                 
-                obj.modelResultsHandle.busyIndicator = [];
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
                 
