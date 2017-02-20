@@ -482,70 +482,51 @@ classdef controllerResults < handle
             %clear axes
             cla(obj.viewResultsHandle.hAScatterBlueRed)
             axes(obj.viewResultsHandle.hAScatterBlueRed);
+            LegendString={};
             
             % Type 1 Fibers (blue)
-            if isempty(obj.modelResultsHandle.StatsMatDataT1)
-                x = 0;
-                y = 0;
-                hScat(1) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(1,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT1)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,14)); %meanBlue Values
                 hScat(1) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(1,:)); 
+                LegendString{end+1} = 'Type 1';
             end
             
             
             hold on
             
             % Type 12h Fibers (magenta)
-            if isempty(obj.modelResultsHandle.StatsMatDataT12h)
-                x = 0;
-                y = 0;
-                hScat(2) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(2,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT12h)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,14)); %meanBlue Values
                 hScat(2) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(2,:));
+                LegendString{end+1} = 'Type 12h';
             end
             
             
             % Type 2x Fibers
-            if isempty(obj.modelResultsHandle.StatsMatDataT2x)
-                x = 0;
-                y = 0;
-                hScat(3) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,14)); %meanBlue Values
                 hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:));
+                LegendString{end+1} = 'Type 2x';
             end
             
             % Type 2a Fibers
-            if isempty(obj.modelResultsHandle.StatsMatDataT2a)
-                x = 0;
-                y = 0;
-                hScat(3) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,14)); %meanBlue Values
                 hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:));
+                LegendString{end+1} = 'Type 2a';
             end
             
             % Type 2ax Fibers
-            if isempty(obj.modelResultsHandle.StatsMatDataT2ax)
-                x = 0;
-                y = 0;
-                hScat(3) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,14)); %meanBlue Values
                 hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:));
+                LegendString{end+1} = 'Type 2ax';
             end
-            
-            ylabel('y: mean Blue (B)','FontSize',12);
-            xlabel('x: mean Red (R)','FontSize',12);
-            xlim([0 Inf] );
-            ylim([0 Inf] );
             
             if obj.modelResultsHandle.AnalyzeMode == 1 || obj.modelResultsHandle.AnalyzeMode == 2
                 % Color-Based Classification
@@ -578,24 +559,14 @@ classdef controllerResults < handle
                     f_Bdist = BlueRedTh * R / (1-BlueRedDistB); %blue dist fcn
                     f_Rdist = BlueRedTh * R * (1-BlueRedDistR); %red dist fcn
                     
-                    
-                    
- 
                     plot(R,f_Bdist,'b');
-                    text1 = ['f_{Bdist}(R) = ' num2str(BlueRedTh) ' * R / (1-' num2str(BlueRedDistB) ')'];
+                    LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(BlueRedTh) ' * R / (1-' num2str(BlueRedDistB) ')'];
 
                     plot(R,f_Rdist,'r');
-                    text2 = ['f_{Rdist}(R) = ' num2str(BlueRedTh) ' * R * (1-' num2str(BlueRedDistR) ')'];
+                    LegendString{end+1}= ['f_{Rdist}(R) = ' num2str(BlueRedTh) ' * R * (1-' num2str(BlueRedDistR) ')'];
                     
                     plot(R,f_BRthresh,'k');
-                    text3 = ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
-                    %                 text(R(end-2),B(end-2),['\rightarrow B(R) = R*(1-' num2str(ColorDis) ')'],'HorizontalAlignment','left')
-                    
-                    l(3) = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax',text1,...
-                        text2,text3,'Location','Best');
-                    set(l(3),'Tag','LegendScatterPlotBlueRed');
-                    
-%                     title({'Color-Based Classification triple labeling'},'FontSize',16);
+                    LegendString{end+1}= ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
                     
                 else
                     BlueRedTh = 1;
@@ -603,9 +574,9 @@ classdef controllerResults < handle
                     BlueRedDistR = 0;
                     f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
                     plot(R,f_BRthresh,'k');
-                    text1 = ['BRthresh(R) = ' num2str(BlueRedTh) ' * R )'];
-                    l(3) = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax',text1,'Location','Best');
-                    set(l(3),'Tag','LegendScatterPlotBlueRed');
+                    LegendString{end+1} = ['BRthresh(R) = ' num2str(BlueRedTh) ' * R )'];
+                    
+                    
                 end
                 
                 if obj.modelResultsHandle.AnalyzeMode == 1
@@ -614,23 +585,23 @@ classdef controllerResults < handle
                     title({'Color-Based Classification quad labeling'},'FontSize',16);
                 end
                 
-                
-                maxBlueValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,14)));
-                maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));
-                maxLim =  max([maxBlueValue maxRedValue])+50;
-                
-                ylim([ 0 maxLim ] );
-                xlim([ 0 maxLim ] );
-                set(gca,'xtick',[0:20:maxLim*2]);
-                set(gca,'ytick',[0:20:maxLim*2]);
-                
             elseif obj.modelResultsHandle.AnalyzeMode == 3
-                title('ScatterPlot Color-Cluster Classification, 2 Clusters','FontSize',16);
-                l(3) = legend('Type 1','Type 2','Location','Best');
+                title('OPTICS-Cluster-Based Classification triple labeling','FontSize',16);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
-                title('ScatterPlot Color-Cluster Classification, 3 Clusters','FontSize',16);
-                l(3) = legend('Type 1','Type 2','Type 3','Location','Best');
+                title('OPTICS-Cluster-Based Classification quad labeling','FontSize',16);
             end
+            
+            l(3) = legend(LegendString,'Location','Best');
+            set(l(3),'Tag','LegendScatterPlotBlueRed');
+            maxBlueValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,14)));
+            maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));
+            maxLim =  max([maxBlueValue maxRedValue])+50;
+            ylabel('y: mean Blue (B)','FontSize',12);
+            xlabel('x: mean Red (R)','FontSize',12);    
+            ylim([ 0 maxLim ] );
+            xlim([ 0 maxLim ] );
+            set(gca,'xtick',[0:20:maxLim*2]);
+            set(gca,'ytick',[0:20:maxLim*2]);
             
             grid on
             hold off
@@ -642,46 +613,33 @@ classdef controllerResults < handle
             
             cla(obj.viewResultsHandle.hAScatterFarredRed);
             axes(obj.viewResultsHandle.hAScatterFarredRed);
+            LegendString = {};
             
             hold on
             % Type 2x Fibers
-            if isempty(obj.modelResultsHandle.StatsMatDataT2x)
-                x = 0;
-                y = 0;
-                hScatFRR(1) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,15)); %meanFarred Values
                 hScatFRR(1) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:));
-
+                LegendString{end+1} = 'Type 2x';
             end
             
             % Type 2a Fibers
-            if isempty(obj.modelResultsHandle.StatsMatDataT2a)
-                x = 0;
-                y = 0;
-                hScatFRR(2) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,15)); %meanFarred Values
                 hScatFRR(2) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:));
+                LegendString{end+1} = 'Type 2a';
             end
             
             % Type 2ax Fibers
-            if isempty(obj.modelResultsHandle.StatsMatDataT2ax)
-                x = 0;
-                y = 0;
-                hScatFRR(3) = scatter(x,y,0.1,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:),'Marker','none');
-            else
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,12)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,15)); %meanFarred Values
                 hScatFRR(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:));
+                LegendString{end+1} = 'Type 2ax';
             end
             hold on
-            
-            ylabel('y: mean Farred(FR)','FontSize',12);
-            xlabel('x: mean Red (R)','FontSize',12);
-            
             
             if obj.modelResultsHandle.AnalyzeMode == 1 || obj.modelResultsHandle.AnalyzeMode == 2
                 % Color-Based Classification
@@ -706,35 +664,16 @@ classdef controllerResults < handle
                 f_FRdist = FarredRedTh * R / (1-FarredRedDistFR); %farred dist fcn
                 f_Rdist = FarredRedTh * R * (1-FarredRedDistR); %red dist fcn
                 
-                
-
                 plot(R,f_FRdist,'y');
-                text1 = ['f_{Bdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
+                LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
 
                 plot(R,f_Rdist,'r');
-                text2 = ['f_{Rdist}(R) = ' num2str(FarredRedTh) ' * R * (1-' num2str(FarredRedDistR) ')'];
+                LegendString{end+1} = ['f_{Rdist}(R) = ' num2str(FarredRedTh) ' * R * (1-' num2str(FarredRedDistR) ')'];
                 
                 plot(R,f_FRRthresh,'k');
-                text3 = ['f_{BRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
-
-%                 text(R(end-2),B(end-2),['\rightarrow B(R) = R*(1-' num2str(ColorDis) ')'],'HorizontalAlignment','left')
-                
-                l(4) = legend('Type 2x','Type 2a','Type 2ax',text1,...
-                    text2,text3,'Location','Best');
-                    set(l(4),'Tag','LegendScatterPlotFarredRed');
-                else
-                    l(4) = legend('Type 2x','Location','Best');
-                    set(l(4),'Tag','LegendScatterPlotFarredRed');
+                LegendString{end+1} = ['f_{BRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
                 end
                 
-                maxFarredValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,15)));
-                maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));
-                maxLim =max([maxFarredValue maxRedValue])+50;
-                
-                ylim([ 0 maxLim ] );
-                xlim([ 0 maxLim ] );
-                set(gca,'xtick',[0:20:maxLim*2]);
-                set(gca,'ytick',[0:20:maxLim*2]);
                 
                 if obj.modelResultsHandle.AnalyzeMode == 1
                     title({'Color-Based Classification triple labeling'},'FontSize',16);
@@ -742,48 +681,77 @@ classdef controllerResults < handle
                     title({'Color-Based Classification quad labeling'},'FontSize',16);
                 end
                 
+            elseif obj.modelResultsHandle.AnalyzeMode == 3
+                title('OPTICS-Cluster-Based Classification triple labeling','FontSize',16);
+            elseif obj.modelResultsHandle.AnalyzeMode == 4
+                title('OPTICS-Cluster-Based Classification quad labeling','FontSize',16);
+            end
+                maxFarredValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,15)));
+                maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));
+                maxLim =max([maxFarredValue maxRedValue])+50;
+                ylabel('y: mean Farred (FR)','FontSize',12);
+                xlabel('x: mean Red (R)','FontSize',12); 
+                
+                ylim([ 0 maxLim ] );
+                xlim([ 0 maxLim ] );
+                set(gca,'xtick',[0:20:maxLim*2]);
+                set(gca,'ytick',[0:20:maxLim*2]);
+                l(4) = legend(LegendString,'Location','Best');
+                set(l(4),'Tag','LegendScatterPlotFarredRed');
+                    
                 grid on
                 hold off
                 
-            
-            else
-            end
-            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Scatter Plot all Fiber objects %%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             cla(obj.viewResultsHandle.hAScatterAll);
             axes(obj.viewResultsHandle.hAScatterAll);
+            LegendString={};
             
-            
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT1)
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,12)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,14)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,15)); %meanFarred Values
             scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(1,:));
+            LegendString{end+1} = 'Type 1';
+            end
             hold on
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT12h)
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,12)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,14)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,15)); %meanFarred Values
             scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(2,:));
+            LegendString{end+1} = 'Type 12h';
+            end
             hold on
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,12)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,14)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,15)); %meanFarred Values
             scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:));
+            LegendString{end+1} = 'Type 2x';
+            end
             hold on
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,12)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,14)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,15)); %meanFarred Values
             scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:));
+            LegendString{end+1} = 'Type 2a';
+            end
             hold on
+            if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,12)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,14)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,15)); %meanFarred Values
             scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:));
+            LegendString{end+1} = 'Type 2ax';
+            end
             hold on
             title({'Scatter Plot all Fiber Types'},'FontSize',16);
             hold on
-            l(5) = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','Location','Best');
+            l(5) = legend(LegendString,'Location','Best');
             set(l(5),'Tag','LegendScatterPlotAll');
             hold on
             zlabel('z: mean Farred','FontSize',12);

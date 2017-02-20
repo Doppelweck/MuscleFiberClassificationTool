@@ -521,6 +521,12 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
                 % Color-Based triple labeling classification
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',1)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
+                
                 set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
@@ -528,41 +534,60 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
-%                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - Colordistance-Based classification were selected';
-%                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 1;
-%                 set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','on')
-%                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','on')
-                
             elseif src.Value == 2
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
                 % Color-Based quad labeling classification
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',1)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
+                
                 set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',1)
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
-%                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - searching for 2 Fiber Type cluster';
-%                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 0;
-%                 set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
-%                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
-                
             elseif src.Value == 3
-                % Cluster-Based  classification 3 Fiber Type cluster
+                obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
                 
-%                 obj.modelAnalyzeHandle.InfoMessage = '   - Parameter:';
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - Cluster-Based classification were selected';
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - searching for 3 Fiber Type cluster';
-%                 obj.viewAnalyzeHandle.B_ColorDistanceActive.Value = 0;
-%                 set(obj.viewAnalyzeHandle.B_ColorDistance,'Enable','off')
-%                 set(obj.viewAnalyzeHandle.B_ColorDistanceActive,'Enable','off')
-%                 obj.modelAnalyzeHandle.InfoMessage = '      - color distance parameter is not necessary';
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
+                
+            elseif src.Value == 4
+                obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
             end
             
