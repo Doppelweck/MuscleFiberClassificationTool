@@ -146,8 +146,8 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontSize',fontSizeM, 'String', 'Analyze Mode :' );
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-            String = {'Color-Based triple labeling (T: 1 12h 2x)                     ' , 'Color-Based quad labeling (T: 1 12h 2a 2x 2ax)',...
-            'OPTICS-Cluster-Based triple labeling (T: 1 12h 2x)' , 'OPTICS-Cluster-Based quad labeling (T: 1 12h 2a 2x 2ax)'};
+            String= {sprintf('Color-Based triple labeling') ; sprintf('Color-Based quad labeling');...
+            'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontSize',fontSizeM, 'String', String ,'Value',2);
             
             set( HBoxPara1, 'Widths', [-2 -5] );

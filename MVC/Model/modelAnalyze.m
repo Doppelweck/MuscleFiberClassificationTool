@@ -893,7 +893,7 @@ classdef modelAnalyze < handle
                 X(:,2) = [tempStats.ColorBlue]';
                 
                 [RD,CD,order] = optics(X,minPoints);
-                Class = zeros(size(obj.Stats,1),1);
+                Class = zeros(size(tempStats,1),1);
                 Cluster = 0;
                 searchForClusters = true;
                 
@@ -1063,7 +1063,7 @@ classdef modelAnalyze < handle
                     X(:,2) = [tempStats.ColorFarRed]';
                     
                     [RD,CD,order] = optics(X,minPoints);
-                    Class = zeros(size(obj.Stats,1),1);
+                    Class = zeros(size(tempStats,1),1);
                     Cluster = 0;
                     searchForClusters = true;
                     
@@ -1109,14 +1109,14 @@ classdef modelAnalyze < handle
                         
                     elseif Cluster == 2
                         %Core Cluster 1
-                        C1xV = [tempStats(Class==1).ColorFarRed]';
-                        C1yV = [tempStats(Class==1).ColorRed]';
+                        C1xV = [tempStats(Class==1).ColorRed]';
+                        C1yV = [tempStats(Class==1).ColorFarRed]';
                         C1x = [sum(C1xV)/length(C1xV) 1];
                         C1y = [sum(C1yV)/length(C1yV) 1];
                         
                         %Core Cluster 2
-                        C2xV = [tempStats(Class==2).ColorFarRed]';
-                        C2yV = [tempStats(Class==2).ColorRed]';
+                        C2xV = [tempStats(Class==2).ColorRed]';
+                        C2yV = [tempStats(Class==2).ColorFarRed]';
                         C2x = [sum(C2xV)/length(C2xV) 2];
                         C2y = [sum(C2yV)/length(C2yV) 2];
                         
@@ -1135,20 +1135,20 @@ classdef modelAnalyze < handle
                         
                     elseif Cluster == 3
                         %Core Cluster 1
-                        C1xV = [tempStats(Class==1).ColorFarRed]';
-                        C1yV = [tempStats(Class==1).ColorRed]';
+                        C1xV = [tempStats(Class==1).ColorRed]';
+                        C1yV = [tempStats(Class==1).ColorFarRed]';
                         C1x = [sum(C1xV)/length(C1xV) 1];
                         C1y = [sum(C1yV)/length(C1yV) 1];
                         
                         %Core Cluster 2
-                        C2xV = [tempStats(Class==2).ColorFarRed]';
-                        C2yV = [tempStats(Class==2).ColorRed]';
+                        C2xV = [tempStats(Class==2).ColorRed]';
+                        C2yV = [tempStats(Class==2).ColorFarRed]';
                         C2x = [sum(C2xV)/length(C2xV) 2];
                         C2y = [sum(C2yV)/length(C2yV) 2];
                         
                         %Core Cluster 3
-                        C3xV = [tempStats(Class==3).ColorFarRed]';
-                        C3yV = [tempStats(Class==3).ColorRed]';
+                        C3xV = [tempStats(Class==3).ColorRed]';
+                        C3yV = [tempStats(Class==3).ColorFarRed]';
                         C3x = [sum(C3xV)/length(C3xV) 3];
                         C3y = [sum(C3yV)/length(C3yV) 3];
                         

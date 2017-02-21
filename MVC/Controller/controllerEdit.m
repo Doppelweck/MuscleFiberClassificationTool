@@ -2018,7 +2018,7 @@ classdef controllerEdit < handle
                 set(figHandles,'pointer','watch');
                 %find all objects that are enabled and disable them
                 obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text');
+                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelEditHandle.busyObj, 'Enable', 'off')
                 
                 try

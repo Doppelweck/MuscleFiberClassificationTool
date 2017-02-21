@@ -1095,7 +1095,7 @@ classdef controllerResults < handle
                 set(figHandles,'pointer','watch');
                 %find all objects that are enabled and disable them
                 obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text');
+                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
                 
                 try

@@ -519,6 +519,7 @@ classdef controllerAnalyze < handle
             
             if src.Value == 1
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
+                obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h and 2x fibers';
                 % Color-Based triple labeling classification
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
@@ -536,6 +537,7 @@ classdef controllerAnalyze < handle
                 
             elseif src.Value == 2
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
+                obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h 2x 2a and 2ax fibers';
                 % Color-Based quad labeling classification
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
                 
@@ -555,6 +557,7 @@ classdef controllerAnalyze < handle
                 
             elseif src.Value == 3
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
+                obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h and 2x fibers';
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
@@ -573,6 +576,7 @@ classdef controllerAnalyze < handle
                 
             elseif src.Value == 4
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
+                obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h 2x 2a and 2ax fibers';
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
@@ -957,7 +961,9 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.BoundarieMat = [];
             % Clear PicRGB and Boundarie Objects
             handleChild = allchild(obj.modelAnalyzeHandle.handlePicRGB.Parent);
+            if ~isempty(handleChild)
             delete(handleChild);
+            end
             
             % If a window for Fibertype manipulation already exists,
             % delete it
@@ -1307,7 +1313,7 @@ classdef controllerAnalyze < handle
                 set(figHandles,'pointer','watch');
                 %find all objects that are enabled and disable them
                 obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text');
+                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
                 
                 try
