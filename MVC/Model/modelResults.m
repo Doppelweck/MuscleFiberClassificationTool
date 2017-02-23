@@ -493,6 +493,7 @@ classdef modelResults < handle
                 case 4
                     obj.StatisticMat{1,2} =  'OPTICS-Cluster-Based quad labeling';
                 case 5
+                    obj.StatisticMat{1,2} =  'Manual Classification';
             end
             
             % 2. Row
@@ -506,6 +507,8 @@ classdef modelResults < handle
                     obj.StatisticMat{2,2} =  '1 2 12h 2x fibers';
                 case 4
                     obj.StatisticMat{2,2} =  '1 2 12h 2x 2a 2ax fibers';
+                case 5
+                    obj.StatisticMat{2,2} =  'Manual Classification';
             end
             
             % 3. and 4. Row

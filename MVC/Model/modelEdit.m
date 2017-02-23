@@ -928,12 +928,12 @@ classdef modelEdit < handle
             end
             obj.InfoMessage = '   - brightness adjustment finished';
             
-            if isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed) || ...
-                    isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed)
+            if isempty(obj.PicBCFarRed) && isempty(obj.PicBCFarRed) && ...
+                    isempty(obj.PicBCFarRed) && isempty(obj.PicBCFarRed)
                 
                 infotext = {'Info! ',...
                     '',...
-                    'Not all brightness adjustment images were found.',...
+                    'No brightness adjustment images were found.',...
                     '',...
                     'Go to the "Check planes" menu to verify the images:',...
                     'The following options are available:',...
@@ -970,7 +970,6 @@ classdef modelEdit < handle
                     Area = [stats(:).Area];
                     Area = sort(Area);
                     %mean area  value of the biggest fibers
-                    workbar(1/4,'determine fiber radius... ','Background Calculation'); 
                     AreaBig = Area(round(length(Area)*(2/3)):end);
                     MeanArea = mean(AreaBig);
                     obj.InfoMessage = '            - determine fiber radius';
@@ -979,18 +978,15 @@ classdef modelEdit < handle
                     %double radius to be sure that the structering element
                     %is bigger than the fibers
                     radius=ceil(radius)*3;
-                    workbar(2/4,'calculate background profile... ','Background Calculation'); 
                     obj.InfoMessage = '            - calculate background profile';
                     background = imopen(obj.PicPlaneGreen,strel('disk',radius));
                     h = fspecial('disk', radius);
-                    obj.InfoMessage = '            - smoothing background profile';
-                    workbar(3/4,'smoothing background profile... ','Background Calculation'); 
+                    obj.InfoMessage = '            - smoothing background profile'; 
                     smoothedBackground = imfilter(double(background), h, 'replicate');
                     %Normalized Background to 1
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCGreen = smoothedBackground;
                     obj.FilenameBCGreen = 'calculated from Green plane background';
-                    workbar(4/4,'save data ','Background Calculation'); 
                     
                 case 'Blue'
                     

@@ -126,6 +126,7 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_BackEdit,'Callback',@obj.backEditModeEvent);
             set(obj.viewAnalyzeHandle.B_StartResults,'Callback',@obj.startResultsModeEvent);
             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Callback',@obj.startAnalyzeEvent);
+            set(obj.viewAnalyzeHandle.B_PreResults,'Callback',@obj.showPreResultsEvent);
             
             set(obj.viewAnalyzeHandle.B_AnalyzeMode,'Callback',@obj.analyzeModeEvent)
             
@@ -149,9 +150,9 @@ classdef controllerAnalyze < handle
             %           obj:    Handle to controllerAnalyze object.
             %
             
-            set(obj.mainFigure,'ButtonDownFcn','');
+            set(obj.mainFigure,'WindowButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
-            set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
+%             set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
             
         end
@@ -212,6 +213,18 @@ classdef controllerAnalyze < handle
             %           src:    source of the callback.
             %           evnt:   callback event data.
             %
+            
+            % If a window already exists, delete it
+            OldFig = findobj('Tag','FigureManipulate');
+            if ~isempty(OldFig) && isvalid(OldFig)
+                delete(OldFig);
+            end
+            
+            % If a highlight BoundarieBox already exists, delete it
+            OldBox = findobj('Tag','highlightBox');
+            if ~isempty(OldBox) && isvalid(OldBox)
+                delete(OldBox);
+            end
             
             % Which element has triggered the callback
             Tag = evnt.AffectedObject.Tag;
@@ -556,7 +569,7 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
             elseif src.Value == 3
-                obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
+                obj.modelAnalyzeHandle.InfoMessage = '   -OPTICS -Cluster-Based triple labeling';
                 obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h and 2x fibers';
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
                 
@@ -575,8 +588,26 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
             elseif src.Value == 4
-                obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
+                obj.modelAnalyzeHandle.InfoMessage = '   -OPTICS -Cluster-Based quad labeling';
                 obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h 2x 2a and 2ax fibers';
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
+            
+            elseif src.Value == 5 
+                obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification';
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
@@ -613,6 +644,18 @@ classdef controllerAnalyze < handle
             %           src:    source of the callback.
             %           evnt:   callback event data.
             %
+            
+            % If a window already exists, delete it
+            OldFig = findobj('Tag','FigureManipulate');
+            if ~isempty(OldFig) && isvalid(OldFig)
+                delete(OldFig);
+            end
+            
+            % If a highlight BoundarieBox already exists, delete it
+            OldBox = findobj('Tag','highlightBox');
+            if ~isempty(OldBox) && isvalid(OldBox)
+                delete(OldBox);
+            end
             
             % Which element has triggered the callback
             Tag = evnt.Source.Tag;
@@ -752,6 +795,27 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
                 axis on
                 axis image
+                
+            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 3
+                
+                %Show image for quad labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
+                axis on
+                axis image
+                
+            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 4
+                
+                %Show image for quad labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
+                axis on
+                axis image   
+                
+            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 5
+                
+                %Show image for quad labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
+                axis on
+                axis image     
             end
             
             % set panel title to filename and path
@@ -771,11 +835,21 @@ classdef controllerAnalyze < handle
             % If a window for Fibertype manipulation already exists,
             % delete it
             OldFig = findobj('Tag','FigureManipulate');
-            delete(OldFig);
+            if ~isempty(OldFig) && isvalid(OldFig)
+                delete(OldFig);
+            end
+            
             % If a Higlight Boundarie Box already exists,
             % delete it
             OldBox = findobj('Tag','highlightBox');
-            delete(OldBox);
+            if ~isempty(OldBox) && isvalid(OldBox)
+                delete(OldBox);
+            end
+            
+            preFig = findobj('Tag','FigurePreResults');
+            if ~isempty(preFig) && isvalid(preFig)
+                delete(preFig);
+            end
             
             %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
@@ -822,6 +896,14 @@ classdef controllerAnalyze < handle
                 obj.addWindowCallbacks()
             end
             
+            % If a window for preview results already exists,
+            % delete it
+            preFig = findobj('Tag','FigurePreResults');
+            if ~isempty(preFig) && isvalid(preFig)
+                delete(preFig);
+                obj.addWindowCallbacks()
+            end
+            
             obj.busyIndicator(1);
             % Set all Vlaues form the GUI objects in the correspondending
             % model properties.
@@ -854,34 +936,34 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.XScale = str2double(obj.viewAnalyzeHandle.B_XScale.String);
             obj.modelAnalyzeHandle.YScale = str2double(obj.viewAnalyzeHandle.B_YScale.String);
             
-            % Disable all GUI buttons during classification
-            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_AnalyzeMode,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_AreaActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MinArea,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MaxArea,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_XScale,'Enable','off')
-            set(obj.viewAnalyzeHandle.B_YScale,'Enable','off')
+%             % Disable all GUI buttons during classification
+%             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_AnalyzeMode,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_AreaActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MinArea,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MaxArea,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_XScale,'Enable','off')
+%             set(obj.viewAnalyzeHandle.B_YScale,'Enable','off')
             
             % start the classification
             obj.modelAnalyzeHandle.startAnalysze();
@@ -891,50 +973,50 @@ classdef controllerAnalyze < handle
             obj.controllerResultsHandle.clearData();
             obj.busyIndicator(0);
             % Enable all GUI buttons
-            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
-            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
-            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
-            set(obj.viewAnalyzeHandle.B_AnalyzeMode,'Enable','on')
-            
-            set(obj.viewAnalyzeHandle.B_AreaActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_AreaActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_MinArea,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_MaxArea,'Enable','on')
-            end
-            
-            set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_RoundnessActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
-            end
-            
-            set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_AspectRatioActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
-            end
-            
-            set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_BlueRedThreshActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
-                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
-            end
-            if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
-                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
-                if obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value == 1
-                    set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
-                    set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
-                    set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
-                end
-            end
-            
-            set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
-            if obj.viewAnalyzeHandle.B_ColorValueActive.Value == 1
-                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
-            end
-            
-            set(obj.viewAnalyzeHandle.B_XScale,'Enable','on')
-            set(obj.viewAnalyzeHandle.B_YScale,'Enable','on')
+%             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
+%             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
+%             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
+%             set(obj.viewAnalyzeHandle.B_AnalyzeMode,'Enable','on')
+%             
+%             set(obj.viewAnalyzeHandle.B_AreaActive,'Enable','on')
+%             if obj.viewAnalyzeHandle.B_AreaActive.Value == 1
+%                 set(obj.viewAnalyzeHandle.B_MinArea,'Enable','on')
+%                 set(obj.viewAnalyzeHandle.B_MaxArea,'Enable','on')
+%             end
+%             
+%             set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+%             if obj.viewAnalyzeHandle.B_RoundnessActive.Value == 1
+%                 set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+%             end
+%             
+%             set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+%             if obj.viewAnalyzeHandle.B_AspectRatioActive.Value == 1
+%                 set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+%                 set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+%             end
+%             
+%             set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
+%             if obj.viewAnalyzeHandle.B_BlueRedThreshActive.Value == 1
+%                 set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
+%                 set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
+%                 set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
+%             end
+%             if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
+%                 set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','on')
+%                 if obj.viewAnalyzeHandle.B_FarredRedThreshActive.Value == 1
+%                     set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','on')
+%                     set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
+%                     set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
+%                 end
+%             end
+%             
+%             set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+%             if obj.viewAnalyzeHandle.B_ColorValueActive.Value == 1
+%                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+%             end
+%             
+%             set(obj.viewAnalyzeHandle.B_XScale,'Enable','on')
+%             set(obj.viewAnalyzeHandle.B_YScale,'Enable','on')
             
             
         end
@@ -977,6 +1059,13 @@ classdef controllerAnalyze < handle
             if ~isempty(OldFig)
                 OldBox = findobj('Tag','highlightBox');
                 delete(OldBox);
+            end
+            
+            % If a window for preview results already exists,
+            % delete it
+            preFig = findobj('Tag','FigurePreResults');
+            if ~isempty(preFig) && isvalid(preFig)
+                delete(preFig);
             end
             
             % set log text from Analyze GUI to Pic GUI
@@ -1022,6 +1111,13 @@ classdef controllerAnalyze < handle
                 if ~isempty(OldFig)
                     OldBox = findobj('Tag','highlightBox');
                     delete(OldBox);
+                end
+                
+                % If a window for preview results already exists,
+                % delete it
+                preFig = findobj('Tag','FigurePreResults');
+                if ~isempty(preFig) && isvalid(preFig)
+                    delete(preFig);
                 end
                 
                 obj.modelAnalyzeHandle.InfoMessage = ' ';
@@ -1133,7 +1229,11 @@ classdef controllerAnalyze < handle
             PosAxes = get(obj.viewAnalyzeHandle.hAP, 'CurrentPoint');
             PosOut = obj.modelAnalyzeHandle.checkPosition(PosAxes);
             
-            if ~isnan(PosOut(1)) && ~isnan(PosOut(1)) && ~isempty(obj.modelAnalyzeHandle.LabelMat)
+            if isnan(PosOut(1)) || isnan(PosOut(1))
+                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            end
+            
+            if ~isnan(PosOut(1)) && ~isnan(PosOut(2)) && ~isempty(obj.modelAnalyzeHandle.LabelMat)
                 
                 %Check whether object was clicked
                 Label = obj.modelAnalyzeHandle.LabelMat(PosOut(2),PosOut(1));
@@ -1241,6 +1341,201 @@ classdef controllerAnalyze < handle
             
             % refresh Callback function in figure AnalyzeMode
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+        end
+        
+        function showPreResultsEvent(obj,src,evnt)
+            
+            % If a window already exists, delete it
+            OldFig = findobj('Tag','FigureManipulate');
+            if ~isempty(OldFig) && isvalid(OldFig)
+                delete(OldFig);
+            end
+            
+            % If a highlight BoundarieBox already exists, delete it
+            OldBox = findobj('Tag','highlightBox');
+            if ~isempty(OldBox) && isvalid(OldBox)
+                delete(OldBox);
+            end
+            
+            if ~isempty(obj.modelAnalyzeHandle.Stats)
+                
+                %Find Pre Figure for results
+                preFig = findobj('Tag','FigurePreResults');
+                if ~isempty(preFig) && isvalid(preFig)
+                    % If figure already exist make it the current figure
+                    figure(preFig)
+                else
+                    % If figure dont exist create a new figure
+                    
+                    ColorMap(1,:) = [51 51 255]; % Blue Fiber Type 1
+                    ColorMap(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+                    ColorMap(3,:) = [255 51 51]; % Red Fiber Type 2x
+                    ColorMap(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+                    ColorMap(5,:) = [255 153 51]; % orange Fiber Type 2ax
+                    ColorMap(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+                    ColorMap = ColorMap/255;
+                    
+                    obj.viewAnalyzeHandle.showFigurePreResults();
+                    
+                    %find all Type 1 Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 1');
+                    T1 = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 12h Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 12h');
+                    T12h = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2x Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2x');
+                    T2x = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2a Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2a');
+                    T2a = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2ax Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2ax');
+                    T2ax = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    ax = obj.viewAnalyzeHandle.hAPRBR;
+                    
+                    LegendString = {};
+                    
+                    axes(ax)
+                    hold on
+                    if ~isempty(T1)
+                        h=scatter([T1.ColorRed],[T1.ColorBlue],20,ColorMap(1,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 1';
+                    end
+                    hold on
+                    if ~isempty(T12h)
+                        h=scatter([T12h.ColorRed],[T12h.ColorBlue],20,ColorMap(2,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 12h';
+                    end
+                    hold on
+                    if ~isempty(T2x)
+                        h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2x';
+                    end
+                    hold on
+                    if ~isempty(T2a)
+                        h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2a';
+                    end
+                    hold on
+                    if ~isempty(T2ax)
+                        h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2a';
+                    end
+                    
+                    Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
+                    Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
+                    R = [0 2*Rmax]; %Red value vector
+                    
+                    if obj.modelAnalyzeHandle.BlueRedThreshActive
+                        % BlueRedThreshActive Parameter is active, plot
+                        % classification functions
+                        
+                        BlueRedTh = obj.modelAnalyzeHandle.BlueRedThresh;
+                        BlueRedDistB = obj.modelAnalyzeHandle.BlueRedDistBlue;
+                        BlueRedDistR = obj.modelAnalyzeHandle.BlueRedDistRed;
+                        
+                        % creat classification function line obj
+                        f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
+                        f_Bdist = BlueRedTh * R / (1-BlueRedDistB); %blue dist fcn
+                        f_Rdist = BlueRedTh * R * (1-BlueRedDistR); %red dist fcn
+                        hold on
+                        plot(R,f_Bdist,'b');
+                        LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(BlueRedTh) ' * R / (1-' num2str(BlueRedDistB) ')'];
+                        hold on
+                        plot(R,f_Rdist,'r');
+                        LegendString{end+1}= ['f_{Rdist}(R) = ' num2str(BlueRedTh) ' * R * (1-' num2str(BlueRedDistR) ')'];
+                        hold on
+                        plot(R,f_BRthresh,'k');
+                        LegendString{end+1}= ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
+                    elseif obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 2
+                        BlueRedTh = 1;
+                        BlueRedDistB = 0;
+                        BlueRedDistR = 0;
+                        f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
+                        hold on
+                        plot(R,f_BRthresh,'k');
+                    end
+                    
+                    maxLim =  max([Rmax Bmax]);
+                    ylabel('y: mean Blue (B)','FontSize',12);
+                    xlabel('x: mean Red (R)','FontSize',12);
+                    ylim([ 0 maxLim+10 ] );
+                    xlim([ 0 maxLim+10 ] );
+                    grid on
+                    legend(LegendString,'Location','Best')
+                    
+                    %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    ax = obj.viewAnalyzeHandle.hAPRFRR;
+                    axes(ax)
+                    LegendString = {};
+                    
+                    hold on
+                    if ~isempty(T2x)
+                        h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2x';
+                    end
+                    hold on
+                    if ~isempty(T2a)
+                        h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2a';
+                    end
+                    hold on
+                    if ~isempty(T2ax)
+                        h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2a';
+                    end
+                    
+                    Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
+                    FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
+                    
+                    if obj.modelAnalyzeHandle.FarredRedThreshActive
+                        R = [0 2*Rmax]; %Red value vector
+                        % Color-Based Classification
+                        % FarredRedThreshActive Parameter is active, plot
+                        % classification functions
+                        FarredRedTh = obj.modelAnalyzeHandle.FarredRedThresh;
+                        FarredRedDistFR = obj.modelAnalyzeHandle.FarredRedDistFarred;
+                        FarredRedDistR = obj.modelAnalyzeHandle.FarredRedDistRed;
+                        
+                        % creat classification function line obj
+                        f_FRRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
+                        f_FRdist = FarredRedTh * R / (1-FarredRedDistFR); %farred dist fcn
+                        f_Rdist = FarredRedTh * R * (1-FarredRedDistR); %red dist fcn
+                        
+                        plot(R,f_FRdist,'y');
+                        LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
+                        
+                        plot(R,f_Rdist,'r');
+                        LegendString{end+1} = ['f_{Rdist}(R) = ' num2str(FarredRedTh) ' * R * (1-' num2str(FarredRedDistR) ')'];
+                        
+                        plot(R,f_FRRthresh,'k');
+                        LegendString{end+1} = ['f_{BRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
+                    end
+                    
+                    maxLim =  max([Rmax FRmax]);
+                    ylabel('y: mean Farred (FR)','FontSize',14);
+                    xlabel('x: mean Red (R)','FontSize',14);
+                    ylim([ 0 maxLim+10 ] );
+                    xlim([ 0 maxLim+10 ] );
+                    grid on
+                    legend(LegendString,'Location','Best')
+                    
+                end
+            end
         end
         
         function setInfoTextView(obj,InfoText)

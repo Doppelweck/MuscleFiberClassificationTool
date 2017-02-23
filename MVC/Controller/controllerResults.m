@@ -589,6 +589,8 @@ classdef controllerResults < handle
                 title('OPTICS-Cluster-Based Classification triple labeling','FontSize',16);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
                 title('OPTICS-Cluster-Based Classification quad labeling','FontSize',16);
+            elseif obj.modelResultsHandle.AnalyzeMode == 5
+                title('Manual Classification','FontSize',16);
             end
             
             l(3) = legend(LegendString,'Location','Best');
@@ -685,6 +687,8 @@ classdef controllerResults < handle
                 title('OPTICS-Cluster-Based Classification triple labeling','FontSize',16);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
                 title('OPTICS-Cluster-Based Classification quad labeling','FontSize',16);
+            elseif obj.modelResultsHandle.AnalyzeMode == 5
+                title('Manual Classification','FontSize',16);
             end
                 maxFarredValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,15)));
                 maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));

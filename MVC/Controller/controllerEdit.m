@@ -77,7 +77,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences';
             obj.modelEditHandle.InfoMessage = 'Version 1.0 2017';
             obj.modelEditHandle.InfoMessage = ' ';
-            obj.modelEditHandle.InfoMessage = 'Press "New image" to start';
+            obj.modelEditHandle.InfoMessage = 'Press "New file" to start';
             
             
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');

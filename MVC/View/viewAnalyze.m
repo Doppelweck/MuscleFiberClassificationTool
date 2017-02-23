@@ -29,11 +29,17 @@ classdef viewAnalyze < handle
         panelControl;    %handle to panel with controls.
         panelPicture;   %handle to panel with image.
         hAP;    %handle to axes with image.
+        hAMC; %handle to axes for manual classification mode.
         hFM; %handle to figure to change the Fiber-Type.
+        hFMC; %handle to figure for manual classification mode.
+        hFPR; %handle to figure the shows a preview of the ruslts after calssification.
+        hAPRBR; %handle to axes with Blue over Red classification results in the Preview Results Figure.
+        hAPRFRR; %handle to axes with Farred over Red classification results in the Preview Results Figure.
         
         B_BackEdit; %Button, close the AnalyzeMode and opens the the EditMode.     
         B_StartAnalyze; %Button, runs the segmentation and classification functions.
         B_StartResults; %Button, close the AnalyzeMode and opens the the ResultsMode.
+        B_PreResults; %Button, Shows a preview scatter plot with classified fibers. 
         
         B_AnalyzeMode; %Popup menu, select the classification method.
         
@@ -83,6 +89,11 @@ classdef viewAnalyze < handle
         B_ManipulateOK; %Button, apply fiber type changes.
         B_ManipulateCancel; %Button, cancel fiber type changes.
         
+        B_ManualInfoText; %Text, info text for manual classification
+        B_ManualClassBack; %Button, manual classification, go back to choose main fiber types.
+        B_ManualClassEnd; %Button, quit manual classification.
+        B_ManualClassForward; %Button, manual classification, go forward to specify type 2 fiber types.
+        
     end
     
     methods
@@ -128,12 +139,14 @@ classdef viewAnalyze < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%
             VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 5 );
-            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 600],'Spacing', 5 );
             
+            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 600],'Spacing', 5 );
             obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', 'Back to edit mode','FontSize',fontSizeB );
             obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', 'Show results','FontSize',fontSizeB );
             
-            obj.B_StartAnalyze = uicontrol( 'Parent', VBBoxControl, 'String', 'Start analyzing','FontSize',fontSizeB );
+            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 600],'Spacing', 5 );
+            obj.B_StartAnalyze = uicontrol( 'Parent', HBBoxControl2, 'String', 'Start analyzing','FontSize',fontSizeB );
+            obj.B_PreResults = uicontrol( 'Parent', HBBoxControl2, 'String', 'Preview results','FontSize',fontSizeB );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%% Panel Para %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -146,7 +159,7 @@ classdef viewAnalyze < handle
             uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontSize',fontSizeM, 'String', 'Analyze Mode :' );
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-            String= {sprintf('Color-Based triple labeling') ; sprintf('Color-Based quad labeling');...
+            String= {sprintf('Color-Ratio-Based triple labeling') ; sprintf('Color-Ratio-Based quad labeling');...
             'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontSize',fontSizeM, 'String', String ,'Value',2);
             
@@ -428,7 +441,7 @@ classdef viewAnalyze < handle
             obj.B_InfoText = uicontrol('Parent',PanelInfo,'Style','listbox','FontSize',fontSizeM,'String',{});
             
             %%%%%%%%%%%%%%% call edit functions for GUI
-%             obj.setToolTipStrings();
+            obj.setToolTipStrings();
 
         end
         
@@ -565,6 +578,89 @@ classdef viewAnalyze < handle
             set(obj.hFM,'Visible','on')
         end
         
+        function showFigureManualClassify(obj)
+            % Creates a new figure when the user selects manual classification.
+            %
+            %   showFigureManualClassify(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:        Handle to viewEdit object
+            %
+            
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big 
+            end
+            
+            obj.hFMC = figure('NumberTitle','off','Units','normalized','Name','Manual Classification','Visible','off');
+            set(obj.hFMC,'Tag','FigureManualClassify')
+            set(obj.hFMC, 'position', [0.2 0.1 0.6 0.8]);
+            set(obj.hFMC,'WindowStyle','normal');
+            
+            VBox = uix.VBox('Parent', obj.hFMC );
+            %VBox 1 with info text
+            HBoxText = uix.HButtonBox('Parent', VBox,'ButtonSize',[6000 40],'Padding', 1 );
+            String = 'Select a Area by clicking the mouse and choose fiber type';
+            uicontrol( 'Parent', HBoxText,'Style','text','FontSize',fontSizeB, 'String', String);
+            String = 'Select Main Fiber types 1 12h and 2';
+            obj.B_ManualInfoText = uicontrol( 'Parent', HBoxText,'Style','text','FontSize',fontSizeB, 'String', String,'Tag','ManualInfoText');
+            
+            %VBox 2 with axes
+            AxesBox = uix.HBox('Parent', VBox,'Padding', 1 );
+            obj.hAMC = axes('Parent',uicontainer('Parent', AxesBox), 'FontSize',fontSizeB,'Tag','AxesManualClassify');
+            set(obj.hAMC, 'LooseInset', [0,0,0,0]);
+            daspect(obj.hAMC,[1 1 1]);
+            %VBox 3 with Buttons
+            BBox = uix.HButtonBox('Parent', VBox,'ButtonSize',[600 40],'Padding', 10 );
+            obj.B_ManualClassBack = uicontrol( 'Parent', BBox, 'String', 'Back Main Fbers','FontSize',fontSizeM ,'Tag','Back Main Fbers');
+            obj.B_ManualClassEnd = uicontrol( 'Parent', BBox, 'String', 'End Classification','FontSize',fontSizeM ,'Tag','Complete Classification');
+            obj.B_ManualClassForward = uicontrol( 'Parent', BBox, 'String', 'Specify Type 2 Fibers','FontSize',fontSizeM ,'Tag','Specify Type 2 Fibers');
+            
+            set( VBox, 'Heights', [-1 -8 -1], 'Spacing', 1 ); 
+            set(obj.hFMC, 'Visible', 'on');
+        end
+        
+        function showFigurePreResults(obj)
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big 
+            end
+            
+            obj.hFPR = figure('NumberTitle','off','Units','normalized','Name','Preview Results','Visible','off','MenuBar','none');
+            set(obj.hFPR,'Tag','FigurePreResults')
+            set(obj.hFPR, 'position', [0.1 0.1 0.8 0.8]);
+            set(obj.hFPR,'WindowStyle','normal');
+            
+            AxesBox = uix.HBox('Parent', obj.hFPR,'Padding', 25,'Spacing', 10 );
+            obj.hAPRBR = axes('Parent',uicontainer('Parent', AxesBox), 'FontSize',fontSizeM,'Tag','AxesManualClassify');
+            set(obj.hAPRBR, 'LooseInset', [0,0,0,0]);
+            daspect(obj.hAPRBR,[1 1 1]);
+            obj.hAPRFRR = axes('Parent',uicontainer('Parent', AxesBox), 'FontSize',fontSizeM,'Tag','AxesManualClassify');
+            set(obj.hAPRFRR, 'LooseInset', [0,0,0,0]);
+            daspect(obj.hAPRFRR,[1 1 1]);
+            set(obj.hFPR, 'Visible', 'on');
+        end
+        
         function setToolTipStrings(obj)
             % Set all tooltip strings in the properties of the operationg
             % elements that are shown in the GUI
@@ -617,7 +713,7 @@ classdef viewAnalyze < handle
             set(obj.B_MinAspectRatio,'tooltipstring',MinAspectToolTip);
             set(obj.B_MaxAspectRatio,'tooltipstring',MaxAspectToolTip);
             set(obj.B_MinRoundness,'tooltipstring',MinRoundToolTip);
-            set(obj.B_ColorDistance,'tooltipstring',MinColorDistToolTip);
+%             set(obj.B_ColorDistance,'tooltipstring',MinColorDistToolTip);
             set(obj.B_ColorValue,'tooltipstring',MinColorValueToolTip);
             
         end
