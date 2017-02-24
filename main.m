@@ -19,7 +19,7 @@ mainFig = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85],...
     'doublebuffer', 'off','Menubar','figure','Visible','on',...
     'WindowStyle','normal','NumberTitle','off');
 
-% hide needless ToogleTool objects in teh main figure
+% hide needless ToogleTool objects in the main figure
 set( findall(mainFig,'ToolTipString','Edit Plot') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Colorbar') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Legend') ,'Visible','Off');

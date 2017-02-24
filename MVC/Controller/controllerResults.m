@@ -428,9 +428,9 @@ classdef controllerResults < handle
             set(gca,'XTick',[1 2 3 4 5 6]);
             ylabel('Numbers');
             title('Number of fiber types','FontSize',16)
-            l(1) = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind',...
+            l1 = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind',...
                     'Location','Best');
-            set(l(1),'Tag','LegendNumberPlot');
+            set(l1,'Tag','LegendNumberPlot');
             grid on
             hold off
             
@@ -469,9 +469,11 @@ classdef controllerResults < handle
             StringLegend(z==0)=[];
             
             title('Area of fiber types','FontSize',16)
-            l(2) = legend(StringLegend,...
-                    'Location','Best');
-            set(l(2),'Tag','LegendAreaPlot');
+            
+            if ~isempty(StringLegend)
+                l2 = legend(StringLegend,'Location','Best');
+                set(l2,'Tag','LegendAreaPlot');
+            end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Plot Scatter Blue/Red Classification %%%%%%%%%%%%%%%%%%%%%%%%
@@ -540,7 +542,7 @@ classdef controllerResults < handle
                 if isempty(Rmax)
                     % if Rmax is empty (no Red Fibers detected) Rmax is the
                     % largest Red Value of all fibers
-                    Rmax = max(obj.modelResultsHandle.StatsMatData(:,12));
+                    Rmax = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));
                 end
                 
                 R = [0 2*Rmax]; %Red value vector
@@ -593,8 +595,11 @@ classdef controllerResults < handle
                 title('Manual Classification','FontSize',16);
             end
             
-            l(3) = legend(LegendString,'Location','Best');
-            set(l(3),'Tag','LegendScatterPlotBlueRed');
+            if ~isempty(LegendString)
+                l3 = legend(LegendString,'Location','Best');
+                set(l3,'Tag','LegendScatterPlotBlueRed');
+            end
+            
             maxBlueValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,14)));
             maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,12)));
             maxLim =  max([maxBlueValue maxRedValue])+50;
@@ -700,8 +705,11 @@ classdef controllerResults < handle
                 xlim([ 0 maxLim ] );
                 set(gca,'xtick',[0:20:maxLim*2]);
                 set(gca,'ytick',[0:20:maxLim*2]);
-                l(4) = legend(LegendString,'Location','Best');
-                set(l(4),'Tag','LegendScatterPlotFarredRed');
+                
+                if ~isempty(LegendString)
+                    l4 = legend(LegendString,'Location','Best');
+                    set(l4,'Tag','LegendScatterPlotFarredRed');
+                end
                     
                 grid on
                 hold off
@@ -755,8 +763,12 @@ classdef controllerResults < handle
             hold on
             title({'Scatter Plot all Fiber Types'},'FontSize',16);
             hold on
-            l(5) = legend(LegendString,'Location','Best');
-            set(l(5),'Tag','LegendScatterPlotAll');
+            
+            if ~isempty(LegendString)
+                l5 = legend(LegendString,'Location','Best');
+                set(l5,'Tag','LegendScatterPlotAll');
+            end
+            
             hold on
             zlabel('z: mean Farred','FontSize',12);
             ylabel('y: mean Blue','FontSize',12);
