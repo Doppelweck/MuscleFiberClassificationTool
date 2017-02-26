@@ -44,8 +44,9 @@ classdef modelResults < handle
         SaveFiberTable; %Indicates whether the fiber type table should be saved.
         SaveScatterAll; %Indicates whether the scatter plot with for all fibers should be saved.
         SavePlots; %Indicates whether the statistics plots should be saved.
-        SavePicRGBFRProcessed; %Indicates whether the processed image should be saved.
-        SavePicRGBProcessed; %Indicates whether the color-plane image should be saved.
+        SaveHisto; %Indicates whether the Histogram plots should be saved.
+        SavePicRGBFRProcessed; %Indicates whether the processed image with Farred should be saved.
+        SavePicRGBProcessed; %Indicates whether the processed image without Farred should be saved.
         SavePath; % Save Path, same as the selected RGB image path.
         ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
@@ -197,6 +198,8 @@ classdef modelResults < handle
             obj.controllerResultsHandle.showAxesDataInGUI();
             
             obj.controllerResultsHandle.showInfoInTableGUI();
+            
+            obj.controllerResultsHandle.showHistogramGUI();
             
             obj.controllerResultsHandle.showPicProcessedGUI();
             
@@ -901,6 +904,54 @@ classdef modelResults < handle
                 obj.InfoMessage = '   - saving plots complete';
             end
             
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % save Histograms
+            if obj.SaveHisto
+                
+                obj.InfoMessage = '      - saving Histograms plots...';
+                
+                obj.InfoMessage = '         - saving Area histogram as .pdf';
+                picName = [fileName '_processed_AreaHisto' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                fTemp = figure('Visible','off');
+                copyobj(obj.controllerResultsHandle.viewResultsHandle.hAAreaHist,fTemp);
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '         - saving AspectRatio histogram as .pdf';
+                picName = [fileName '_processed_AspectRatioHisto' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                fTemp = figure('Visible','off');
+                copyobj(obj.controllerResultsHandle.viewResultsHandle.hAAspectHist,fTemp);
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '         - saving Diameter histogram as .pdf';
+                picName = [fileName '_processed_DiameterHisto' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                fTemp = figure('Visible','off');
+                copyobj(obj.controllerResultsHandle.viewResultsHandle.hADiaHist,fTemp);
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '         - saving Roundness histogram as .pdf';
+                picName = [fileName '_processed_RoundnessHisto' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                fTemp = figure('Visible','off');
+                copyobj(obj.controllerResultsHandle.viewResultsHandle.hARoundHist,fTemp);
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '   - saving Histograms complete';
+                
+            end
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % save Scatter all
             if obj.SaveScatterAll
                 obj.InfoMessage = '      - saving Scatter all Fibers...';
                 obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';

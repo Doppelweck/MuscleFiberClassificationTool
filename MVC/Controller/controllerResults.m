@@ -305,6 +305,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.SaveFiberTable = obj.viewResultsHandle.B_SaveFiberTable.Value;
             obj.modelResultsHandle.SaveScatterAll = obj.viewResultsHandle.B_SaveScatterAll.Value;
             obj.modelResultsHandle.SavePlots = obj.viewResultsHandle.B_SavePlots.Value;
+            obj.modelResultsHandle.SaveHisto = obj.viewResultsHandle.B_SaveHisto.Value;
             obj.modelResultsHandle.SavePicRGBFRProcessed = obj.viewResultsHandle.B_SavePicRGBFRProc.Value;
             obj.modelResultsHandle.SavePicRGBProcessed = obj.viewResultsHandle.B_SavePicRGBProc.Value;
             
@@ -792,7 +793,7 @@ classdef controllerResults < handle
         end
         
         function showPicProcessedGUI(obj)
-            % Shows the proceesed images ande the color plane image in the  
+            % Shows the proceesed images and the color plane image in the  
             % corresponding axes in the GUI. 
             %
             %   showPicProcessedGUI(obj);
@@ -811,7 +812,9 @@ classdef controllerResults < handle
             axesPicAnalyze = obj.controllerAnalyzeHandle.viewAnalyzeHandle.hAP;
             %get boundaries
             hBounds = findobj(axesPicAnalyze,'Type','hggroup');
-            
+            if isempty(hBounds)
+            hBounds = findobj(axesPicAnalyze,'Type','line');
+            end
             % get axes in the results GUI
             axesResultsRGBFR = obj.viewResultsHandle.hAPProcessedRGBFR;
             % show RGB image with farred plane
@@ -858,6 +861,90 @@ classdef controllerResults < handle
             hold off
             
             obj.modelResultsHandle.InfoMessage = '   - load images complete';
+            
+        end
+        
+        function showHistogramGUI(obj)
+            % Shows the Histogram plots in the  
+            % corresponding axes in the GUI. 
+            %
+            %   showPicProcessedGUI(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
+            
+            obj.modelResultsHandle.InfoMessage = '   - show Histograms...';
+            
+            %find all objevts that are not classified as undefined Type 0
+            
+            tempStats = obj.modelResultsHandle.Stats([obj.modelResultsHandle.Stats.FiberTypeMainGroup]>0);
+            
+            if ~isempty(tempStats)
+            %%%%%%%%% Area Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.modelResultsHandle.InfoMessage = '      - plot Area Histogram';
+            
+            cla(obj.viewResultsHandle.hAAreaHist);
+            axes(obj.viewResultsHandle.hAAreaHist);
+            
+            h = histogram([tempStats.Area]);
+            h.BinWidth = 50;
+            
+            title('Area Histogram','FontSize',16)
+            xlabel(['Area in \mum^2 ( Stepsize bins: ' num2str(h.BinWidth) ' \mum^2 )'],'FontSize',14)
+            ylabel('Numbers','FontSize',14)
+            grid on
+            
+            %%%%%%%%% Aspect Ratio Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.modelResultsHandle.InfoMessage = '      - plot Aspect Ratio Histogram';
+            
+            cla(obj.viewResultsHandle.hAAspectHist);
+            axes(obj.viewResultsHandle.hAAspectHist);
+            
+            h = histogram([tempStats.AspectRatio]);
+            h.BinWidth = 0.02;
+            
+            title('Aspect Ratio Histogram','FontSize',16)
+            xlabel(['Aspect Ratio ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontSize',14)
+            ylabel('Numbers','FontSize',14)
+            grid on
+            
+            %%%%%%%%% Diameters Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.modelResultsHandle.InfoMessage = '      - plot Diameter Histogram';
+            
+            cla(obj.viewResultsHandle.hADiaHist);
+            axes(obj.viewResultsHandle.hADiaHist);
+            
+            h = histogram([tempStats.MinorAxisLength],'FaceAlpha',0.5);
+            h.BinWidth = 2;
+            hold on
+            h = histogram([tempStats.MajorAxisLength],'FaceAlpha',0.5);
+            h.BinWidth = 2;
+            
+            title('Diameter Histogram , MinorAxis (blue) and MajorAxis (orange) ','FontSize',16)
+            xlabel(['Diameters in \mum ( Stepsize bins: ' num2str(h.BinWidth) ' \mum )'] ,'FontSize',14)
+            ylabel('Numbers','FontSize',14)
+            grid on
+            
+            %%%%%%%%% Roundness Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.modelResultsHandle.InfoMessage = '      - plot Roundness Histogram';
+            
+            cla(obj.viewResultsHandle.hARoundHist);
+            axes(obj.viewResultsHandle.hARoundHist);
+            
+            h = histogram([tempStats.Roundness]);
+            h.BinWidth = 0.01;
+            
+            title('Roundness Histogram','FontSize',16)
+            xlabel(['Roundness ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontSize',14)
+            ylabel('Numbers','FontSize',14)
+            grid on
+            
+            else
+                obj.modelResultsHandle.InfoMessage = '      - ERROR: No Data for Histogram';
+            end
             
         end
         
@@ -1048,6 +1135,34 @@ classdef controllerResults < handle
                 reset(obj.viewResultsHandle.hAScatterAll);
             end
             
+            % Clear Histogramm Area if exist
+            if ~isempty(obj.viewResultsHandle.hAAreaHist.Children)
+                handleChild = allchild(obj.viewResultsHandle.hAAreaHist);
+                delete(handleChild);
+                reset(obj.viewResultsHandle.hAAreaHist);
+            end
+            
+            % Clear Histogramm AspectRatio if exist
+            if ~isempty(obj.viewResultsHandle.hAAspectHist.Children)
+                handleChild = allchild(obj.viewResultsHandle.hAAspectHist);
+                delete(handleChild);
+                reset(obj.viewResultsHandle.hAAspectHist);
+            end
+            
+            % Clear Histogramm Diameter if exist
+            if ~isempty(obj.viewResultsHandle.hADiaHist.Children)
+                handleChild = allchild(obj.viewResultsHandle.hADiaHist);
+                delete(handleChild);
+                reset(obj.viewResultsHandle.hADiaHist);
+            end
+            
+            % Clear Histogramm Rondness if exist
+            if ~isempty(obj.viewResultsHandle.hARoundHist.Children)
+                handleChild = allchild(obj.viewResultsHandle.hARoundHist);
+                delete(handleChild);
+                reset(obj.viewResultsHandle.hARoundHist);
+            end
+            
             %Delete Legends
             lTemp = findobj('Tag','LegendAreaPlot');
             delete(lTemp);
@@ -1057,7 +1172,7 @@ classdef controllerResults < handle
             delete(lTemp);
             lTemp = findobj('Tag','LegendScatterPlotFarredRed');
             delete(lTemp);
-            lTemp = findobj('Tag','LegendScatterAll');
+            lTemp = findobj('Tag','LegendScatterPlotAll');
             delete(lTemp);
             
             obj.modelResultsHandle.ResultUpdateStaus = false;

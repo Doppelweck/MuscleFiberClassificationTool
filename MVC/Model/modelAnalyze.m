@@ -488,6 +488,10 @@ classdef modelAnalyze < handle
             hBounds = findobj(axesh,'Type','hggroup');
             delete(hBounds);
             
+            % Find old Line Objects and delete them
+            hLines = findobj(axesh,'Type','line');
+            delete(hLines);
+            
             nObjects = size(obj.Stats,1);
             hold on
             for i=1:1:nObjects
@@ -513,8 +517,9 @@ classdef modelAnalyze < handle
                 end
                 
                 
-                
-                htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
+                drawnow limitrate
+                htemp = line(axesh,obj.Stats(i).Boundarie{1, 1}(:,2),obj.Stats(i).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
+%                 htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
                 % Tag every Boundarie Line Object with his own Label number
                 % to find them later for manipualtion
                 set(htemp,'Tag',['boundLabel ' num2str(i)]);
@@ -1601,10 +1606,22 @@ classdef modelAnalyze < handle
                 
                 % find old boundarie and delete them
                 htemp = findobj('Tag',['boundLabel ' num2str(labelNo)]);
+                
+                if strcmp(htemp.Type , 'line')
+                    %Boundaire is a line object
+                    plotline = true;
+                else 
+                    %Boundaire is a hggroup object
+                    plotline = false;
+                end
                 delete(htemp);
                 
                 % plot new boundarie
-                htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color,'LineWidth',2);
+                if plotline
+                    htemp = line(axesh,obj.Stats(labelNo).Boundarie{1, 1}(:,2),obj.Stats(labelNo).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
+                else
+                    htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color,'LineWidth',2);
+                end
                 set(htemp,'Tag',['boundLabel ' num2str(labelNo)])
                 obj.InfoMessage = ['   - Fiber-Type object No. ' num2str(labelNo) ' changed by user'];
             end
