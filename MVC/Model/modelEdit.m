@@ -262,13 +262,22 @@ classdef modelEdit < handle
             % as the selectd image
             FileNameBio = [];
             if isempty(FileNameBio)
+                FileNameBio = dir([f '.zvi']);
+            end
+            if isempty(FileNameBio)
                 FileNameBio = dir([f '.lsm']);
             end
             if isempty(FileNameBio)
-                FileNameBio = dir([f '.zvi']);
+                FileNameBio = dir([f '.ics']);
             end
             if isempty(FileNameBio)
-                FileNameBio = dir([f '.zvi']);
+                FileNameBio = dir([f '.nd2']);
+            end
+            if isempty(FileNameBio)
+                FileNameBio = dir([f '.dv']);
+            end
+            if isempty(FileNameBio)
+                FileNameBio = dir([f '.img']);
             end
             
             
@@ -351,7 +360,7 @@ classdef modelEdit < handle
             %get Number of Color Planes
             NumberOfPlanes = size(data{1,1},1);
             
-            if NumberOfPlanes == 3 || NumberOfPlanes == 4
+            if (NumberOfPlanes == 3 || NumberOfPlanes == 4) && seriesCount == 1
                 %%
                 if NumberOfPlanes == 3 
                     
@@ -379,12 +388,22 @@ classdef modelEdit < handle
                         %this for plane identification
                         sucsess = obj.planeIdentifier();
                         
-                        if sucsess
+                        if sucsess == true
                             status = 'SuccessIndentify';
+                            foundBlue = 1;
+                            foundGreen = 1;
+                            foundRed = 1;
                         else
                             obj.InfoMessage = 'ERROR while indentifing planes';
                             obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
                             status = 'ErrorIndentify';
+                            foundBlue = 0;
+                            foundGreen = 0;
+                            foundRed = 0;
+                            obj.PicPlaneBlue = obj.PicPlane1;
+                            obj.PicPlaneRed = obj.PicPlane2;
+                            obj.PicPlaneGreen = obj.PicPlane3;
+                            obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
                         end
                         
                         
@@ -422,18 +441,6 @@ classdef modelEdit < handle
                                 obj.InfoMessage = '      -can not indentifing planes';
                                 obj.InfoMessage = '      -no channel color name were found in meta data';
                                 
-                                %find RGB image with the same file name and use
-                                %this for plane identification
-                                sucsess = obj.planeIdentifier();
-                                
-                                if sucsess
-                                    status = 'SucsessIndentify';
-                                else
-                                    obj.InfoMessage = 'ERROR while indentifing planes';
-                                    obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
-                                    status = 'ErrorIndentify';
-                                end
-                                
                             end
                             
                         end %end for I:noPlanes
@@ -442,6 +449,22 @@ classdef modelEdit < handle
                     
                     if foundBlue && foundRed && foundGreen
                         status = 'SucsessIndentify';
+                    else
+                        %find RGB image with the same file name and use
+                        %this for plane identification
+                        sucsess = obj.planeIdentifier();
+                        
+                        if sucsess == true
+                            status = 'SuccessIndentify';
+                        else
+                            obj.InfoMessage = 'ERROR while indentifing planes';
+                            obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                            status = 'ErrorIndentify';
+                            obj.PicPlaneBlue = obj.PicPlane1;
+                            obj.PicPlaneRed = obj.PicPlane2;
+                            obj.PicPlaneGreen = obj.PicPlane3;
+                            obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
+                        end
                     end
                 %%    
                 elseif NumberOfPlanes == 4
@@ -468,12 +491,24 @@ classdef modelEdit < handle
                         %this for plane identification
                         sucsess = obj.planeIdentifier();
                         
-                        if sucsess
+                        if sucsess == true
                             status = 'SuccessIndentify';
+                            foundBlue = 1;
+                            foundGreen = 1;
+                            foundRed = 1;
+                            foundFarRed = 1;
                         else
                             obj.InfoMessage = 'ERROR while indentifing planes';
                             obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
                             status = 'ErrorIndentify';
+                            foundBlue = 0;
+                            foundGreen = 0;
+                            foundRed = 0;
+                            foundFarRed = 0;
+                            obj.PicPlaneBlue = obj.PicPlane1;
+                            obj.PicPlaneRed = obj.PicPlane2;
+                            obj.PicPlaneGreen = obj.PicPlane3;
+                            obj.PicPlaneFarRed = obj.PicPlane4;
                         end
                         
                         
@@ -519,31 +554,36 @@ classdef modelEdit < handle
                                 obj.InfoMessage = '      -can not indentifing planes';
                                 obj.InfoMessage = '      -no channel color name were found in meta data';
                                 
-                                %find RGB image with the same file name and use
-                                %this for plane identification
-                                sucsess = obj.planeIdentifier();
-                                
-                                if sucsess
-                                    status = 'SucsessIndentify';
-                                else
-                                    obj.InfoMessage = 'ERROR while indentifing planes';
-                                    obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
-                                    status = 'ErrorIndentify';
-                                end
-                                
                             end
                         end %end for I:noPlanes
                     end %end size Channel Name
                     
                     if foundBlue && foundRed && foundGreen && foundFarRed
                         status = 'SucsessIndentify';
+                    else
+                         %find RGB image with the same file name and use
+                        %this for plane identification
+                        sucsess = obj.planeIdentifier();
+                        
+                        if sucsess == true
+                            status = 'SuccessIndentify';
+                        else
+                            obj.InfoMessage = 'ERROR while indentifing planes';
+                            obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                            status = 'ErrorIndentify';
+                            obj.PicPlaneBlue = obj.PicPlane1;
+                            obj.PicPlaneRed = obj.PicPlane2;
+                            obj.PicPlaneGreen = obj.PicPlane3;
+                            obj.PicPlaneFarRed = obj.PicPlane4;
+                        end
+                        
                     end
                  %%   
                 end %end NumerPlanes =3 elseif = 4
                 
             % Searching for brightness adjustment Pics
                 obj.InfoMessage = '   - searching for brightness adjustment images';
-                regexp(ch_wave_name,'A4')
+
                 %Save currebt folder
                 currentFolder = pwd;
                 %go to the directory of the RGB image
@@ -649,7 +689,27 @@ classdef modelEdit < handle
                 
                 cd(currentFolder);
             
+                if isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed) || ...
+                    isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed)
                 
+                infotext = {'Info! ',...
+                    '',...
+                    'Not all brightness adjustment images were found.',...
+                    '',...
+                    'Go to the "Check planes" menu to verify the images:',...
+                    'The following options are available:',...
+                    '   - you can select new brightness images from',...
+                    '     your hard drive.',...
+                    '   - you can calculate new brightness images from the',... 
+                    '     background illumination.',...
+                    '   - you can delete incorrect or unnecessary images',...
+                    '',...
+                    'See MANUAL for more details.',...
+                        };
+                %show info message on gui
+                obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
+                
+                end
             else
                 % no 4 planes founded
                 status = 'false';
@@ -664,12 +724,12 @@ classdef modelEdit < handle
                 tempFR = obj.PicPlaneFarRed_adj;
             
                 tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,2) = double(1*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,3) = double(1*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,2) = double(0*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,3) = double(0*ones(size(tempR))).*(double(tempR)/255);
                 
-                tempG3D(:,:,1) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,1) = double(0*ones(size(tempG))).*(double(tempG)/255);
                 tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
-                tempG3D(:,:,3) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,3) = double(0*ones(size(tempG))).*(double(tempG)/255);
                 
                 tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
                 tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
@@ -690,12 +750,12 @@ classdef modelEdit < handle
                 tempFR = obj.PicPlaneFarRed;
                 
                 tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,2) = double(1*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,3) = double(1*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,2) = double(0*ones(size(tempR))).*(double(tempR)/255);
+                tempR3D(:,:,3) = double(0*ones(size(tempR))).*(double(tempR)/255);
                 
-                tempG3D(:,:,1) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,1) = double(0*ones(size(tempG))).*(double(tempG)/255);
                 tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
-                tempG3D(:,:,3) = double(1*ones(size(tempG))).*(double(tempG)/255);
+                tempG3D(:,:,3) = double(0*ones(size(tempG))).*(double(tempG)/255);
                 
                 tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
                 tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
@@ -928,27 +988,7 @@ classdef modelEdit < handle
             end
             obj.InfoMessage = '   - brightness adjustment finished';
             
-            if isempty(obj.PicBCFarRed) && isempty(obj.PicBCFarRed) && ...
-                    isempty(obj.PicBCFarRed) && isempty(obj.PicBCFarRed)
-                
-                infotext = {'Info! ',...
-                    '',...
-                    'No brightness adjustment images were found.',...
-                    '',...
-                    'Go to the "Check planes" menu to verify the images:',...
-                    'The following options are available:',...
-                    '   - you can select new brightness images from',...
-                    '     your hard drive.',...
-                    '   - you can calculate new brightness images from the',... 
-                    '     background illumination.',...
-                    '   - you can delete incorrect or unnecessary images',...
-                    '',...
-                    'See MANUAL for more details.',...
-                        };
-                %show info message on gui
-                obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
-                
-            end
+            
             
         end
         

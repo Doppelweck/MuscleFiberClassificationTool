@@ -159,7 +159,7 @@ classdef viewResults < handle
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontSize',fontSizeM, 'String', 'Save processed with Farred plane :' );
+            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontSize',fontSizeM, 'String', 'Save processed image with Farred plane :' );
             
             HButtonBoxSave52 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SavePicRGBFRProc = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SavePicRGBFRProc');
@@ -170,7 +170,7 @@ classdef viewResults < handle
             HBoxSave6 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave61 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontSize',fontSizeM, 'String', 'Save processed without Farred plane :' );
+            uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontSize',fontSizeM, 'String', 'Save processed image without Farred plane :' );
             
             HButtonBoxSave62 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SavePicRGBProc = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','B_SavePicRGBProc');

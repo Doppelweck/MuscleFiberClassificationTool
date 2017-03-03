@@ -527,7 +527,11 @@ classdef controllerEdit < handle
             %               selected, otherwise flase.
             
             %Get filename and path of the new image
-            [tempFileNames,tempPathNames] = uigetfile('*.*','Select new file','MultiSelect', 'off');
+            fileSelectStrings = {'*.lsm;*.zvi;*.ics;*.nd2;*.dv;*.img','Bioformat files (*.lsm,*.zvi,*.ics,*.nd2,*.dv,*.img)';...
+               '*.bmp;*.png;*.tiff;*.tif;*.jpeg;*.jpg','Image files (*.bmp,*.png,*.tiff,*.tif,*.jpeg,*.jpg)' ;...
+               '*.*','All Files (*.*)'};
+            
+            [tempFileNames,tempPathNames] = uigetfile(fileSelectStrings,'Select new file','MultiSelect', 'off');
             
             
             
@@ -542,7 +546,7 @@ classdef controllerEdit < handle
                 [pathstr,name,ext] = fileparts(tempFileNames);
                 
                 if  strcmp(ext,'.bmp') || strcmp(ext,'.png') || ...
-                        strcmp(ext,'.tiff') || strcmp(ext,'.tif') || ...
+                        strcmp(ext,'.tiff') || strcmp(ext,'.tiff') || ...
                         strcmp(ext,'.jpeg') || strcmp(ext,'.jpg')
                     
                     %Image file was selected. Searching for bio format files
@@ -565,6 +569,9 @@ classdef controllerEdit < handle
                     obj.modelEditHandle.FileName = tempFileNames;
                     obj.modelEditHandle.PathName = tempPathNames;
                     format = 'bioformat';
+                    
+                else
+                   format = 'notSupported'; 
                 end
                 
                 
