@@ -400,6 +400,7 @@ classdef viewAnalyze < handle
             axis image
             
             set( VBoxMainInfoFiber, 'Heights', [-6 -6 -6 -6 -6 -6 -64], 'Spacing', 1 );
+            set( VBoxMainInfoFiber, 'MinimumHeights', [20 20 20 20 20 20 20] );
 %             VBoxMainInfoFiber = uix.VBox('Parent', PanelFiberInformation);
 %             HBBoxInfoFiber = uix.HBox('Parent', VBoxMainInfoFiber);
 %             VButtonBoxleftFiber = uix.VButtonBox('Parent', HBBoxInfoFiber,'ButtonSize',[6000 50]);

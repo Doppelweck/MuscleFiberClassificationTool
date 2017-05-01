@@ -2,11 +2,12 @@
 % find starting path
 path = cd;
 % add files to the matalb path
-addpath(genpath(path));
+addpath(genpath('MVC'));
+addpath(genpath('Functions'));
 
 cl;
 pause(0.1);
-% 
+
 % if checkSystem()
 
 % create starting screen

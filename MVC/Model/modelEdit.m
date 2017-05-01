@@ -234,7 +234,7 @@ classdef modelEdit < handle
         end
         
         function success = searchBioformat(obj)
-            % When the user select a RGB image this function searches 
+            % When the user select a RGB image this function searches
             % for the bioformt file that contains the color plane images
             % and the brightness adjustment images in the same directory as
             % the selected RGB image.
@@ -285,7 +285,7 @@ classdef modelEdit < handle
                 %bioformat file was found
                 obj.FileName = FileNameBio.name;
                 obj.InfoMessage = '      - bio format file found';
-
+                
                 success = true;
             else
                 obj.InfoMessage = '   - ERROR searching for bio format file';
@@ -301,7 +301,7 @@ classdef modelEdit < handle
                     'You can open supported bioformat files directly.',...
                     '',...
                     'See MANUAL for more details.',...
-                        };
+                    };
                 success = false;
                 
                 %show info message on gui
@@ -310,7 +310,7 @@ classdef modelEdit < handle
         end
         
         function status = openBioformat(obj)
-            % When the user select a bioformat file this function opens 
+            % When the user select a bioformat file this function opens
             % the bioformt file that contains the color plane images.
             % The funcion also searches for the brightness adjustment
             % images in the same directory as the selected file.
@@ -323,7 +323,7 @@ classdef modelEdit < handle
             %           obj:        Handle to modelEdit object
             %
             %       - Output
-            %           status:    returns 'SuccessIndentify' if the color 
+            %           status:    returns 'SuccessIndentify' if the color
             %               plane images were founded and identified.
             %               Returns 'ErrorIndentify' if the images were
             %               foundet but not identified. Returns 'false' if
@@ -361,8 +361,8 @@ classdef modelEdit < handle
             NumberOfPlanes = size(data{1,1},1);
             
             if (NumberOfPlanes == 3 || NumberOfPlanes == 4) && seriesCount == 1
-                %%
-                if NumberOfPlanes == 3 
+                
+                if NumberOfPlanes == 3
                     
                     obj.InfoMessage = '   - 3 plane images';
                     
@@ -434,39 +434,39 @@ classdef modelEdit < handle
                                 obj.PicPlaneGreen = bfGetPlane(reader,i);
                                 obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                                 foundGreen = 1;
-                                   
+                                
                             else
                                 
-                                obj.InfoMessage = '   -ERROR while indentifing planes';
-                                obj.InfoMessage = '      -can not indentifing planes';
+                                obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
                                 obj.InfoMessage = '      -no channel color name were found in meta data';
                                 
                             end
                             
                         end %end for I:noPlanes
                         
+                        
+                        
+                        if foundBlue && foundRed && foundGreen
+                            status = 'SucsessIndentify';
+                        else
+                            %find RGB image with the same file name and use
+                            %this for plane identification
+                            sucsess = obj.planeIdentifier();
+                            
+                            if sucsess == true
+                                status = 'SuccessIndentify';
+                            else
+                                obj.InfoMessage = 'ERROR while indentifing planes';
+                                obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                                status = 'ErrorIndentify';
+                                obj.PicPlaneBlue = obj.PicPlane1;
+                                obj.PicPlaneRed = obj.PicPlane2;
+                                obj.PicPlaneGreen = obj.PicPlane3;
+                                obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
+                            end
+                        end
                     end %end size Channel Name
                     
-                    if foundBlue && foundRed && foundGreen
-                        status = 'SucsessIndentify';
-                    else
-                        %find RGB image with the same file name and use
-                        %this for plane identification
-                        sucsess = obj.planeIdentifier();
-                        
-                        if sucsess == true
-                            status = 'SuccessIndentify';
-                        else
-                            obj.InfoMessage = 'ERROR while indentifing planes';
-                            obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
-                            status = 'ErrorIndentify';
-                            obj.PicPlaneBlue = obj.PicPlane1;
-                            obj.PicPlaneRed = obj.PicPlane2;
-                            obj.PicPlaneGreen = obj.PicPlane3;
-                            obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
-                        end
-                    end
-                %%    
                 elseif NumberOfPlanes == 4
                     obj.InfoMessage = '   - 4 plane images';
                     
@@ -527,6 +527,16 @@ classdef modelEdit < handle
                                 obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                                 foundBlue = 1;
                                 
+                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
+                                    ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
+                                    ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
+                                    ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
+                                
+                                obj.PicPlaneFarRed = bfGetPlane(reader,i);
+                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                foundFarRed = 1;
+                                
+                                
                             elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
                                     ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
                                 
@@ -541,49 +551,42 @@ classdef modelEdit < handle
                                 obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                                 foundGreen = 1;
                                 
-                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
-                                
-                                obj.PicPlaneFarRed = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundFarRed = 1;
-                                
                             else
                                 
-                                obj.InfoMessage = '   -ERROR while indentifing planes';
-                                obj.InfoMessage = '      -can not indentifing planes';
+                                obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
                                 obj.InfoMessage = '      -no channel color name were found in meta data';
                                 
                             end
                         end %end for I:noPlanes
+                        
+                        
+                        if foundBlue && foundRed && foundGreen && foundFarRed
+                            status = 'SucsessIndentify';
+                        else
+                            %find RGB image with the same file name and use
+                            %this for plane identification
+                            sucsess = obj.planeIdentifier();
+                            
+                            if sucsess == true
+                                status = 'SuccessIndentify';
+                            else
+                                obj.InfoMessage = 'ERROR while indentifing planes';
+                                obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                                status = 'ErrorIndentify';
+                                obj.PicPlaneBlue = obj.PicPlane1;
+                                obj.PicPlaneRed = obj.PicPlane2;
+                                obj.PicPlaneGreen = obj.PicPlane3;
+                                obj.PicPlaneFarRed = obj.PicPlane4;
+                            end
+                            
+                        end
                     end %end size Channel Name
                     
-                    if foundBlue && foundRed && foundGreen && foundFarRed
-                        status = 'SucsessIndentify';
-                    else
-                         %find RGB image with the same file name and use
-                        %this for plane identification
-                        sucsess = obj.planeIdentifier();
-                        
-                        if sucsess == true
-                            status = 'SuccessIndentify';
-                        else
-                            obj.InfoMessage = 'ERROR while indentifing planes';
-                            obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
-                            status = 'ErrorIndentify';
-                            obj.PicPlaneBlue = obj.PicPlane1;
-                            obj.PicPlaneRed = obj.PicPlane2;
-                            obj.PicPlaneGreen = obj.PicPlane3;
-                            obj.PicPlaneFarRed = obj.PicPlane4;
-                        end
-                        
-                    end
-                 %%   
                 end %end NumerPlanes =3 elseif = 4
                 
-            % Searching for brightness adjustment Pics
+                % Searching for brightness adjustment Pics
                 obj.InfoMessage = '   - searching for brightness adjustment images';
-
+                
                 %Save currebt folder
                 currentFolder = pwd;
                 %go to the directory of the RGB image
@@ -642,7 +645,8 @@ classdef modelEdit < handle
                 if ~isempty(FileNamePicBCBlue)
                     %A4*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCBlue(1).name]);
-                    obj.PicBCBlue = bfGetPlane(readertemp,1);
+                    obj.PicBCBlue = double(bfGetPlane(readertemp,1));
+                    obj.PicBCBlue = obj.PicBCBlue/max(max(obj.PicBCBlue));
                     obj.FilenameBCBlue = FileNamePicBCBlue(1).name;
                     obj.InfoMessage = ['      - ' FileNamePicBCBlue(1).name ' were found'];
                 else
@@ -654,7 +658,8 @@ classdef modelEdit < handle
                 if ~isempty(FileNamePicBCGreen)
                     %L5*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCGreen(1).name]);
-                    obj.PicBCGreen = bfGetPlane(readertemp,1);
+                    obj.PicBCGreen = double(bfGetPlane(readertemp,1));
+                    obj.PicBCGreen = obj.PicBCGreen/max(max(obj.PicBCGreen));
                     obj.FilenameBCGreen = FileNamePicBCGreen(1).name;
                     obj.InfoMessage = ['      - ' FileNamePicBCGreen(1).name ' were found'];
                 else
@@ -666,7 +671,8 @@ classdef modelEdit < handle
                 if ~isempty(FileNamePicBCRed)
                     %TX*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCRed(1).name]);
-                    obj.PicBCRed = bfGetPlane(readertemp,1);
+                    obj.PicBCRed = double(bfGetPlane(readertemp,1));
+                    obj.PicBCRed = obj.PicBCRed/max(max(obj.PicBCRed));
                     obj.FilenameBCRed = FileNamePicBCRed(1).name;
                     obj.InfoMessage = ['      - ' FileNamePicBCRed(1).name ' were found'];
                 else
@@ -678,7 +684,8 @@ classdef modelEdit < handle
                 if ~isempty(FileNamePicBCFarRed)
                     %Y5*.zvi brightness adjustment image were found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCFarRed(1).name]);
-                    obj.PicBCFarRed = bfGetPlane(readertemp,1);
+                    obj.PicBCFarRed = double(bfGetPlane(readertemp,1));
+                    obj.PicBCFarRed = obj.PicBCFarRed/max(max(obj.PicBCFarRed));
                     obj.FilenameBCFarRed = FileNamePicBCFarRed(1).name;
                     obj.InfoMessage = ['      - ' FileNamePicBCFarRed(1).name ' were found'];
                 else
@@ -688,27 +695,27 @@ classdef modelEdit < handle
                 end
                 
                 cd(currentFolder);
-            
+                
                 if isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed) || ...
-                    isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed)
-                
-                infotext = {'Info! ',...
-                    '',...
-                    'Not all brightness adjustment images were found.',...
-                    '',...
-                    'Go to the "Check planes" menu to verify the images:',...
-                    'The following options are available:',...
-                    '   - you can select new brightness images from',...
-                    '     your hard drive.',...
-                    '   - you can calculate new brightness images from the',... 
-                    '     background illumination.',...
-                    '   - you can delete incorrect or unnecessary images',...
-                    '',...
-                    'See MANUAL for more details.',...
+                        isempty(obj.PicBCFarRed) || isempty(obj.PicBCFarRed)
+                    
+                    infotext = {'Info! ',...
+                        '',...
+                        'Not all brightness adjustment images were found.',...
+                        '',...
+                        'Go to the "Check planes" menu to verify the images:',...
+                        'The following options are available:',...
+                        '   - you can select new brightness images from',...
+                        '     your hard drive.',...
+                        '   - you can calculate new brightness images from the',...
+                        '     background illumination.',...
+                        '   - you can delete incorrect or unnecessary images',...
+                        '',...
+                        'See MANUAL for more details.',...
                         };
-                %show info message on gui
-                obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
-                
+                    %show info message on gui
+                    obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
+                    
                 end
             else
                 % no 4 planes founded
@@ -718,54 +725,54 @@ classdef modelEdit < handle
         end
         
         function createRGBImages(obj)
-                tempR = obj.PicPlaneRed_adj;
-                tempB = obj.PicPlaneBlue_adj;
-                tempG = obj.PicPlaneGreen_adj;
-                tempFR = obj.PicPlaneFarRed_adj;
+            tempR = obj.PicPlaneRed_adj;
+            tempB = obj.PicPlaneBlue_adj;
+            tempG = obj.PicPlaneGreen_adj;
+            tempFR = obj.PicPlaneFarRed_adj;
             
-                tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,2) = double(0*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,3) = double(0*ones(size(tempR))).*(double(tempR)/255);
-                
-                tempG3D(:,:,1) = double(0*ones(size(tempG))).*(double(tempG)/255);
-                tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
-                tempG3D(:,:,3) = double(0*ones(size(tempG))).*(double(tempG)/255);
-                
-                tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
-                tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
-                tempB3D(:,:,3) = double(255*ones(size(tempB))).*(double(tempB)/255);
-                
-                tempY3D(:,:,1) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
-                tempY3D(:,:,2) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
-                tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
-                
-                obj.PicRGBFRPlanes = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
-                
-                obj.PicRGBPlanes = uint8(tempR3D + tempG3D + tempB3D );
-                
-                % Create RGB image without brightness correction
-                tempR = obj.PicPlaneRed;
-                tempB = obj.PicPlaneBlue;
-                tempG = obj.PicPlaneGreen;
-                tempFR = obj.PicPlaneFarRed;
-                
-                tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,2) = double(0*ones(size(tempR))).*(double(tempR)/255);
-                tempR3D(:,:,3) = double(0*ones(size(tempR))).*(double(tempR)/255);
-                
-                tempG3D(:,:,1) = double(0*ones(size(tempG))).*(double(tempG)/255);
-                tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
-                tempG3D(:,:,3) = double(0*ones(size(tempG))).*(double(tempG)/255);
-                
-                tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
-                tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
-                tempB3D(:,:,3) = double(255*ones(size(tempB))).*(double(tempB)/255);
-                
-                tempY3D(:,:,1) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
-                tempY3D(:,:,2) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
-                tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
-                
-                obj.PicRGBFRPlanesNoBC = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
+            tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
+            tempR3D(:,:,2) = double(0*ones(size(tempR))).*(double(tempR)/255);
+            tempR3D(:,:,3) = double(0*ones(size(tempR))).*(double(tempR)/255);
+            
+            tempG3D(:,:,1) = double(0*ones(size(tempG))).*(double(tempG)/255);
+            tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
+            tempG3D(:,:,3) = double(0*ones(size(tempG))).*(double(tempG)/255);
+            
+            tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
+            tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
+            tempB3D(:,:,3) = double(255*ones(size(tempB))).*(double(tempB)/255);
+            
+            tempY3D(:,:,1) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+            tempY3D(:,:,2) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+            tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
+            
+            obj.PicRGBFRPlanes = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
+            
+            obj.PicRGBPlanes = uint8(tempR3D + tempG3D + tempB3D );
+            
+            % Create RGB image without brightness correction
+            tempR = obj.PicPlaneRed;
+            tempB = obj.PicPlaneBlue;
+            tempG = obj.PicPlaneGreen;
+            tempFR = obj.PicPlaneFarRed;
+            
+            tempR3D(:,:,1) = double(255*ones(size(tempR))).*(double(tempR)/255);
+            tempR3D(:,:,2) = double(0*ones(size(tempR))).*(double(tempR)/255);
+            tempR3D(:,:,3) = double(0*ones(size(tempR))).*(double(tempR)/255);
+            
+            tempG3D(:,:,1) = double(0*ones(size(tempG))).*(double(tempG)/255);
+            tempG3D(:,:,2) = double(255*ones(size(tempG))).*(double(tempG)/255);
+            tempG3D(:,:,3) = double(0*ones(size(tempG))).*(double(tempG)/255);
+            
+            tempB3D(:,:,1) = double(0*ones(size(tempB))).*(double(tempB)/255);
+            tempB3D(:,:,2) = double(0*ones(size(tempB))).*(double(tempB)/255);
+            tempB3D(:,:,3) = double(255*ones(size(tempB))).*(double(tempB)/255);
+            
+            tempY3D(:,:,1) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+            tempY3D(:,:,2) = double(255*ones(size(tempFR))).*(double(tempFR)/255);
+            tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
+            
+            obj.PicRGBFRPlanesNoBC = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
         end
         
         function success = planeIdentifier(obj)
@@ -865,17 +872,17 @@ classdef modelEdit < handle
                                     %save red plane temporary
                                     tempR = Pic(:,:,plane);
                                     %clear foundet plane in the r array
-                                    r(plane,:) = [];
-                                    Pic(:,:,plane) = [];
+                                    r(plane,:) = -Inf;
+%                                     Pic(:,:,plane) = [];
                                     obj.InfoMessage = '         - red-plane was identified';
                                 else
                                     %farred plane was identified
                                     %save farred plane temporary
                                     tempFR = Pic(:,:,plane);
                                     %clear foundet plane and color in the r array
-                                    r(plane,:) = [];
-                                    Pic(:,:,plane) = [];
-                                    r(:,color) = 0;
+                                    r(plane,:) = -Inf;
+%                                     Pic(:,:,plane) = [];
+                                    r(:,color) = -Inf;
                                     obj.InfoMessage = '         - farred-plane was identified';
                                 end
                                 
@@ -883,9 +890,9 @@ classdef modelEdit < handle
                                 %green plane was identified
                                 %save green plane temporary
                                 tempG = Pic(:,:,plane);
-                                r(plane,:) = [];
-                                r(:,color) = 0;
-                                Pic(:,:,plane) = [];
+                                r(plane,:) = -Inf;
+                                r(:,color) = -Inf;
+%                                 Pic(:,:,plane) = [];
                                 obj.InfoMessage = '         - green-plane was identified';
                                 
                             case 3  %Blue
@@ -893,9 +900,9 @@ classdef modelEdit < handle
                                 %save blue plane temporary
                                 tempB = Pic(:,:,plane);
                                 %clear foundet plane and color in the r array
-                                r(plane,:) = [];
-                                r(:,color) = 0;
-                                Pic(:,:,plane) = [];
+                                r(plane,:) = -Inf;
+                                r(:,color) = -Inf;
+%                                 Pic(:,:,plane) = [];
                                 obj.InfoMessage = '         - blue-plane was identified';
                         end
                     end
@@ -905,10 +912,10 @@ classdef modelEdit < handle
                     obj.PicPlaneBlue = tempB;
                     obj.PicPlaneRed = tempR;
                     obj.PicPlaneFarRed = tempFR;
- 
+                    success = true;
                 else
                     % no RGB image were found
-                    success = 'false';
+                    success = false;
                     
                 end
                 
@@ -924,7 +931,7 @@ classdef modelEdit < handle
             % imadjust() function from the image processing toolbox. Trys
             % to seperate the foreground from the background. Adjustment
             % images will not be used for classification.
-            % 
+            %
             %
             %   brightnessAdjustment(obj)
             %
@@ -941,9 +948,18 @@ classdef modelEdit < handle
                 %brightness adjustment PicPlaneGreen
                 if ~isempty(obj.PicBCGreen)
                     obj.InfoMessage = '      - adjust green plane';
-                      div = double(obj.PicBCGreen)/double(max(max(obj.PicBCGreen)));
-                      Mat1 = double(obj.PicPlaneGreen)./double(div);
-                      obj.PicPlaneGreen_adj = uint8(Mat1);
+                    PicMF = medfilt2(obj.PicBCGreen,[5 5],'symmetric');
+                    PicMFnorm = double(PicMF)./double(max(max(PicMF)));
+                    PicBC = double(obj.PicPlaneGreen)./double(PicMFnorm);
+                    PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneGreen)));
+                    obj.PicPlaneGreen_adj = uint8(PicBC);
+                    
+%                     figure('name','green BC')
+%                     surf(div,'EdgeColor','none')
+%                     figure('name','green Plane')
+%                     surf(obj.PicPlaneGreen,'EdgeColor','none')
+%                     figure('name','green Plane adj')
+%                     surf(obj.PicPlaneGreen_adj,'EdgeColor','none')
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicBCGreen not found';
@@ -953,9 +969,18 @@ classdef modelEdit < handle
                 %brightness adjustment PicPlaneRed
                 if ~isempty(obj.PicBCRed)
                     obj.InfoMessage = '      - adjust red plane';
-                      div = double(obj.PicBCRed)/double(max(max(obj.PicBCRed)));
-                      Mat1 = double(obj.PicPlaneRed)./double(div);
-                      obj.PicPlaneRed_adj = uint8(Mat1);
+                    PicMF = medfilt2(obj.PicBCRed,[5 5],'symmetric');
+                    PicMFnorm = double(PicMF)/double(max(max(PicMF)));
+                    PicBC = double(obj.PicPlaneRed)./double(PicMFnorm);
+                    PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneRed)));
+                    obj.PicPlaneRed_adj = uint8(PicBC);
+                    
+%                     figure('name','red BC')
+%                     surf(div,'EdgeColor','none')
+%                     figure('name','red Plane')
+%                     surf(obj.PicPlaneRed,'EdgeColor','none')
+%                     figure('name','red Plane adj')
+%                     surf(obj.PicPlaneRed_adj,'EdgeColor','none')
                 else
                     obj.InfoMessage = '      - PicBCRed not found';
                     obj.PicPlaneRed_adj = obj.PicPlaneRed;
@@ -964,9 +989,23 @@ classdef modelEdit < handle
                 %brightness adjustment PicPlaneBlue
                 if ~isempty(obj.PicBCBlue)
                     obj.InfoMessage = '      - adjust blue plane';
-                      div = double(obj.PicBCBlue)/double(max(max(obj.PicBCBlue)));
-                      Mat1 = double(obj.PicPlaneBlue)./double(div);
-                      obj.PicPlaneBlue_adj = uint8(Mat1);
+                    PicMF = medfilt2(obj.PicBCBlue,[5 5],'symmetric');
+                    PicMFnorm = double(PicMF)/double(max(max(PicMF)));
+%                     minP = min(obj.PicPlaneBlue(:)); %min Plane Original
+                    maxP = double( max(obj.PicPlaneBlue(:)) ); %max Plane Original
+                    PicBC = double(obj.PicPlaneBlue)./double(PicMFnorm);
+                    minPBC = double(min(PicBC(:))); %min Plane afer BC
+%                     maxPBC = max(PicBC(:)); %max Plane after BC
+                    PicBC = ((PicBC-minPBC)/max(max((PicBC-minPBC)))*(maxP-minPBC))+minPBC;
+%                     PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneBlue)));
+                    obj.PicPlaneBlue_adj = uint8(PicBC);
+                    
+%                     figure('name','blue BC')
+%                     surf(div,'EdgeColor','none')
+%                     figure('name','blue Plane')
+%                     surf(obj.PicPlaneBlue,'EdgeColor','none')
+%                     figure('name','blue Plane adj')
+%                     surf(obj.PicPlaneBlue_adj,'EdgeColor','none')
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicBCBlue not found';
@@ -976,15 +1015,20 @@ classdef modelEdit < handle
                 %brightness adjustment PicPlaneFarRed
                 if ~isempty(obj.PicBCFarRed)
                     obj.InfoMessage = '      - adjust farred plane';
-                      div = double(obj.PicBCFarRed)/double(max(max(obj.PicBCFarRed)));
-                      Mat1 = double(obj.PicPlaneFarRed)./double(div);
-                      obj.PicPlaneFarRed_adj = uint8(Mat1);
+                    PicMF = medfilt2(obj.PicBCFarRed,[5 5],'symmetric');
+                    PicMFnorm = double(PicMF)/double(max(max(PicMF)));
+                    PicBC = double(obj.PicPlaneFarRed)./double(PicMFnorm);
+                    maxP = double( max(obj.PicPlaneFarRed(:)) ); %max Plane Original
+                    minPBC = double(min(PicBC(:))); %min Plane afer BC
+                    PicBC = ((PicBC-minPBC)/max(max((PicBC-minPBC)))*(maxP-minPBC))+minPBC;
+                    PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneFarRed)));
+                    obj.PicPlaneFarRed_adj = uint8(PicBC);
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicY4 not found';
                     obj.PicPlaneFarRed_adj = obj.PicPlaneFarRed;
                 end
-
+                
             end
             obj.InfoMessage = '   - brightness adjustment finished';
             
@@ -993,7 +1037,7 @@ classdef modelEdit < handle
         end
         
         function calculateBackgroundIllumination(obj,plane)
-            obj.controllerEditHandle.busyIndicator(1);
+%             obj.controllerEditHandle.busyIndicator(1);
             switch plane
                 
                 case 'Green'
@@ -1021,7 +1065,7 @@ classdef modelEdit < handle
                     obj.InfoMessage = '            - calculate background profile';
                     background = imopen(obj.PicPlaneGreen,strel('disk',radius));
                     h = fspecial('disk', radius);
-                    obj.InfoMessage = '            - smoothing background profile'; 
+                    obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(double(background), h, 'replicate');
                     %Normalized Background to 1
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
@@ -1056,7 +1100,7 @@ classdef modelEdit < handle
                     obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(double(background), h, 'replicate');
                     %Normalized Background to 1
-                    smoothedBackground = smoothedBackground/max(max(smoothedBackground));
+%                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCBlue = smoothedBackground;
                     obj.FilenameBCBlue = 'calculated from Blue plane background';
                     
@@ -1123,27 +1167,14 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCFarRed = smoothedBackground;
                     obj.FilenameBCFarRed = 'calculated from Farred plane background';
-                      
+                    
                 otherwise %calculate all missing images
                     disp('all missing');
                     
             end
-            obj.controllerEditHandle.busyIndicator(0);
+%             obj.controllerEditHandle.busyIndicator(0);
         end
-        
-        function imagePreBinarization(obj)
-            % 
-            % 
-            %
-            %   brightnessAdjustment(obj)
-            %
-            %   ARGUMENTS:
-            %
-            %       - Input
-            %           obj:    Handle to modelEdit object
-            %
-        end
-        
+
         function createBinary(obj)
             % Creates a binary image from the green color image depending
             % on the selected threshold mode and threshold value.
@@ -1168,7 +1199,8 @@ classdef modelEdit < handle
                             
                             obj.PicBW = im2bw(obj.PicPlaneGreen_adj,thresh);
                             obj.handlePicBW.CData = obj.PicBW;
-                            
+%                             figure
+% imhist(obj.PicPlaneGreen_adj)
                         case 2 % Use automatic adaptive threshold for binarization
                             
                             obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
@@ -1181,9 +1213,8 @@ classdef modelEdit < handle
                             obj.PicBW = PicBW1 | PicBW2;
                             obj.handlePicBW.CData = obj.PicBW;
                             
-                        case 4 % Use automatic setup for binarization 
+                        case 4 % Use automatic setup for binarization
                             obj.autoSetupBinarization();
-                            obj.addToBuffer();
                             
                     end
                 else
@@ -1209,9 +1240,9 @@ classdef modelEdit < handle
                             obj.PicBW = ~(temp1 | temp2);
                             obj.handlePicBW.CData = obj.PicBW;
                             
-                        case 4 % Use automatic setup for binarization     
+                        case 4 % Use automatic setup for binarization
                             obj.autoSetupBinarization();
-                            obj.addToBuffer();
+%                             obj.addToBuffer();
                     end
                     
                 end
@@ -1280,25 +1311,37 @@ classdef modelEdit < handle
             %           obj:    Handle to modelEdit object
             %           CurPos: current cursor position in the binary image
             %
-            
+            xMax = double(size(obj.PicBW,2));
+            yMax = double(size(obj.PicBW,1));
             x = round(CurPos(1,1));
             y = round(CurPos(1,2));
+            if x > xMax
+                x = xMax;
+            end
+            if y > yMax
+                y = yMax;
+            end
+            if x < 1
+                x = 1;
+            end
+            if y < 1
+                y = 1;
+            end
             if obj.ColorValue == 1
                 %white fill
-            BW1 = obj.handlePicBW.CData;
-            BW2 = imfill(BW1,[y x]);
-            BW3 = ~eq(BW1,BW2);
-
-            obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
+                BW1 = obj.handlePicBW.CData;
+                BW2 = imfill(BW1,[y x]);
+                BW3 = ~eq(BW1,BW2);
+                
+                obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
             elseif obj.ColorValue == 0
-               BW1 = ~obj.handlePicBW.CData; 
-               BW2 = imfill(BW1,[y x]);
-               BW3 = ~eq(BW1,BW2);
-               obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
+                BW1 = ~obj.handlePicBW.CData;
+                BW2 = imfill(BW1,[y x]);
+                BW3 = ~eq(BW1,BW2);
+                obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
             else
             end
-            
-            obj.addToBuffer();
+           
         end
         
         function startDragFcn(obj,CurPos)
@@ -1488,13 +1531,13 @@ classdef modelEdit < handle
                     obj.InfoMessage = '      - image is in inverted form';
                     obj.InfoMessage = '      - labeling objects';
                     
-                    temp = obj.handlePicBW.CData; 
+                    temp = obj.handlePicBW.CData;
                     % Fill holes in the binary image
                     temp = imfill(temp,8,'holes');
                     % Remove single pixels
                     temp = bwareaopen(temp,1,4);
                     L = bwlabel(temp,4);
-                    obj.InfoMessage = ['      - ' num2str(max(max(L))) 'objects was found'];
+                    obj.InfoMessage = ['      - ' num2str(max(max(L))) ' objects was found'];
                     
                     temp = label2rgb(L, 'jet', 'w', 'shuffle');
                     obj.InfoMessage = ['      - objects will be highlighted in RGB colors'];
@@ -1509,7 +1552,8 @@ classdef modelEdit < handle
                     % Remove single pixels
                     temp = bwareaopen(temp,1,4);
                     L = bwlabel(temp,4);
-                    obj.InfoMessage = ['      - ' num2str(max(max(L))) 'objects was found'];
+                    obj.InfoMessage = ['      - ' num2str(max(max(L))) ' objects was found'];
+
                     temp = label2rgb(L, 'jet', 'w', 'shuffle');
                     obj.InfoMessage = ['      - objects will be highlighted in RGB colors'];
                     obj.handlePicBW.CData = temp;
@@ -1557,6 +1601,7 @@ classdef modelEdit < handle
                     end
                     obj.InfoMessage = '      - dilate operation completed';
                     
+                    
                 case 'skel'
                     
                     obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'skel',Inf);
@@ -1571,6 +1616,11 @@ classdef modelEdit < handle
                     
                     obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'open',obj.NoIteration);
                     obj.InfoMessage = '      - open operation completed';
+                
+                case 'close'
+                    
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'close',obj.NoIteration);
+                    obj.InfoMessage = '      - close operation completed';    
                     
                 case 'remove'
                     
@@ -1587,10 +1637,10 @@ classdef modelEdit < handle
                     obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',obj.NoIteration);
                     obj.InfoMessage = '      - majority operation completed';
                     
-                case 'edge smoothing'
+                case 'smoothing'
                     
                     %performs the majority morph 500 times
-                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',500);
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',Inf);
                     obj.InfoMessage = '      - edge smoothing completed';
                     
                 case 'close small gaps'
@@ -1606,15 +1656,20 @@ classdef modelEdit < handle
                         tempPic = obj.handlePicBW.CData;
                     end
                     
+                    %skel the temp binary image
+                    tempPic = bwmorph(tempPic,'skel',Inf);
+                    
                     %create small structering element
                     se = strel('disk',1);
                     
                     %perform n times a dilate with small SE
-                    for i = 1:1:round(obj.NoIteration/2)
+                    for i = 1:1:round(obj.NoIteration)
                         tempPic = imdilate(tempPic , se);
-                        if mod(i,2)==0
+                        if mod(i,1)==0
                             tempPic = bwmorph(tempPic,'majority',1);
                         end
+%                         figure
+%                         imshow(tempPic)
                     end
                     
                     %skel the temp binary image again
@@ -1633,6 +1688,51 @@ classdef modelEdit < handle
                     end
                     
                     obj.InfoMessage = '      - closing gaps complete';
+                    
+                case 'Remove incomplete objects'
+                    
+                    obj.InfoMessage = ['      - removing objects at the image border'];
+                    
+                    %Check invert status of the binary image
+                    if strcmp(obj.PicBWisInvert,'true')
+                        %image is invert. Fibers are foreground
+                        tempPic = obj.handlePicBW.CData;
+                    else
+                        %image is in normal form. Collagen is Foreground
+                        tempPic = ~obj.handlePicBW.CData;
+                    end
+                    
+                    %create Label Mat
+                    tempLabelMat = bwlabel(tempPic,8);
+                    % get size of Label Mat
+                    [m,n]=size(tempLabelMat);
+                    %seperate x and y Edges
+                    BordersX(1,:) =tempLabelMat(1,:); %Upper-X Axis
+                    BordersX(2,:) =tempLabelMat(m,:); %Lower-X Axis
+                    BordersY(1,:) =tempLabelMat(:,1); %Left-Y Axis
+                    BordersY(2,:) =tempLabelMat(:,n); %Left-Y Axis
+                    %Find Labels of Objects at the image edge
+                    
+                    EdgeObjectsX=unique(BordersX);
+                    EdgeObjectsY=unique(BordersY);
+                    EdgeObjects=cat(1,EdgeObjectsX,EdgeObjectsY)
+                    EdgeObjects=unique(EdgeObjects);
+                    if ~isempty(EdgeObjects)
+                        for i=1:1:size(EdgeObjects,1)
+                            tempPic(tempLabelMat==EdgeObjects(i))=0;
+                        end
+                    end
+                    
+                    %Check invert status of the binary image
+                    if strcmp(obj.PicBWisInvert,'true')
+                        %Update binary mask in inverted form
+                        obj.handlePicBW.CData = tempPic;
+                        obj.PicBW = tempPic;
+                    else
+                        %Update binary mask in normal form
+                        obj.handlePicBW.CData = ~tempPic;
+                        obj.PicBW = ~tempPic;
+                    end
                 otherwise
                     obj.InfoMessage = '! ERROR in runMorphOperation() FUNCTION !';
             end
@@ -1645,278 +1745,96 @@ classdef modelEdit < handle
             
             obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
             obj.PicBWisInvert = 'false';
-            se = strel('disk',4);
-            imTopHatGreen = imtophat(obj.PicPlaneGreen_adj,se);
-            imTopHatGreen = imadjust(imTopHatGreen);
-            imCompGreen = imcomplement(obj.PicPlaneGreen_adj);
-%             figure(11)
-%             imshow(imCompGreen);
             
-            %             imOpenGreen = imopen(imCompGreen, se);
-            %             figure(12)
-            %             imshow(imOpenGreen);
-            %
-            %             imErodeGreen = imerode(imCompGreen, se);
-            %             figure(13)
-            %             imshow(imErodeGreen);
-            %
-            %             Iobr = imreconstruct(imErodeGreen, imCompGreen);
-            %             figure(14)
-            %             imshow(Iobr);
-            %
-            %             Ioc = imclose(imOpenGreen, se);
-            
-            I = imCompGreen;
-            
+            %create Gradient Magnitude image
+            obj.InfoMessage = '      - compute Gradient-Magnitude image';
             hy = fspecial('sobel');
             hx = hy';
-            Iy = imfilter(double(I), hy, 'replicate');
-            Ix = imfilter(double(I), hx, 'replicate');
-            gradmag = sqrt(Ix.^2 + Iy.^2);
+            Iy = imfilter(double(obj.PicPlaneGreen_adj), hy, 'replicate');
+            Ix = imfilter(double(obj.PicPlaneGreen_adj), hx, 'replicate');
+            gradmag = sqrt(Ix.^2 + Iy.^2); %image of Gradient Magnitude
+            gradmag = medfilt2(gradmag,[5 5],'symmetric');
+
+%             test = gradmag;
+%             test(test>255)=255;
+%             x = imbinarize(uint8(test),'adaptive','ForegroundPolarity','bright');
+%             figure()
+%             imshow(x,[])
+% %             
+%             x = imregionalmin(gradmag);
             
-%             figure(10)
-%             imshow(gradmag,[],'InitialMagnification','fit'), title('gradmag');
-            Io = imopen(I, se);
-%             figure(12)
-%             imshow(Io), title('Opening (Io)')
+%             Hmin = imhmin(gradmag,round(MeanMinGradMag/3));
+%             HminVec = Hmin(:,500);
+%             grandmagVec = gradmag(:,500);
+%             grandmagPlus = gradmag+round(MeanMinGradMag/3);
+%             grandmagPlusVec = grandmagPlus(:,500);
+%             figure
+%             plot(grandmagVec,'k','LineWidth',2)
+%             hold on
+%             plot(grandmagPlusVec,'r','LineWidth',2)
+%             hold on
+%             plot(HminVec,'--b','LineWidth',2)
+%             grid on
+%             obj.InfoMessage = '      - compute fiber type markes';
+%             LEG=legend('G`','G`+h','HMIN(G`)');
+%             set(LEG,'FontSize',36)
+%             set(gca,'FontSize',36)
+%             %find mean value of all regional minima
+            MeanMinGradMag=mean(gradmag(imregionalmin(gradmag)));
             
-            Ie = imerode(I, se);
-            Iobr = imreconstruct(Ie, I);
-%             figure(13)
-%             imshow(Iobr), title('Opening-by-reconstruction (Iobr)')
+            MeanMinGradMag = round(MeanMinGradMag/3);
+            if MeanMinGradMag < 3
+                MeanMinGradMag = 3;
+            end
             
-            Ioc = imclose(Io, se);
-%             figure(14)
-%             imshow(Ioc), title('Opening-closing (Ioc)')
+            %extend regional minima using h-min transform
+            MinMarker = imextendedmin(gradmag,round(MeanMinGradMag));
+%             MaxMarker = imextendedmax(gradmag,200);
+            %
+            MinMarker = imfill(MinMarker,'holes');
+            MinMarker = bwareaopen(MinMarker,5);
+            MinMarker = imfill(MinMarker,'holes');
+%             figure()
+%             imshow(MinMarker)
+            MinMarker = imclose(MinMarker,strel('disk',3));
+            MinMarker = imerode(MinMarker,strel('disk',1));
+            MinMarker = imfill(MinMarker,'holes');
+
+%             figure()
+%             imshow(MinMarker,[])
+%             
+            stats = regionprops('struct',MinMarker,'Area');
+            MeanArea = mean([stats(:).Area]);
+            obj.InfoMessage = '      - remove small fiber type markes';
+            MinMarker = bwareaopen(MinMarker,round(MeanArea/10));
+
+%             figure()
+%             imshow(MinMarker)
             
-            Iobrd = imdilate(Iobr, se);
-            Iobrcbr = imreconstruct(imcomplement(Iobrd), imcomplement(Iobr));
-            Iobrcbr = imcomplement(Iobrcbr);
-%             figure(15)
-%             imshow(Iobrcbr), title('Opening-closing by reconstruction (Iobrcbr)')
-            
-            fgm = imregionalmax(Iobrcbr);
-%             figure(16)
-%             imshow(fgm,[],'InitialMagnification','fit'), title('Regional maxima of opening-closing by reconstruction (fgm)')
-            
-            I2 = I;
-            I2(fgm) = 255;
-%             figure(17)
-%             imshow(I2,[],'InitialMagnification','fit'), title('Regional maxima superimposed on original image (I2)')
-            
-            se2 = strel(ones(3,3));
-            fgm2 = imclose(fgm, se2);
-            fgm3 = imerode(fgm2, se2);
-            
-            fgm4 = bwareaopen(fgm3, 10); %%%%%%%%%%%%%%%%
-            fgm4 = imfill(fgm4,'holes');
-            
-            I3 = I;
-            I3(fgm4) = 255;
-%             figure(18)
-%             imshow(I3,[],'InitialMagnification','fit')
-%             title('Modified regional maxima superimposed on original image (fgm4)')
-            
-            bw = imbinarize(Iobrcbr);
-%             figure(19)
-%             imshow(bw,[],'InitialMagnification','fit'), title('Thresholded opening-closing by reconstruction (bw)')
-            
-            D = bwdist(bw);
+            %Background Markers (currently not used)
+            D = bwdist(MinMarker);
             DL = watershed(D);
             bgm = DL == 0;
-%             figure(20)
-%             imshow(DL,[],'InitialMagnification','fit'), title('Watershed ridge lines (bgm)')
-            
-            gradmag2 = imimposemin(gradmag, bgm | fgm4);
-            
-            obj.InfoMessage = '      - run watershed transformation';
+%             figure()
+%             imshow(bgm)
+%             gradmag2 = imimposemin(gradmag, bgm | MinMarker);
+            gradmag2 = imimposemin(gradmag, MinMarker);
+
+            obj.InfoMessage = '      - perform watershed transformation';
             L = watershed(gradmag2);
-            
-            I4 = obj.PicPlaneGreen_adj;
-            I4(imdilate(L == 0, ones(1, 1),1) | bgm | fgm4) = 255;
-%             
-%             figure(21)
-%             imshow(I4,[],'InitialMagnification','fit')
-%             title('Markers and object boundaries superimposed on original image (I4)')
-            
-            Lrgb = label2rgb(L, 'jet', 'w', 'shuffle');
-%             figure(22)
-%             imshow(Lrgb,[],'InitialMagnification','fit')
-%             title('Colored watershed label matrix (Lrgb)')
-            
-%             figure(23)
-%             imshow(obj.PicRGBFRPlanes)
-%             hold on
-%             himage = imshow(Lrgb,[],'InitialMagnification','fit');
-%             himage.AlphaData = 0.2;
-%             title('Lrgb superimposed transparently on original image')
             
             f2=zeros(size(L));
             f2(L==0)=1;
             se = strel('disk',1);
             f2 = imdilate(f2,se);
-            
+            obj.InfoMessage = '      - create binary mask';
             obj.PicBW = obj.PicBW | f2;
             obj.handlePicBW.CData = obj.PicBW | f2;
             
             obj.InfoMessage = '   - auto setup binarization completed';
-            %             [x,y]=size(imTopHatGreen);
-            %             X=1:x;
-            %             Y=1:y;
-            %             [xx,yy]=meshgrid(Y,X);
-            %             i=im2double(imTopHatGreen);
-            %             figure(12);mesh(xx,yy,i);
-            %             colorbar
-            %             figure;imshow(i)
         end
         
-%         function autoSetupBinarization(obj)
-%                    %Set invert status to false
-%                    obj.PicBWisInvert = 'false';
-%             
-%                    %create binary image
-%                    obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
-%                    
-%                    f = obj.PicPlaneGreen_adj;
-%                    h = fspecial('sobel');
-%                    fd = double(f);
-%                    g = sqrt(imfilter(fd,h,'replicate').^2 + imfilter(fd,h','replicate').^2);
-%                    g2 = imclose(imopen(g, ones(3,3)), ones(3,3));
-%                    figure(11)
-%                    imshow(g,[],'InitialMagnification','fit');
-%                    figure(12)
-%                    imshow(g2,[],'InitialMagnification','fit');
-%                    L = watershed(g2);
-%                    figure(13)
-%                    rgb = label2rgb(L,'jet',[.5 .5 .5]);
-%                    imshow(rgb,[],'InitialMagnification','fit');
-%                    
-%                    wr = L == 0;
-%                    
-%                    rm = imregionalmin(f);
-%                    im = imextendedmin(f,5);
-%                    fim = f;
-%                    fim(im) = 175;
-%                    figure(14)
-%                    imshow(fim,[],'InitialMagnification','fit');
-%                    
-%                    Lim = watershed(bwdist(im));
-%                    em = Lim == 0;
-%                    figure(15)
-%                    imshow(em,[],'InitialMagnification','fit');
-%                    
-%                    g3 = imimposemin(g2,im | em);
-%                    L2 = watershed(g3);
-%                    f2 = zeros(size(L2));
-%                    f2(L2 == 0) = 255;
-%                    rgb = label2rgb(L2,'jet',[.5 .5 .5]);
-%                     figure(16)
-%                     imshow(rgb,[],'InitialMagnification','fit');
-%                    
-%                    tempPic = ~imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',0.5);
-%                    
-%                    figure
-%                    imshow(f2);
-%                    
-%                    
-%                    imDistMarker = bwdist(~tempPic,'cityblock');
-%                    figure(7)
-%                    imshow(imDistMarker,[],'InitialMagnification','fit');
-%                    imDistMarkerBW = imbinarize(imDistMarker,'adaptive','ForegroundPolarity','bright','Sensitivity',0.00001);
-%                    figure(6)
-%                    imshow(imDistMarkerBW,[],'InitialMagnification','fit');
-% %                    tempPic = ~tempPic;
-% %                    tempPic = imfill(tempPic,8,'holes');
-% %                    tempPic = ~tempPic;
-% 
-%                    %Set invert status to false
-%                    obj.PicBWisInvert = 'false';
-%                     
-%                    
-%                    
-% %                     %create small structering element
-% %                     se = strel('disk',1);
-% %                     
-% %                     tempPic = bwmorph(tempPic,'diag');
-% %                     tempPic = bwmorph(tempPic,'skel',Inf);
-% %                     
-% %                     %perform n times a dilate with small SE
-% %                     for i = 1:1:5
-% %                         tempPic = imdilate(tempPic , se);
-% %                         if mod(i,2)==0
-% %                             tempPic = bwmorph(tempPic,'majority',1);
-% %                         end
-% %                     end
-% %                     
-% %                     %skel the temp binary image again
-% %                     tempPic = bwmorph(tempPic,'skel',Inf);
-% %                     %perform one times a dilate with small SE to make the
-% %                     %skeleton thicker
-% %                     tempPic = imdilate(tempPic , se);
-% %                     %remove pixels with a small neighborhood
-% % %                     tempPic = bwmorph(tempPic,'majority',1);
-% %                     tempPic = tempPic | obj.PicBW;
-% %                     
-%                     
-% %                     figure
-% %                     imshow(D,[],'InitialMagnification','fit');
-%                     figure(8)
-%                     imshow(tempPic);
-%                     imDist = -bwdist(~tempPic,'cityblock');
-%                     imDist(~tempPic)=-inf;
-%                     figure(9)
-%                     imshow(imDist,[],'InitialMagnification','fit');
-%                     BW = imregionalmax(imDistMarker);
-%                     figure(10)
-%                     imshow(BW);
-%                     I3 = imhmin(imDist,30);
-%                     L = watershed(I3);
-%                     rgb = label2rgb(L,'jet',[.5 .5 .5]);
-%                     figure(11)
-%                     imshow(rgb,[],'InitialMagnification','fit');
-%                     
-%                     tempPic(L==0)=1;
-% %                     D_BW = imbinarize(D,'adaptive','ForegroundPolarity','bright','Sensitivity',1);
-% % %                     
-% % %                     D = -D;
-% % %                     figure
-% % %                     imshow(D,[],'InitialMagnification','fit');
-% % %                     D(~tempPic) = Inf;
-% %                     L = watershed(D);
-% %                     rgb = label2rgb(L,'jet',[.5 .5 .5]);
-% %                     figure
-% %                     imshow(rgb,'InitialMagnification','fit');
-% % %                     tempPic(L==0)=1;
-% % %                     tempPic(L>0)=0;
-% % %                     se = strel('disk',1);
-% % %                     tempPic = imdilate(tempPic , se);
-% %                     Y=D./max(max(D));
-% %                     X=im2bw(Y,graythresh(Y));
-% %                     X= bwareaopen(X,4,4);
-% %                     [LOld,numOld] = bwlabel(X);
-% %                     numNew = numOld;
-% %                     Xnew = X;
-% %                     se = strel('disk',1);
-% %                     while numOld == numNew
-% %                         [LNew,numNew] = bwlabel(Xnew);
-% % %                         figure
-% % %                         imshow(X,'InitialMagnification','fit');
-% %                         if numOld == numNew
-% %                             X = Xnew;
-% %                             
-% %                             Xnew = imdilate(Xnew , se); 
-% %                         end  
-% %                     end
-% %                     X = ~X;
-% %                     X = bwmorph(X,'skel',Inf);
-% %                     X = imdilate(X , se);
-%                     
-%                     obj.PicBW = obj.PicBW | f2;
-%                     obj.handlePicBW.CData = obj.PicBW | f2;
-% 
-%         end
-        
-        function [xOut yOut] = checkPosition(obj,PosX,PosY)
+        function [xOut yOut isInAxes] = checkPosition(obj,PosX,PosY)
             % Check whether the positon of the cursor is in the binary
             % image while drawing a line. If the positon is out if range
             % the poition will be set to the max and min values of the
@@ -1936,26 +1854,31 @@ classdef modelEdit < handle
             %           obj:    Handle to modelEdit object.
             %
             %       - Output
-            %           xOut:    Corrected x position.
-            %           yOut:    Corrected y position.
+            %           xOut:   Corrected x position.
+            %           yOut:   Corrected y position.
+            %       isInAxes:   True if PosX and PoxY are within the Axes  
             %
             
             if PosX < 1
                 PosX = 1;
+                isInAxes = false;
             end
             
             if PosY < 1
                 PosY = 1;
+                isInAxes = false;
             end
             
             if PosX > size(obj.PicRGBFRPlanes,2)
                 PosX = size(obj.PicRGBFRPlanes,2);
+                isInAxes = false;
             end
             
             if PosY > size(obj.PicRGBFRPlanes,1)
                 PosY = size(obj.PicRGBFRPlanes,1);
+                isInAxes = false;
             end
-            
+            isInAxes = true;
             xOut = PosX;
             yOut = PosY;
         end
@@ -1971,7 +1894,7 @@ classdef modelEdit < handle
             %       - Input
             %           obj:    Handle to modelEdit object.
             %
-
+            
             
             if obj.PicBufferPointer > 1 && obj.PicBufferPointer <= obj.BufferSize
                 obj.PicBufferPointer = obj.PicBufferPointer-1;
@@ -2005,7 +1928,8 @@ classdef modelEdit < handle
         
         function addToBuffer(obj)
             % Save current binary image in the buffer for redo and undo
-            % functionality.
+            % functionality. Saves the current binary mask in the PicBW
+            % properties.
             %
             %   addToBuffer(obj)
             %

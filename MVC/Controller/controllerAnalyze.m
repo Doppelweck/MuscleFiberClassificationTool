@@ -846,6 +846,8 @@ classdef controllerAnalyze < handle
                 delete(OldBox);
             end
             
+            % If a Preview Results figure already exists,
+            % delete it
             preFig = findobj('Tag','FigurePreResults');
             if ~isempty(preFig) && isvalid(preFig)
                 delete(preFig);
@@ -909,9 +911,15 @@ classdef controllerAnalyze < handle
             % model properties.
             obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
             
+            
             obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
-            obj.modelAnalyzeHandle.MinArea = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
-            obj.modelAnalyzeHandle.MaxArea = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
+            if obj.modelAnalyzeHandle.AreaActive == 1
+                obj.modelAnalyzeHandle.MinArea = str2double(obj.viewAnalyzeHandle.B_MinArea.String);
+                obj.modelAnalyzeHandle.MaxArea = str2double(obj.viewAnalyzeHandle.B_MaxArea.String);
+            else
+                obj.modelAnalyzeHandle.MinArea ='-';
+                obj.modelAnalyzeHandle.MaxArea ='-';
+            end
             
             obj.modelAnalyzeHandle.RoundnessActive = obj.viewAnalyzeHandle.B_RoundnessActive.Value;
             obj.modelAnalyzeHandle.MinRoundness = str2double(obj.viewAnalyzeHandle.B_MinRoundness.String);
@@ -1156,18 +1164,65 @@ classdef controllerAnalyze < handle
             Info = obj.modelAnalyzeHandle.getFiberInfo(Pos);
             
             %show info in GUI fiber information panel.
+            %Label Number
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
+            %Area. Display text in red when out of range
+            if obj.modelAnalyzeHandle.AreaActive && ~isempty(str2num(Info{2}))
+                if obj.modelAnalyzeHandle.MaxArea < str2num(Info{2})
+                obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[1 0 0];
+                else
+                    obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[0 0 0];
+                end
+            else
+                obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[0 0 0];
+            end
             set(obj.viewAnalyzeHandle.B_TextArea,'String', Info{2} );
+            
+            % Aspect Ratio. Display text in red when out of range
+            if obj.modelAnalyzeHandle.AspectRatioActive && ~isempty(str2num(Info{3}))
+                if obj.modelAnalyzeHandle.MinAspectRatio > str2num(Info{3}) ||...
+                        obj.modelAnalyzeHandle.MaxAspectRatio < str2num(Info{3})
+                obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[1 0 0];
+                else
+                    obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[0 0 0];
+                end
+            else
+                obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[0 0 0];
+            end
             set(obj.viewAnalyzeHandle.B_TextAspectRatio,'String', Info{3} );
+            
+            % Roundnes. Display text in red when out of range
+            if obj.modelAnalyzeHandle.RoundnessActive && isnumeric(str2num(Info{4}))
+                if obj.modelAnalyzeHandle.MinRoundness > str2num(Info{4})
+                obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[1 0 0];
+                else
+                    obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[0 0 0];
+                end
+            else
+                obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[0 0 0];
+            end
             set(obj.viewAnalyzeHandle.B_TextRoundness,'String', Info{4} );
+            
             set(obj.viewAnalyzeHandle.B_TextBlueRedRatio,'String', Info{5} );
             set(obj.viewAnalyzeHandle.B_TextFarredRedRatio,'String', Info{6} );
             set(obj.viewAnalyzeHandle.B_TextMeanRed,'String', Info{7} );
             set(obj.viewAnalyzeHandle.B_TextMeanGreen,'String', Info{8} );
             set(obj.viewAnalyzeHandle.B_TextMeanBlue,'String', Info{9} );
             set(obj.viewAnalyzeHandle.B_TextMeanFarred,'String', Info{10} );
+            
+            % Roundnes. Display text in red when out of range
+            if obj.modelAnalyzeHandle.ColorValueActive && isnumeric(str2num(Info{11}))
+                if obj.modelAnalyzeHandle.ColorValue > str2num(Info{11})
+                obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[1 0 0];
+                else
+                    obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[0 0 0];
+                end
+            else
+                obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[0 0 0];
+            end
             set(obj.viewAnalyzeHandle.B_TextColorValue,'String', Info{11} );
-             set(obj.viewAnalyzeHandle.B_TextFiberType,'String', Info{12} );
+            
+            set(obj.viewAnalyzeHandle.B_TextFiberType,'String', Info{12} );
             
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'image');
             obj.modelAnalyzeHandle.handleInfoAxes.CData = Info{13};
@@ -1482,19 +1537,19 @@ classdef controllerAnalyze < handle
                     
                     hold on
                     if ~isempty(T2x)
-                        h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
+                        h=scatter([T2x.ColorRed],[T2x.ColorFarRed],20,ColorMap(3,:),'filled');
                         set(h,'MarkerEdgeColor','k');
                         LegendString{end+1} = 'Type 2x';
                     end
                     hold on
                     if ~isempty(T2a)
-                        h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
+                        h=scatter([T2a.ColorRed],[T2a.ColorFarRed],20,ColorMap(4,:),'filled');
                         set(h,'MarkerEdgeColor','k');
                         LegendString{end+1} = 'Type 2a';
                     end
                     hold on
                     if ~isempty(T2ax)
-                        h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
+                        h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
                         set(h,'MarkerEdgeColor','k');
                         LegendString{end+1} = 'Type 2a';
                     end

@@ -125,7 +125,7 @@ classdef modelResults < handle
         Stats; % Data struct of all fiber objets and all fiber datas
         
         StatsMatData; % Cell Array, Contains the data of all fiber objets that are shown in the object table in the GUI.
-        % [Label Area XPos YPos MinorAxis MajorAxis Perimeter Roundness ...
+        % [Label Area XPos YPos minDiameter maxDiameter Perimeter Roundness ...
         %  AspectRatio ColorHue VolorValue Red Green Blue FarRed ...
         %  Blue/Red Farred/Red MainType Type]
         StatsMatDataT1; % Contains the data of all type 1 fiber objets.
@@ -232,7 +232,14 @@ classdef modelResults < handle
             %remove field Centroid
             tempCell = rmfield(tempCell,'Centroid');
             %remove field Solidity
-            tempCell = rmfield(tempCell,'Solidity');
+%             tempCell = rmfield(tempCell,'Solidity');
+
+            %order Fields for Excel Sheet and GUI Table
+            tempCell=orderfields(tempCell, {'Area', 'Perimeter', 'maxDiameter',...
+                'minDiameter','Roundness','AspectRatio','ColorValue',...
+                'ColorRed','ColorGreen','ColorBlue','ColorFarRed',...
+                'ColorRatioBlueRed','ColorRatioFarredRed','FiberTypeMainGroup',...
+                'FiberType'});
             
             %transform struct to temporary cellarray
             tempCell = struct2cell(tempCell)';
@@ -255,32 +262,32 @@ classdef modelResults < handle
             obj.StatsMatData = cat(2, LabelNo,tempCell(:,1),FCPX,FCPY,tempCell(:,2:end) );
             
             % Create CellArray only for Type 1 Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 1');
+            IndexC = strcmp(obj.StatsMatData(:,end), 'Type 1');
             Index = find(IndexC==1);
             obj.StatsMatDataT1 = obj.StatsMatData(Index,:);
             
             % Create CellArray only for Type 12h Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 12h');
+            IndexC = strcmp(obj.StatsMatData(:,end), 'Type 12h');
             Index = find(IndexC==1);
             obj.StatsMatDataT12h = obj.StatsMatData(Index,:);
             
             % Create CellArray only for Type 2a Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 2a');
+            IndexC = strcmp(obj.StatsMatData(:,end), 'Type 2a');
             Index = find(IndexC==1);
             obj.StatsMatDataT2a = obj.StatsMatData(Index,:);
             
             % Create CellArray only for Type 2a Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 2x');
+            IndexC = strcmp(obj.StatsMatData(:,end), 'Type 2x');
             Index = find(IndexC==1);
             obj.StatsMatDataT2x = obj.StatsMatData(Index,:);
             
             % Create CellArray only for Type 2a Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'Type 2ax');
+            IndexC = strcmp(obj.StatsMatData(:,end), 'Type 2ax');
             Index = find(IndexC==1);
             obj.StatsMatDataT2ax = obj.StatsMatData(Index,:);
           
             % Create CellArray only for Type 0 undifined Fiber objects
-            IndexC = strcmp(obj.StatsMatData(:,19), 'undefined');
+            IndexC = strcmp(obj.StatsMatData(:,end), 'undefined');
             Index = find(IndexC==1);
             obj.StatsMatDataT0 = obj.StatsMatData(Index,:);
             
@@ -298,7 +305,8 @@ classdef modelResults < handle
             %
             
             obj.InfoMessage = '   - Calculate fiber type areas';
-            obj.AreaPic = size(obj.PicPRGBFRPlanes,1) * size(obj.PicPRGBFRPlanes,2);
+            %Area Image in um^2
+            obj.AreaPic = size(obj.PicPRGBFRPlanes,1) * size(obj.PicPRGBFRPlanes,2) * obj.XScale * obj.YScale;
             obj.AreaType1 = 0;
             obj.AreaType2a = 0;
             obj.AreaType2x = 0;
@@ -1020,9 +1028,10 @@ classdef modelResults < handle
                 end
                 
                 Header = {'Label' sprintf('Area (\x3BCm^2)') ...
-                    'XPos (pixel)' 'YPos (pixel)' sprintf('MajorAxis (\x3BCm)') ...
-                    sprintf('MinorAxis (\x3BCm)') 'Perimeter (pixel)' 'Roundness' ...
-                    'AspectRatio' 'ColorHue' 'ColorValue' 'meanRed' 'meanGreen' ...
+                    sprintf('XPos (\x3BCm)') sprintf('YPos (\x3BCm)')...
+                    sprintf('Perimeter (\x3BCm)') sprintf('maxDiameter (\x3BCm)') ...
+                    sprintf('minDiameter (\x3BCm)')  'Roundness' ...
+                    'AspectRatio' 'ColorValue' 'meanRed' 'meanGreen' ...
                     'meanBlue' 'meanFarred' 'Blue/Red' 'Farred/Red'...
                     'FiberMainGroup' 'FiberType'};
                 

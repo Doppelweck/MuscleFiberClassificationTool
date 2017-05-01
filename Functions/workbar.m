@@ -90,6 +90,9 @@ if percentdone == 100 % Task completed
     return
 end
 
+if percentdone == 0
+    starttime = clock;
+end
 % Create new progress bar if needed
 if isempty(progfig)
     

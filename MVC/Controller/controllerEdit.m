@@ -342,8 +342,14 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
-                        set(obj.viewEditHandle.B_Threshold,'Enable','on');
-                        set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                        if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                            obj.viewEditHandle.B_ThresholdMode.Value == 3 )   
+                            set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                            set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                        else
+                            set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                            set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');   
+                        end
                         set(obj.viewEditHandle.B_Color,'Enable','on');
                         set(obj.viewEditHandle.B_Invert,'Enable','on');
                         set(obj.viewEditHandle.B_Alpha,'Enable','on');
@@ -444,8 +450,14 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
-                    set(obj.viewEditHandle.B_Threshold,'Enable','on');
-                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                    if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                       obj.viewEditHandle.B_ThresholdMode.Value == 3 )   
+                        set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                        set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                    else
+                        set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                        set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');   
+                    end
                     set(obj.viewEditHandle.B_Color,'Enable','on');
                     set(obj.viewEditHandle.B_Invert,'Enable','on');
                     set(obj.viewEditHandle.B_Alpha,'Enable','on');
@@ -465,7 +477,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_CheckMask,'Enable','off');
             else
                 %selecting a new image was not successfully.
-                if isempty(obj.modelEditHandle.handlePicBW)
+                if isempty(obj.modelEditHandle.handlePicBW.CData)
                     %No image is loaded into the program.
                     %disable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
@@ -492,8 +504,14 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
-                    set(obj.viewEditHandle.B_Threshold,'Enable','on');
-                    set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                    if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                       obj.viewEditHandle.B_ThresholdMode.Value == 3 )   
+                        set(obj.viewEditHandle.B_Threshold,'Enable','on');
+                        set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                    else
+                        set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                        set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');   
+                    end
                     set(obj.viewEditHandle.B_Invert,'Enable','on');
                     set(obj.viewEditHandle.B_Color,'Enable','on');
                     set(obj.viewEditHandle.B_Alpha,'Enable','on');
@@ -546,7 +564,7 @@ classdef controllerEdit < handle
                 [pathstr,name,ext] = fileparts(tempFileNames);
                 
                 if  strcmp(ext,'.bmp') || strcmp(ext,'.png') || ...
-                        strcmp(ext,'.tiff') || strcmp(ext,'.tiff') || ...
+                        strcmp(ext,'.tif') || strcmp(ext,'.tiff') || ...
                         strcmp(ext,'.jpeg') || strcmp(ext,'.jpg')
                     
                     %Image file was selected. Searching for bio format files
@@ -854,7 +872,8 @@ classdef controllerEdit < handle
                         NumberOfPlanes = size(data{1,1},1);
                         
                         if seriesCount == 1 && NumberOfPlanes == 1
-                            obj.modelEditHandle.PicBCGreen = bfGetPlane(reader,1);
+                            obj.modelEditHandle.PicBCGreen = double(bfGetPlane(reader,1));
+                            obj.modelEditHandle.PicBCGreen = obj.modelEditHandle.PicBCGreen/max(max(obj.modelEditHandle.PicBCGreen));
                             obj.modelEditHandle.FilenameBCGreen = FileName;
                             createNew = 1;
                         else
@@ -877,7 +896,8 @@ classdef controllerEdit < handle
                         NumberOfPlanes = size(data{1,1},1);
                         
                         if seriesCount == 1 && NumberOfPlanes == 1
-                            obj.modelEditHandle.PicBCBlue = bfGetPlane(reader,1);
+                            obj.modelEditHandle.PicBCBlue = double(bfGetPlane(reader,1));
+                            obj.modelEditHandle.PicBCBlue = obj.modelEditHandle.PicBCBlue/max(max(obj.modelEditHandle.PicBCBlue));
                             obj.modelEditHandle.FilenameBCBlue = FileName;
                             createNew = 1;
                         else
@@ -900,7 +920,8 @@ classdef controllerEdit < handle
                         NumberOfPlanes = size(data{1,1},1);
                         
                         if seriesCount == 1 && NumberOfPlanes == 1
-                            obj.modelEditHandle.PicBCRed = bfGetPlane(reader,1);
+                            obj.modelEditHandle.PicBCRed = double(bfGetPlane(reader,1));
+                            obj.modelEditHandle.PicBCRed = obj.modelEditHandle.PicBCRed/max(max(obj.modelEditHandle.PicBCRed));
                             obj.modelEditHandle.FilenameBCRed = FileName;
                             createNew = 1;
                         else
@@ -923,7 +944,8 @@ classdef controllerEdit < handle
                         NumberOfPlanes = size(data{1,1},1);
                         
                         if seriesCount == 1 && NumberOfPlanes == 1
-                            obj.modelEditHandle.PicBCFarRed = bfGetPlane(reader,1);
+                            obj.modelEditHandle.PicBCFarRed = double(bfGetPlane(reader,1));
+                            obj.modelEditHandle.PicBCFarRed = obj.modelEditHandle.PicBCFarRed/max(max(obj.modelEditHandle.PicBCFarRed));
                             obj.modelEditHandle.FilenameBCFarRed = FileName;
                             createNew = 1;
                         else
@@ -953,27 +975,34 @@ classdef controllerEdit < handle
                 %create binary pic
                 obj.modelEditHandle.createBinary();
                 
-                %reset pic buffer for undo redo functionality
-                obj.modelEditHandle.PicBuffer = {};
-                %load binary pic in the buffer
-                obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
-                %reset buffer pointer
-                obj.modelEditHandle.PicBufferPointer = 1;
+                %save data into Buffer after new BC image was created
+                obj.modelEditHandle.addToBuffer();
+%                 %reset pic buffer for undo redo functionality
+% %                 obj.modelEditHandle.PicBuffer = {};
+%                 %load binary pic in the buffer
+%                 obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+%                 %reset buffer pointer
+%                 obj.modelEditHandle.PicBufferPointer = 1;
                 
+                %update GUI checkplanes figure
                 obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
                 obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                 
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
                 imshow(obj.modelEditHandle.PicBCGreen);
+                caxis([0, 1])
                 
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
                 imshow(obj.modelEditHandle.PicBCBlue);
+                caxis([0, 1])
                 
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
                 imshow(obj.modelEditHandle.PicBCRed);
+                caxis([0, 1])
                 
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
                 imshow(obj.modelEditHandle.PicBCFarRed);
+                caxis([0, 1])
                 
                 obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
                 obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
@@ -1032,12 +1061,14 @@ classdef controllerEdit < handle
                 %create binary pic
                 obj.modelEditHandle.createBinary();
                 
-                %reset pic buffer for undo redo functionality
-                obj.modelEditHandle.PicBuffer = {};
-                %load binary pic in the buffer
-                obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
-                %reset buffer pointer
-                obj.modelEditHandle.PicBufferPointer = 1;
+                %save data into Buffer after new BC image was created
+                obj.modelEditHandle.addToBuffer();
+%                 %reset pic buffer for undo redo functionality
+% %                 obj.modelEditHandle.PicBuffer = {};
+%                 %load binary pic in the buffer
+%                 obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+%                 %reset buffer pointer
+%                 obj.modelEditHandle.PicBufferPointer = 1;
                 
                 obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
                 obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
@@ -1105,28 +1136,31 @@ classdef controllerEdit < handle
                 %create binary pic
                 obj.modelEditHandle.createBinary();
                 
-                %reset pic buffer for undo redo functionality
-                obj.modelEditHandle.PicBuffer = {};
-                %load binary pic in the buffer
-                obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
-                %reset buffer pointer
-                obj.modelEditHandle.PicBufferPointer = 1;
+                %save data into Buffer after new BC image was created
+                obj.modelEditHandle.addToBuffer();
+%                 %reset pic buffer for undo redo functionality
+% %                 obj.modelEditHandle.PicBuffer = {};
+%                 %load binary pic in the buffer
+%                 obj.modelEditHandle.PicBuffer{1,1} = obj.modelEditHandle.PicBW;
+%                 %reset buffer pointer
+%                 obj.modelEditHandle.PicBufferPointer = 1;
                 
                 obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
                 obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                 
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
-                imshow(obj.modelEditHandle.PicBCGreen);
+                imshow(obj.modelEditHandle.PicBCGreen,[]);
+                caxis([0, 1])
                 
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
-                imshow(obj.modelEditHandle.PicBCBlue);
-                
+                imshow(obj.modelEditHandle.PicBCBlue,[]);
+                caxis([0, 1])
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
-                imshow(obj.modelEditHandle.PicBCRed);
-                
+                imshow(obj.modelEditHandle.PicBCRed,[]);
+                caxis([0, 1])
                 axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
-                imshow(obj.modelEditHandle.PicBCFarRed);
-                
+                imshow(obj.modelEditHandle.PicBCFarRed,[]);
+                caxis([0, 1])
                 obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
                 obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
                 obj.viewEditHandle.B_CurBrightImRed.String = obj.modelEditHandle.FilenameBCRed;
@@ -1207,20 +1241,18 @@ classdef controllerEdit < handle
                 % Use Automatic setup for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
-                
-                set(obj.viewEditHandle.B_NewPic,'Enable','off');
-                set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
-                set(obj.viewEditHandle.B_CheckMask,'Enable','off');
-                set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
-                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
-                set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
-                set(obj.viewEditHandle.B_Threshold,'Enable','off');
-                set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
-                set(obj.viewEditHandle.B_Color,'Enable','off');
-                set(obj.viewEditHandle.B_Invert,'Enable','off');
-                set(obj.viewEditHandle.B_Alpha,'Enable','off');
-                set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
-                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+%                 
+%                 set(obj.viewEditHandle.B_NewPic,'Enable','off');
+%                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+%                 set(obj.viewEditHandle.B_CheckMask,'Enable','off');
+%                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+%                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+%                 set(obj.viewEditHandle.B_Color,'Enable','off');
+%                 set(obj.viewEditHandle.B_Invert,'Enable','off');
+%                 set(obj.viewEditHandle.B_Alpha,'Enable','off');
+%                 set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 
                 obj.busyIndicator(1);
                 
@@ -1231,23 +1263,23 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.createBinary();
                 obj.busyIndicator(0);
                 
-                set(obj.viewEditHandle.B_NewPic,'Enable','on');
-                set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
-                set(obj.viewEditHandle.B_CheckMask,'Enable','on');
-                set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
-                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
-                set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
-                set(obj.viewEditHandle.B_Color,'Enable','on');
-                set(obj.viewEditHandle.B_Invert,'Enable','on');
-                set(obj.viewEditHandle.B_Alpha,'Enable','on');
-                set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
-                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+%                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
+%                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+%                 set(obj.viewEditHandle.B_CheckMask,'Enable','on');
+%                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
+%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+%                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+%                 set(obj.viewEditHandle.B_Color,'Enable','on');
+%                 set(obj.viewEditHandle.B_Invert,'Enable','on');
+%                 set(obj.viewEditHandle.B_Alpha,'Enable','on');
+%                 set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                 
             else
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in thresholdModeEvent() FUNCTION !';
             end
-            
+            obj.modelEditHandle.addToBuffer();
         end
         
         function thresholdEvent(obj,src,evnt)
@@ -1584,6 +1616,10 @@ classdef controllerEdit < handle
                 case 'open'
                     
                     obj.modelEditHandle.morphOP = 'open';
+                
+                case 'close'
+                    
+                    obj.modelEditHandle.morphOP = 'close';    
                     
                 case 'remove'
                     
@@ -1597,13 +1633,17 @@ classdef controllerEdit < handle
                     
                     obj.modelEditHandle.morphOP = 'majority';
                     
-                case 'edge smoothing'
+                case 'smoothing'
                     
-                    obj.modelEditHandle.morphOP = 'edge smoothing';
+                    obj.modelEditHandle.morphOP = 'smoothing';
                     
                 case 'close small gaps'
                     
                     obj.modelEditHandle.morphOP = 'close small gaps';
+                    
+                case 'Remove incomplete objects'
+                    
+                    obj.modelEditHandle.morphOP = 'Remove incomplete objects';
                     
                 otherwise
                     
@@ -1635,7 +1675,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 
-            elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate')
+            elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate') ||...
+                    strcmp(tempMorpStr,'open') || strcmp(tempMorpStr,'close')
                 % Morph options that need a structuring element. No
                 % structering element is selected
                 
@@ -1650,12 +1691,20 @@ classdef controllerEdit < handle
                     % Morph options with choosen structuring element
                     
                     %enable run morph button
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','on')
                     set(obj.viewEditHandle.B_SizeSE,'Enable','on')
                     set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
                     
                 end
+            elseif   strcmp(tempMorpStr,'smoothing') || strcmp(tempMorpStr,'skel') ...
+                    || strcmp(tempMorpStr,'Remove incomplete objects')
                 
+                %enable run morph button
+                set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
+                set(obj.viewEditHandle.B_SizeSE,'Enable','off')
+                set(obj.viewEditHandle.B_NoIteration,'Enable','off')
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
             else
                 % Morph options that dont need a structuring element
                 
@@ -1738,7 +1787,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 
-            elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate')
+            elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate') ||...
+                    strcmp(tempMorpStr,'open') || strcmp(tempMorpStr,'close')
                 % Morph options that need a structuring element. No
                 % structering element is selected
                 
@@ -1753,6 +1803,7 @@ classdef controllerEdit < handle
                     % Morph options with choosen structuring element
                     
                     %enable run morph button
+                    set(obj.viewEditHandle.B_ShapeSE,'Enable','on')
                     set(obj.viewEditHandle.B_SizeSE,'Enable','on')
                     set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
@@ -1851,20 +1902,23 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             if ~isempty(obj.modelEditHandle.handlePicBW)
-                
+                set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
+                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
                 if (obj.viewEditHandle.B_Color.Value == 1 || ...
                      obj.viewEditHandle.B_Color.Value == 2 )   
                 % Color Black or white is selected to use free hand draw
                 % mode.
-                set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+%                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
+%                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
                 Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
                 obj.modelEditHandle.startDragFcn(Pos);
                 
                 elseif (obj.viewEditHandle.B_Color.Value == 3 || ...
                      obj.viewEditHandle.B_Color.Value == 4 ) 
                 % Color Black or white is selected to use region fill
-                % mode. 
+                % mode.
+%                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
+%                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
                 Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
                 obj.modelEditHandle.fillRegion(Pos);
                 else
@@ -1890,7 +1944,12 @@ classdef controllerEdit < handle
             %get cursor positon in binary pic
             Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
             %call drag fcn in model with given cursor position
+            if (obj.viewEditHandle.B_Color.Value == 1 || ...
+                     obj.viewEditHandle.B_Color.Value == 2 )  
             obj.modelEditHandle.DragFcn(Pos);
+            else
+                obj.modelEditHandle.fillRegion(Pos);
+            end
         end
         
         function stopDragFcn(obj,~,~)
