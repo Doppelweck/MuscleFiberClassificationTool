@@ -150,10 +150,13 @@ classdef controllerAnalyze < handle
             %           obj:    Handle to controllerAnalyze object.
             %
             
-            set(obj.mainFigure,'WindowButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
-%             set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
+            set(obj.mainFigure,'WindowButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
+            set(obj.mainFigure,'ButtonDownFcn','');
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
+            set(obj.mainFigure,'ResizeFcn','');
+            
+            %             set(obj.modelAnalyzeHandle.handlePicRGB,'ButtonDownFcn',@obj.manipulateFiberShowInfoEvent);
             
         end
         
@@ -190,7 +193,7 @@ classdef controllerAnalyze < handle
             addlistener(obj.viewAnalyzeHandle.B_FarredRedDistRed,'String','PostSet',@obj.valueUpdateEvent);
             
             addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.valueUpdateEvent);
-            addlistener(obj.viewAnalyzeHandle.B_XScale,'String','PostSet',@obj.valueUpdateEvent);
+            addlistener(obj.viewAnalyzeHandle.B_YScale,'String','PostSet',@obj.valueUpdateEvent);
             
             % listeners MODEL
             addlistener(obj.modelAnalyzeHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
@@ -486,7 +489,11 @@ classdef controllerAnalyze < handle
                         % Value is not numerical. Set value to 1
                         set(obj.viewAnalyzeHandle.B_XScale,'String','1');
                     end
-                    
+                    Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);  
+                    maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
+                    obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
+                    obj.viewAnalyzeHandle.hAP.XTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Xvalue;
+                
                 case obj.viewAnalyzeHandle.B_YScale.Tag
                     %YScale value has changed. Can only be between 0
                     % and +Inf
@@ -506,7 +513,23 @@ classdef controllerAnalyze < handle
                         % Value is not numerical. Set value to 1
                         set(obj.viewAnalyzeHandle.B_YScale,'String','1');
                     end
-                    
+                    maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
+                    Yvalue = str2num(obj.viewAnalyzeHandle.B_YScale.String);
+                    obj.viewAnalyzeHandle.hAP.YTick = [0:100:maxPixelY];
+                    obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Yvalue;
+%                 Yvalue = str2num(obj.viewAnalyzeHandle.B_YScale.String);
+%                 maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
+%                 NoTicksY = 100*floor(maxPixelY/100)/100;
+%                 YStep = (NoTicksY*ceil(maxPixelY/NoTicksY)*round(Yvalue))/(NoTicksY*Yvalue);
+%                 obj.viewAnalyzeHandle.hAP.YTick = [0:YStep:maxPixelY];
+% %                 obj.viewAnalyzeHandle.hAP.YTick = linspace(0,maxPixelY);
+%                 obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.YTick*Yvalue;
+                
+%                 maxUmY = maxPixelY*Yvalue;
+% %                 set(a,'xlim',[0 xmaxa]);
+% %                 yticks(obj.viewAnalyzeHandle.hAP,'auto');
+% %                 obj.viewAnalyzeHandle.hAP.Xlim = [0 maxUmY];
+%                 obj.viewAnalyzeHandle.hAP.YTick = [0:maxPixelY/10*Yvalue:maxPixelY];
                 otherwise
                     % Error Code
                     obj.modelAnalyzeHandle.InfoMessage = '! ERROR in valueUpdateEvent() FUNCTION !';
@@ -607,7 +630,25 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
             
             elseif src.Value == 5 
-                obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification';
+                obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification triple labeling';
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
+                
+            elseif src.Value == 6 
+                obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification quad labeling';
                 obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
@@ -622,7 +663,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
 
-                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';    
                 
             end
             
@@ -737,7 +778,7 @@ classdef controllerAnalyze < handle
             
         end
         
-        function startAnalyzeModeEvent(obj,PicData,InfoText)
+        function startAnalyzeMode(obj,PicData,InfoText)
             % Called by the controllerEdit instance when the user change
             % the program state to analyze-mode. Saves all nessessary Data
             % from the edit model into the analyze model.
@@ -789,6 +830,7 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
                 axis on
                 axis image
+
             elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
                 
                 %Show image for quad labeling
@@ -798,7 +840,7 @@ classdef controllerAnalyze < handle
                 
             elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 3
                 
-                %Show image for quad labeling
+                %Show image for triple labeling
                 obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
                 axis on
                 axis image
@@ -812,11 +854,30 @@ classdef controllerAnalyze < handle
                 
             elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 5
                 
+                %Show image for triple labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
+                axis on
+                axis image
+                
+            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 6
+                
                 %Show image for quad labeling
                 obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
                 axis on
-                axis image     
+                axis image         
             end
+            
+            lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',14);
+            lhy=ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',14);
+            set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
+            Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);  
+            maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
+            obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
+            obj.viewAnalyzeHandle.hAP.XTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Xvalue;
+            maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
+            Yvalue = str2num(obj.viewAnalyzeHandle.B_YScale.String);
+            obj.viewAnalyzeHandle.hAP.YTick = [0:100:maxPixelY];
+            obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Yvalue;
             
             % set panel title to filename and path
             Titel = [obj.modelAnalyzeHandle.PathName obj.modelAnalyzeHandle.FileName];
@@ -944,6 +1005,8 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.XScale = str2double(obj.viewAnalyzeHandle.B_XScale.String);
             obj.modelAnalyzeHandle.YScale = str2double(obj.viewAnalyzeHandle.B_YScale.String);
             
+            obj.modelAnalyzeHandle.minPointsPerCluster = 'not active';
+            
 %             % Disable all GUI buttons during classification
 %             set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
 %             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
@@ -1027,6 +1090,74 @@ classdef controllerAnalyze < handle
 %             set(obj.viewAnalyzeHandle.B_YScale,'Enable','on')
             
             
+        end
+        
+        function plotBoundaries(obj)
+            % Show boundaries in the RGB image after classification.
+            %
+            %   plotBoundaries(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to modelAnalyze object
+            %
+            
+            obj.modelAnalyzeHandle.InfoMessage = '   - plot boundaries...';
+            
+            %Make axes with rgb image the current axes
+            axesh = obj.modelAnalyzeHandle.handlePicRGB.Parent;
+%             axes(axesh)
+            
+            % Find old Boundarie Objects and delete them
+            hBounds = findobj(axesh,'Type','hggroup');
+            delete(hBounds);
+            
+            % Find old Line Objects and delete them
+            hLines = findobj(axesh,'Type','line');
+            delete(hLines);
+            
+            nObjects = size(obj.modelAnalyzeHandle.Stats,1);
+            hold on
+            for i=1:1:nObjects
+                %select boundarie color for diffrent fiber types
+                switch obj.modelAnalyzeHandle.Stats(i).FiberType
+                    case 'undefined'
+                        % Type 0
+                        Color = 'w';
+                    case 'Type 1'
+                        Color = 'b';
+                    case 'Type 2x'
+                        Color = 'r';
+                    case 'Type 2a'
+                        Color = 'y';    
+                    case 'Type 2ax'
+                        Color = [255/255 100/255 0]; %orange
+                    case 'Type 12h'
+                        % Type 3
+                        Color = 'm';
+                    otherwise
+                        % error
+                        Color = 'k';
+                end
+                
+                
+                drawnow limitrate
+                htemp = line(axesh,obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,2),obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
+%                 htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
+                % Tag every Boundarie Line Object with his own Label number
+                % to find them later for manipualtion
+                set(htemp,'Tag',['boundLabel ' num2str(i)]);
+                set(htemp,'HitTest','off');
+                
+                percent = (i-0.1)/nObjects;
+%                 if i == 1
+%                     % get workbar in foreground
+%                     pause(0.1)
+%                 end
+                workbar(percent,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
+            end
+            hold off
         end
         
         function backEditModeEvent(obj,~,~)
@@ -1138,7 +1269,7 @@ classdef controllerAnalyze < handle
                 
                 % send all data to the result controller and start the
                 % result mode
-                obj.controllerResultsHandle.startResultsModeEvent(Data,InfoText);
+                obj.controllerResultsHandle.startResultsMode(Data,InfoText);
             end
         end
         
@@ -1240,7 +1371,7 @@ classdef controllerAnalyze < handle
                     case 'Type 2a'
                         Color = 'y';    
                     case 'Type 2ax'
-                        Color = [255/255 165/255 0]; %orange
+                        Color = [255/255 100/255 0]; %orange
                     case 'Type 12h'
                         % Type 3
                         Color = 'm';
@@ -1430,7 +1561,7 @@ classdef controllerAnalyze < handle
                     ColorMap(6,:) = [224 224 224]; % Grey Fiber Type undifiend
                     ColorMap = ColorMap/255;
                     
-                    obj.viewAnalyzeHandle.showFigurePreResults();
+                    obj.viewAnalyzeHandle.showFigurePreResults(obj.mainFigure);
                     
                     %find all Type 1 Fibers
                     Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 1');
@@ -1490,7 +1621,7 @@ classdef controllerAnalyze < handle
                     
                     Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
                     Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
-                    R = [0 2*Rmax]; %Red value vector
+                    R = [0 10*Rmax]; %Red value vector
                     
                     if obj.modelAnalyzeHandle.BlueRedThreshActive
                         % BlueRedThreshActive Parameter is active, plot
@@ -1500,26 +1631,32 @@ classdef controllerAnalyze < handle
                         BlueRedDistB = obj.modelAnalyzeHandle.BlueRedDistBlue;
                         BlueRedDistR = obj.modelAnalyzeHandle.BlueRedDistRed;
                         
+                        if BlueRedDistB == 1
+                            BlueRedDistB = 0.999999999;
+                        end
+                        
                         % creat classification function line obj
                         f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
                         f_Bdist = BlueRedTh * R / (1-BlueRedDistB); %blue dist fcn
                         f_Rdist = BlueRedTh * R * (1-BlueRedDistR); %red dist fcn
                         hold on
-                        plot(R,f_Bdist,'b');
+                        plot(R,f_Bdist,'b','LineWidth',1.5);
                         LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(BlueRedTh) ' * R / (1-' num2str(BlueRedDistB) ')'];
                         hold on
-                        plot(R,f_Rdist,'r');
+                        plot(R,f_Rdist,'r','LineWidth',1.5);
                         LegendString{end+1}= ['f_{Rdist}(R) = ' num2str(BlueRedTh) ' * R * (1-' num2str(BlueRedDistR) ')'];
                         hold on
-                        plot(R,f_BRthresh,'k');
+                        plot(R,f_BRthresh,'k','LineWidth',1.5);
                         LegendString{end+1}= ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
                     elseif obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 2
                         BlueRedTh = 1;
                         BlueRedDistB = 0;
                         BlueRedDistR = 0;
                         f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
+                         LegendString{end+1}= ['f_{BRthresh}(R) = R (not active)'];
                         hold on
                         plot(R,f_BRthresh,'k');
+                        
                     end
                     
                     maxLim =  max([Rmax Bmax]);
@@ -1528,7 +1665,8 @@ classdef controllerAnalyze < handle
                     ylim([ 0 maxLim+10 ] );
                     xlim([ 0 maxLim+10 ] );
                     grid on
-                    legend(LegendString,'Location','Best')
+                    title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h)'},'FontSize',14)
+                    legend(LegendString,'Location','best')
                     
                     %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                     ax = obj.viewAnalyzeHandle.hAPRFRR;
@@ -1556,9 +1694,9 @@ classdef controllerAnalyze < handle
                     
                     Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
                     FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
+                    R = [0 10*Rmax]; %Red value vector
                     
                     if obj.modelAnalyzeHandle.FarredRedThreshActive
-                        R = [0 2*Rmax]; %Red value vector
                         % Color-Based Classification
                         % FarredRedThreshActive Parameter is active, plot
                         % classification functions
@@ -1566,27 +1704,41 @@ classdef controllerAnalyze < handle
                         FarredRedDistFR = obj.modelAnalyzeHandle.FarredRedDistFarred;
                         FarredRedDistR = obj.modelAnalyzeHandle.FarredRedDistRed;
                         
+                        if FarredRedDistFR == 1
+                            FarredRedDistFR = 0.999999999;
+                        end
+                        
                         % creat classification function line obj
                         f_FRRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
                         f_FRdist = FarredRedTh * R / (1-FarredRedDistFR); %farred dist fcn
                         f_Rdist = FarredRedTh * R * (1-FarredRedDistR); %red dist fcn
                         
-                        plot(R,f_FRdist,'y');
-                        LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
+                        plot(R,f_FRdist,'y','LineWidth',1.5);
+                        LegendString{end+1} = ['f_{FRdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
                         
-                        plot(R,f_Rdist,'r');
+                        plot(R,f_Rdist,'r','LineWidth',1.5);
                         LegendString{end+1} = ['f_{Rdist}(R) = ' num2str(FarredRedTh) ' * R * (1-' num2str(FarredRedDistR) ')'];
                         
-                        plot(R,f_FRRthresh,'k');
-                        LegendString{end+1} = ['f_{BRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
+                        plot(R,f_FRRthresh,'k','LineWidth',1.5);
+                        LegendString{end+1} = ['f_{FRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
+                   elseif obj.modelAnalyzeHandle.AnalyzeMode == 2
+                        FarredRedTh = 1;
+                        FarredRedDistFR = 0;
+                        FarredRedDistR = 0;
+                        f_BRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
+                        LegendString{end+1} = ['f_{FRthresh}(R) = R (not active)'];
+                        hold on
+                        plot(R,f_BRthresh,'k');
+                    
                     end
                     
                     maxLim =  max([Rmax FRmax]);
-                    ylabel('y: mean Farred (FR)','FontSize',14);
-                    xlabel('x: mean Red (R)','FontSize',14);
+                    ylabel('y: mean Farred (FR)','FontSize',12);
+                    xlabel('x: mean Red (R)','FontSize',12);
                     ylim([ 0 maxLim+10 ] );
                     xlim([ 0 maxLim+10 ] );
                     grid on
+                    title({'Fiber Type-2 specification classification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
                     legend(LegendString,'Location','Best')
                     
                 end

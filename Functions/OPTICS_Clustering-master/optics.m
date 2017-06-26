@@ -38,12 +38,12 @@ function [RD,CD,order]=optics(x,k)
 
 [m,n]=size(x);
 CD=zeros(1,m);
-RD=ones(1,m)*10^10;
+RD=ones(1,m)*Inf;
 
 % Calculate Core Distances
 for i=1:m	
     D=sort(dist(x(i,:),x));
-    CD(i)=D(k+1);  
+    CD(i)=D(k);  
 end
 
 order=[];
@@ -61,7 +61,7 @@ while ~isempty(seeds)
     [i1 ind]=min(RD(seeds));
 end   
 
-RD(1)=max(RD(2:m))+.1*max(RD(2:m));
+RD(1)=max(RD(2:m));
 
 
 function [D]=dist(i,x)

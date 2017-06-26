@@ -1,12 +1,13 @@
 function hf = startSrcreen()
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-
+Pic = imread('StartScreen3.jpg');
+[m n]= size(Pic);
 hf  = figure('Visible','off','MenuBar','none','NumberTitle','off',...
-    'WindowStyle','modal','Units','normalized','Position',[0 0 0.7 0.7]);
-ha = axes('Parent',hf,'Visible','on','Units','normalized','Position',[0 0 1 1]);
+    'WindowStyle','modal','Units','pixels','Position',[0 0 m n]);
+ha = axes('Parent',hf,'Visible','on','Units','pixels','Position',[0 0 m n]);
 axis image
-Pic = imread('StartScreen.png');
+% Pic = imread('StartScreen.png');
 set(ha, 'LooseInset', [0,0,0,0]);
 ih = imshow(Pic);
 imxpos = get(ih,'XData');
@@ -20,5 +21,6 @@ movegui(hf,'center');
 set(hf,'CloseRequestFcn','');
 set(hf,'Visible','on');
 set(hf,'WindowStyle','normal');
+
 end
 

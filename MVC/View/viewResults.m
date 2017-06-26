@@ -28,8 +28,8 @@ classdef viewResults < handle
         hFR; %handle to figure with Results and controls.
         panelControl; %handle to panel with controls.
         panelResults; %handle to panel with results.
-        hAPProcessedRGBFR; %handle to axes with processed image in the picture Panel all planes.
-        hAPProcessedRGB; %handle to axes with image created from the Red Green and Blue color-planes.
+        hAPProcessed; %handle to axes with processed image in the picture Panel all planes.
+        hAPGroups; %handle to axes with image created from the Red Green and Blue color-planes.
         
         hAArea; %handle to axes with area plot.  
         hACount; %handle to axes with counter plot.
@@ -52,8 +52,8 @@ classdef viewResults < handle
         B_SaveScatterAll; %Checkbox, select if statistic table should be saved.
         B_SavePlots; %Checkbox, select if Statistics plots should be saved.
         B_SaveHisto; %Checkbox, select if Histogram plots should be saved.
-        B_SavePicRGBFRProc; %Checkbox, select if processed image with Farred should be saved.
-        B_SavePicRGBProc; %Checkbox, select if processed image without Farred image should be saved.
+        B_SavePicProc; %Checkbox, select if processed image with Farred should be saved.
+        B_SavePicGroups; %Checkbox, select if processed image without Farred image should be saved.
         B_SaveOpenDir %Button, opens the save directory.
         
         B_TableStatistic; %Table, that shows all statistic data.
@@ -78,11 +78,11 @@ classdef viewResults < handle
                 fontSizeM = 12; % Font size medium
                 fontSizeB = 16; % Font size big 
             end
-
+%             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',5,'Padding',5 );
             
             obj.panelResults = uix.Panel( 'Title', 'Results', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
-            obj.panelControl = uix.Panel( 'Title', 'Control Panel', 'Parent', mainPanelBox,'FontSize',fontSizeB );
+            obj.panelControl = uix.Panel( 'Title', 'Control Panel - RESULTS-MODE', 'Parent', mainPanelBox,'FontSize',fontSizeB );
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             
@@ -98,82 +98,82 @@ classdef viewResults < handle
             set( PanelVBox, 'Heights', [-3 -7 -14], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%% Panel control %%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 5 );
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 );
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',5);
-            obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', 'Back to analyze mode','FontSize',fontSizeB );
-            obj.B_CloseProgramm = uicontrol( 'Parent', HBoxControl1,'FontSize',fontSizeB, 'String', 'Close program' );
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
+            obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', sprintf('\x21E6 Analyze-Mode'),'FontUnits','normalized','Fontsize',0.4 );
+            obj.B_CloseProgramm = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Close program \x2612') );
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',5);
-            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'New image' );
-            obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', 'Save data','FontSize',fontSizeB );
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
+            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x25A4 New file') );
+            obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', sprintf('Save data \x2611'),'FontUnits','normalized','Fontsize',0.4 );
             
             %%%%%%%%%%%%%%%%%%%Panel SaveOptions %%%%%%%%%%%%%%%%%%%%%%%%%%
             mainVBBoxSave = uix.VBox('Parent', PanelSave,'Spacing', 5 );
             
-            %%%%%%%%%%%%%%%% 1. Row Save Fiber Table 
+            %%%%%%%%%%%%%%%% 1. Row Save Overview plots 
             HBoxSave1 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave11 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave11,'Style','text','FontSize',fontSizeM, 'String', 'Save Fiber-Data table as Excel sheet :' );
+            HButtonBoxSave11 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Save Overview plots as .pdf:' );
             
             HButtonBoxSave12 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveFiberTable = uicontrol( 'Parent', HButtonBoxSave12,'Style','checkbox','Value',1,'Tag','SaveFiberTable');
+            obj.B_SavePlots = uicontrol( 'Parent', HButtonBoxSave12,'Style','checkbox','Value',1,'Tag','SaveOverview');
             
             set( HBoxSave1, 'Widths', [-10 -1] );
             
-            %%%%%%%%%%%%%%%% 2. Row Save Scatter all plot 
+            %%%%%%%%%%%%%%%% 2. Row Save Histogram plots 
             HBoxSave2 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave21 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontSize',fontSizeM, 'String', 'Save Scatter plot all fibers as .pdf file:' );
+            HButtonBoxSave21 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Save Histogram plots as .pdf:' );
             
             HButtonBoxSave22 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','SaveStatistcTable');
+            obj.B_SaveHisto = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','SaveHistogram');
             
             set( HBoxSave2, 'Widths', [-10 -1] );
             
-            %%%%%%%%%%%%%%%% 3. Row Save statistics plots
+            %%%%%%%%%%%%%%%% 3. Row Save Processed image
             HBoxSave3 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave31 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave31,'Style','text','FontSize',fontSizeM, 'String', 'Save statistics plots as .pdf files :' );
+            HButtonBoxSave31 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave31,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Save Processed Image as .pdf: ' );
             
             HButtonBoxSave32 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePlots = uicontrol( 'Parent', HButtonBoxSave32,'Style','checkbox','Value',1,'Tag','SaveParameter');
+            obj.B_SavePicProc = uicontrol( 'Parent', HButtonBoxSave32,'Style','checkbox','Value',1,'Tag','SavePicProcessed');
             
             set( HBoxSave3, 'Widths', [-10 -1] );
             
-            %%%%%%%%%%%%%%%% 4. Row Histogram plots
+            %%%%%%%%%%%%%%%% 4. Row Save Fiber Groups image
             HBoxSave4 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave41 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontSize',fontSizeM, 'String', 'Save statistics plots as .pdf files :' );
+            HButtonBoxSave41 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Save Fiber-Grouping Image as .pdf: ' );
             
             HButtonBoxSave42 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveHisto = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SaveParameter');
+            obj.B_SavePicGroups = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SavePicGroups');
             
             set( HBoxSave4, 'Widths', [-10 -1] );
             
-            %%%%%%%%%%%%%%%% 5. Row Save Picture analyzed 
+            %%%%%%%%%%%%%%%% 5. Row Save Fiber Table 
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontSize',fontSizeM, 'String', 'Save processed image with Farred plane :' );
+            HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Save Fiber-Table as Excel sheet :' );
             
             HButtonBoxSave52 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePicRGBFRProc = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SavePicRGBFRProc');
+            obj.B_SaveFiberTable = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SaveFiberTable'); 
             
             set( HBoxSave5, 'Widths', [-10 -1] );
             
-            %%%%%%%%%%%%%%%% 6. Row Save Picture analyzed 
+            %%%%%%%%%%%%%%%% 6. Row Save Scatter all 
             HBoxSave6 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave61 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 18],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontSize',fontSizeM, 'String', 'Save processed image without Farred plane :' );
+            HButtonBoxSave61 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Save Scatterplot all fibers as .pdf: ' );
             
             HButtonBoxSave62 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePicRGBProc = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','B_SavePicRGBProc');
+            obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','SaveScatterAll');
             
             set( HBoxSave6, 'Widths', [-10 -1] );
 
@@ -181,7 +181,7 @@ classdef viewResults < handle
             HBoxSave7 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[600 30],'Padding', 1 );
-            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave71,'FontSize',fontSizeM, 'String', 'Open results folder' );
+            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave71,'FontUnits','normalized','Fontsize',0.4, 'String', 'Open results folder' );
             
             %%%%%%%%
             set( mainVBBoxSave, 'Heights', [-1 -1 -1 -1 -1 -1 -2] );
@@ -202,7 +202,7 @@ classdef viewResults < handle
             tableTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             scatterAllTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line');
             
-            tabPanel.TabTitles = {'Statistics','Histograms','Image with Farred processed','Image without Farred processed', 'Fiber Type Table','Scatter all Fibers'};
+            tabPanel.TabTitles = {'Overview','Histograms','Image processed','Image with Fiber-Groups', 'Fiber Type Table','Scatter all Fibers'};
             
             tabPanel.TabWidth = -1;
             %%%%%%%%%%%%%%%%%%% Tab Statistics %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -229,7 +229,7 @@ classdef viewResults < handle
             
             PanelStatisticTabel = uix.Panel('Parent',statisticTabHBox,'Padding',5,'Title', 'Fiber-Type statistics','FontSize',fontSizeM);
             
-            set(statisticTabHBox,'Widths', [-3 -3 -2])
+            set(statisticTabHBox,'Widths', [-2 -2 -1.2])
             set( statsVBoxleft, 'Heights', [-1 -1] );
             set( statsVBoxright, 'Heights', [-1 -1] );
             
@@ -245,7 +245,7 @@ classdef viewResults < handle
 
             set(obj.hAScatterBlueRed,'Units','normalized','OuterPosition',[0 0 1 1]);
 
-            obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeM);
+            obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeS);
             
             
            
@@ -271,17 +271,17 @@ classdef viewResults < handle
             set(obj.hARoundHist, 'LooseInset', [0,0,0,0]);
             
             
-            %%%%%%%%%%%%%%%%%%%%%%%% Tab Image all planes processed
-            mainPicPanel = uix.Panel('Parent',pictureTabPanel,'Padding',35,'Title', 'RGB Image (all Planes) processed with object boundaries and label numbers','FontSize',fontSizeM);
+            %%%%%%%%%%%%%%%%%%%%%%%% Tab Image processed
+            mainPicProcPanel = uix.Panel('Parent',pictureTabPanel,'Padding',35,'Title', 'RGB Image processed with object boundaries and label numbers','FontSize',fontSizeM);
             
-            obj.hAPProcessedRGBFR = axes('Parent',mainPicPanel,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAPProcessed = axes('Parent',mainPicProcPanel,'Units','normalized','Position',[0 0 1 1]);
             axis image
             
-            %%%%%%%%%%%%%%%%%%%%%%%% Tab Image without farred %%%%%%%%%%%%%
+            %%%%%%%%%%%%%%%%%%%%%%%% Tab Image with Groups %%%%%%%%%%%%%
             
-            mainPicPlanePanel = uix.Panel('Parent',pictureRGBPlaneTabPanel,'Padding',35,'Title', 'RGB Image (Red Green and Blue Plane)processed with object boundaries and label numbers','FontSize',fontSizeM);
+            mainPicGroupPanel = uix.Panel('Parent',pictureRGBPlaneTabPanel,'Padding',35,'Title', 'RGB Image with Fiber-Type-Groups','FontSize',fontSizeM);
             
-            obj.hAPProcessedRGB = axes('Parent',mainPicPlanePanel,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAPGroups = axes('Parent',mainPicGroupPanel,'Units','normalized','Position',[0 0 1 1]);
             axis image
             
             %%%%%%%%%%%%%%%%%%%%%%%% Tab Tabel %%%%%%%%%%%%%%%%%%%%%%%%%%

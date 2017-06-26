@@ -74,7 +74,11 @@ classdef controllerEdit < handle
             obj.modelEditHandle.InfoMessage = 'Fiber-Type classification tool';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Developed by:';
-            obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences';
+            obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences, GER';
+            obj.modelEditHandle.InfoMessage = ' ';
+            obj.modelEditHandle.InfoMessage = 'In cooperation with:';
+            obj.modelEditHandle.InfoMessage = 'The Royal Veterinary College, UK';
+            obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Version 1.0 2017';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Press "New file" to start';
@@ -153,9 +157,11 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
-            set(obj.mainFigure,'ButtonDownFcn','');
             set(obj.mainFigure,'WindowButtonMotionFcn','');
+            set(obj.mainFigure,'WindowButtonDownFcn','');
+            set(obj.mainFigure,'ButtonDownFcn','');
             set(obj.mainFigure,'CloseRequestFcn',@obj.closeProgramEvent);
+            set(obj.mainFigure,'ResizeFcn','');
         end
         
         function setInitValueInModel(obj)
@@ -197,10 +203,10 @@ classdef controllerEdit < handle
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
                 % first start of the programm. No image handle exist.
                 % create image handle for Pic RGB
-                obj.modelEditHandle.handlePicRGB = imshow(PicRGB);
+                obj.modelEditHandle.handlePicRGB = imshow(ones(size(PicRGB)));
             else
                 % New image was selected. Change data in existing handle
-                obj.modelEditHandle.handlePicRGB.CData = PicRGB;
+                obj.modelEditHandle.handlePicRGB.CData = ones(size(PicRGB));
             end
             
             hold on
@@ -221,6 +227,14 @@ classdef controllerEdit < handle
             axis on
             axis image
             hold off
+            lhx=xlabel(obj.viewEditHandle.hAP, 'x/pixel','Fontsize',14);
+            lhy=ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',14);
+            set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
+            maxPixelX = size(PicBW,2);
+            obj.viewEditHandle.hAP.XTick = [0:100:maxPixelX];
+            maxPixelY = size(PicBW,1);
+            obj.viewEditHandle.hAP.YTick = [0:100:maxPixelY];
+            
             Titel = [obj.modelEditHandle.PathName obj.modelEditHandle.FileName];
             obj.viewEditHandle.panelPicture.Title = Titel;
             
@@ -477,7 +491,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_CheckMask,'Enable','off');
             else
                 %selecting a new image was not successfully.
-                if isempty(obj.modelEditHandle.handlePicBW.CData)
+                if isempty(obj.modelEditHandle.handlePicBW)
                     %No image is loaded into the program.
                     %disable GUI objects
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
@@ -616,7 +630,7 @@ classdef controllerEdit < handle
             
             obj.modelEditHandle.InfoMessage = '   - Checking planes opened';
             PicData = obj.modelEditHandle.sendPicsToController();
-            obj.viewEditHandle.checkPlanes(PicData);
+            obj.viewEditHandle.checkPlanes(PicData,obj.mainFigure);
             
             % set Callbacks of the cancel and Ok button color planes.
             set(obj.viewEditHandle.B_CheckPOK,'Callback',@obj.checkPlanesOKEvent);
@@ -1905,22 +1919,22 @@ classdef controllerEdit < handle
                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
                 if (obj.viewEditHandle.B_Color.Value == 1 || ...
-                     obj.viewEditHandle.B_Color.Value == 2 )   
-                % Color Black or white is selected to use free hand draw
-                % mode.
-%                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-%                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
-                Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
-                obj.modelEditHandle.startDragFcn(Pos);
-                
+                        obj.viewEditHandle.B_Color.Value == 2 )
+                    % Color Black or white is selected to use free hand draw
+                    % mode.
+                    %                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
+                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+                    Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
+                    obj.modelEditHandle.startDragFcn(Pos);
+                    
                 elseif (obj.viewEditHandle.B_Color.Value == 3 || ...
-                     obj.viewEditHandle.B_Color.Value == 4 ) 
-                % Color Black or white is selected to use region fill
-                % mode.
-%                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-%                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
-                Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
-                obj.modelEditHandle.fillRegion(Pos);
+                        obj.viewEditHandle.B_Color.Value == 4 )
+                    % Color Black or white is selected to use region fill
+                    % mode.
+                    %                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
+                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+                    Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
+                    obj.modelEditHandle.fillRegion(Pos);
                 else
                     
                 end
@@ -1973,6 +1987,18 @@ classdef controllerEdit < handle
             obj.modelEditHandle.stopDragFcn();
         end
         
+        function test(obj,~,~)
+            Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
+            x = int16(Pos(1,1));
+            y = int16(Pos(1,2));
+            [xOut yOut isInAxes] = obj.modelEditHandle.checkPosition(x,y);
+            if isInAxes
+                set(obj.mainFigure,'pointer','fullcrosshair')
+            else
+                set(obj.mainFigure,'pointer','arrow')
+            end
+        end
+        
         function startAnalyzeModeEvent(obj,src,evnt)
             % Callback function of the Start Analyze Mode-Button in the GUI.
             % Calls the function sendPicsToController() in the editModel to
@@ -1996,7 +2022,7 @@ classdef controllerEdit < handle
             
             %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
-            obj.controllerAnalyzeHandle.startAnalyzeModeEvent(PicData,InfoText);
+            obj.controllerAnalyzeHandle.startAnalyzeMode(PicData,InfoText);
             
         end
         
@@ -2156,6 +2182,7 @@ classdef controllerEdit < handle
                     %find all figures and delete them
                     figHandles = findobj('Type','figure');
                     delete(figHandles);
+                    delete(obj)
                 case 'No'
                     obj.modelEditHandle.InfoMessage = '   - closing program canceled';
                 otherwise

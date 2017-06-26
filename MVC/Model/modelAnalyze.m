@@ -80,6 +80,8 @@ classdef modelAnalyze < handle
         FarredRedDistFarred;
         FarredRedDistRed;
         
+        minPointsPerCluster;
+        
         XScale; %Inicates the um/pixels in X direction to change values in micro meter
         YScale; %Inicates the um/pixels in Y direction to change values in micro meter
         CalculationRunning; %Indicates if any caluclation is still running.
@@ -186,11 +188,11 @@ classdef modelAnalyze < handle
             
             % classify all fiber objects
             obj.specifyFiberType();
-            
+
             % plot boundaries 
-            obj.plotBoundaries();
+            obj.controllerAnalyzeHandle.plotBoundaries();
             
-            workbar(1,'completed','completed');
+            workbar(1,'completed','completed',obj.controllerAnalyzeHandle.mainFigure);
             
             obj.InfoMessage = '- analyzing completed';
             
@@ -247,6 +249,8 @@ classdef modelAnalyze < handle
             for i=1:1:size(obj.Stats,1)
                 % convert Area from pixel^2 in um^2
                 obj.Stats(i).Area = obj.Stats(i).Area *obj.XScale *obj.YScale;
+                obj.Stats(i).Centroid(1) = obj.Stats(i).Centroid(1) *obj.XScale;
+                obj.Stats(i).Centroid(2) = obj.Stats(i).Centroid(2) *obj.YScale;
             end
             % Add Field Boundarie to Stats Struct and set all Values to
             % zero
@@ -288,7 +292,7 @@ classdef modelAnalyze < handle
                 obj.Stats(i).Perimeter = sum(sqrt(sum(d,2))); 
                 
                 percent = (i-0.1)/size(obj.Stats,1);
-                workbar(percent,'Please Wait...calculating perimeter','Permimeter'); 
+                workbar(percent,'Please Wait...calculating perimeter','Permimeter',obj.controllerAnalyzeHandle.mainFigure); 
 %                 pause(0.00001)
             end
             
@@ -322,6 +326,8 @@ classdef modelAnalyze < handle
             % Add Field Roundness to Stats Struct ans set all Values to
             % zero
             [obj.Stats(:).Roundness] = deal(0);
+            [obj.Stats(:).AreaMinCS] = deal(0);
+            [obj.Stats(:).AreaMaxCS] = deal(0);
             
             for i=1:1:size(obj.Stats,1)
                 
@@ -343,10 +349,12 @@ classdef modelAnalyze < handle
                 Ratiomin = A_Fiber/A_Cmin;
                 
                 % Roundenss. Normalized distance between Ratiomax and Ratiomin
-                obj.Stats(i).Roundness = 1 - (abs( Ratiomax -  Ratiomin))/max([Ratiomax  Ratiomin]);
-                
+%                 obj.Stats(i).Roundness = 1 - (abs( Ratiomax -  Ratiomin))/max([Ratiomax  Ratiomin]);
+                obj.Stats(i).Roundness =A_Fiber/A_Cmax;
+                obj.Stats(i).AreaMaxCS = A_Cmax;
+                obj.Stats(i).AreaMinCS = A_Cmin;
                 percent = (i-0.1)/size(obj.Stats,1);
-                workbar(percent,'Please Wait...calculating roundness','Roundness');
+                workbar(percent,'Please Wait...calculating roundness','Roundness',obj.controllerAnalyzeHandle.mainFigure);
 %                 pause(0.0001)
             end
         end
@@ -388,7 +396,7 @@ classdef modelAnalyze < handle
                 
                 
                 percent = (abs(j-0.1))/(angle/angleStep);
-                workbar(percent,'Please Wait...calculating diameters','Diameters');
+                workbar(percent,'Please Wait...calculating diameters','Diameters',obj.controllerAnalyzeHandle.mainFigure);
 %                 pause(0.00001)
             end
             
@@ -397,7 +405,7 @@ classdef modelAnalyze < handle
                 obj.Stats(k).minDiameter = min(minDia(k,:));
                 obj.Stats(k).maxDiameter = max(maxDia(k,:));
                 percent = (k-0.1)/noObjects;
-                workbar(percent,'Please Wait...saving diameters','Find min and max Diameters');
+                workbar(percent,'Please Wait...saving diameters','Find min and max Diameters',obj.controllerAnalyzeHandle.mainFigure);
 %                 pause(0.00001)
             end
             
@@ -427,7 +435,7 @@ classdef modelAnalyze < handle
             for i=1:1:nObjects
                 obj.Stats(i).AspectRatio = obj.Stats(i).maxDiameter/obj.Stats(i).minDiameter;
                 percent = (i-0.1)/nObjects;
-                workbar(percent,'Please Wait...calculating aspect ratio','Aspect Ratio');
+                workbar(percent,'Please Wait...calculating aspect ratio','Aspect Ratio',obj.controllerAnalyzeHandle.mainFigure);
 %                 pause(0.00001)
             end
             
@@ -441,7 +449,6 @@ classdef modelAnalyze < handle
             %   - mean Farred Color from farredColorPlane image
             %   - ratio meanBlue / meanRed
             %   - distance meanBlue / meanRed normalized
-            %   - mean Color-Hue (HSV Colormodel) from RGB image
             %   - mean Color-Value (HSV Colormodel) from RGB image
             %
             %   calculatingFiberColor(obj);
@@ -454,117 +461,36 @@ classdef modelAnalyze < handle
             
             obj.InfoMessage = '   - calculating fiber color...';
             
-            % Add color feature fields  to Stats Struct and
-            % set all values to zero
-%             [obj.Stats(:).ColorHue] = deal(0); %Hue-channel of HSV colormodel
+            meanRed = regionprops(obj.LabelMat,obj.PicPlaneRed,'MeanIntensity');
+            meanFarRed = regionprops(obj.LabelMat,obj.PicPlaneFarRed,'MeanIntensity');
+            meanBlue = regionprops(obj.LabelMat,obj.PicPlaneBlue,'MeanIntensity');
+            meanGreen = regionprops(obj.LabelMat,obj.PicPlaneGreen,'MeanIntensity');
+            
+            
+            % Add color feature fields  to Stats Struct
             [obj.Stats(:).ColorValue] = deal(0); %Value-channel of HSV colormodel
-            [obj.Stats(:).ColorRed] = deal(0);
-            [obj.Stats(:).ColorGreen] = deal(0);
-            [obj.Stats(:).ColorBlue] = deal(0);
-            [obj.Stats(:).ColorFarRed] = deal(0);
+            [obj.Stats(:).ColorRed] = deal(meanRed.MeanIntensity);
+            [obj.Stats(:).ColorGreen] = deal(meanGreen.MeanIntensity);
+            [obj.Stats(:).ColorBlue] = deal(meanBlue.MeanIntensity);
+            [obj.Stats(:).ColorFarRed] = deal(meanFarRed.MeanIntensity);
             [obj.Stats(:).ColorRatioBlueRed] = deal(0);
             [obj.Stats(:).ColorRatioFarredRed] = deal(0);
             
             nObjects = size(obj.Stats,1);
-            
-%             % convert original RGB image to HSV colormodel
-%             PicRGB_HSV = rgb2hsv(obj.handlePicRGB.CData);
-%             PicRGB_H = PicRGB_HSV(:,:,1); % H-channel of HSV image
-%             PicRGB_V = PicRGB_HSV(:,:,3); % V-channel of HSV image
-            
+
             for i=1:1:nObjects
-                %Calculates the color features for each fiber object
-                
-%                 meanColorH =   mean( PicRGB_H(obj.LabelMat == i) );
-%                 meanColorV =   mean( PicRGB_V(obj.LabelMat == i) );
-                meanRed = mean( obj.PicPlaneRed(obj.LabelMat == i) );
-                meanFarRed = mean( obj.PicPlaneFarRed(obj.LabelMat == i) );
-                meanBlue = mean( obj.PicPlaneBlue(obj.LabelMat == i) );
-                meanGreen = mean( obj.PicPlaneGreen(obj.LabelMat == i) );
-                
-                obj.Stats(i).ColorRed = meanRed;
-                obj.Stats(i).ColorGreen = meanGreen;
-                obj.Stats(i).ColorBlue = meanBlue;
-                obj.Stats(i).ColorFarRed = meanFarRed;
-                obj.Stats(i).ColorValue = max([meanRed meanBlue meanFarRed])/255;
-                obj.Stats(i).ColorRatioFarredRed = meanFarRed/meanRed;
-                obj.Stats(i).ColorRatioBlueRed = meanBlue/meanRed;
-                
+
+                obj.Stats(i).ColorRatioBlueRed = obj.Stats(i).ColorBlue/obj.Stats(i).ColorRed;
+                obj.Stats(i).ColorRatioFarredRed = obj.Stats(i).ColorFarRed/obj.Stats(i).ColorRed;
+                obj.Stats(i).ColorValue = max([obj.Stats(i).ColorRed obj.Stats(i).ColorBlue obj.Stats(i).ColorFarRed])/255;
                 percent =   (i-0.1)/nObjects;
-                workbar(percent,'Please Wait...calculating fiber color','Fiber-Color');
-%                 pause(0.0001)
+                workbar(percent,'Please Wait...calculating fiber color','Fiber-Color',obj.controllerAnalyzeHandle.mainFigure);
                 
             end
             
         end
         
-        function plotBoundaries(obj)
-            % Show boundaries in the RGB image after classification.
-            %
-            %   plotBoundaries(obj);
-            %
-            %   ARGUMENTS:
-            %
-            %       - Input
-            %           obj:    Handle to modelAnalyze object
-            %
-            
-            obj.InfoMessage = '   - plot boundaries...';
-            
-            %Make axes with rgb image the current axes
-            axesh = obj.handlePicRGB.Parent;
-%             axes(axesh)
-            
-            % Find old Boundarie Objects and delete them
-            hBounds = findobj(axesh,'Type','hggroup');
-            delete(hBounds);
-            
-            % Find old Line Objects and delete them
-            hLines = findobj(axesh,'Type','line');
-            delete(hLines);
-            
-            nObjects = size(obj.Stats,1);
-            hold on
-            for i=1:1:nObjects
-                %select boundarie color for diffrent fiber types
-                switch obj.Stats(i).FiberType
-                    case 'undefined'
-                        % Type 0
-                        Color = 'w';
-                    case 'Type 1'
-                        Color = 'b';
-                    case 'Type 2x'
-                        Color = 'r';
-                    case 'Type 2a'
-                        Color = 'y';    
-                    case 'Type 2ax'
-                        Color = [255/255 165/255 0]; %orange
-                    case 'Type 12h'
-                        % Type 3
-                        Color = 'm';
-                    otherwise
-                        % error
-                        Color = 'k';
-                end
-                
-                
-                drawnow limitrate
-                htemp = line(axesh,obj.Stats(i).Boundarie{1, 1}(:,2),obj.Stats(i).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
-%                 htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
-                % Tag every Boundarie Line Object with his own Label number
-                % to find them later for manipualtion
-                set(htemp,'Tag',['boundLabel ' num2str(i)]);
-                set(htemp,'HitTest','off');
-                
-                percent = (i-0.1)/nObjects;
-%                 if i == 1
-%                     % get workbar in foreground
-%                     pause(0.1)
-%                 end
-                workbar(percent,'Please Wait...ploting boundaries','Boundaries');
-            end
-            hold off
-        end
+        
         
         function specifyFiberType(obj)
             % Specifiy the fiber types depending on the selected analyzing
@@ -585,7 +511,9 @@ classdef modelAnalyze < handle
             [obj.Stats(:).FiberTypeMainGroup] = deal(0);
             
             [obj.Stats(:).FiberType] = deal('');
-
+            
+            %perform pre classification
+            obj.preClassification();
 
             if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 2
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -606,7 +534,7 @@ classdef modelAnalyze < handle
                 obj.classifyOPTICS();
             
                 
-            elseif obj.AnalyzeMode == 5
+            elseif obj.AnalyzeMode == 5 || obj.AnalyzeMode == 6
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 %Manual labeling 
                 obj.classifyMANUAL();  
@@ -614,18 +542,17 @@ classdef modelAnalyze < handle
             end
             
         end
-        
-        function classifyOPTICS(obj)
-            
-            obj.InfoMessage = '      - use OPTICS clustering';
+
+        function preClassification(obj)
             noElements = size(obj.Stats,1);
-            
+
             %find all fiber types that are undefined (out of the
             %parameter range).
+            obj.InfoMessage = '      - run Pre-Classification...';
             obj.InfoMessage = '         - find objects that are out of parameter range';
             for i=1:1:noElements
                 percent=(i-0.1)/noElements;
-                workbar(percent,'Please Wait...pre-classification','OPTICS-Clustering');
+                workbar(percent,'Please Wait...pre-classification','Pre-Classification',obj.controllerAnalyzeHandle.mainFigure);
                 
                 if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
                     
@@ -652,7 +579,8 @@ classdef modelAnalyze < handle
                     
                 elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
                     
-                    % Object ColorValue is to small. FiberType 0: No Fiber (white))
+                    % Object ColorValue is to small. FiberType 0: No Fiber
+                    % (white).
                     obj.Stats(i).FiberTypeMainGroup = 0;
                     obj.Stats(i).FiberType = 'undefined';
                     
@@ -660,6 +588,53 @@ classdef modelAnalyze < handle
                     
                 end
             end
+        end
+        
+        function classifyOPTICS(obj)
+            
+            obj.InfoMessage = '      - use OPTICS clustering';
+            noElements = size(obj.Stats,1);
+            
+%             %find all fiber types that are undefined (out of the
+%             %parameter range).
+%             obj.InfoMessage = '         - find objects that are out of parameter range';
+%             for i=1:1:noElements
+%                 percent=(i-0.1)/noElements;
+%                 workbar(percent,'Please Wait...pre-classification','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
+%                 
+%                 if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
+%                     
+%                     % Object Area is to big. FiberType 0: No Fiber (white)
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                     
+%                 elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
+%                         obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
+%                     
+%                     % ApsectRatio is to small or to great.
+%                     % FiberType 0: No Fiber (white)
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                     
+%                 elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
+%                     
+%                     % Object Roundness is to small. FiberType 0: No Fiber (white))
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                     
+%                 elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
+%                     
+%                     % Object ColorValue is to small. FiberType 0: No Fiber (white))
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                 else
+%                     
+%                 end
+%             end
 
             obj.InfoMessage = '         - create temp stats struct';
             %create temp stats with label number for further
@@ -680,15 +655,16 @@ classdef modelAnalyze < handle
                     tempStats(i) = [];
                 end
             end
-            workbar(0.99,'Please Wait...pre-classification','OPTICS-Clustering');
+            workbar(0.99,'Please Wait...pre-classification','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
             obj.InfoMessage = '         - get min points of cluster';
             %Get Minimum amount of cluster points from User
             inputSuccses = false;
             while ~inputSuccses
-                prompt = {'Minimum amount of cluster points:'};
+                beep
+                prompt = {['Minimum amount of cluster points: Range: 2 - ' num2str(size(tempStats,1))]};
                 dlg_title = 'Input';
                 num_lines = 1;
-                defaultans = {num2str(ceil(noElements/100))};
+                defaultans = {num2str(ceil(noElements*0.05))};
                 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
                 
                 if isempty(answer)
@@ -697,13 +673,14 @@ classdef modelAnalyze < handle
                     minPoints = str2num(answer{1});
                     
                     if isscalar(minPoints) && isreal(minPoints) && ~isnan(minPoints) ...
-                            && minPoints < size(tempStats,1)
+                            && minPoints <= size(tempStats,1) && minPoints>1
                         inputSuccses = true;
                     else
                         inputSuccses = false;
                     end
                 end
             end
+            obj.minPointsPerCluster=minPoints;
             
             % Classify the main fiber type groups 1 2 3
            
@@ -742,6 +719,11 @@ classdef modelAnalyze < handle
 %                         Class(order(i)) = Cluster;
                     else
 %                         Class(order(i)) = Cluster;
+                            if ~newCluster
+                                %Endpoint of a Cluster. The Value i belongs
+                                %to that cluster
+                                Class(order(i)) = Cluster;
+                            end
                             newCluster = true;
                             Class(order(i)) = 0; %Noise
                     end
@@ -755,9 +737,11 @@ classdef modelAnalyze < handle
                     searchForClusters = true;
 %                     disp([epsilon Cluster])
                 else
-                    list = unique(Class);
-                    [n, index] = histc(Class, list);
-                    if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < nnz(Class)/2
+%                     list = unique(Class);
+%                     [n, index] = histc(Class, list);
+                    ClassNoNoise = Class(Class~=0);
+                    n =  histcounts(ClassNoNoise);
+                    if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)/10 %nnz(Class)/length(n)
                         searchForClusters = false;
                     else
 %                         epsilon = epsilon + 1;
@@ -770,26 +754,85 @@ classdef modelAnalyze < handle
                 end
             end %end while searchForClusters
             obj.InfoMessage = ['         - ' num2str(Cluster) ' clusters were found'];
-%             figure
+            
+%             f0=figure();
 %             bar(ReachPlot)
-%             disp([epsilon Cluster])
-% %           
-%             figure
-%             bar(RD(order))
+%             title({['Reachability-Distance-Plot (P_{min} = ' num2str(minPoints) ')'],...
+%                 ['Found Clusters = ' num2str(Cluster)] })
+%             hold on
+%             plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+%             set(gca,'xlim',[0 length(ReachPlot)])
+%             grid on
+%             set(f0,'Position',[100,100,250,200]);
+%             saveFigure(f0,['ReachPlotPmin' num2str(minPoints) '.pdf'])
+
+%             f1=figure('Color',[1 1 1],'InvertHardcopy','off')
+%             bar(Noise(:,1),Noise(:,2),'FaceColor','k','EdgeColor','none')
+%             hold on
+%             bar(Clus1(:,1),Clus1(:,2),'FaceColor','b','EdgeColor','none')
+%             hold on
+%             bar(Clus2(:,1),Clus2(:,2),'FaceColor','m','EdgeColor','none')
+%             hold on
+%             bar(Clus3(:,1),Clus3(:,2),'FaceColor','r','EdgeColor','none')
+%              hold on
+%              set(gca,'xlim',[0 length(ReachPlot)])
+%             plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+%             title('Reachability-Distance fiber type main group (P_{min} = 9)')
+%             grid on
+%             xlabel('Cluster order of datapoints O','FontSize',12);
+%             ylabel('Distance R_D','FontSize',12);
+%             set(gca, 'LooseInset', [0,0,0,0]);
+%             legend({'Noise','Type 1','Type 12h','Type 2 (all)','\delta = 58.93'},'Location','best')
+%             ylim([ 0 Inf ] );
+%             xlim([ 0 Inf ] );
+%             set(f1,'Position',[100,100,400,270]);
 %             
-%             cm = colormap(prism);
+%             f2=figure('Color',[1 1 1],'InvertHardcopy','off')
+%             color = [[0 0 0];[0 0 1];[255 51 255]/255;[1 0 0]];
 %             
-%             figure
-%             for i=1:1:size(tempStats,1)
-%                 scatter(tempStats(order(i)).ColorRed,tempStats(order(i)).ColorBlue,20,cm(Class(order(i)),:))
+%             Nx = [tempStats(Class==0).ColorRed];
+%             Ny = [tempStats(Class==0).ColorBlue];
+%             C1x= [tempStats(Class==1).ColorRed];
+%             C1y =[tempStats(Class==1).ColorBlue];
+%             C2x= [tempStats(Class==2).ColorRed];
+%             C2y =[tempStats(Class==2).ColorBlue];
+%             C3x= [tempStats(Class==3).ColorRed];
+%             C3y =[tempStats(Class==3).ColorBlue];
+%            
 %                 hold on
-%             end
+%                 scatter(Nx,Ny,20,[224 224 224]/255,'filled','MarkerEdgeColor','k')
+%                 hold on
+%                 scatter(C1x,C1y,20,[0 0 1],'filled','MarkerEdgeColor','k')
+%                 hold on
+%                 scatter(C2x,C2y,20,[255 51 255]/255,'filled','MarkerEdgeColor','k')
+%                 hold on
+%                 scatter(C3x,C3y,20,[1 0 0],'filled','MarkerEdgeColor','k')
+% 
+%             grid on
+%             title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h)'})
+%             ylabel('y: mean Blue (B)','FontSize',12);
+%             xlabel('x: mean Red (R)','FontSize',12);
+%             legend({'Noise','Type 1','Type 12h','Type 2 (all)'},'Location','best')
+%             set(gca, 'LooseInset', [0,0,0,0]);
+%             yl=get(gca,'ylim');
+%             xl=get(gca,'xlim');
+%             ylim([ 0 yl(2) ] );
+%             xlim([ 0 xl(2) ] );
+%            set(f2,'Position',[100,100,400,270]);
             
             obj.InfoMessage = '         - determine cluster focus';
             
+            NoiseObj = Class==0;
+            NoNoise = Class~=0;
+            tempX=X;
+            tempX(NoiseObj,:)=Inf;
+            [IDX,D] = knnsearch(tempX,X(NoiseObj,:));
+            Class(NoiseObj)=Class(IDX);
+
+            
             %Claculate cluster Core points
             if Cluster == 1
-                workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering');
+                workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                 if mean([tempStats.ColorBlue]) > mean([tempStats.ColorRed])
                     [tempStats.FiberType] = deal('Type 1');
                     [tempStats.FiberTypeMainGroup] = deal(1);
@@ -800,9 +843,7 @@ classdef modelAnalyze < handle
                 
             elseif Cluster == 2
                 noElementsWc = sum(Class(:)==0);
-                 while sum(Class(:)==0)>0
-                    percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
-                    workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering');
+                
                     %Core Cluster 1
                     C1xV = [tempStats(Class==1).ColorRed]';
                     C1yV = [tempStats(Class==1).ColorBlue]';
@@ -815,6 +856,9 @@ classdef modelAnalyze < handle
                     C2x = [sum(C2xV)/length(C2xV) 2];
                     C2y = [sum(C2yV)/length(C2yV) 2];
                 
+                 while sum(Class(:)==0)>0
+                    percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
+                    workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);    
                
                     idx = find(Class==0, 1, 'first'); %get index of first 0 element
                     Nx = tempStats(idx).ColorRed;
@@ -828,8 +872,9 @@ classdef modelAnalyze < handle
                  end
 
                 obj.InfoMessage = '         - identify clusters'; 
-                workbar(0.99,'Please Wait...identify clusters','OPTICS-Clustering');
+                workbar(0.99,'Please Wait...identify clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                 %gradient of corepoint
+                dC=[];
                 dC(1,:) = [C1y(1)/C1x(1) 1];
                 dC(2,:) = [C2y(1)/C2x(1) 2];
                 
@@ -843,9 +888,7 @@ classdef modelAnalyze < handle
                 
             elseif Cluster == 3
                 noElementsWc = sum(Class(:)==0);
-                while sum(Class(:)==0)>0
-                    percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
-                    workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering');
+                
                     %Core Cluster 1
                     C1xV = [tempStats(Class==1).ColorRed]';
                     C1yV = [tempStats(Class==1).ColorBlue]';
@@ -863,7 +906,10 @@ classdef modelAnalyze < handle
                     C3yV = [tempStats(Class==3).ColorBlue]';
                     C3x = [sum(C3xV)/length(C3xV) 3];
                     C3y = [sum(C3yV)/length(C3yV) 3];
-                
+                    
+                while sum(Class(:)==0)>0
+                    percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
+                    workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                 
                     idx = find(Class==0, 1, 'first'); %get index of first 0 element
                     Nx = tempStats(idx).ColorRed;
@@ -877,8 +923,9 @@ classdef modelAnalyze < handle
                     Class(idx)=idxC;
                 end
 
-                workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering');
+                workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                 %gradient of corepoint
+                dC=[];
                 dC(1,:) = [C1y(1)/C1x(1) 1];
                 dC(2,:) = [C2y(1)/C2x(1) 2];
                 dC(3,:) = [C3y(1)/C3x(1) 3];
@@ -900,7 +947,7 @@ classdef modelAnalyze < handle
             %write Data from tempStats in main Stats structure
             for i=1:1:size(tempStats,1)
                 percent = (i-0.01)/size(tempStats,1);
-                workbar(percent,'Please Wait...save Cluster data','OPTICS-Clustering');
+                workbar(percent,'Please Wait...save Cluster data','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                 obj.Stats(tempStats(i).Label).FiberTypeMainGroup = tempStats(i).FiberTypeMainGroup;
                 obj.Stats(tempStats(i).Label).FiberType = tempStats(i).FiberType;
             end
@@ -943,6 +990,10 @@ classdef modelAnalyze < handle
                 X(:,1) = [tempStats.ColorRed]';
                 X(:,2) = [tempStats.ColorFarRed]';
                 
+                if minPoints > size(X,1)
+                    minPoints = size(X,1);
+                end
+                
                 [RD,CD,order] = optics(X,minPoints);
                 Class = zeros(size(tempStats,1),1);
 %                 Cluster = 0;
@@ -977,6 +1028,11 @@ classdef modelAnalyze < handle
 %                         Class(order(i)) = Cluster;
                     else
 %                         Class(order(i)) = Cluster;
+                            if ~newCluster
+                                %Endpoint of a Cluster. The Value i belongs
+                                %to that cluster
+                                Class(order(i)) = Cluster;
+                            end
                             newCluster = true;
                             Class(order(i)) = 0; %Noise
                     end
@@ -988,9 +1044,10 @@ classdef modelAnalyze < handle
                         epsilon = ReachValues(posReach);
                         searchForClusters = true;
                     else
-                        list = unique(Class);
-                        [n, index] = histc(Class, list);
-                        if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < nnz(Class)/2
+%                         list = unique(Class);
+                        ClassNoNoise = Class(Class~=0);
+                        n =  histcounts(ClassNoNoise);
+                        if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)/10
                             searchForClusters = false;
                         else
                             posReach = posReach+1;
@@ -999,13 +1056,81 @@ classdef modelAnalyze < handle
                         end
                     end
                 end %end while searchForClusters
+%             figure
+%             bar(ReachPlot)
+%             hold on
+%             plot(get(gca,'xlim'), [epsilon epsilon]);
+%             
+
+            
+            
+%             f3=figure('Color',[1 1 1],'InvertHardcopy','off')
+%             bar(Noise(:,1),Noise(:,2),'FaceColor','k','EdgeColor','none')
+%             hold on
+%             bar(Clus1(:,1),Clus1(:,2),'FaceColor','r','EdgeColor','none')
+%             hold on
+%             bar(Clus2(:,1),Clus2(:,2),'FaceColor','y','EdgeColor','none')
+% %             hold on
+% %             bar(Clus3(:,1),Clus3(:,2),'FaceColor','r','EdgeColor','none')
+%              hold on
+%              set(gca,'xlim',[0 length(ReachPlot)])
+%             plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+%             title('Reachability-Distance type 2 subgroup (P_{min} = 9)')
+%             grid on
+%             xlabel('Cluster order of datapoints O','FontSize',12);
+%             ylabel('Distance R_D','FontSize',12);
+%             ylim([ 0 Inf ] );
+%             xlim([ 0 Inf ] );
+%             set(gca, 'LooseInset', [0,0,0,0]);
+%             legend({'Noise','Type 2x','Type 2a','\delta = 182.33'},'Location','best')
+%             set(f3,'Position',[100,100,400,270]);
+%             
+%             f4=figure('Color',[1 1 1],'InvertHardcopy','off')
+%             color = [[0 0 0];[0 0 1];[255 51 255]/255;[1 0 0]];
+%             
+%             Nx = [tempStats(Class==0).ColorRed];
+%             Ny = [tempStats(Class==0).ColorFarRed];
+%             C1x= [tempStats(Class==1).ColorRed];
+%             C1y =[tempStats(Class==1).ColorFarRed];
+%             C2x= [tempStats(Class==2).ColorRed];
+%             C2y =[tempStats(Class==2).ColorFarRed];
+% %             C3x= [tempStats(Class==3).ColorRed];
+% %             C3y =[tempStats(Class==3).ColorBlue];
+%            
+%                 hold on
+%                 scatter(Nx,Ny,20,[224 224 224]/255,'filled','MarkerEdgeColor','k')
+%                 hold on
+%                 scatter(C1x,C1y,20,[1 0 0],'filled','MarkerEdgeColor','k')
+%                 hold on
+%                 scatter(C2x,C2y,20,'y','filled','MarkerEdgeColor','k')
+% %                 hold on
+% %                 scatter(C3x,C3y,20,[1 0 0],'filled','MarkerEdgeColor','k')
+% % 
+%             grid on
+%             title({'Fiber Type-2 specification classification' ;'(Type-2x, Type-2a, Type-2ax)'})
+%             ylabel('y: mean FarRed (FR)','FontSize',12);
+%             xlabel('x: mean Red (R)','FontSize',12);
+%             legend({'Noise','Type 2x','Type 2a'},'Location','best')
+%             set(gca, 'LooseInset', [0,0,0,0]);
+%             yl=get(gca,'ylim');
+%             xl=get(gca,'xlim');
+%             ylim([ 0 yl(2) ] );
+%             xlim([ 0 xl(2) ] );
+%            set(f4,'Position',[100,100,400,270]);    
                 
+            NoiseObj = Class==0;
+            NoNoise = Class~=0;
+            tempX=X;
+            tempX(NoiseObj,:)=Inf;
+            [IDX,D] = knnsearch(tempX,X(NoiseObj,:));
+            Class(NoiseObj)=Class(IDX);
+
                 obj.InfoMessage = ['         - ' num2str(Cluster) ' clusters were found'];
                 
                 obj.InfoMessage = '         - determine cluster focus';
                 %Claculate cluster Core points
                 if Cluster == 1
-                    workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering');
+                    workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                     if mean([tempStats.ColorFarRed]) > mean([tempStats.ColorRed])
                         [tempStats([tempStats.FiberTypeMainGroup]==2).FiberType] = deal('Type 2a');
                     else
@@ -1014,9 +1139,7 @@ classdef modelAnalyze < handle
                     
                 elseif Cluster == 2
                     noElementsWc = sum(Class(:)==0);
-                    while sum(Class(:)==0)>0
-                        percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
-                        workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering');
+                    
                         %Core Cluster 1
                         C1xV = [tempStats(Class==1).ColorRed]';
                         C1yV = [tempStats(Class==1).ColorFarRed]';
@@ -1028,7 +1151,9 @@ classdef modelAnalyze < handle
                         C2yV = [tempStats(Class==2).ColorFarRed]';
                         C2x = [sum(C2xV)/length(C2xV) 2];
                         C2y = [sum(C2yV)/length(C2yV) 2];
-                        
+                   while sum(Class(:)==0)>0
+                        percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
+                        workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                         idx = find(Class==0, 1, 'first'); %get index of first 0 element
                         Nx = tempStats(idx).ColorRed;
                         Ny = tempStats(idx).ColorFarRed;
@@ -1041,8 +1166,9 @@ classdef modelAnalyze < handle
                     end
                     pause(0.1)
                     obj.InfoMessage = '         - identify clusters'; 
-                    workbar(0.99,'Please Wait...identify clusters','OPTICS-Clustering');
+                    workbar(0.99,'Please Wait...identify clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                     %gradient of corepoint
+                    dC=[];
                     dC(1,:) = [C1y(1)/C1x(1) 1];
                     dC(2,:) = [C2y(1)/C2x(1) 2];
                     
@@ -1057,9 +1183,7 @@ classdef modelAnalyze < handle
                     
                 elseif Cluster == 3
                     noElementsWc = sum(Class(:)==0);
-                    while sum(Class(:)==0)>0
-                        percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
-                        workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering');
+                    
                         %Core Cluster 1
                         C1xV = [tempStats(Class==1).ColorRed]';
                         C1yV = [tempStats(Class==1).ColorFarRed]';
@@ -1078,7 +1202,9 @@ classdef modelAnalyze < handle
                         C3x = [sum(C3xV)/length(C3xV) 3];
                         C3y = [sum(C3yV)/length(C3yV) 3];
                 
-                
+                    while sum(Class(:)==0)>0
+                        percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
+                        workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                         idx = find(Class==0, 1, 'first'); %get index of first 0 element
                         Nx = tempStats(idx).ColorRed;
                         Ny = tempStats(idx).ColorFarRed;
@@ -1091,8 +1217,9 @@ classdef modelAnalyze < handle
                         Class(idx)=idxC;
                     end
                     
-                    workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering');
+                    workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                     %gradient of corepoint
+                    dC=[];
                     dC(1,:) = [C1y(1)/C1x(1) 1];
                     dC(2,:) = [C2y(1)/C2x(1) 2];
                     dC(3,:) = [C3y(1)/C3x(1) 3];
@@ -1119,7 +1246,7 @@ classdef modelAnalyze < handle
             %write Data from tempStats in main Stats structure
             for i=1:1:size(tempStats,1)
                 percent = (i-0.01)/size(tempStats,1);
-                workbar(percent,'Please Wait...save Cluster data','OPTICS-Clustering');
+                workbar(percent,'Please Wait...save Cluster data','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                 obj.Stats(tempStats(i).Label).FiberTypeMainGroup = tempStats(i).FiberTypeMainGroup;
                 obj.Stats(tempStats(i).Label).FiberType = tempStats(i).FiberType;
             end
@@ -1128,35 +1255,91 @@ classdef modelAnalyze < handle
         end
         
         function classifyCOLOR(obj)
+            nObjects = size(obj.Stats,1);
+            
+            % Classify Fiber Type main groups 
+            for i=1:1:nObjects
+                percent =   (i-0.1)/nObjects;
+                workbar(percent,'Please Wait...classify Fiber-Type main groups','Fiber-Type main groups',obj.controllerAnalyzeHandle.mainFigure);
+                if strcmp(obj.Stats(i).FiberType , 'undefined')
+                    %do nothing. Go to next Fiber
+                elseif obj.BlueRedThreshActive
+                    %Blue/Red thresh is active. Searching for Type 1 2 and
+                    %12 hybrid fibers.
+                    if obj.Stats(i).ColorRatioBlueRed >= obj.BlueRedThresh/(1 - obj.BlueRedDistBlue)
+                        obj.Stats(i).FiberTypeMainGroup = 1;
+                        obj.Stats(i).FiberType = 'Type 1';
+                    elseif obj.Stats(i).ColorRatioBlueRed <= obj.BlueRedThresh*(1 - obj.BlueRedDistRed)
+                        obj.Stats(i).FiberTypeMainGroup = 2;
+                        obj.Stats(i).FiberType = 'Type 2x';
+                    else
+                        % Type 1 2 hybrid
+                        obj.Stats(i).FiberTypeMainGroup = 3;
+                        obj.Stats(i).FiberType = 'Type 12h';
+                    end
+                else
+                    %Blue Red thresh is not active. Searching only for Type
+                    %1 and 2 fibers.
+                    if obj.Stats(i).ColorRatioBlueRed >= 1
+                        % Type 1 fiber (blue)
+                        obj.Stats(i).FiberTypeMainGroup = 1;
+                        obj.Stats(i).FiberType = 'Type 1';
+                    else
+                        % Type 2 fiber (red)
+                        obj.Stats(i).FiberTypeMainGroup = 2;
+                        obj.Stats(i).FiberType = 'Type 2x';
+                    end
+                end
+                        
+            end %End for loop
+            
+            if obj.AnalyzeMode == 2 %Color quad labeling is active
+                % Specify Fiber Type 2 subgroups
+                for i=1:1:nObjects
+                    percent =   (i-0.1)/nObjects;
+                    workbar(percent,'Please Wait...sepcify Fiber-Type 2 subgroups','Fiber-Type 2 subgroups',obj.controllerAnalyzeHandle.mainFigure);
+                    if obj.Stats(i).FiberTypeMainGroup == 2
+                        if obj.FarredRedThreshActive
+                            % Farred/Red Thresh is active. Searching for
+                            % Type 2x 2a and 2ax hybrid fibers.
+                            if obj.Stats(i).ColorRatioFarredRed  >= obj.FarredRedThresh/(1 - obj.FarredRedDistFarred)
+                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                obj.Stats(i).FiberType = 'Type 2a';
+                            elseif obj.Stats(i).ColorRatioFarredRed  <= obj.FarredRedThresh*(1 - obj.FarredRedDistFarred)
+                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                obj.Stats(i).FiberType = 'Type 2x';
+                            else
+                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                obj.Stats(i).FiberType = 'Type 2ax';
+                            end
+                        else
+                            % Farred/Red Thresh is not active. Searching
+                            % only for Type 2x and 2a fibers.
+                            if obj.Stats(i).ColorRatioFarredRed  >= 1
+                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                obj.Stats(i).FiberType = 'Type 2a';
+                            else 
+                                obj.Stats(i).FiberTypeMainGroup = 2;
+                                obj.Stats(i).FiberType = 'Type 2x';
+                            end
+                        end
+                        
+                    else
+                        %No Type 2 fiber. Go to next fiber.
+                    end
+                end
+            
+            end
+            
+        end
+        
+        function classifyCOLOR1(obj)
             
             nObjects = size(obj.Stats,1);
             for i=1:1:nObjects
                 
-                if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
-                    
-                    % Object Area is to big. FiberType 0: No Fiber (white)
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
-                        obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
-                    
-                    % ApsectRatio is to small or to great.
-                    % FiberType 0: No Fiber (white)
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
-                    
-                    % Object Roundness is to small. FiberType 0: No Fiber (white))
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
-                    
-                    % Object ColorValue is to small. FiberType 0: No Fiber (white))
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
+                if strcmp(obj.Stats(i).FiberType , 'undefined')
+                    %do nothing. Go to next Fiber
                     
                 elseif obj.BlueRedThreshActive
                     %Blue Red thresh is active. Searchinf for Type 1 2
@@ -1319,54 +1502,54 @@ classdef modelAnalyze < handle
                 end
                 
                 percent =   (i-0.1)/nObjects;
-                workbar(percent,'Please Wait...specifing Fiber-Type','Fiber-Type');
+                workbar(percent,'Please Wait...specifing Fiber-Type','Fiber-Type',obj.controllerAnalyzeHandle.mainFigure);
             end
         end
         
         function classifyMANUAL(obj)
             noElements = size(obj.Stats,1);
             
-            %find all fiber types that are undefined (out of the
-            %parameter range).
-            for i=1:1:noElements
-                
-                if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
-                    
-                    % Object Area is to big. FiberType 0: No Fiber (white)
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                    
-                elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
-                        obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
-                    
-                    % ApsectRatio is to small or to great.
-                    % FiberType 0: No Fiber (white)
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                    
-                elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
-                    
-                    % Object Roundness is to small. FiberType 0: No Fiber (white))
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                    
-                elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
-                    
-                    % Object ColorValue is to small. FiberType 0: No Fiber (white))
-                    obj.Stats(i).FiberTypeMainGroup = 0;
-                    obj.Stats(i).FiberType = 'undefined';
-                    
-                else
-                    
-                end
-            end
+%             %find all fiber types that are undefined (out of the
+%             %parameter range).
+%             for i=1:1:noElements
+%                 
+%                 if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
+%                     
+%                     % Object Area is to big. FiberType 0: No Fiber (white)
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                     
+%                 elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
+%                         obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
+%                     
+%                     % ApsectRatio is to small or to great.
+%                     % FiberType 0: No Fiber (white)
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                     
+%                 elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
+%                     
+%                     % Object Roundness is to small. FiberType 0: No Fiber (white))
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                     
+%                 elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
+%                     
+%                     % Object ColorValue is to small. FiberType 0: No Fiber (white))
+%                     obj.Stats(i).FiberTypeMainGroup = 0;
+%                     obj.Stats(i).FiberType = 'undefined';
+%                     
+%                 else
+%                     
+%                 end
+%             end
             
             %create temp stats with label number for further
             %processing that contains only fibers that are not
-            %undefined
+            %Type-0 undefined 
             
             tempStats = obj.Stats;
             [tempStats.Label] = deal(0);
@@ -1381,7 +1564,7 @@ classdef modelAnalyze < handle
                 end
             end
             
-            noElements = size(tempStats,1);
+%             noElements = size(tempStats,1);
             % set all remaining fibers to undefiend
             [tempStats.Color] = deal(0);
             [tempStats.FiberType] = deal('undefined');
@@ -1439,15 +1622,16 @@ classdef modelAnalyze < handle
                 if obj.ManualClassifyMode == 1
                     
                     figure(fig)
-                    InfoText = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualInfoText;
-                    String = 'Type 1 , Type 12h (1 2 hybrid), Type 2 (all Type 2 fibers)';
-                    set(InfoText,'String',String);
+%                     InfoText = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualInfoText;
+%                     String = 'Type 1 , Type 12h (1 2 hybrid), Type 2 (all Type 2 fibers)';
+%                     set(InfoText,'String',String);
                     
                     axes(hAM);
                     if isempty(hAM.Children)
                     h = scatter([tempStats.ColorRed],[tempStats.ColorBlue],20,Color,'filled');
                     set(h,'MarkerEdgeColor','k')
-                    title(['\fontsize{16}Classify {\color{blue}Type 1 ','\color{magenta}Type 12h \color{red}Type 2}'],'interpreter','tex');
+                    title({'\fontsize{16}Select a Area by clicking the mouse and choose fiber type:';...
+                        ['\fontsize{16}Classify {\color{blue}Type 1 ','\color{magenta}Type 12h \color{red}Type 2}']},'interpreter','tex');
                     ylabel('y: mean Blue (B)','FontSize',16);
                     xlabel('x: mean Red (R)','FontSize',16);
                     maxLim = max(max([[tempStats.ColorRed] [tempStats.ColorBlue]]));
@@ -1467,7 +1651,7 @@ classdef modelAnalyze < handle
                         if ~isempty(hAM.Children) && ~isempty(hPoly)
                             pos = getPosition(hPoly)
                             
-                            [in,on] = inpolygon([tempStats.ColorRed],[tempStats.ColorBlue],pos(:,1),pos(:,2))
+                            [in,on] = inpolygon([tempStats.ColorRed],[tempStats.ColorBlue],pos(:,1),pos(:,2));
                             [s,v] = listdlg('PromptString','Select Fiber Type:',...
                                 'SelectionMode','single',...
                                 'ListString',{'Type 1 (blue)','Type 12h (magenta)','Type 2 (red)','undefined'},...
@@ -1511,9 +1695,9 @@ classdef modelAnalyze < handle
                 elseif obj.ManualClassifyMode == 2
                     
                     figure(fig)
-                    InfoText = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualInfoText;
-                    String = 'Type 2x , Type 2a, Type 2ax (2a 2x hybrid)';
-                    set(InfoText,'String',String);
+%                     InfoText = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualInfoText;
+%                     String = 'Type 2x , Type 2a, Type 2ax (2a 2x hybrid)';
+%                     set(InfoText,'String',String);
                     
                     %Only show type 2 fibers
                     type2Stats = [];
@@ -1539,7 +1723,8 @@ classdef modelAnalyze < handle
                         h = scatter([type2Stats.ColorRed],[type2Stats.ColorFarRed],20,Color,'filled');
                         set(h,'MarkerEdgeColor','k');
                         
-                        title(['\fontsize{16}Classify {\color{red}Type 2x ','\color{yellow}Type 2a \color{orange}Type 2ax}'],'interpreter','tex');
+                        title({'\fontsize{16}Select a Area by clicking the mouse and choose fiber type:';...
+                            ['\fontsize{16}Classify {\color{red}Type 2x ','\color{yellow}Type 2a \color{orange}Type 2ax}']},'interpreter','tex');
                         ylabel('y: mean Farred (FR)','FontSize',16);
                         xlabel('x: mean Red (R)','FontSize',16);
                         
@@ -1677,21 +1862,27 @@ classdef modelAnalyze < handle
                 case 1
                     %Fiber Type 1 (blue)
                     newFiberType = 'Type 1';
+                    newFiberTypeMainGroup = 1;
                 case 2
                     %Fiber Type 12h (hybird fiber) (magenta)
                     newFiberType = 'Type 12h';
+                    newFiberTypeMainGroup = 3;
                 case 3
                     %Fiber Type 2x (red)
                     newFiberType = 'Type 2x';
+                    newFiberTypeMainGroup = 2;
                 case 4
                     %Fiber Type 2a (yellow)
                     newFiberType = 'Type 2a';
+                    newFiberTypeMainGroup = 2;
                 case 5
                     %Fiber Type 2ax (orange)
                     newFiberType = 'Type 2ax'; 
+                    newFiberTypeMainGroup = 2;
                 case 6
                     %Fiber Type 0 (white)
                     newFiberType = 'undefined';
+                    newFiberTypeMainGroup = 0;
             end
             
             
@@ -1742,6 +1933,7 @@ classdef modelAnalyze < handle
                 
                 % change finer type
                 obj.Stats(labelNo).FiberType = newFiberType;
+                obj.Stats(labelNo).FiberTypeMainGroup = newFiberTypeMainGroup;
                 
                 % find old boundarie and delete them
                 htemp = findobj('Tag',['boundLabel ' num2str(labelNo)]);
@@ -1850,6 +2042,8 @@ classdef modelAnalyze < handle
             
             Data{26} = obj.XScale;
             Data{27} = obj.YScale;
+            
+            Data{28} = obj.minPointsPerCluster;
             
         end
         

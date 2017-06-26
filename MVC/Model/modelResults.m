@@ -45,8 +45,8 @@ classdef modelResults < handle
         SaveScatterAll; %Indicates whether the scatter plot with for all fibers should be saved.
         SavePlots; %Indicates whether the statistics plots should be saved.
         SaveHisto; %Indicates whether the Histogram plots should be saved.
-        SavePicRGBFRProcessed; %Indicates whether the processed image with Farred should be saved.
-        SavePicRGBProcessed; %Indicates whether the processed image without Farred should be saved.
+        SavePicProcessed; %Indicates whether the processed image with Farred should be saved.
+        SavePicGroups; %Indicates whether the processed image without Farred should be saved.
         SavePath; % Save Path, same as the selected RGB image path.
         ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
@@ -78,6 +78,8 @@ classdef modelResults < handle
         
         ColorValueActive; %Indicates if ColorValue parameter is used for classification.
         ColorValue; %Minimal allowed ColorValue. Is used for classification. Objects with smaller ColorValue will be classified as Type 0.
+        
+        minPointsPerCluster;
         
         NoOfObjects; %Number of objects.
         NoTyp1; %Number of Type 1 fibers.
@@ -122,9 +124,9 @@ classdef modelResults < handle
         XScale; %Inicates the um/pixels in X direction to change values in micro meter.
         YScale; %Inicates the um/pixels in Y direction to change values in micro meter.
         
-        Stats; % Data struct of all fiber objets and all fiber datas
-        
-        StatsMatData; % Cell Array, Contains the data of all fiber objets that are shown in the object table in the GUI.
+        Stats; %Data struct of all fiber objets and all fiber datas
+        GroupStats;
+        StatsMatData; %Cell Array, Contains the data of all fiber objets that are shown in the object table in the GUI.
         % [Label Area XPos YPos minDiameter maxDiameter Perimeter Roundness ...
         %  AspectRatio ColorHue VolorValue Red Green Blue FarRed ...
         %  Blue/Red Farred/Red MainType Type]
@@ -195,6 +197,8 @@ classdef modelResults < handle
             
             obj.createMatStatisticTable();
             
+            obj.findFiberGroups();
+            
             obj.controllerResultsHandle.showAxesDataInGUI();
             
             obj.controllerResultsHandle.showInfoInTableGUI();
@@ -202,6 +206,8 @@ classdef modelResults < handle
             obj.controllerResultsHandle.showHistogramGUI();
             
             obj.controllerResultsHandle.showPicProcessedGUI();
+            
+            obj.controllerResultsHandle.showPicGroupsGUI();
             
             obj.InfoMessage = '- updating GUI complete';
             
@@ -233,10 +239,12 @@ classdef modelResults < handle
             tempCell = rmfield(tempCell,'Centroid');
             %remove field Solidity
 %             tempCell = rmfield(tempCell,'Solidity');
+            %remove field AreaMaxCS (max Area Cross Section)
+%             tempCell = rmfield(tempCell,'AreaMaxCS');
 
             %order Fields for Excel Sheet and GUI Table
-            tempCell=orderfields(tempCell, {'Area', 'Perimeter', 'maxDiameter',...
-                'minDiameter','Roundness','AspectRatio','ColorValue',...
+            tempCell=orderfields(tempCell, {'Area','AreaMinCS','AreaMaxCS', 'Perimeter', 'minDiameter',...
+                'maxDiameter','Roundness','AspectRatio','ColorValue',...
                 'ColorRed','ColorGreen','ColorBlue','ColorFarRed',...
                 'ColorRatioBlueRed','ColorRatioFarredRed','FiberTypeMainGroup',...
                 'FiberType'});
@@ -259,7 +267,7 @@ classdef modelResults < handle
             LabelNo = mat2cell(LabelNo,ones(size(obj.Stats,1),1),1);
             
             %create Cell array
-            obj.StatsMatData = cat(2, LabelNo,tempCell(:,1),FCPX,FCPY,tempCell(:,2:end) );
+            obj.StatsMatData = cat(2, LabelNo,FCPX,FCPY,tempCell);
             
             % Create CellArray only for Type 1 Fiber objects
             IndexC = strcmp(obj.StatsMatData(:,end), 'Type 1');
@@ -304,7 +312,7 @@ classdef modelResults < handle
             %           obj:    Handle to modelResults object.
             %
             
-            obj.InfoMessage = '   - Calculate fiber type areas';
+            obj.InfoMessage = '   - calculate fiber type areas...';
             %Area Image in um^2
             obj.AreaPic = size(obj.PicPRGBFRPlanes,1) * size(obj.PicPRGBFRPlanes,2) * obj.XScale * obj.YScale;
             obj.AreaType1 = 0;
@@ -315,40 +323,59 @@ classdef modelResults < handle
             obj.AreaType0 = 0;
             obj.AreaFibers = 0;
             
-            obj.NoOfObjects = size(obj.Stats,1);
+%             obj.NoOfObjects = size(obj.Stats,1);
+%             
+%             for i=1:1:obj.NoOfObjects;
+%                 
+%                 switch obj.Stats(i).FiberType
+%                     case 'Type 1'
+%                         % Type1 Fiber (blue)
+%                         % Total area of all type 1 fibers
+%                         obj.AreaType1 = obj.AreaType1 + obj.Stats(i).Area;
+%                     case 'Type 12h'
+%                         %Type 12 hybrid fiber (between Red and Blue)
+%                         % Total area of all type 3 fibers
+%                         obj.AreaType12h = obj.AreaType12h + obj.Stats(i).Area;
+%                     case 'Type 2x'
+%                         % Type 2x fiber (red)
+%                         % Total area of all type 2x fibers
+%                         obj.AreaType2x = obj.AreaType2x + obj.Stats(i).Area;
+%                     case 'Type 2a'
+%                         % Type 2a fiber (yellow)
+%                         % Total area of all type 2a fibers
+%                         obj.AreaType2a = obj.AreaType2a + obj.Stats(i).Area;
+%                     case 'Type 2ax'
+%                         % Type 2ax fiber (orange)
+%                         % Total area of all type 2ax fibers
+%                         obj.AreaType2ax = obj.AreaType2ax + obj.Stats(i).Area;
+%                     case 'undefined'
+%                         % Type 0 fiber (white, no fiber)
+%                         % Total area of all undefined fibers
+%                         obj.AreaType0 = obj.AreaType0 + obj.Stats(i).Area;
+%                     otherwise
+%                         obj.InfoMessage = 'ERROR in calculateAreaFeatures() Fcn';
+%                 end
+%                 
+%             end
             
-            for i=1:1:obj.NoOfObjects;
-                
-                switch obj.Stats(i).FiberType
-                    case 'Type 1'
-                        % Type1 Fiber (blue)
-                        % Total area of all type 1 fibers
-                        obj.AreaType1 = obj.AreaType1 + obj.Stats(i).Area;
-                    case 'Type 12h'
-                        %Type 12 hybrid fiber (between Red and Blue)
-                        % Total area of all type 3 fibers
-                        obj.AreaType12h = obj.AreaType12h + obj.Stats(i).Area;
-                    case 'Type 2x'
-                        % Type 2x fiber (red)
-                        % Total area of all type 2x fibers
-                        obj.AreaType2x = obj.AreaType2x + obj.Stats(i).Area;
-                    case 'Type 2a'
-                        % Type 2a fiber (yellow)
-                        % Total area of all type 2a fibers
-                        obj.AreaType2a = obj.AreaType2a + obj.Stats(i).Area;
-                    case 'Type 2ax'
-                        % Type 2ax fiber (orange)
-                        % Total area of all type 2ax fibers
-                        obj.AreaType2ax = obj.AreaType2ax + obj.Stats(i).Area;
-                    case 'undefined'
-                        % Type 0 fiber (white, no fiber)
-                        % Total area of all undefined fibers
-                        obj.AreaType0 = obj.AreaType0 + obj.Stats(i).Area;
-                    otherwise
-                        obj.InfoMessage = 'ERROR in calculateAreaFeatures() Fcn';
-                end
-                
-            end
+            %Total area of all Type-1 fibers.
+            IsType1 = find( strcmp({obj.Stats.FiberType} , 'Type 1') );
+            obj.AreaType1 = sum([obj.Stats(IsType1).Area]);
+            %Total area of all Type-12h fibers.
+            IsType12h = find( strcmp({obj.Stats.FiberType} , 'Type 12h') );
+            obj.AreaType12h = sum([obj.Stats(IsType12h).Area]);
+            %Total area of all Type-2a fibers.
+            IsType2a = find( strcmp({obj.Stats.FiberType} , 'Type 2a') );
+            obj.AreaType2a = sum([obj.Stats(IsType2a).Area]);
+            %Total area of all Type-2ax fibers.
+            IsType2ax = find( strcmp({obj.Stats.FiberType} , 'Type 2ax') );
+            obj.AreaType2ax = sum([obj.Stats(IsType2ax).Area]);
+            %Total area of all Type-2x fibers.
+            IsType2x = find( strcmp({obj.Stats.FiberType} , 'Type 2x') );
+            obj.AreaType2x = sum([obj.Stats(IsType2x).Area]);
+            %Total area of all Type-0 fibers.
+            IsType0 = find( strcmp({obj.Stats.FiberType} , 'undefined') );
+            obj.AreaType0 = sum([obj.Stats(IsType0).Area]);
             
             % Total area of all fiber objects including Type 0
             obj.AreaFibers = obj.AreaType1+obj.AreaType12h+obj.AreaType2x+obj.AreaType2a+obj.AreaType2ax+obj.AreaType0;
@@ -386,12 +413,12 @@ classdef modelResults < handle
             obj.AreaMinMaxObj(2) = find([obj.Stats.Area]==obj.AreaMinMax(2),1);
            
             % Find samlest and largest Fiber of each Type
-            
+            obj.InfoMessage = '   - find min and max areas';
             if ~isempty(obj.StatsMatDataT1)
-                obj.AreaMinMaxT1(1) = min(cell2mat(obj.StatsMatDataT1(:,2)));
-                obj.AreaMinMaxObjT1(1) = cell2mat(obj.StatsMatDataT1( find([obj.StatsMatDataT1{:,2}]==obj.AreaMinMaxT1(1),1) ,1));
-                obj.AreaMinMaxT1(2) = max(cell2mat(obj.StatsMatDataT1(:,2)));
-                obj.AreaMinMaxObjT1(2) = cell2mat(obj.StatsMatDataT1( find([obj.StatsMatDataT1{:,2}]==obj.AreaMinMaxT1(2),1) ,1));
+                obj.AreaMinMaxT1(1) = min(cell2mat(obj.StatsMatDataT1(:,4)));
+                obj.AreaMinMaxObjT1(1) = cell2mat(obj.StatsMatDataT1( find([obj.StatsMatDataT1{:,4}]==obj.AreaMinMaxT1(1),1) ,1));
+                obj.AreaMinMaxT1(2) = max(cell2mat(obj.StatsMatDataT1(:,4)));
+                obj.AreaMinMaxObjT1(2) = cell2mat(obj.StatsMatDataT1( find([obj.StatsMatDataT1{:,4}]==obj.AreaMinMaxT1(2),1) ,1));
             else
                 obj.AreaMinMaxT1 = '--';
                 obj.AreaMinMaxObjT1 = '--';
@@ -399,10 +426,10 @@ classdef modelResults < handle
             end
             
             if ~isempty(obj.StatsMatDataT12h)
-                obj.AreaMinMaxT12h(1) = min(cell2mat(obj.StatsMatDataT12h(:,2)));
-                obj.AreaMinMaxObjT12h(1) = cell2mat(obj.StatsMatDataT12h( find([obj.StatsMatDataT12h{:,2}]==obj.AreaMinMaxT12h(1),1) ,1));
-                obj.AreaMinMaxT12h(2) = max(cell2mat(obj.StatsMatDataT12h(:,2)));
-                obj.AreaMinMaxObjT12h(2) = cell2mat(obj.StatsMatDataT12h( find([obj.StatsMatDataT12h{:,2}]==obj.AreaMinMaxT12h(2),1) ,1));
+                obj.AreaMinMaxT12h(1) = min(cell2mat(obj.StatsMatDataT12h(:,4)));
+                obj.AreaMinMaxObjT12h(1) = cell2mat(obj.StatsMatDataT12h( find([obj.StatsMatDataT12h{:,4}]==obj.AreaMinMaxT12h(1),1) ,1));
+                obj.AreaMinMaxT12h(2) = max(cell2mat(obj.StatsMatDataT12h(:,4)));
+                obj.AreaMinMaxObjT12h(2) = cell2mat(obj.StatsMatDataT12h( find([obj.StatsMatDataT12h{:,4}]==obj.AreaMinMaxT12h(2),1) ,1));
             else
                 obj.AreaMinMaxT12h = '--';
                 obj.AreaMinMaxObjT12h = '--';
@@ -410,10 +437,10 @@ classdef modelResults < handle
             end
             
             if ~isempty(obj.StatsMatDataT2a)
-                obj.AreaMinMaxT2a(1) = min(cell2mat(obj.StatsMatDataT2a(:,2)));
-                obj.AreaMinMaxObjT2a(1) = cell2mat(obj.StatsMatDataT2a( find([obj.StatsMatDataT2a{:,2}]==obj.AreaMinMaxT2a(1),1) ,1));
-                obj.AreaMinMaxT2a(2) = max(cell2mat(obj.StatsMatDataT2a(:,2)));
-                obj.AreaMinMaxObjT2a(2) = cell2mat(obj.StatsMatDataT2a( find([obj.StatsMatDataT2a{:,2}]==obj.AreaMinMaxT2a(2),1) ,1));
+                obj.AreaMinMaxT2a(1) = min(cell2mat(obj.StatsMatDataT2a(:,4)));
+                obj.AreaMinMaxObjT2a(1) = cell2mat(obj.StatsMatDataT2a( find([obj.StatsMatDataT2a{:,4}]==obj.AreaMinMaxT2a(1),1) ,1));
+                obj.AreaMinMaxT2a(2) = max(cell2mat(obj.StatsMatDataT2a(:,4)));
+                obj.AreaMinMaxObjT2a(2) = cell2mat(obj.StatsMatDataT2a( find([obj.StatsMatDataT2a{:,4}]==obj.AreaMinMaxT2a(2),1) ,1));
             else
                 obj.AreaMinMaxT2a = '--';
                 obj.AreaMinMaxObjT2a = '--';
@@ -421,10 +448,10 @@ classdef modelResults < handle
             end
             
             if ~isempty(obj.StatsMatDataT2x)
-                obj.AreaMinMaxT2x(1) = min(cell2mat(obj.StatsMatDataT2x(:,2)));
-                obj.AreaMinMaxObjT2x(1) = cell2mat(obj.StatsMatDataT2x( find([obj.StatsMatDataT2x{:,2}]==obj.AreaMinMaxT2x(1),1) ,1));
-                obj.AreaMinMaxT2x(2) = max(cell2mat(obj.StatsMatDataT2x(:,2)));
-                obj.AreaMinMaxObjT2x(2) = cell2mat(obj.StatsMatDataT2x( find([obj.StatsMatDataT2x{:,2}]==obj.AreaMinMaxT2x(2),1) ,1));
+                obj.AreaMinMaxT2x(1) = min(cell2mat(obj.StatsMatDataT2x(:,4)));
+                obj.AreaMinMaxObjT2x(1) = cell2mat(obj.StatsMatDataT2x( find([obj.StatsMatDataT2x{:,4}]==obj.AreaMinMaxT2x(1),1) ,1));
+                obj.AreaMinMaxT2x(2) = max(cell2mat(obj.StatsMatDataT2x(:,4)));
+                obj.AreaMinMaxObjT2x(2) = cell2mat(obj.StatsMatDataT2x( find([obj.StatsMatDataT2x{:,4}]==obj.AreaMinMaxT2x(2),1) ,1));
             else
                 obj.AreaMinMaxT2x = '--';
                 obj.AreaMinMaxObjT2x = '--';
@@ -432,10 +459,10 @@ classdef modelResults < handle
             end
             
             if ~isempty(obj.StatsMatDataT2ax)
-                obj.AreaMinMaxT2ax(1) = min(cell2mat(obj.StatsMatDataT2ax(:,2)));
-                obj.AreaMinMaxObjT2ax(1) = cell2mat(obj.StatsMatDataT2ax( find([obj.StatsMatDataT2ax{:,2}]==obj.AreaMinMaxT2ax(1),1) ,1));
-                obj.AreaMinMaxT2ax(2) = max(cell2mat(obj.StatsMatDataT2ax(:,2)));
-                obj.AreaMinMaxObjT2ax(2) = cell2mat(obj.StatsMatDataT2ax( find([obj.StatsMatDataT2ax{:,2}]==obj.AreaMinMaxT2ax(2),1) ,1));
+                obj.AreaMinMaxT2ax(1) = min(cell2mat(obj.StatsMatDataT2ax(:,4)));
+                obj.AreaMinMaxObjT2ax(1) = cell2mat(obj.StatsMatDataT2ax( find([obj.StatsMatDataT2ax{:,4}]==obj.AreaMinMaxT2ax(1),1) ,1));
+                obj.AreaMinMaxT2ax(2) = max(cell2mat(obj.StatsMatDataT2ax(:,4)));
+                obj.AreaMinMaxObjT2ax(2) = cell2mat(obj.StatsMatDataT2ax( find([obj.StatsMatDataT2ax{:,4}]==obj.AreaMinMaxT2ax(2),1) ,1));
             else
                 obj.AreaMinMaxT2ax = '--';
                 obj.AreaMinMaxObjT2ax = '--';
@@ -489,250 +516,525 @@ classdef modelResults < handle
             %       - Input
             %           obj:    Handle to modelResults object.
             %
-            
+            obj.InfoMessage = '   - create statistic cell array';
             obj.StatisticMat = {}; 
             
-            % 1. Row
-            obj.StatisticMat{1,1} = 'Analyze Mode:';
+            obj.StatisticMat{end+1,1} = 'Analyze Mode:';
             switch obj.AnalyzeMode
                 case 1
-                    obj.StatisticMat{1,2} =  'Color-Based triple labeling';
+                    obj.StatisticMat{end,2} =  'Color-Based triple labeling';
                 case 2
-                    obj.StatisticMat{1,2} =  'Color-Based quad labeling';
+                    obj.StatisticMat{end,2} =  'Color-Based quad labeling';
                 case 3
-                    obj.StatisticMat{1,2} =  'OPTICS-Cluster-Based triple labeling';
+                    obj.StatisticMat{end,2} =  'OPTICS-Cluster-Based triple labeling';
                 case 4
-                    obj.StatisticMat{1,2} =  'OPTICS-Cluster-Based quad labeling';
+                    obj.StatisticMat{end,2} =  'OPTICS-Cluster-Based quad labeling';
                 case 5
-                    obj.StatisticMat{1,2} =  'Manual Classification';
+                    obj.StatisticMat{end,2} =  'Manual Classification triple labeling';
+                case 6
+                    obj.StatisticMat{end,2} =  'Manual Classification quad labeling';    
             end
-            
-            % 2. Row
-            obj.StatisticMat{2,1} = 'Searching for:';
+
+            obj.StatisticMat{end+1,1} = 'Searching for:';
             switch obj.AnalyzeMode
                 case 1
-                    obj.StatisticMat{2,2} =  '1 2 12h 2x fibers';
+                    obj.StatisticMat{end,2} =  '1 2 12h 2x fibers';
                 case 2
-                    obj.StatisticMat{2,2} =  '1 2 12h 2x 2a 2ax fibers';
+                    obj.StatisticMat{end,2} =  '1 2 12h 2x 2a 2ax fibers';
                 case 3
-                    obj.StatisticMat{2,2} =  '1 2 12h 2x fibers';
+                    obj.StatisticMat{end,2} =  '1 2 12h 2x fibers';
                 case 4
-                    obj.StatisticMat{2,2} =  '1 2 12h 2x 2a 2ax fibers';
+                    obj.StatisticMat{end,2} =  '1 2 12h 2x 2a 2ax fibers';
                 case 5
-                    obj.StatisticMat{2,2} =  'Manual Classification';
+                    obj.StatisticMat{end,2} =  'Manual Classification';
+                case 6
+                    obj.StatisticMat{end,2} =  'Manual Classification';    
             end
             
-            % 3. and 4. Row
-            obj.StatisticMat{3,1} = sprintf('Para min area (\x3BCm^2):');
-            obj.StatisticMat{4,1} = sprintf('Para max area (\x3BCm^2):');
+            obj.StatisticMat{end+1,1} = sprintf('Para min Area (\x3BCm^2):');
             if obj.AreaActive
-                obj.StatisticMat{3,2} =  obj.MinAreaPixel;
-                obj.StatisticMat{4,2} =  obj.MaxAreaPixel;
+                obj.StatisticMat{end,2} =  obj.MinAreaPixel;
             else
-                obj.StatisticMat{3,2} =  'not active';
-                obj.StatisticMat{4,2} =  'not active';
+                obj.StatisticMat{end,2} =  'not active';
+            end
+            obj.StatisticMat{end+1,1} = sprintf('Para max Area (\x3BCm^2):');
+            if obj.AreaActive
+                obj.StatisticMat{end,2} =  obj.MaxAreaPixel;
+            else
+                obj.StatisticMat{end,2} =  'not active';
             end
             
-            % 5. and 6. Row
-            obj.StatisticMat{5,1} = 'Para min Asp.Ratio:';
-            obj.StatisticMat{6,1} = 'Para max Asp.Ratio:';
+            obj.StatisticMat{end+1,1} = 'Para min Aspect Ratio:';
             if obj.AspectRatioActive
-                obj.StatisticMat{5,2} =  obj.MinAspectRatio;
-                obj.StatisticMat{6,2} =  obj.MaxAspectRatio;
+                obj.StatisticMat{end,2} =  obj.MinAspectRatio;
             else
-                obj.StatisticMat{5,2} =  'not active';
-                obj.StatisticMat{6,2} =  'not active';
+                obj.StatisticMat{end,2} =  'not active';
+            end
+            obj.StatisticMat{end+1,1} = 'Para max Aspect Ratio:';
+            if obj.AspectRatioActive
+                obj.StatisticMat{end,2} =  obj.MaxAspectRatio;
+            else
+                obj.StatisticMat{end,2} =  'not active';
             end
             
-            % 7. Row
-            obj.StatisticMat{7,1} = 'Para min Roundn.:';
+            obj.StatisticMat{end+1,1} = 'Para min Roundness:';
             if obj.RoundnessActive
-                obj.StatisticMat{7,2} =  obj.MinRoundness;
+                obj.StatisticMat{end,2} =  obj.MinRoundness;
             else
-                obj.StatisticMat{7,2} =  'not active';
+                obj.StatisticMat{end,2} =  'not active';
             end
             
-            % 8. 9. 10. Row
-            obj.StatisticMat{8,1} = 'Para Blue/Red thresh:';
-            obj.StatisticMat{9,1} = 'Para Blue dist:';
-            obj.StatisticMat{10,1} = 'Para Red dist::';
-            if obj.BlueRedThreshActive
-                obj.StatisticMat{8,2} =  obj.BlueRedThresh;
-                obj.StatisticMat{9,2} =  obj.BlueRedDistBlue;
-                obj.StatisticMat{10,2} =  obj.BlueRedDistRed;
-            else
-                obj.StatisticMat{8,2} =  'not active';
-                obj.StatisticMat{9,2} =  'not active';
-                obj.StatisticMat{10,2} =  'not active';
-            end
-            
-            % 11. 12. 13. Row
-            obj.StatisticMat{11,1} = 'Para Farred/Red thresh:';
-            obj.StatisticMat{12,1} = 'Para Farred dist:';
-            obj.StatisticMat{13,1} = 'Para Red dist::';
-            if obj.FarredRedThreshActive
-                obj.StatisticMat{11,2} =  obj.FarredRedThresh;
-                obj.StatisticMat{12,2} =  obj.FarredRedDistFarred;
-                obj.StatisticMat{13,2} =  obj.FarredRedDistRed;
-            else
-                obj.StatisticMat{11,2} =  'not active';
-                obj.StatisticMat{12,2} =  'not active';
-                obj.StatisticMat{13,2} =  'not active';
-            end
-            
-             % 14 Row
-            obj.StatisticMat{14,1} = 'Para min ColorValue:';
+            obj.StatisticMat{end+1,1} = 'Para min Color-Value:';
             if obj.ColorValueActive
-                obj.StatisticMat{14,2} =  obj.ColorValue;
+                obj.StatisticMat{end,2} =  obj.ColorValue;
             else
-                obj.StatisticMat{14,2} =  'not active';
+                obj.StatisticMat{end,2} =  'not active';
             end
             
-            % 15 Row
-            obj.StatisticMat{15,1} = sprintf('XScale in \x3BCm/pixel:');
-            obj.StatisticMat{15,2} =  obj.XScale;
-            % 16 Row
-            obj.StatisticMat{16,1} = sprintf('XScale in \x3BCm/pixel:');
-            obj.StatisticMat{16,2} =  obj.YScale;
+            obj.StatisticMat{end+1,1} = 'Para Blue/Red thresh:';
+            obj.StatisticMat{end+1,1} = 'Para Blue distance:';
+            obj.StatisticMat{end+1,1} = 'Para Red distance:';
+            if obj.BlueRedThreshActive
+                obj.StatisticMat{end-2,2} =  obj.BlueRedThresh;
+                obj.StatisticMat{end-1,2} =  obj.BlueRedDistBlue;
+                obj.StatisticMat{end,2} =  obj.BlueRedDistRed;
+            else
+                obj.StatisticMat{end-2,2} =  'not active';
+                obj.StatisticMat{end-1,2} =  'not active';
+                obj.StatisticMat{end,2} =  'not active';
+            end
             
-            % 17 Row
-            obj.StatisticMat{17,1} = 'Number objects:';
-            obj.StatisticMat{17,2} =  obj.NoOfObjects;
-            % 18 Row
-            obj.StatisticMat{18,1} = 'Number Type 1:';
-            obj.StatisticMat{18,2} =  obj.NoTyp1;
-            % 19 Row
-            obj.StatisticMat{19,1} = 'Number Type 12h:';
-            obj.StatisticMat{19,2} =  obj.NoTyp12h;
-            % 20 Row
-            obj.StatisticMat{20,1} = 'Number Type 2a:';
-            obj.StatisticMat{20,2} =  obj.NoTyp2a;
-            % 21 Row
-            obj.StatisticMat{21,1} = 'Number Type 2x:';
-            obj.StatisticMat{21,2} =  obj.NoTyp2x;
-            % 22 Row
-            obj.StatisticMat{22,1} = 'Number Type 2ax:';
-            obj.StatisticMat{22,2} =  obj.NoTyp2ax;
-            % 23 Row
-            obj.StatisticMat{23,1} = 'Number undefined:';
-            obj.StatisticMat{23,2} =  obj.NoTyp0;
+            obj.StatisticMat{end+1,1} = 'Para Farred/Red thresh:';
+            obj.StatisticMat{end+1,1} = 'Para Farred distance:';
+            obj.StatisticMat{end+1,1} = 'Para Red distance:';
+            if obj.FarredRedThreshActive
+                obj.StatisticMat{end-2,2} =  obj.FarredRedThresh;
+                obj.StatisticMat{end-1,2} =  obj.FarredRedDistFarred;
+                obj.StatisticMat{end,2} =  obj.FarredRedDistRed;
+            else
+                obj.StatisticMat{end-2,2} =  'not active';
+                obj.StatisticMat{end-1,2} =  'not active';
+                obj.StatisticMat{end,2} =  'not active';
+            end
             
-            % 24 Row
-            obj.StatisticMat{24,1} =  sprintf('Area Type 1 (\x3BCm^2):');
-            obj.StatisticMat{24,2} =  obj.AreaType1;
-            % 25 Row
-            obj.StatisticMat{25,1} =  sprintf('Area Type 12h (\x3BCm^2):');
-            obj.StatisticMat{25,2} =  obj.AreaType12h;
-            % 26 Row
-            obj.StatisticMat{26,1} =  sprintf('Area Type 2a (\x3BCm^2):');
-            obj.StatisticMat{26,2} =  obj.AreaType2a;
-            % 27 Row
-            obj.StatisticMat{27,1} =  sprintf('Area Type 2x (\x3BCm^2):');
-            obj.StatisticMat{27,2} =  obj.AreaType2x;
-            % 28 Row
-            obj.StatisticMat{28,1} =  sprintf('Area Type 2ax (\x3BCm^2):');
-            obj.StatisticMat{28,2} =  obj.AreaType2ax;
-            % 29 Row
-            obj.StatisticMat{29,1} = sprintf('Area Collagen (\x3BCm^2):');
-            obj.StatisticMat{29,2} =  obj.AreaNoneObj;
+            obj.StatisticMat{end+1,1} = 'Para min Points per Cluster:';
+            obj.StatisticMat{end,2} = obj.minPointsPerCluster;
             
-            % 30 Row
-            obj.StatisticMat{30,1} = 'Area Type 1 (%):';
-            obj.StatisticMat{30,2} =  obj.AreaType1PC;
-            % 31 Row
-            obj.StatisticMat{31,1} = 'Area Type 12h (%):';
-            obj.StatisticMat{31,2} =  obj.AreaType12hPC;
-            % 32 Row
-            obj.StatisticMat{32,1} = 'Area Type 2a (%):';
-            obj.StatisticMat{32,2} =  obj.AreaType2aPC;
-            % 33 Row
-            obj.StatisticMat{33,1} = 'Area Type 2x (%):';
-            obj.StatisticMat{33,2} =  obj.AreaType2xPC;
-            % 34 Row
-            obj.StatisticMat{34,1} = 'Area Type 2ax (%):';
-            obj.StatisticMat{34,2} =  obj.AreaType2axPC;
-            % 35 Row
-            obj.StatisticMat{35,1} = 'Area Collagen (%):';
-            obj.StatisticMat{35,2} =  obj.AreaNoneObjPC;
+            obj.StatisticMat{end+1,1} = sprintf('XScale in \x3BCm/pixel:');
+            obj.StatisticMat{end,2} =  obj.XScale;
+
+            obj.StatisticMat{end+1,1} = sprintf('XScale in \x3BCm/pixel:');
+            obj.StatisticMat{end,2} =  obj.YScale;
             
-            % 36 Row
-            obj.StatisticMat{36,1} =  sprintf('Smallest Area (\x3BCm^2):');
-            obj.StatisticMat{36,2} =  obj.AreaMinMax(1);
-            % 37 Row
-            obj.StatisticMat{37,1} = 'Smallest Fiber:';
-            obj.StatisticMat{37,2} =  obj.AreaMinMaxObj(1);
-            % 38 Row
-            obj.StatisticMat{38,1} =  sprintf('Largest Area (\x3BCm^2):');
-            obj.StatisticMat{38,2} =  obj.AreaMinMax(2);
-            % 39 Row
-            obj.StatisticMat{39,1} = 'Largest Fiber:';
-            obj.StatisticMat{39,2} =  obj.AreaMinMaxObj(2);
+            obj.StatisticMat{end+1,1} = 'Number objects:';
+            obj.StatisticMat{end,2} =  obj.NoOfObjects;
+
+            obj.StatisticMat{end+1,1} = 'Number Type 1:';
+            obj.StatisticMat{end,2} =  obj.NoTyp1;
+           
+            obj.StatisticMat{end+1,1} = 'Number Type 12h:';
+            obj.StatisticMat{end,2} =  obj.NoTyp12h;
+           
+            obj.StatisticMat{end+1,1} = 'Number Type 2a:';
+            obj.StatisticMat{end,2} =  obj.NoTyp2a;
             
-            % 40 Row
-            obj.StatisticMat{40,1} = sprintf('Smallest Area T1 (\x3BCm^2):');
-            obj.StatisticMat{40,2} =  obj.AreaMinMaxT1(1);
-            % 41 Row
-            obj.StatisticMat{41,1} = 'Smallest T1 Fiber:';
-            obj.StatisticMat{41,2} =  obj.AreaMinMaxObjT1(1);
-            % 42 Row
-            obj.StatisticMat{42,1} = sprintf('Largest Area T1 (\x3BCm^2):');
-            obj.StatisticMat{42,2} =  obj.AreaMinMaxT1(2);
-            % 43 Row
-            obj.StatisticMat{43,1} = 'Largest T1 Fiber:';
-            obj.StatisticMat{43,2} =  obj.AreaMinMaxObjT1(2);
+            obj.StatisticMat{end+1,1} = 'Number Type 2x:';
+            obj.StatisticMat{end,2} =  obj.NoTyp2x;
             
-            % 44 Row
-            obj.StatisticMat{44,1} = sprintf('Smallest Area T12h (\x3BCm^2):');
-            obj.StatisticMat{44,2} =  obj.AreaMinMaxT12h(1);
-            % 45 Row
-            obj.StatisticMat{45,1} = 'Smallest T12h Fiber:';
-            obj.StatisticMat{45,2} =  obj.AreaMinMaxObjT12h(1);
-            % 46 Row
-            obj.StatisticMat{46,1} = sprintf('Largest Area T12h (\x3BCm^2):');
-            obj.StatisticMat{46,2} =  obj.AreaMinMaxT12h(2);
-            % 47 Row
-            obj.StatisticMat{47,1} = 'Largest T12h Fiber:';
-            obj.StatisticMat{47,2} =  obj.AreaMinMaxObjT12h(2);
+            obj.StatisticMat{end+1,1} = 'Number Type 2ax:';
+            obj.StatisticMat{end,2} =  obj.NoTyp2ax;
+           
+            obj.StatisticMat{end+1,1} = 'Number undefined:';
+            obj.StatisticMat{end,2} =  obj.NoTyp0;
             
-            % 48 Row
-            obj.StatisticMat{48,1} = sprintf('Smallest Area T2a (\x3BCm^2):');
-            obj.StatisticMat{48,2} =  obj.AreaMinMaxT2a(1);
-            % 49 Row
-            obj.StatisticMat{49,1} = 'Smallest T2a Fiber:';
-            obj.StatisticMat{49,2} =  obj.AreaMinMaxObjT2a(1);
-            % 50 Row
-            obj.StatisticMat{50,1} = sprintf('Largest Area T2a (\x3BCm^2):');
-            obj.StatisticMat{50,2} =  obj.AreaMinMaxT2a(2);
-            % 51 Row
-            obj.StatisticMat{51,1} = 'Largest T2a Fiber:';
-            obj.StatisticMat{51,2} =  obj.AreaMinMaxObjT2a(2);
+            obj.StatisticMat{end+1,1} =  sprintf('Area Type 1 (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaType1;
+
+            obj.StatisticMat{end+1,1} =  sprintf('Area Type 12h (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaType12h;
+           
+            obj.StatisticMat{end+1,1} =  sprintf('Area Type 2a (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaType2a;
+          
+            obj.StatisticMat{end+1,1} =  sprintf('Area Type 2x (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaType2x;
+         
+            obj.StatisticMat{end+1,1} =  sprintf('Area Type 2ax (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaType2ax;
+           
+            obj.StatisticMat{end+1,1} = sprintf('Area Collagen (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaNoneObj;
             
-            % 52 Row
-            obj.StatisticMat{52,1} = sprintf('Smallest Area T2x (\x3BCm^2):');
-            obj.StatisticMat{52,2} =  obj.AreaMinMaxT2x(1);
-            % 53 Row
-            obj.StatisticMat{53,1} = 'Smallest T2x Fiber:';
-            obj.StatisticMat{53,2} =  obj.AreaMinMaxObjT2x(1);
-            % 54 Row
-            obj.StatisticMat{54,1} = sprintf('Largest Area T2x (\x3BCm^2):');
-            obj.StatisticMat{54,2} =  obj.AreaMinMaxT2x(2);
-            % 55 Row
-            obj.StatisticMat{55,1} = 'Largest T2x Fiber:';
-            obj.StatisticMat{55,2} =  obj.AreaMinMaxObjT2x(2);
+            obj.StatisticMat{end+1,1} = 'Area Type 1 (%):';
+            obj.StatisticMat{end,2} =  obj.AreaType1PC;
             
-            % 56 Row
-            obj.StatisticMat{56,1} = sprintf('Smallest Area T2ax (\x3BCm^2):');
-            obj.StatisticMat{56,2} =  obj.AreaMinMaxT2ax(1);
-            % 57 Row
-            obj.StatisticMat{57,1} = 'Smallest T2ax Fiber:';
-            obj.StatisticMat{57,2} =  obj.AreaMinMaxObjT2ax(1);
-            % 58 Row
-            obj.StatisticMat{58,1} = sprintf('Largest Area T2ax (\x3BCm^2):');
-            obj.StatisticMat{58,2} =  obj.AreaMinMaxT2ax(2);
-            % 59 Row
-            obj.StatisticMat{59,1} = 'Largest T2ax Fiber:';
-            obj.StatisticMat{59,2} =  obj.AreaMinMaxObjT2ax(2);
+            obj.StatisticMat{end+1,1} = 'Area Type 12h (%):';
+            obj.StatisticMat{end,2} =  obj.AreaType12hPC;
             
+            obj.StatisticMat{end+1,1} = 'Area Type 2a (%):';
+            obj.StatisticMat{end,2} =  obj.AreaType2aPC;
+            
+            obj.StatisticMat{end+1,1} = 'Area Type 2x (%):';
+            obj.StatisticMat{end,2} =  obj.AreaType2xPC;
+            
+            obj.StatisticMat{end+1,1} = 'Area Type 2ax (%):';
+            obj.StatisticMat{end,2} =  obj.AreaType2axPC;
+            
+            obj.StatisticMat{end+1,1} = 'Area Collagen (%):';
+            obj.StatisticMat{end,2} =  obj.AreaNoneObjPC;
+            
+            obj.StatisticMat{end+1,1} =  sprintf('Smallest Area (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMax(1);
+          
+            obj.StatisticMat{end+1,1} = 'Smallest Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObj(1);
+          
+            obj.StatisticMat{end+1,1} =  sprintf('Largest Area (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMax(2);
+          
+            obj.StatisticMat{end+1,1} = 'Largest Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObj(2);
+            
+            obj.StatisticMat{end+1,1} = sprintf('Smallest Area T1 (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT1(1);
+
+            obj.StatisticMat{end+1,1} = 'Smallest T1 Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT1(1);
+
+            obj.StatisticMat{end+1,1} = sprintf('Largest Area T1 (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT1(2);
+            
+            obj.StatisticMat{end+1,1} = 'Largest T1 Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT1(2);
+
+            obj.StatisticMat{end+1,1} = sprintf('Smallest Area T12h (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT12h(1);
+            
+            obj.StatisticMat{end+1,1} = 'Smallest T12h Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT12h(1);
+           
+            obj.StatisticMat{end+1,1} = sprintf('Largest Area T12h (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT12h(2);
+            
+            obj.StatisticMat{end+1,1} = 'Largest T12h Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT12h(2);
+    
+            obj.StatisticMat{end+1,1} = sprintf('Smallest Area T2a (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2a(1);
+
+            obj.StatisticMat{end+1,1} = 'Smallest T2a Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2a(1);
+    
+            obj.StatisticMat{end+1,1} = sprintf('Largest Area T2a (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2a(2);
+            
+            obj.StatisticMat{end+1,1} = 'Largest T2a Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2a(2);
+            
+            obj.StatisticMat{end+1,1} = sprintf('Smallest Area T2x (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2x(1);
+            
+            obj.StatisticMat{end+1,1} = 'Smallest T2x Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2x(1);
+           
+            obj.StatisticMat{end+1,1} = sprintf('Largest Area T2x (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2x(2);
+           
+            obj.StatisticMat{end+1,1} = 'Largest T2x Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2x(2);
+            
+            obj.StatisticMat{end+1,1} = sprintf('Smallest Area T2ax (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2ax(1);
+           
+            obj.StatisticMat{end+1,1} = 'Smallest T2ax Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2ax(1);
+           
+            obj.StatisticMat{end+1,1} = sprintf('Largest Area T2ax (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2ax(2);
+            
+            obj.StatisticMat{end+1,1} = 'Largest T2ax Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2ax(2);
+            
+        end
+        
+        function findFiberGroups(obj)
+            obj.InfoMessage = '   - searching for fiber type groups...';
+            
+            se = strel('disk',2);
+            Imag = obj.LabelMat; %get Label Mat
+            
+            obj.InfoMessage = '      - create convex hull';
+            BW_C = zeros(size(obj.LabelMat));
+            for i=1:1:size(obj.Stats,1)
+                % seperate centroid in X and Y values
+                FCPX = round(obj.Stats(i).Centroid(1));
+                FCPY = round(obj.Stats(i).Centroid(2));
+                BW_C(FCPY,FCPX)=1;
+            end
+            BW_C=bwconvhull(BW_C);
+            
+            
+            BW = zeros(size(obj.LabelMat));
+            BW(obj.LabelMat>0)=1;
+            Hull = BW_C | BW;
+%             Hull = bwconvhull(HullC);
+            Hull = imdilate(Hull,se);
+            
+            obj.InfoMessage = '      - lable space withount fibers';
+            Imag(Hull==0)=max(max(Imag))+1;
+            ImagDist = bwdist(Imag); %Dist transform
+          
+            
+%             figure(9)
+%             imshow(Hull,[])
+            obj.InfoMessage = '      - minimize collagen thickness';
+            I_WS=watershed(ImagDist); 
+%             I_BW=ones(size(I_WS));
+%             I_BW(I_WS==0)=0; %Binary Mat without Collagen thiknes
+%             
+%             
+%             [I_Bound,I_Label] = bwboundaries(I_BW,8,'noholes');
+%             I_Label = I_Label*(-1); %Set all Labels negativ
+%             
+%             figure()
+%             imshow(Imag,[])
+            I_Label = double(I_WS)*(-1);
+            n = max(max(obj.LabelMat)); %No. of Objects
+            
+            obj.InfoMessage = '      - rearrange labels';
+            for i=1:1:n %rearrange Labels
+                Value = unique( I_Label(Imag==i));
+                I_Label(I_Label==Value)=i;
+            end
+%             figure()
+%             imshow(I_Label)
+%             figure(10)
+%             imshow(Imag)
+%             CH = bwconvhull(Imag);
+%             figure(11)
+%             imshow(CH)
+% %             CH= activecontour(Imag,CH,100,'edge');
+%             I_Label(CH==0)=0;
+%             
+%             figure(12)
+%             imshow(CH)
+            obj.InfoMessage = '      - searching for fiber type groups...';
+            IsType1 = find( strcmp({obj.Stats.FiberType} , 'Type 1') );
+            IsType12h = find( strcmp({obj.Stats.FiberType} , 'Type 12h') );
+            IsType2a = find( strcmp({obj.Stats.FiberType} , 'Type 2a') );
+            IsType2ax = find( strcmp({obj.Stats.FiberType} , 'Type 2ax') );
+            IsType2x = find( strcmp({obj.Stats.FiberType} , 'Type 2x') );
+            IsType0 = find( strcmp({obj.Stats.FiberType} , 'undefined') );
+            
+            LrgbT1 = [];
+            LrgbT12h = [];
+            LrgbT2x = [];
+            LrgbT2a = [];
+            LrgbT2ax = [];
+            
+            
+            
+%             
+%             IsType1 = find([obj.Stats.FiberTypeMainGroup] == 1);
+%             IsType2 = find([obj.Stats.FiberTypeMainGroup] == 2);
+%             IsType3 = find([obj.Stats.FiberTypeMainGroup] == 3);
+%             IBWT1=[];
+%             IBWT2=[];
+%             IBWT3=[];
+            se = strel('disk',1);
+            
+            %%%%%%%%%%%%%%%%%%%%% Type-1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.InfoMessage = '         - find Type-1 groups';
+            if ~isempty(IsType1)
+                IBWT1=zeros(size(I_Label));  
+                for i=1:1:size(IsType1,2)
+                    IBWT1(I_Label==IsType1(i))=1;
+                end
+                IBWT1_C=imclose(IBWT1,se);
+%                 IBWT1 = bwmorph(IBWT1_C,'thin',2);
+                [BWT1_Bound,BWT1_Label] = bwboundaries(IBWT1_C,8,'noholes');
+                LrgbT1(:,:,1)=IBWT1_C*0;
+                LrgbT1(:,:,2)=IBWT1_C*0;
+                LrgbT1(:,:,3)=IBWT1_C*1;
+                
+                nG = max(max(BWT1_Label)); %find number of fiber type groups
+                NoObj = [];
+                for i=1:1:nG
+                    %Find number of fibers within each group
+                    Vec=unique(obj.LabelMat(BWT1_Label==i));
+                    Vec(Vec==0)=[];
+                    NoObj(i)=length(Vec);
+                end
+                
+                %Store Data in GroupStats
+                obj.GroupStats.BoundT1 = BWT1_Bound;
+                obj.GroupStats.LabelT1 = BWT1_Label;
+                obj.GroupStats.NoObjT1 = NoObj;
+                
+            else
+                LrgbT1(:,:,1)=zeros(size(I_Label));
+                LrgbT1(:,:,2)=zeros(size(I_Label));
+                LrgbT1(:,:,3)=zeros(size(I_Label)); 
+                
+                obj.GroupStats.BoundT1 = [];
+                obj.GroupStats.LabelT1 = [];
+                obj.GroupStats.NoObjT1 = [];
+            end
+            
+            %%%%%%%%%%%%%%%%%%%%% Type-12h %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.InfoMessage = '         - find Type-12h groups';
+            if ~isempty(IsType12h)
+                IBWT12h=zeros(size(I_Label));   
+                for i=1:1:size(IsType12h,2)
+                    IBWT12h(I_Label==IsType12h(i))=1;
+                end
+                IBWT12h_C=imclose(IBWT12h,se);
+%                 IBWT12h = bwmorph(IBWT12h_C,'thin',2);
+                [BWT12h_Bound,BWT12h_Label] = bwboundaries(IBWT12h_C,8,'noholes');
+                LrgbT12h(:,:,1)=IBWT12h_C*1;
+                LrgbT12h(:,:,2)=IBWT12h_C*0;
+                LrgbT12h(:,:,3)=IBWT12h_C*1;
+                
+                nG = max(max(BWT12h_Label)); %find number of fiber type groups
+                NoObj = [];
+                for i=1:1:nG
+                    %Find number of fibers within each group
+                    Vec=unique(obj.LabelMat(BWT12h_Label==i));
+                    Vec(Vec==0)=[];
+                    NoObj(i)=length(Vec);
+                end
+                
+                %Store Data in GroupStats
+                obj.GroupStats.BoundT12h = BWT12h_Bound;
+                obj.GroupStats.LabelT12h = BWT12h_Label;
+                obj.GroupStats.NoObjT12h = NoObj;
+                
+            else
+                LrgbT12h(:,:,1)=zeros(size(I_Label));
+                LrgbT12h(:,:,2)=zeros(size(I_Label));
+                LrgbT12h(:,:,3)=zeros(size(I_Label));
+                
+                obj.GroupStats.BoundT12h = [];
+                obj.GroupStats.LabelT12h = [];
+                obj.GroupStats.NoObjT12h = [];
+            end
+            %%%%%%%%%%%%%%%%%%%%% Type-2x %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.InfoMessage = '         - find Type-2x groups';
+            if ~isempty(IsType2x)
+                IBWT2x=zeros(size(I_Label));  
+                for i=1:1:size(IsType2x,2)
+                    IBWT2x(I_Label==IsType2x(i))=1;
+                end
+                IBWT2x_C=imclose(IBWT2x,se);
+%                 IBWT2x = bwmorph(IBWT2x_C,'thin',2);
+                [BWT2x_Bound,BWT2x_Label] = bwboundaries(IBWT2x_C,8,'noholes');
+                LrgbT2x(:,:,1)=IBWT2x_C*1;
+                LrgbT2x(:,:,2)=IBWT2x_C*0;
+                LrgbT2x(:,:,3)=IBWT2x_C*0;
+                
+                nG = max(max(BWT2x_Label)); %find number of fiber type groups
+                NoObj = [];
+                for i=1:1:nG
+                    %Find number of fibers within each group
+                    Vec=unique(obj.LabelMat(BWT2x_Label==i));
+                    Vec(Vec==0)=[];
+                    NoObj(i)=length(Vec);
+                end
+                
+                %Store Data in GroupStats
+                obj.GroupStats.BoundT2x = BWT2x_Bound;
+                obj.GroupStats.LabelT2x = BWT2x_Label;
+                obj.GroupStats.NoObjT2x = NoObj;
+                
+                
+            else
+                LrgbT2x(:,:,1)=zeros(size(I_Label));
+                LrgbT2x(:,:,2)=zeros(size(I_Label));
+                LrgbT2x(:,:,3)=zeros(size(I_Label)); 
+                
+                obj.GroupStats.BoundT2x = [];
+                obj.GroupStats.LabelT2x = [];
+                obj.GroupStats.NoObjT2x = [];
+                
+            end
+            %%%%%%%%%%%%%%%%%%%%% Type-2a %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.InfoMessage = '         - find Type-2a groups';
+            if ~isempty(IsType2a)
+                IBWT2a=zeros(size(I_Label));  
+                for i=1:1:size(IsType2a,2)
+                    IBWT2a(I_Label==IsType2a(i))=1;
+                end
+                IBWT2a_C=imclose(IBWT2a,se);
+%                 IBWT2a = bwmorph(IBWT2a_C,'thin',2);
+                [BWT2a_Bound,BWT2a_Label] = bwboundaries(IBWT2a_C,8,'noholes');
+                LrgbT2a(:,:,1)=IBWT2a_C*1;
+                LrgbT2a(:,:,2)=IBWT2a_C*1;
+                LrgbT2a(:,:,3)=IBWT2a_C*0;
+                
+                nG = max(max(BWT2a_Label)); %find number of fiber type groups
+                NoObj = [];
+                for i=1:1:nG
+                    %Find number of fibers within each group
+                    Vec=unique(obj.LabelMat(BWT2a_Label==i));
+                    Vec(Vec==0)=[];
+                    NoObj(i)=length(Vec);
+                end
+                
+                %Store Data in GroupStats
+                obj.GroupStats.BoundT2a = BWT2a_Bound;
+                obj.GroupStats.LabelT2a = BWT2a_Label;
+                obj.GroupStats.NoObjT2a = NoObj;
+                
+            else
+                LrgbT2a(:,:,1)=zeros(size(I_Label));
+                LrgbT2a(:,:,2)=zeros(size(I_Label));
+                LrgbT2a(:,:,3)=zeros(size(I_Label)); 
+                
+                obj.GroupStats.BoundT2a = [];
+                obj.GroupStats.LabelT2a = [];
+                obj.GroupStats.NoObjT2a = [];
+            end
+            %%%%%%%%%%%%%%%%%%%%% Type-2ax %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            obj.InfoMessage = '         - find Type-2ax groups';
+            if ~isempty(IsType2ax)
+                IBWT2ax=zeros(size(I_Label));  
+                for i=1:1:size(IsType2ax,2)
+                    IBWT2ax(I_Label==IsType2ax(i))=1;
+                end
+                IBWT2ax_C=imclose(IBWT2ax,se);
+%                 IBWT2ax = bwmorph(IBWT2ax_C,'thin',2);
+                [BWT2ax_Bound,BWT2ax_Label] = bwboundaries(IBWT2ax_C,8,'noholes');
+                LrgbT2ax(:,:,1)=IBWT2ax_C*1;
+                LrgbT2ax(:,:,2)=IBWT2ax_C*100/255;
+                LrgbT2ax(:,:,3)=IBWT2ax_C*0;
+                
+                nG = max(max(BWT2ax_Label)); %find number of fiber type groups
+                NoObj = [];
+                for i=1:1:nG
+                    %Find number of fibers within each group
+                    Vec=unique(obj.LabelMat(BWT2ax_Label==i));
+                    Vec(Vec==0)=[];
+                    NoObj(i)=length(Vec);
+                end
+                
+                %Store Data in GroupStats
+                obj.GroupStats.BoundT2ax = BWT2ax_Bound;
+                obj.GroupStats.LabelT2ax = BWT2ax_Label;
+                obj.GroupStats.NoObjT2ax = NoObj;
+                 
+            else
+                LrgbT2ax(:,:,1)=zeros(size(I_Label));
+                LrgbT2ax(:,:,2)=zeros(size(I_Label));
+                LrgbT2ax(:,:,3)=zeros(size(I_Label)); 
+                
+                obj.GroupStats.BoundT2ax = [];
+                obj.GroupStats.LabelT2ax = [];
+                obj.GroupStats.NoObjT2ax = [];
+            end
+            
+            Lrgb = LrgbT1+LrgbT12h+LrgbT2x+LrgbT2a+LrgbT2ax;
+            obj.GroupStats.Lrgb = Lrgb;
+            obj.GroupStats.LabelMat = obj.LabelMat;
         end
         
         function saveResults(obj)
@@ -785,71 +1087,85 @@ classdef modelResults < handle
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save image all color planes processed with boudaries
-            if obj.SavePicRGBFRProcessed
-                obj.InfoMessage = '      - saving image processed with Farred Plane...';
+            % save image processed
+            if obj.SavePicProcessed
+                obj.InfoMessage = '      - saving image processed...';
                 
-                % save picture as tif file
-                f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
-                h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGBFR,f);
-                SizeFig = size(obj.PicPRGBFRPlanes)/max(size(obj.PicPRGBFRPlanes));
-                set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
-                set(h,'Units','normalized');
-                h.Position = [0 0 1 1];
-                h.DataAspectRatioMode = 'auto';
+                try
+                    picName ='';
+                    % save picture as vector graphics
+                    picName = [fileName '_image_processed' time '.pdf'];
+                    fullFileName = fullfile(SaveDir,picName);
+                    saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fullFileName);
+                    obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
+                catch
+                    warning('Problem while saving Image as .pdf. Image could not be saved.');
+                    obj.InfoMessage = 'ERROR: Image could not be saved as .pdf vector grafic';
+                    
+                    % save picture as tif file
+                    f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
+                    h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,f);
+                    SizeFig = size(obj.PicPRGBFRPlanes)/max(size(obj.PicPRGBFRPlanes));
+                    set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
+                    set(h,'Units','normalized');
+                    h.Position = [0 0 1 1];
+                    h.DataAspectRatioMode = 'auto';
+                    
+                    picName ='';
+                    frame = getframe(f);
+                    frame=frame.cdata;
+                    picName = [fileName '_image_processed' time '.tif'];
+                    oldPath = pwd;
+                    cd(SaveDir)
+                    imwrite(frame,picName)
+                    cd(oldPath)
+                    picName ='';
+                    close(f);
+                    obj.InfoMessage = '         - image has been saved as .tif';
+                end
+                picName ='';
                 
-                picName ='';
-                frame = getframe(f);
-                frame=frame.cdata;
-                picName = [fileName '_image_processed_withFR' time '.tif'];
-                oldPath = pwd;
-                cd(SaveDir)
-                imwrite(frame,picName)
-                cd(oldPath)
-                picName ='';
-                close(f);
-                obj.InfoMessage = '         - image has been saved as .tif';
-                
-                % save picture as vector graphics
-                picName = [fileName '_image_processed_withFR' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGBFR,fullFileName);
-                picName ='';
-                obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save image all color planes processed with boudaries
-            if obj.SavePicRGBProcessed
-                obj.InfoMessage = '      - saving image processed without Farred Plane...';
+            % save image with fiber type groups
+            if obj.SavePicGroups
+                obj.InfoMessage = '      - saving image with fiber groups...';
                 
-                % save picture as tif file
-                f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
-                h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGB,f);
-                SizeFig = size(obj.PicPRGBPlanes)/max(size(obj.PicPRGBPlanes));
-                set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
-                set(h,'Units','normalized');
-                h.Position = [0 0 1 1];
-                h.DataAspectRatioMode = 'auto';
+                try
+                    % save picture as vector graphics
+                    picName ='';
+                    picName = [fileName '_image_groups' time '.pdf'];
+                    fullFileName = fullfile(SaveDir,picName);
+                    saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,fullFileName);
+                    obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
+                catch
+                    warning('Problem while saving Image as .pdf. Image could not be saved.');
+                    obj.InfoMessage = 'ERROR: Image could not be saved as .pdf vector grafic';
+                    
+                    % save picture as tif file
+                    f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
+                    h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,f);
+                    SizeFig = size(obj.PicPRGBPlanes)/max(size(obj.PicPRGBPlanes));
+                    set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
+                    set(h,'Units','normalized');
+                    h.Position = [0 0 1 1];
+                    h.DataAspectRatioMode = 'auto';
+                    
+                    picName ='';
+                    frame = getframe(f);
+                    frame=frame.cdata;
+                    picName = [fileName '_image_groups' time '.tif'];
+                    oldPath = pwd;
+                    cd(SaveDir)
+                    imwrite(frame,picName)
+                    cd(oldPath)
+                    picName ='';
+                    close(f);
+                    obj.InfoMessage = '         - image has been saved as .tif';
+                end
+                picName ='';
                 
-                picName ='';
-                frame = getframe(f);
-                frame=frame.cdata;
-                picName = [fileName '_image_processed_withoutFR' time '.tif'];
-                oldPath = pwd;
-                cd(SaveDir)
-                imwrite(frame,picName)
-                cd(oldPath)
-                picName ='';
-                close(f);
-                obj.InfoMessage = '         - image has been saved as .tif';
-                
-                % save picture as vector graphics
-                picName = [fileName '_image_processed_withoutFR' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessedRGB,fullFileName);
-                picName ='';
-                obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -994,7 +1310,7 @@ classdef modelResults < handle
                 %dialog input box parameter
                 prompt = {'Date','Animal code','Muscle code','Image number','Microscope magnification','treated/control'};
                 dlg_title = 'Completion of the Excel table';
-                num_lines = [1 100];
+                num_lines = [1,50];
                 defaultans = {};
                 for i=1:1:size(prompt,2)
                     if i <= size(strComp,2)
@@ -1003,7 +1319,8 @@ classdef modelResults < handle
                         defaultans{1,i}='';
                     end
                 end
-                options.Resize='on';
+                options.Resize='off';
+                options.WindowStyle='normal';
                 answer = inputdlg(prompt,dlg_title,num_lines,defaultans,options)';
                 
                 if isempty(answer)
@@ -1027,8 +1344,8 @@ classdef modelResults < handle
                     [InfoAnimalT2ax{:,i}] = deal(answer{1,i});
                 end
                 
-                Header = {'Label' sprintf('Area (\x3BCm^2)') ...
-                    sprintf('XPos (\x3BCm)') sprintf('YPos (\x3BCm)')...
+                Header = {'Label' sprintf('XPos (\x3BCm)') sprintf('YPos (\x3BCm)')... 
+                    sprintf('Area (\x3BCm^2)') sprintf('min Cross Section Area (\x3BCm^2)'),sprintf('max Cross Section Area (\x3BCm^2)')...
                     sprintf('Perimeter (\x3BCm)') sprintf('maxDiameter (\x3BCm)') ...
                     sprintf('minDiameter (\x3BCm)')  'Roundness' ...
                     'AspectRatio' 'ColorValue' 'meanRed' 'meanGreen' ...
@@ -1076,49 +1393,49 @@ classdef modelResults < handle
                     
                     xlsfileName = [fileName '_processed' time '.xlsx'];
                     
-                    
-                    oldPath = pwd;
-                    cd(SaveDir);
+                    fullFileName = fullfile(SaveDir,xlsfileName);
+%                     oldPath = pwd;
+%                     cd(SaveDir);
                     
                     obj.InfoMessage = '            - write all fiber types ';
                     sheetName = 'Fyber Types';
                     startRange = 'B2';
                     % undocumented function from the file exchange Matlab Forum
                     % for creating .xlsx files on a macintosh OS
-                    status = xlwrite(xlsfileName, CellFiberTable , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
                     
                     sheetName = 'Statistics';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write statistic table ';
-                    status = xlwrite(xlsfileName, obj.StatisticMat , sheetName, startRange);
+                    status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
                     
                     
                     sheetName = 'Type 1';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 1 fibers ';
-                    status = xlwrite(xlsfileName, CellFiberTableT1 , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
                     
                     sheetName = 'Type 12h';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 12h fibers ';
-                    status = xlwrite(xlsfileName, CellFiberTableT12h , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
                     
                     sheetName = 'Type 2x';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 2x fibers ';
-                    status = xlwrite(xlsfileName, CellFiberTableT2x , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
                     
                     sheetName = 'Type 2a';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 2a fibers ';
-                    status = xlwrite(xlsfileName, CellFiberTableT2a , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
                     
                     sheetName = 'Type 2ax';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 2ax fibers ';
-                    status = xlwrite(xlsfileName, CellFiberTableT2ax , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
                     
-                    cd(oldPath);
+%                     cd(oldPath);
                     
                     if status
                         obj.InfoMessage = '         - .xlxs file has been created';
@@ -1155,50 +1472,50 @@ classdef modelResults < handle
                     javaaddpath(path);
                     
                     xlsfileName = [fileName '_processed' time '.xlsx'];
-                    sheetName = 'Fiber types';
-                    startRange = 'B2';
-                    oldPath = pwd;
-                    cd(SaveDir);
+
+%                     oldPath = pwd;
+%                     cd(SaveDir);
+                    fullFileName = fullfile(SaveDir,xlsfileName);
                     
+                    obj.InfoMessage = '            - write all fiber types ';
                     sheetName = 'Fyber Types';
                     startRange = 'B2';
-                    
                     % undocumented function from the file exchange Matlab Forum
                     % for creating .xlsx files on a macintosh OS
-                    status = xlwrite(xlsfileName, CellFiberTable , sheetName, startRange);
+                    status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
                     
                     sheetName = 'Statistics';
                     startRange = 'B2';
-                    
-                    status = xlwrite(xlsfileName, obj.StatisticMat , sheetName, startRange);
+                    obj.InfoMessage = '            - write statistic table ';
+                    status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
                     
                     
                     sheetName = 'Type 1';
                     startRange = 'B2';
-                    
-                    status = xlwrite(xlsfileName, CellFiberTableT1 , sheetName, startRange);
+                    obj.InfoMessage = '            - write Type 1 fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
                     
                     sheetName = 'Type 12h';
                     startRange = 'B2';
-                    
-                    status = xlwrite(xlsfileName, CellFiberTableT12h , sheetName, startRange);
+                    obj.InfoMessage = '            - write Type 12h fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
                     
                     sheetName = 'Type 2x';
                     startRange = 'B2';
-                    
-                    status = xlwrite(xlsfileName, CellFiberTableT2x , sheetName, startRange);
+                    obj.InfoMessage = '            - write Type 2x fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
                     
                     sheetName = 'Type 2a';
                     startRange = 'B2';
-                    
-                    status = xlwrite(xlsfileName, CellFiberTableT2a , sheetName, startRange);
+                    obj.InfoMessage = '            - write Type 2a fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
                     
                     sheetName = 'Type 2ax';
                     startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 2ax fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
                     
-                    status = xlwrite(xlsfileName, CellFiberTableT2ax , sheetName, startRange);
-                    
-                    cd(oldPath);
+%                     cd(oldPath);
                     
                     if status
                         obj.InfoMessage = '         - .xlxs file has been created';

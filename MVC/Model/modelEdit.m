@@ -1100,7 +1100,7 @@ classdef modelEdit < handle
                     obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(double(background), h, 'replicate');
                     %Normalized Background to 1
-%                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
+                    smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCBlue = smoothedBackground;
                     obj.FilenameBCBlue = 'calculated from Blue plane background';
                     
@@ -1715,7 +1715,7 @@ classdef modelEdit < handle
                     
                     EdgeObjectsX=unique(BordersX);
                     EdgeObjectsY=unique(BordersY);
-                    EdgeObjects=cat(1,EdgeObjectsX,EdgeObjectsY)
+                    EdgeObjects=cat(1,EdgeObjectsX,EdgeObjectsY);
                     EdgeObjects=unique(EdgeObjects);
                     if ~isempty(EdgeObjects)
                         for i=1:1:size(EdgeObjects,1)
@@ -1858,7 +1858,7 @@ classdef modelEdit < handle
             %           yOut:   Corrected y position.
             %       isInAxes:   True if PosX and PoxY are within the Axes  
             %
-            
+            isInAxes = true;
             if PosX < 1
                 PosX = 1;
                 isInAxes = false;
@@ -1878,7 +1878,6 @@ classdef modelEdit < handle
                 PosY = size(obj.PicRGBFRPlanes,1);
                 isInAxes = false;
             end
-            isInAxes = true;
             xOut = PosX;
             yOut = PosY;
         end
