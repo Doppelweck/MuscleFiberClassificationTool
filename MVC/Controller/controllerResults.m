@@ -168,6 +168,8 @@ classdef controllerResults < handle
             %               Data{26}: XScale in ?m/pixel
             %               Data{27}: YScale in ?m/pixel
             %               Data{28}: min Points per Cluster
+            %               Data{29}: 1/2 Hybrid Fibers allowed
+            %               Data{30}: 2ax Hybrid Fibers allowed
             %           InfoText:   Info text log.
             %
             
@@ -210,6 +212,9 @@ classdef controllerResults < handle
             obj.modelResultsHandle.YScale = Data{27};
             
             obj.modelResultsHandle.minPointsPerCluster = Data{28};
+            
+            obj.modelResultsHandle.Hybrid12FiberActive = Data{29};
+            obj.modelResultsHandle.Hybrid2axFiberActive = Data{30};
 
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));
@@ -445,7 +450,7 @@ classdef controllerResults < handle
             % get highest position of text objects
             maxTextPos = max(max([hText.Position]));
             
-            ylim([0 maxTextPos+20]);
+            ylim([0 maxTextPos+round(maxTextPos/10)]);
             set(obj.viewResultsHandle.hACount,'FontUnits','normalized','Fontsize',0.03);
             l1 = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind',...
                     'Location','Best');
@@ -613,17 +618,17 @@ classdef controllerResults < handle
                 end
                 
                 if obj.modelResultsHandle.AnalyzeMode == 1
-                    title({'Color-Based Classification triple labeling'},'FontUnits','normalized','Fontsize',0.06);
+                    title({'Color-Based Triple Labeling (Main Groups)'},'FontUnits','normalized','Fontsize',0.06);
                 elseif obj.modelResultsHandle.AnalyzeMode == 2
-                    title({'Color-Based Classification quad labeling'},'FontUnits','normalized','Fontsize',0.06);
+                    title({'Color-Based Quad Labeling (Main Groups)'},'FontUnits','normalized','Fontsize',0.06);
                 end
                 
             elseif obj.modelResultsHandle.AnalyzeMode == 3
-                title('OPTICS-Cluster-Based Classification triple labeling','FontUnits','normalized','Fontsize',0.06);
+                title('Cluster-Based Triple Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
-                title('OPTICS-Cluster-Based Classification quad labeling','FontUnits','normalized','Fontsize',0.06);
+                title('luster-Based Quad Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 5 || obj.modelResultsHandle.AnalyzeMode == 6
-                title('Manual Classification','FontUnits','normalized','Fontsize',0.06);
+                title('Manual Classification (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             end
             
             if ~isempty(LegendString)
@@ -724,17 +729,17 @@ classdef controllerResults < handle
                 
                 
                 if obj.modelResultsHandle.AnalyzeMode == 1
-                    title({'Color-Based Classification triple labeling'},'FontUnits','normalized','Fontsize',0.06);
+                    title({'Color-Based Triple Labeling (Type-2 Subgroups)'},'FontUnits','normalized','Fontsize',0.06);
                 elseif obj.modelResultsHandle.AnalyzeMode == 2
-                    title({'Color-Based Classification quad labeling'},'FontUnits','normalized','Fontsize',0.06);
+                    title({'Color-Based Quad Labeling (Type-2 Subgroups)'},'FontUnits','normalized','Fontsize',0.06);
                 end
                 
             elseif obj.modelResultsHandle.AnalyzeMode == 3
-                title('OPTICS-Cluster-Based Classification triple labeling','FontUnits','normalized','Fontsize',0.06);
+                title('Cluster-Based Triple Labeling (Type-2 Subgroups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
-                title('OPTICS-Cluster-Based Classification quad labeling','FontUnits','normalized','Fontsize',0.06);
+                title('Cluster-Based Quad Labeling (Type-2 Subgroups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 5 || obj.modelResultsHandle.AnalyzeMode == 6
-                title('Manual Classification','FontUnits','normalized','Fontsize',0.06);
+                title('Manual Classification (Type-2 Subgroups)','FontUnits','normalized','Fontsize',0.06);
             end
                 maxFarredValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,14)));
                 maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,PosColorRed)));
@@ -1008,7 +1013,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.InfoMessage = '         - show Type 1 Groups';
             if ~isempty(GroupStats.BoundT1)
                 hold on
-                visboundaries(GroupStats.BoundT1,'Color','b','LineWidth', 4)
+                visboundaries(GroupStats.BoundT1,'Color','b','LineWidth', 2)
                 n=max(max(GroupStats.LabelT1));
                 tempStats=regionprops('struct',GroupStats.LabelT1,'Centroid');
                 for i=1:1:n
@@ -1033,7 +1038,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.InfoMessage = '         - show Type 12h Groups';
             if ~isempty(GroupStats.BoundT12h)
                 hold on
-                visboundaries(GroupStats.BoundT12h,'Color','m','LineWidth', 4)
+                visboundaries(GroupStats.BoundT12h,'Color','m','LineWidth', 2)
                 n=max(max(GroupStats.LabelT12h));
                 tempStats=regionprops('struct',GroupStats.LabelT12h,'Centroid');
                 for i=1:1:n
@@ -1054,7 +1059,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.InfoMessage = '         - show Type 2x Groups';
             if ~isempty(GroupStats.BoundT2x)
                 hold on
-                visboundaries(GroupStats.BoundT2x,'Color','r','LineWidth', 4)
+                visboundaries(GroupStats.BoundT2x,'Color','r','LineWidth', 2)
                 n=max(max(GroupStats.LabelT2x));
                 tempStats=regionprops('struct',GroupStats.LabelT2x,'Centroid');
                 for i=1:1:n
@@ -1075,7 +1080,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.InfoMessage = '         - show Type 2a Groups';
             if ~isempty(GroupStats.BoundT2a)
                 hold on
-                visboundaries(GroupStats.BoundT2a,'Color','y','LineWidth', 4)
+                visboundaries(GroupStats.BoundT2a,'Color','y','LineWidth', 2)
                 n=max(max(GroupStats.LabelT2a));
                 tempStats=regionprops('struct',GroupStats.LabelT2a,'Centroid');
                 for i=1:1:n
@@ -1096,7 +1101,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.InfoMessage = '         - show Type 2ax Groups';
             if ~isempty(GroupStats.BoundT2ax)
                 hold on
-                visboundaries(GroupStats.BoundT2ax,'Color',[255/255 100/255 0],'LineWidth', 4)
+                visboundaries(GroupStats.BoundT2ax,'Color',[255/255 100/255 0],'LineWidth', 2)
                 n=max(max(GroupStats.LabelT2ax));
                 tempStats=regionprops('struct',GroupStats.LabelT2ax,'Centroid');
                 for i=1:1:n

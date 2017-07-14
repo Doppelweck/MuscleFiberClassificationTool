@@ -569,7 +569,15 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
+                
+                obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 
             elseif src.Value == 2
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
@@ -589,7 +597,14 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
                 
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
+                
+                obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 
             elseif src.Value == 3
                 obj.modelAnalyzeHandle.InfoMessage = '   -OPTICS -Cluster-Based triple labeling';
@@ -607,8 +622,15 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',1)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
+                
+                obj.viewAnalyzeHandle.ParaCard.Selection = 2;
                 
             elseif src.Value == 4
                 obj.modelAnalyzeHandle.InfoMessage = '   -OPTICS -Cluster-Based quad labeling';
@@ -626,8 +648,15 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',1)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',1)
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
+                
+                obj.viewAnalyzeHandle.ParaCard.Selection = 2;
             
             elseif src.Value == 5 
                 obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification triple labeling';
@@ -644,6 +673,11 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
@@ -662,6 +696,11 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';    
                 
@@ -1004,6 +1043,9 @@ classdef controllerAnalyze < handle
             
             obj.modelAnalyzeHandle.XScale = str2double(obj.viewAnalyzeHandle.B_XScale.String);
             obj.modelAnalyzeHandle.YScale = str2double(obj.viewAnalyzeHandle.B_YScale.String);
+            
+            obj.modelAnalyzeHandle.Hybrid12FiberActive = obj.viewAnalyzeHandle.B_12HybridFiberActive.Value;
+            obj.modelAnalyzeHandle.Hybrid2axFiberActive = obj.viewAnalyzeHandle.B_2axHybridFiberActive.Value;
             
             obj.modelAnalyzeHandle.minPointsPerCluster = 'not active';
             

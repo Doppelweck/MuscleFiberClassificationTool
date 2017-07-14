@@ -81,6 +81,9 @@ classdef modelResults < handle
         
         minPointsPerCluster;
         
+        Hybrid12FiberActive;
+        Hybrid2axFiberActive;
+        
         NoOfObjects; %Number of objects.
         NoTyp1; %Number of Type 1 fibers.
         NoTyp12h; %Number of Type 12 hybeid fibers.
@@ -619,6 +622,25 @@ classdef modelResults < handle
             
             obj.StatisticMat{end+1,1} = 'Para min Points per Cluster:';
             obj.StatisticMat{end,2} = obj.minPointsPerCluster;
+            
+            obj.StatisticMat{end+1,1} = 'Para Cluster 1/2 Hybrid Fibers:';
+            if obj.Hybrid12FiberActive && (obj.AnalyzeMode == 3 || obj.AnalyzeMode == 4)
+                obj.StatisticMat{end,2} = '12h Fibers allowed';
+            elseif ~obj.Hybrid12FiberActive && (obj.AnalyzeMode == 3 || obj.AnalyzeMode == 4)
+                obj.StatisticMat{end,2} = '12h Fibers not allowed';
+            else
+               obj.StatisticMat{end,2} = 'not active'; 
+            end
+            
+            obj.StatisticMat{end+1,1} = 'Para Cluster 2ax Hybrid Fibers:';
+            if obj.Hybrid2axFiberActive && (obj.AnalyzeMode == 3 || obj.AnalyzeMode == 4)
+                obj.StatisticMat{end,2} = '2ax Fibers allowed';
+            elseif ~obj.Hybrid12FiberActive && (obj.AnalyzeMode == 3 || obj.AnalyzeMode == 4)
+                obj.StatisticMat{end,2} = '2ax Fibers not allowed';
+            else
+               obj.StatisticMat{end,2} = 'not active'; 
+            end
+            
             
             obj.StatisticMat{end+1,1} = sprintf('XScale in \x3BCm/pixel:');
             obj.StatisticMat{end,2} =  obj.XScale;

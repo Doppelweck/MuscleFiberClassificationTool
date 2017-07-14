@@ -71,7 +71,7 @@ classdef controllerEdit < handle
             
             %show init text in the info log
             obj.modelEditHandle.InfoMessage = '*** Start program ***';
-            obj.modelEditHandle.InfoMessage = 'Fiber-Type classification tool';
+            obj.modelEditHandle.InfoMessage = 'Fiber-Type-Classification-Tool';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Developed by:';
             obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences, GER';
@@ -124,7 +124,7 @@ classdef controllerEdit < handle
             
             %ButtonDownFcn of the binary pic. Starts the hand draw
             %functions
-            set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragFcn);
+            set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragEvent);
             
             set(obj.viewEditHandle.B_Undo,'Callback',@obj.undoEvent);
             set(obj.viewEditHandle.B_Redo,'Callback',@obj.redoEvent);
@@ -203,10 +203,10 @@ classdef controllerEdit < handle
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
                 % first start of the programm. No image handle exist.
                 % create image handle for Pic RGB
-                obj.modelEditHandle.handlePicRGB = imshow(ones(size(PicRGB)));
+                obj.modelEditHandle.handlePicRGB = imshow(PicRGB);
             else
                 % New image was selected. Change data in existing handle
-                obj.modelEditHandle.handlePicRGB.CData = ones(size(PicRGB));
+                obj.modelEditHandle.handlePicRGB.CData = PicRGB;
             end
             
             hold on
@@ -242,6 +242,19 @@ classdef controllerEdit < handle
             mainTitel = ['Fiber types classification tool: ' obj.modelEditHandle.FileName];
             set(obj.mainFigure,'Name', mainTitel);
             
+%             [r, c] = size(PicBW);
+%             colormap(gray);                              % Use a gray colormap
+% % % axis equal                                   % Make axes grid sizes equal
+% % figure
+% % [r, c] = size(ones(1000,1000));
+% %             colormap(gray);   
+% % him = imagesc(255*ones(1000,1000));
+% % him.Tag = 'him';
+% % axis equal 
+% % set(gca, 'XTick', 0.5:(c+0.5), 'YTick', 0.5:(r+0.5), ...  % Change some axes properties
+% %          'XLim', [0.5 c+0.5], 'YLim', [0.5 r+0.5], ...
+% %          'GridLineStyle', '-', 'XGrid', 'on', 'YGrid', 'on');
+%             
         end
         
         function newFileEvent(obj,~,~)
@@ -706,7 +719,7 @@ classdef controllerEdit < handle
                 
                 obj.modelEditHandle.InfoMessage = '   - close check mask';
                 obj.addWindowCallbacks();
-                set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragFcn);
+                set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragEvent);
                 
                 obj.modelEditHandle.checkMask(src.Value);
                 
@@ -1115,6 +1128,11 @@ classdef controllerEdit < handle
             
             obj.busyIndicator(1);
             
+            % find the handle h of the checkplanes figure
+            h = findobj('Tag','CheckPlanesFigure');
+            % set the close request functio of the figure h
+            set(h,'CloseRequestFcn','');
+            
             switch evnt.Source.Tag
                 
                 case obj.viewEditHandle.B_CreateBrightImGreen.Tag
@@ -1183,6 +1201,7 @@ classdef controllerEdit < handle
                 obj.viewEditHandle.B_AxesCheckRGBPlane.Children.CData = obj.modelEditHandle.PicRGBPlanes;
                 obj.viewEditHandle.B_AxesCheckRGBFRPlane.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                 
+                set(h,'CloseRequestFcn',@obj.checkPlanesBackEvent);
                 obj.busyIndicator(0);
         end
         
@@ -1901,7 +1920,7 @@ classdef controllerEdit < handle
             obj.busyIndicator(0);
         end
         
-        function startDragFcn(obj,~,~)
+        function startDragEvent(obj,~,~)
             % ButtonDownFcn callback function of the GUI figure. Set the
             % WindowButtonMotionFcn callback function of the GUI figure.
             % Get the current cursor position in the figure and calls the
@@ -1916,14 +1935,14 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             if ~isempty(obj.modelEditHandle.handlePicBW)
-                set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+                set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragEvent);
+                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragEvent);
                 if (obj.viewEditHandle.B_Color.Value == 1 || ...
                         obj.viewEditHandle.B_Color.Value == 2 )
                     % Color Black or white is selected to use free hand draw
                     % mode.
                     %                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragEvent);
                     Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
                     obj.modelEditHandle.startDragFcn(Pos);
                     
@@ -1931,8 +1950,8 @@ classdef controllerEdit < handle
                         obj.viewEditHandle.B_Color.Value == 4 )
                     % Color Black or white is selected to use region fill
                     % mode.
-                    %                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragFcn);
-                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragFcn);
+                    %                 set(obj.mainFigure,'WindowButtonUpFcn',@obj.stopDragEvent);
+                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.dragEvent);
                     Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
                     obj.modelEditHandle.fillRegion(Pos);
                 else
@@ -1942,12 +1961,12 @@ classdef controllerEdit < handle
             end
         end
         
-        function dragFcn(obj,~,~)
+        function dragEvent(obj,~,~)
             % WindowButtonMotionFcn callback function of the GUI figure.
             % Get the current cursor position in the figure and calls the
-            % dragFcn in the editModel.
+            % dragEvent in the editModel.
             %
-            %   dragFcn(obj;
+            %   dragEvent(obj;
             %
             %   ARGUMENTS:
             %
@@ -1966,13 +1985,13 @@ classdef controllerEdit < handle
             end
         end
         
-        function stopDragFcn(obj,~,~)
+        function stopDragEvent(obj,~,~)
             % ButtonUpFcn callback function of the GUI figure. Delete the
             % WindowButtonMotionFcn callback function of the GUI figure.
-            % Calls the stopDragFcn in the editModel.
+            % Calls the stopDragEvent in the editModel.
             %
             %
-            %   stopDragFcn(obj);
+            %   stopDragEvent(obj);
             %
             %   ARGUMENTS:
             %

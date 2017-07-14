@@ -1066,7 +1066,7 @@ classdef modelEdit < handle
                     background = imopen(obj.PicPlaneGreen,strel('disk',radius));
                     h = fspecial('disk', radius);
                     obj.InfoMessage = '            - smoothing background profile';
-                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCGreen = smoothedBackground;
@@ -1098,7 +1098,7 @@ classdef modelEdit < handle
                     background = imopen(obj.PicPlaneBlue,strel('disk',radius));
                     h = fspecial('disk', radius);
                     obj.InfoMessage = '            - smoothing background profile';
-                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCBlue = smoothedBackground;
@@ -1130,7 +1130,7 @@ classdef modelEdit < handle
                     background = imopen(obj.PicPlaneRed,strel('disk',radius));
                     h = fspecial('disk', radius);
                     obj.InfoMessage = '            - smoothing background profile';
-                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCRed = smoothedBackground;
@@ -1162,7 +1162,7 @@ classdef modelEdit < handle
                     background = imopen(obj.PicPlaneFarRed,strel('disk',radius));
                     h = fspecial('disk', radius);
                     obj.InfoMessage = '            - smoothing background profile';
-                    smoothedBackground = imfilter(double(background), h, 'replicate');
+                    smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCFarRed = smoothedBackground;
@@ -1360,9 +1360,9 @@ classdef modelEdit < handle
             %           CurPos: current cursor position in the binary image
             %
             
-            obj.x1 = int16(CurPos(1,1));
+            obj.x1 = double(CurPos(1,1));
             
-            obj.y1 = int16(CurPos(1,2));
+            obj.y1 = double(CurPos(1,2));
             
             [imageSizeY imageSizeX]=size(obj.PicBW);
             [columnsInImage rowsInImage] = meshgrid(1:imageSizeX, 1:imageSizeY);
@@ -1376,6 +1376,10 @@ classdef modelEdit < handle
                 % create black circle
                 circlePixels = ~((rowsInImage - double(obj.y1)).^2 + (columnsInImage - double(obj.x1)).^2 <= radius.^2);
                 obj.handlePicBW.CData = obj.handlePicBW.CData & circlePixels;
+%                 
+%                 him=findobj('Tag','him');
+%                 him.CData(obj.y1,obj.x1)=180;
+
             end
             
         end
@@ -1416,16 +1420,19 @@ classdef modelEdit < handle
             end
             
             %calculate gradient in x and y direction
-            obj.dx = double(obj.x1)-obj.x2;
-            obj.dy = double(obj.y1)-obj.y2;
-            obj.abs_dx = abs(obj.dx);
-            obj.abs_dy = abs(obj.dy);
+%             obj.dx = double(obj.x1)-obj.x2;
+%             obj.dy = double(obj.y1)-obj.y2;
+            obj.dx = double(obj.x2-obj.x1);
+            obj.dy = double(obj.y2-obj.y1);
+
+            obj.abs_dx = ceil(abs(obj.dx));
+            obj.abs_dy = ceil(abs(obj.dy));
             
             %calculate eucledian distance between the points.
-            obj.dist = sqrt((obj.abs_dx)^2+(obj.abs_dy)^2);
+%             obj.dist = sqrt((obj.abs_dx)^2+(obj.abs_dy)^2);
             
-            obj.x_v = double( sort([obj.x1 obj.x2]) );
-            obj.y_v = double( sort([obj.y1 obj.y2]) );
+%             obj.x_v = double( sort([obj.x1 obj.x2]) );
+%             obj.y_v = double( sort([obj.y1 obj.y2]) );
             
             %Calculatae slope and offset of the line
             obj.m=double(obj.dy/obj.dx);
@@ -1441,13 +1448,13 @@ classdef modelEdit < handle
                 for i=-obj.LineWidthValue:1:obj.LineWidthValue
                     
                     %crate x values vektor for the line
-                    obj.xValues = (double(obj.x_v(1))+i)*ones(1, int32(obj.dist*2));
+                    obj.xValues = (double(obj.x1)+i)*ones(1, obj.abs_dy*2);
                     %check if the values in the range if the image
                     obj.xValues(obj.xValues<1)=double(1);
                     obj.xValues(obj.xValues>xMax)=xMax;
                     
                     %crate y values vektor for the line
-                    obj.yValues = linspace(obj.y_v(1),obj.y_v(2),int32(obj.dist*2));
+                    obj.yValues = linspace(obj.y1,obj.y2, obj.abs_dy*2);
                     %check if the values in the range if the image
                     obj.yValues(obj.yValues<1)=double(1);
                     obj.yValues(obj.yValues>yMax)=yMax;
@@ -1463,7 +1470,7 @@ classdef modelEdit < handle
                 for i=-obj.LineWidthValue:1:obj.LineWidthValue
                     
                     %crate x values vektor for the line
-                    obj.xValues = linspace(obj.x_v(1),obj.x_v(2),int32(obj.dist*2));
+                    obj.xValues = linspace(obj.x1,obj.x2,obj.abs_dx*3);
                     %crate y values vektor for the line
                     obj.yValues = obj.m*obj.xValues+obj.b+i;
                     
@@ -1484,7 +1491,7 @@ classdef modelEdit < handle
                 for i=-obj.LineWidthValue:1:obj.LineWidthValue
                     
                     %crate y values vektor for the line
-                    obj.yValues = linspace(obj.y_v(1),obj.y_v(2),int32(obj.dist*2));
+                    obj.yValues = linspace(obj.y1,obj.y2,obj.abs_dy*2);
                     %crate x values vektor for the line
                     obj.xValues = ((obj.yValues-obj.b)/obj.m)+i;
                     
@@ -1710,7 +1717,7 @@ classdef modelEdit < handle
                     BordersX(1,:) =tempLabelMat(1,:); %Upper-X Axis
                     BordersX(2,:) =tempLabelMat(m,:); %Lower-X Axis
                     BordersY(1,:) =tempLabelMat(:,1); %Left-Y Axis
-                    BordersY(2,:) =tempLabelMat(:,n); %Left-Y Axis
+                    BordersY(2,:) =tempLabelMat(:,n); %Right-Y Axis
                     %Find Labels of Objects at the image edge
                     
                     EdgeObjectsX=unique(BordersX);

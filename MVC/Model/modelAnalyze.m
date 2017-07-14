@@ -80,6 +80,9 @@ classdef modelAnalyze < handle
         FarredRedDistFarred;
         FarredRedDistRed;
         
+        Hybrid12FiberActive;
+        Hybrid2axFiberActive;
+        
         minPointsPerCluster;
         
         XScale; %Inicates the um/pixels in X direction to change values in micro meter
@@ -285,6 +288,8 @@ classdef modelAnalyze < handle
             
             [obj.Stats(:).Perimeter] = deal(0);
             for i=1:1:size(obj.Stats,1)
+                
+                
                 d = diff(obj.BoundarieMat{i});
                 d(:,2)=d(:,2).*obj.XScale;
                 d(:,1)=d(:,1).*obj.YScale;
@@ -490,8 +495,6 @@ classdef modelAnalyze < handle
             
         end
         
-        
-        
         function specifyFiberType(obj)
             % Specifiy the fiber types depending on the selected analyzing
             % mode and the selected parameters.
@@ -682,6 +685,13 @@ classdef modelAnalyze < handle
             end
             obj.minPointsPerCluster=minPoints;
             
+            if obj.Hybrid12FiberActive
+                % 12-Hybrid Fibers allowed
+                maxCluster = 3;
+            else
+                maxCluster = 2;
+            end
+            
             % Classify the main fiber type groups 1 2 3
            
             X(:,1) = [tempStats.ColorRed]';
@@ -730,7 +740,7 @@ classdef modelAnalyze < handle
                     
                 end
                 
-                if Cluster >3
+                if Cluster > maxCluster
 %                     epsilon = epsilon + 1;
                     posReach = posReach+1;
                     epsilon = ReachValues(posReach);
@@ -741,7 +751,7 @@ classdef modelAnalyze < handle
 %                     [n, index] = histc(Class, list);
                     ClassNoNoise = Class(Class~=0);
                     n =  histcounts(ClassNoNoise);
-                    if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)/10 %nnz(Class)/length(n)
+                    if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)*(0.05) %nnz(Class)/length(n)
                         searchForClusters = false;
                     else
 %                         epsilon = epsilon + 1;
@@ -994,6 +1004,14 @@ classdef modelAnalyze < handle
                     minPoints = size(X,1);
                 end
                 
+                if obj.Hybrid2axFiberActive
+                % 12-Hybrid Fibers allowed
+                    maxCluster = 3;
+                else
+                    maxCluster = 2;
+                end
+                
+                
                 [RD,CD,order] = optics(X,minPoints);
                 Class = zeros(size(tempStats,1),1);
 %                 Cluster = 0;
@@ -1039,7 +1057,7 @@ classdef modelAnalyze < handle
                     
                 end
                 
-                    if Cluster >3
+                    if Cluster > maxCluster
                         posReach = posReach+1;
                         epsilon = ReachValues(posReach);
                         searchForClusters = true;
@@ -1047,7 +1065,7 @@ classdef modelAnalyze < handle
 %                         list = unique(Class);
                         ClassNoNoise = Class(Class~=0);
                         n =  histcounts(ClassNoNoise);
-                        if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)/10
+                        if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)*(0.05)
                             searchForClusters = false;
                         else
                             posReach = posReach+1;
@@ -2005,6 +2023,9 @@ classdef modelAnalyze < handle
             %               Data{25}: ColorValue
             %               Data{26}: XScale in ?m/pixel
             %               Data{27}: YScale in ?m/pixel
+            %               Data{28}: min Points per Cluster
+            %               Data{29}: 1/2 Hybrid Fibers allowed
+            %               Data{30}: 2ax Hybrid Fibers allowed
             %               
             
             Data{1} = obj.FileName;
@@ -2044,6 +2065,9 @@ classdef modelAnalyze < handle
             Data{27} = obj.YScale;
             
             Data{28} = obj.minPointsPerCluster;
+            
+            Data{29} = obj.Hybrid12FiberActive;
+            Data{30} = obj.Hybrid2axFiberActive;
             
         end
         

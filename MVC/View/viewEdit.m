@@ -118,7 +118,6 @@ classdef viewEdit < handle
                 fontSizeS = 10; % Font size small
                 fontSizeM = 12; % Font size medium
                 fontSizeB = 16; % Font size big
-                
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
@@ -147,16 +146,16 @@ classdef viewEdit < handle
             mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 );
             
             HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
-            obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x25A4 New file') );
-            obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('Analyze-Mode \x21E8') ,'Enable','off');
+            obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
+            obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('Analyze-Mode \x25BA') ,'Enable','off');
             
             HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
-            obj.B_CheckMask = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4,'Style','togglebutton', 'String', sprintf('\x25A6 Check mask') ,'Enable','off');
+            obj.B_CheckMask = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4,'Style','togglebutton', 'String', sprintf('\x2593 Check mask') ,'Enable','off');
             obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Check planes \x2750') ,'Enable','off');
             
             HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Spacing',0);
-            obj.B_Undo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('\x27F2 Undo'),'FontUnits','normalized','Fontsize',0.4);
-            obj.B_Redo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('Redo \x27F3'),'FontUnits','normalized','Fontsize',0.4);
+            obj.B_Undo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('\x21BA Undo'),'FontUnits','normalized','Fontsize',0.4);
+            obj.B_Redo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('Redo \x21BB'),'FontUnits','normalized','Fontsize',0.4);
             
             
             
@@ -169,19 +168,19 @@ classdef viewEdit < handle
             HBoxBinari1 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari11 = uix.HButtonBox('Parent', HBoxBinari1,'ButtonSize',[6000 20],'Padding', 1 );
-            ThresholdModeText = uicontrol( 'Parent', HButtonBoxBinari11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Threshold Mode :' );
+            ThresholdModeText = uicontrol( 'Parent', HButtonBoxBinari11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Binarization Mode:' );
             
             HButtonBoxBinari12 = uix.HButtonBox('Parent', HBoxBinari1,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_ThresholdMode = uicontrol( 'Parent', HButtonBoxBinari12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', {'Manual global threshold' , 'Automatic adaptive threshold', 'Combined manual and adaptive', 'Automatic setup'} ,'Enable','off');
             
-            set( HBoxBinari1, 'Widths', [-1 -2] );
+            set( HBoxBinari1, 'Widths', [-2 -3] );
             
             %%%%%%%%%%%%%%%% 2. Row Threshold %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             HBoxBinari2 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari21 = uix.HButtonBox('Parent', HBoxBinari2,'ButtonSize',[6000 20],'Padding', 1 );
-            ThresholdText = uicontrol( 'Parent', HButtonBoxBinari21,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Threshold:' );
+            ThresholdText = uicontrol( 'Parent', HButtonBoxBinari21,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', 'Threshold:' );
             
             HButtonBoxBinari22 = uix.HButtonBox('Parent', HBoxBinari2,'ButtonSize',[6000 18],'Padding', 1 );
             obj.B_Threshold = uicontrol( 'Parent', HButtonBoxBinari22,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Thresh','Tag','sliderThreshold' ,'Enable','off');
@@ -197,7 +196,7 @@ classdef viewEdit < handle
             HBoxBinari3 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari31 = uix.HButtonBox('Parent', HBoxBinari3,'ButtonSize',[6000 20],'Padding', 1 );
-            AlphaText = uicontrol( 'Parent', HButtonBoxBinari31,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Alpha:');
+            AlphaText = uicontrol( 'Parent', HButtonBoxBinari31,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Alpha:');
             
             HButtonBoxBinari32 = uix.HButtonBox('Parent', HBoxBinari3,'ButtonSize',[6000 18],'Padding', 1 );
             obj.B_Alpha = uicontrol( 'Parent', HButtonBoxBinari32,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Alpha' ,'Tag','sliderAlpha','Enable','off');
@@ -213,10 +212,10 @@ classdef viewEdit < handle
             HBoxBinari4 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari41 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
-            LineWidthText = uicontrol( 'Parent', HButtonBoxBinari41,'Style','text', 'FontUnits','normalized','Fontsize',0.6 ,'String', 'Linewidth:');
+            LineWidthText = uicontrol( 'Parent', HButtonBoxBinari41,'Style','text', 'FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', 'Linewidth:');
             
             HButtonBoxBinari42 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_LineWidth = uicontrol( 'Parent', HButtonBoxBinari42,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Linewidth','Min',0,'Max',100,'SliderStep',[1/100,1/100],'Tag','sliderLinewidth' );
+            obj.B_LineWidth = uicontrol( 'Parent', HButtonBoxBinari42,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Linewidth','Min',0,'Max',300,'SliderStep',[1/300,1/300],'Tag','sliderLinewidth' );
             
             HButtonBoxBinari43 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_LineWidthValue = uicontrol( 'Parent', HButtonBoxBinari43,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','textLinewidth');
@@ -229,7 +228,7 @@ classdef viewEdit < handle
             HBoxBinari5 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari51 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 20],'Padding', 1 );
-            ColorText = uicontrol( 'Parent', HButtonBoxBinari51,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Color:' );
+            ColorText = uicontrol( 'Parent', HButtonBoxBinari51,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Color:' );
             
             HButtonBoxBinari52 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_Color = uicontrol( 'Parent', HButtonBoxBinari52,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', {'White' , 'Black', 'White fill region', 'Black fill region'} ,'Enable','off');
@@ -248,18 +247,18 @@ classdef viewEdit < handle
             HButtonBoxMorph4 = uix.HButtonBox('Parent', MainVBoxMorph,'ButtonSize',[3000 20]);
             HButtonBoxMorph5 = uix.HButtonBox('Parent', MainVBoxMorph,'ButtonSize',[3000 40]);
             
-            uicontrol( 'Parent', HButtonBoxMorph1,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Morphol. operation:');
+            uicontrol( 'Parent', HButtonBoxMorph1,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Morphol. operation:');
             String = {'choose operation' ,'Remove incomplete objects','close small gaps' ,'smoothing','erode', 'dilate', 'skel' ,'thin','shrink','majority','remove','open','close'};
             obj.B_MorphOP = uicontrol( 'Parent', HButtonBoxMorph1,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Enable','off');
             
-            uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Structuring element:');
+            uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Structuring element:');
             String = {'choose SE' , 'diamond', 'disk', 'octagon' ,'square'};
             obj.B_ShapeSE = uicontrol( 'Parent', HButtonBoxMorph2,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String,'Enable','off' );
             
-            uicontrol( 'Parent', HButtonBoxMorph3,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Size of structuring element:');
+            uicontrol( 'Parent', HButtonBoxMorph3,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Size of structuring element:');
             obj.B_SizeSE = uicontrol( 'Parent', HButtonBoxMorph3,'Style','edit','FontUnits','normalized','Fontsize',0.6,'String','1','Enable','off' );
             
-            uicontrol( 'Parent', HButtonBoxMorph4,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'No. of iterations / Size gaps:');
+            uicontrol( 'Parent', HButtonBoxMorph4,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'No. of iterations / Size gaps:');
             obj.B_NoIteration = uicontrol( 'Parent', HButtonBoxMorph4,'Style','edit','FontUnits','normalized','Fontsize',0.6,'String','1','Enable','off' );
             
             obj.B_StartMorphOP = uicontrol( 'Parent', HButtonBoxMorph5, 'String', 'Run morphological operation','FontUnits','normalized','Fontsize',0.35 ,'Enable','off' );

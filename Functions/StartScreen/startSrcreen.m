@@ -4,8 +4,8 @@ function hf = startSrcreen()
 Pic = imread('StartScreen3.jpg');
 [m n]= size(Pic);
 hf  = figure('Visible','off','MenuBar','none','NumberTitle','off',...
-    'WindowStyle','modal','Units','pixels','Position',[0 0 m n]);
-ha = axes('Parent',hf,'Visible','on','Units','pixels','Position',[0 0 m n]);
+    'WindowStyle','normal','Units','pixels');
+ha = axes('Parent',hf,'Visible','on','Units','pixels');
 axis image
 % Pic = imread('StartScreen.png');
 set(ha, 'LooseInset', [0,0,0,0]);
