@@ -29,7 +29,7 @@ TitleText1=text(hf.Children,0.45,0.92,'Muscle Fiber',...
     'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
 TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
     'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
-VersionText=text(hf.Children,0.45,0.75,'Version 1.0 2017','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+VersionText=text(hf.Children,0.45,0.75,'Version 1.0 14-July-2017','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
 InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
 text(hf.Children,0.05,0.3,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
 text(hf.Children,0.05,0.15,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');

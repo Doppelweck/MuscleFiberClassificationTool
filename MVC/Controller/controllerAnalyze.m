@@ -363,7 +363,7 @@ classdef controllerAnalyze < handle
                             set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String','0');
                         else
                             % Set BlueRedThresh to Value
-                            set(obj.viewAnalyzeHandle.BlueRedThresh,'String',num2str(Value));
+                            set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String',num2str(Value));
                         end
                     else
                         % Value is not numerical. Set value to 0
