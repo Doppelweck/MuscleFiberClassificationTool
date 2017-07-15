@@ -487,7 +487,7 @@ classdef modelAnalyze < handle
 
                 obj.Stats(i).ColorRatioBlueRed = obj.Stats(i).ColorBlue/obj.Stats(i).ColorRed;
                 obj.Stats(i).ColorRatioFarredRed = obj.Stats(i).ColorFarRed/obj.Stats(i).ColorRed;
-                obj.Stats(i).ColorValue = max([obj.Stats(i).ColorRed obj.Stats(i).ColorBlue obj.Stats(i).ColorFarRed])/255;
+                obj.Stats(i).ColorValue = max([obj.Stats(i).ColorRed obj.Stats(i).ColorBlue obj.Stats(i).ColorFarRed])/256;
                 percent =   (i-0.1)/nObjects;
                 workbar(percent,'Please Wait...calculating fiber color','Fiber-Color',obj.controllerAnalyzeHandle.mainFigure);
                 
