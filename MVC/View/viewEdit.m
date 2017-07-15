@@ -248,7 +248,7 @@ classdef viewEdit < handle
             HButtonBoxMorph5 = uix.HButtonBox('Parent', MainVBoxMorph,'ButtonSize',[3000 40]);
             
             uicontrol( 'Parent', HButtonBoxMorph1,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Morphol. operation:');
-            String = {'choose operation' ,'Remove incomplete objects','close small gaps' ,'smoothing','erode', 'dilate', 'skel' ,'thin','shrink','majority','remove','open','close'};
+            String = {'choose operation' ,'remove incomplete objects','close small gaps' ,'smoothing','erode', 'dilate', 'skel' ,'thin','shrink','majority','remove','open','close'};
             obj.B_MorphOP = uicontrol( 'Parent', HButtonBoxMorph1,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Enable','off');
             
             uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Structuring element:');

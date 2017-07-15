@@ -1674,9 +1674,9 @@ classdef controllerEdit < handle
                     
                     obj.modelEditHandle.morphOP = 'close small gaps';
                     
-                case 'Remove incomplete objects'
+                case 'remove incomplete objects'
                     
-                    obj.modelEditHandle.morphOP = 'Remove incomplete objects';
+                    obj.modelEditHandle.morphOP = 'remove incomplete objects';
                     
                 otherwise
                     

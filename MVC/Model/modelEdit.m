@@ -382,7 +382,7 @@ classdef modelEdit < handle
                         
                         obj.InfoMessage = '   -ERROR while indentifing planes';
                         obj.InfoMessage = '      -can not indentifing planes';
-                        obj.InfoMessage = '      -no channel color name were found in meta data';
+                        obj.InfoMessage = '      -no channel color name was found in meta data';
                         
                         %find RGB image with the same file name and use
                         %this for plane identification
@@ -438,7 +438,7 @@ classdef modelEdit < handle
                             else
                                 
                                 obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
-                                obj.InfoMessage = '      -no channel color name were found in meta data';
+                                obj.InfoMessage = '      -no channel color name was found in meta data';
                                 
                             end
                             
@@ -485,7 +485,7 @@ classdef modelEdit < handle
                         
                         obj.InfoMessage = '   -ERROR while indentifing planes';
                         obj.InfoMessage = '      -can not indentifing planes';
-                        obj.InfoMessage = '      -no channel color name were found in meta data';
+                        obj.InfoMessage = '      -no channel color name was found in meta data';
                         
                         %find RGB image with the same file name and use
                         %this for plane identification
@@ -554,7 +554,7 @@ classdef modelEdit < handle
                             else
                                 
                                 obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
-                                obj.InfoMessage = '      -no channel color name were found in meta data';
+                                obj.InfoMessage = '      -no channel color name was found in meta data';
                                 
                             end
                         end %end for I:noPlanes
@@ -643,53 +643,53 @@ classdef modelEdit < handle
                 cd(currentFolder);
                 
                 if ~isempty(FileNamePicBCBlue)
-                    %A4*.zvi brightness adjustment image were found
+                    %A4*.zvi brightness adjustment image was found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCBlue(1).name]);
                     obj.PicBCBlue = double(bfGetPlane(readertemp,1));
                     obj.PicBCBlue = obj.PicBCBlue/max(max(obj.PicBCBlue));
                     obj.FilenameBCBlue = FileNamePicBCBlue(1).name;
-                    obj.InfoMessage = ['      - ' FileNamePicBCBlue(1).name ' were found'];
+                    obj.InfoMessage = ['      - ' FileNamePicBCBlue(1).name ' was found'];
                 else
-                    obj.InfoMessage = ['      - A*' ext ' file were not found'];
+                    obj.InfoMessage = ['      - A*' ext ' file was not found'];
                     obj.FilenameBCBlue = '-';
                     obj.PicBCBlue = [];
                 end
                 
                 if ~isempty(FileNamePicBCGreen)
-                    %L5*.zvi brightness adjustment image were found
+                    %L5*.zvi brightness adjustment image was found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCGreen(1).name]);
                     obj.PicBCGreen = double(bfGetPlane(readertemp,1));
                     obj.PicBCGreen = obj.PicBCGreen/max(max(obj.PicBCGreen));
                     obj.FilenameBCGreen = FileNamePicBCGreen(1).name;
-                    obj.InfoMessage = ['      - ' FileNamePicBCGreen(1).name ' were found'];
+                    obj.InfoMessage = ['      - ' FileNamePicBCGreen(1).name ' was found'];
                 else
-                    obj.InfoMessage = ['      - L5*' ext ' file were not found'];
+                    obj.InfoMessage = ['      - L5*' ext ' file was not found'];
                     obj.FilenameBCGreen = '-';
                     obj.PicBCGreen = [];
                 end
                 
                 if ~isempty(FileNamePicBCRed)
-                    %TX*.zvi brightness adjustment image were found
+                    %TX*.zvi brightness adjustment image was found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCRed(1).name]);
                     obj.PicBCRed = double(bfGetPlane(readertemp,1));
                     obj.PicBCRed = obj.PicBCRed/max(max(obj.PicBCRed));
                     obj.FilenameBCRed = FileNamePicBCRed(1).name;
-                    obj.InfoMessage = ['      - ' FileNamePicBCRed(1).name ' were found'];
+                    obj.InfoMessage = ['      - ' FileNamePicBCRed(1).name ' was found'];
                 else
-                    obj.InfoMessage = ['      - TX*' ext ' file were not found'];
+                    obj.InfoMessage = ['      - TX*' ext ' file was not found'];
                     obj.FilenameBCRed = '-';
                     obj.PicBCRed = [];
                 end
                 
                 if ~isempty(FileNamePicBCFarRed)
-                    %Y5*.zvi brightness adjustment image were found
+                    %Y5*.zvi brightness adjustment image was found
                     readertemp = bfGetReader([obj.PathName FileNamePicBCFarRed(1).name]);
                     obj.PicBCFarRed = double(bfGetPlane(readertemp,1));
                     obj.PicBCFarRed = obj.PicBCFarRed/max(max(obj.PicBCFarRed));
                     obj.FilenameBCFarRed = FileNamePicBCFarRed(1).name;
-                    obj.InfoMessage = ['      - ' FileNamePicBCFarRed(1).name ' were found'];
+                    obj.InfoMessage = ['      - ' FileNamePicBCFarRed(1).name ' was found'];
                 else
-                    obj.InfoMessage = ['      - Y5*' ext ' file were not found'];
+                    obj.InfoMessage = ['      - Y5*' ext ' file was not found'];
                     obj.FilenameBCFarRed = '-';
                     obj.PicBCFarRed = [];
                 end
@@ -701,7 +701,7 @@ classdef modelEdit < handle
                     
                     infotext = {'Info! ',...
                         '',...
-                        'Not all brightness adjustment images were found.',...
+                        'Not all brightness adjustment images was found.',...
                         '',...
                         'Go to the "Check planes" menu to verify the images:',...
                         'The following options are available:',...
@@ -914,7 +914,7 @@ classdef modelEdit < handle
                     obj.PicPlaneFarRed = tempFR;
                     success = true;
                 else
-                    % no RGB image were found
+                    % no RGB image was found
                     success = false;
                     
                 end
@@ -1696,7 +1696,7 @@ classdef modelEdit < handle
                     
                     obj.InfoMessage = '      - closing gaps complete';
                     
-                case 'Remove incomplete objects'
+                case 'remove incomplete objects'
                     
                     obj.InfoMessage = ['      - removing objects at the image border'];
                     
