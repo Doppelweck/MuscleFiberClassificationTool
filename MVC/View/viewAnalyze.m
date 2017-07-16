@@ -611,7 +611,7 @@ classdef viewAnalyze < handle
             set(obj.hFM,'Visible','on')
         end
         
-        function showFigureManualClassify(obj)
+        function showFigureManualClassify(obj,mainFig)
             % Creates a new figure when the user selects manual classification.
             %
             %   showFigureManualClassify(obj);
@@ -638,7 +638,14 @@ classdef viewAnalyze < handle
             
             obj.hFMC = figure('NumberTitle','off','Units','normalized','Name','Manual Classification','Visible','off');
             set(obj.hFMC,'Tag','FigureManualClassify')
-            set(obj.hFMC, 'position', [0.2 0.1 0.6 0.8]);
+            
+            %get position of mainFigure
+            posMainFig = get(mainFig,'Position');
+            
+            set(obj.hFMC, 'position', [posMainFig(1) posMainFig(2) 0.6 0.8]);
+            movegui(obj.hFMC,'center')
+            
+%             set(obj.hFMC, 'position', [0.2 0.1 0.6 0.8]);
             set(obj.hFMC,'WindowStyle','normal');
             
             VBox = uix.VBox('Parent', obj.hFMC );
@@ -679,7 +686,7 @@ classdef viewAnalyze < handle
                 fontSizeB = 16; % Font size big 
             end
             
-            obj.hFPR = figure('NumberTitle','off','Units','normalized','Name','Preview Results','Visible','on','MenuBar','figure');
+            obj.hFPR = figure('NumberTitle','off','Units','normalized','Name','Preview Results','Visible','off','MenuBar','figure');
             set(obj.hFPR,'Tag','FigurePreResults')
             
             %get position of mainFigure

@@ -1504,7 +1504,8 @@ classdef controllerAnalyze < handle
                 else
                 % click was on the background
                 % refresh Callback function in figure AnalyzeMode
-                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+%                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+                obj.addWindowCallbacks();
                 end
             end
         end
@@ -1533,6 +1534,9 @@ classdef controllerAnalyze < handle
             obj.busyIndicator(0);
             
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            %refresh main figure callbacks 
+            obj.addWindowCallbacks();
+            
             % If a window for Fibertype manipulation already exists,
             % delete it
             OldFig = findobj('Tag','FigureManipulate');
@@ -1569,10 +1573,13 @@ classdef controllerAnalyze < handle
             
             % refresh Callback function in figure AnalyzeMode
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            %refresh main figure callbacks 
+            obj.addWindowCallbacks();
         end
         
         function showPreResultsEvent(obj,src,evnt)
-            
+            %refresh main figure callbacks 
+            addWindowCallbacks(obj);
             % If a window already exists, delete it
             OldFig = findobj('Tag','FigureManipulate');
             if ~isempty(OldFig) && isvalid(OldFig)
