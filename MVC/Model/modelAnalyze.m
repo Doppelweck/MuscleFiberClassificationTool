@@ -487,7 +487,7 @@ classdef modelAnalyze < handle
 
                 obj.Stats(i).ColorRatioBlueRed = obj.Stats(i).ColorBlue/obj.Stats(i).ColorRed;
                 obj.Stats(i).ColorRatioFarredRed = obj.Stats(i).ColorFarRed/obj.Stats(i).ColorRed;
-                obj.Stats(i).ColorValue = max([obj.Stats(i).ColorRed obj.Stats(i).ColorBlue obj.Stats(i).ColorFarRed])/256;
+                obj.Stats(i).ColorValue = max([obj.Stats(i).ColorRed obj.Stats(i).ColorBlue obj.Stats(i).ColorFarRed])/255;
                 percent =   (i-0.1)/nObjects;
                 workbar(percent,'Please Wait...calculating fiber color','Fiber-Color',obj.controllerAnalyzeHandle.mainFigure);
                 
@@ -1589,7 +1589,8 @@ classdef modelAnalyze < handle
             [tempStats.FiberTypeMainGroup] = deal(0);
             
             %Open figure for manual calssification
-            obj.controllerAnalyzeHandle.viewAnalyzeHandle.showFigureManualClassify();
+            mainFig = obj.controllerAnalyzeHandle.mainFigure;
+            obj.controllerAnalyzeHandle.viewAnalyzeHandle.showFigureManualClassify(mainFig);
             %get Handle if that figure
             fig = obj.controllerAnalyzeHandle.viewAnalyzeHandle.hFMC;
             % set the close request functio of the figure for manual calssification
