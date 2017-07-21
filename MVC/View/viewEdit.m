@@ -1,8 +1,8 @@
 classdef viewEdit < handle
     %viewEdit   view of the edit-MVC (Model-View-Controller).
-    %Creates the window to select new pictures for further
-    %processing. The viewEdit class is called by the main.m file. 
-    %Contains serveral buttons and uicontrol elements to manipulate
+    %Creates the first card panel in the main figure to select new pictures 
+    %for further processing. The viewEdit class is called by the main.m  
+    %file. Contains serveral buttons and uicontrol elements to manipulate
     %the binary picture.
     %
     %
@@ -25,107 +25,140 @@ classdef viewEdit < handle
     %
     
     properties(SetObservable)
-        hFP;    %handle to figure with pictures ans controls
+        
         panelControl;    %handle to panel with the controls included
         panelPicture;   %handle to panel with the image axes included
-        hAP;    %handle to axes with that shows the image
-        hFCP;   %handle to figure with planes to check. Opens after the check plane button was pressed
+        hAP;    %handle to axes that shows the image.
+        hFCP;   %handle to figure with planes to check. Opens after the check plane button was pressed.
         
-        B_Undo; %Button, to undo a change in the binary image
-        B_Redo; %Button, to redo a change in the binary image
-        B_NewPic; %Button, to select a new picture
-        B_CheckPlanes;%Button, opens a new figure to check and change the image planes
-        B_StartAnalyzeMode; %Button, closes the figure EditMode and opens the the AnalyzeMode
+        B_Undo; %Button, to undo a change in the binary image.
+        B_Redo; %Button, to redo a change in the binary image.
+        B_NewPic; %Button, to select a new picture.
+        B_CheckPlanes; %Button, opens a new figure to check and change the image planes.
+        B_CheckMask; %Button, shows all objects in RGB colors to check the binary mask.
+        B_StartAnalyzeMode; %Button, close the EditMode and opens the the AnalyzeMode.
         
-        B_Alpha; %Slider, to change the transperancy between the binary and the RGB picture
-        B_AlphaValue; % TextEditBox, to change the transperancy between the binary and the RGB picture
+        B_Alpha; %Slider, to change the transperancy between the binary and the RGB picture.
+        B_AlphaValue; % TextEditBox, to change the transperancy between the binary and the RGB picture.
 
-        B_Color; %Popupmenu, to select the color to draw into the binary image
-        B_Invert; %Butto, invert the binary pic
+        B_Color; %Popupmenu, to select the color to draw into the binary image.
+        B_Invert; %Butto, invert the binary pic.
 
-        B_LineWidth; %Slider, to change the linewidth of the free hand draw function in the binary image
-        B_LineWidthValue; %TextEditBox, to change the linewidth of the free hand draw function in the binary image
+        B_LineWidth; %Slider, to change the linewidth of the free hand draw function in the binary image.
+        B_LineWidthValue; %TextEditBox, to change the linewidth of the free hand draw function in the binary image.
         
-        B_ThresholdMode; %Popupmenu, to choose between manual-global and adaptive threshold mode binarize the image
-        B_Threshold;%Slider, to change the threshold value
-        B_ThresholdValue;%TextEditBox, to change the threshold value
+        B_ThresholdMode; %Popupmenu, to choose between manual-global and adaptive threshold mode binarize the image.
+        B_Threshold;%Slider, to change the threshold value.
+        B_ThresholdValue;%TextEditBox, to change the threshold value.
         
+        B_MorphOP; %Popupmenu, to select between different morphologocal operations.
+        B_ShapeSE; %Popupmenu, to select between different structering elements for morphologocal operation.
+        B_SizeSE; %TextEditBox, to select the size of the structering element.
+        B_NoIteration; %TextEditBox, to select the number of iterations of the morpological operations.
+        B_StartMorphOP; %Button, runs the morpological operations.
+        B_InfoText; %Shows the info log text.
+        
+        B_AxesCheckRGBFRPlane; %axes handle that contains the RGB image in the check planes figure.
+        B_AxesCheckRGBPlane; %axes handle that contains the RGB image in the check planes figure.
+        B_AxesCheckPlaneGreen; %axes handle that contains the green plane in the imagecheck planes figure.
+        B_AxesCheckPlaneBlue; %axes handle that contains the blue plane image in the check planes figure.
+        B_AxesCheckPlaneRed; %axes handle that contains the red plane image in the check planes figure.
+        B_AxesCheckPlaneFarRed; %axes handle that contains the farred plane image in the check planes figure.
 
+        B_ColorPlaneGreen %Popupmenu, to change the color plane in the check planes figure.
+        B_ColorPlaneBlue %Popupmenu, to change the color plane in the check planes figure.
+        B_ColorPlaneRed %Popupmenu, to change the color plane in the check planes figure.
+        B_ColorPlaneFarRed %Popupmenu, to change the color plane in the check planes figure.
         
-        B_MorphOP; %Popupmenu, to select between different morphologocal operations
-        B_ShapeSE; %Popupmenu, to select between different structering elements for morphologocal operation
-        B_SizeSE; %TextEditBox, to select the size of the structering element
-        B_NoIteration; %TextEditBox, to select the number of iterations of the morpological operations
-        B_StartMorphOP; %Button, runs the morpological operations
-        B_InfoText; %Shows the info log text
+        B_CheckPOK %Button, to confirm changes in the check planes figure.
+        B_CheckPBack %Button, to cancel and close the check planes figure.
+        B_CheckPText %Text, shows information text in the check planes figure.
         
-        B_AxesCheckRGB; %axes handle that contains the RGB image in the check planes figure
-        B_AxesCheckRGBPlane; %axes handle that contains the RGB image in the check planes figure
-        B_AxesCheckPlaneGreen; %axes handle that contains the green plane in the imagecheck planes figure
-        B_AxesCheckPlaneBlue; %axes handle that contains the blue plane image in the check planes figure
-        B_AxesCheckPlaneRed; %axes handle that contains the red plane image in the check planes figure
-        B_AxesCheckPlaneFarRed; %axes handle that contains the farred plane image in the check planes figure
-
-        B_ColorPlaneGreen %Popupmenu, to change the color plane in the check planes figure
-        B_ColorPlaneBlue %Popupmenu, to change the color plane in the check planes figure
-        B_ColorPlaneRed %Popupmenu, to change the color plane in the check planes figure
-        B_ColorPlaneFarRed %Popupmenu, to change the color plane in the check planes figure
+        B_AxesCheckRGB_noBC
+        B_AxesCheckRGB_BC
+        B_AxesCheckBrightnessGreen
+        B_AxesCheckBrightnessBlue
+        B_AxesCheckBrightnessRed
+        B_AxesCheckBrightnessFarRed
         
-        B_CheckPOK %Button, to confirm changes in the check planes figure
-        B_CheckPBack %Button, to cancel and close the check planes figure
-        B_CheckPText %Text, shows information text in the check planes figure
+        B_CurBrightImGreen
+        B_SelectBrightImGreen
+        B_CreateBrightImGreen
+        B_DeleteBrightImGreen
+        
+        B_CurBrightImBlue
+        B_SelectBrightImBlue
+        B_CreateBrightImBlue
+        B_DeleteBrightImBlue
+        
+        B_CurBrightImRed
+        B_SelectBrightImRed
+        B_CreateBrightImRed
+        B_DeleteBrightImRed
+        
+        B_CurBrightImFarRed
+        B_SelectBrightImFarRed
+        B_CreateBrightImFarRed
+        B_DeleteBrightImFarRed
     end
     
     methods
         function obj = viewEdit(mainCard)
             % constructor
-            fontSizeS = 10; % Font size small
-            fontSizeM = 12; % Font size medium
-            fontSizeB = 16; % Font size big
             
-            screenSize = get(0,'screensize');
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            end
+%             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
+            mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
             
-%             obj.hFP = figure('NumberTitle','off','Units','normalized','Name','Fiber types classification: EDITING MODE','Visible','off','Tag','viewEditFigure','DockControls','off');
-%             set(obj.hFP, 'position', [0 0 1 0.85]);
-%             set(obj.hFP,'WindowStyle','normal');
-%              % Center window
-%             movegui(obj.hFP,'center');
-            obj.hFP = uix.BoxPanel('Parent', mainCard); 
-
-            mainPanelBox = uix.HBox( 'Parent', obj.hFP, 'Spacing',5,'Padding',5);
-            
-            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',35);
-            obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'Control Panel' ,'FontSize',fontSizeB);
+            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
+            obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'Control Panel - EDIT-MODE' ,'FontSize',fontSizeB);
+            set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             set(obj.panelPicture,'Title','Picture');
-            
-            obj.hAP = axes('Parent',obj.panelPicture,'Units','normalized','Position',[0 0 1 1]);
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.015);
+%             obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.35);
             axis image
+            set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
-            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 5,'Padding',5);
+            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 1,'Padding',1);
             
-            PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',5);
-            PanelBinari = uix.Panel('Parent',PanelVBox,'Title','Binarization operations ','FontSize',fontSizeB,'Padding',5);
-            PanelMorphOp = uix.Panel('Parent',PanelVBox,'Title','Morphological operations','FontSize',fontSizeB,'Padding',5);
-            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',5);
+            PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
+            PanelBinari = uix.Panel('Parent',PanelVBox,'Title','Binarization operations ','FontSize',fontSizeB,'Padding',2);
+            PanelMorphOp = uix.Panel('Parent',PanelVBox,'Title','Morphological operations','FontSize',fontSizeB,'Padding',2);
+            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
             
-            set( PanelVBox, 'Heights', [-1 -1 -1 -1], 'Spacing', 5 );
+            set( PanelVBox, 'Heights', [-4.1 -6 -6 -7.9], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 5 );
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 );
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
-            obj.B_Undo = uicontrol( 'Parent', HBoxControl1, 'String', '<- Undo','FontSize',fontSizeB );
-            obj.B_Redo = uicontrol( 'Parent', HBoxControl1, 'String', 'Redo ->','FontSize',fontSizeB );
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
+            obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
+            obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('Analyze-Mode \x25BA') ,'Enable','off');
+            
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
+            obj.B_CheckMask = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4,'Style','togglebutton', 'String', sprintf('\x2593 Check mask') ,'Enable','off');
+            obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Check planes \x2750') ,'Enable','off');
+            
+            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Spacing',0);
+            obj.B_Undo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('\x21BA Undo'),'FontUnits','normalized','Fontsize',0.4);
+            obj.B_Redo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('Redo \x21BB'),'FontUnits','normalized','Fontsize',0.4);
             
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5, 'Spacing',5);
-            obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'NewPic' );
-            obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontSize',fontSizeB, 'String', 'Check Planes' ,'Enable','off');
             
-            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600],'Padding',5,'Spacing',5);
-            obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl3,'FontSize',fontSizeB,'Style','pushbutton', 'String', 'Start analyzing mode' ,'Enable','off');
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Hand Draw Grid %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,25 +168,25 @@ classdef viewEdit < handle
             HBoxBinari1 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari11 = uix.HButtonBox('Parent', HBoxBinari1,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxBinari11,'Style','text','FontSize',fontSizeM, 'String', 'Threshold Mode :' );
+            ThresholdModeText = uicontrol( 'Parent', HButtonBoxBinari11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Binarization Mode:' );
             
             HButtonBoxBinari12 = uix.HButtonBox('Parent', HBoxBinari1,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_ThresholdMode = uicontrol( 'Parent', HButtonBoxBinari12,'Style','popupmenu','FontSize',fontSizeM, 'String', {'Manual global' , 'Automatic adaptive', 'both'} ,'Enable','off');
+            obj.B_ThresholdMode = uicontrol( 'Parent', HButtonBoxBinari12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', {'Manual global threshold' , 'Automatic adaptive threshold', 'Combined manual and adaptive', 'Automatic setup'} ,'Enable','off');
             
-            set( HBoxBinari1, 'Widths', [-1 -2] );
+            set( HBoxBinari1, 'Widths', [-2 -3] );
             
             %%%%%%%%%%%%%%%% 2. Row Threshold %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             HBoxBinari2 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari21 = uix.HButtonBox('Parent', HBoxBinari2,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxBinari21,'Style','text','FontSize',fontSizeM, 'String', 'Threshold:' );
+            ThresholdText = uicontrol( 'Parent', HButtonBoxBinari21,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', 'Threshold:' );
             
             HButtonBoxBinari22 = uix.HButtonBox('Parent', HBoxBinari2,'ButtonSize',[6000 18],'Padding', 1 );
-            obj.B_Threshold = uicontrol( 'Parent', HButtonBoxBinari22,'Style','slider', 'String', 'Thresh','Tag','sliderThreshold' ,'Enable','off');
+            obj.B_Threshold = uicontrol( 'Parent', HButtonBoxBinari22,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Thresh','Tag','sliderThreshold' ,'Enable','off');
             
             HButtonBoxBinari23 = uix.HButtonBox('Parent', HBoxBinari2,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_ThresholdValue = uicontrol( 'Parent', HButtonBoxBinari23,'Style','edit','FontSize',fontSizeM,'Tag','textThreshold','Enable','off');
+            obj.B_ThresholdValue = uicontrol( 'Parent', HButtonBoxBinari23,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','textThreshold','Enable','off');
             
             set( HBoxBinari2, 'Widths', [-1 -2 -1] );
             
@@ -163,13 +196,13 @@ classdef viewEdit < handle
             HBoxBinari3 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari31 = uix.HButtonBox('Parent', HBoxBinari3,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxBinari31,'Style','text','FontSize',fontSizeM, 'String', 'Alpha:');
+            AlphaText = uicontrol( 'Parent', HButtonBoxBinari31,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Alpha:');
             
             HButtonBoxBinari32 = uix.HButtonBox('Parent', HBoxBinari3,'ButtonSize',[6000 18],'Padding', 1 );
-            obj.B_Alpha = uicontrol( 'Parent', HButtonBoxBinari32,'Style','slider', 'String', 'Alpha' ,'Tag','sliderAlpha','Enable','off');
+            obj.B_Alpha = uicontrol( 'Parent', HButtonBoxBinari32,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Alpha' ,'Tag','sliderAlpha','Enable','off');
             
             HButtonBoxBinari33 = uix.HButtonBox('Parent', HBoxBinari3,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_AlphaValue = uicontrol( 'Parent', HButtonBoxBinari33,'Style','edit','FontSize',fontSizeM,'Tag','textAlpha','Enable','off');
+            obj.B_AlphaValue = uicontrol( 'Parent', HButtonBoxBinari33,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','textAlpha','Enable','off');
             
             set( HBoxBinari3, 'Widths', [-1 -2 -1] );
             
@@ -179,13 +212,13 @@ classdef viewEdit < handle
             HBoxBinari4 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari41 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxBinari41,'Style','text', 'FontSize',fontSizeM ,'String', 'LineWidth:');
+            LineWidthText = uicontrol( 'Parent', HButtonBoxBinari41,'Style','text', 'FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', 'Linewidth:');
             
             HButtonBoxBinari42 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_LineWidth = uicontrol( 'Parent', HButtonBoxBinari42,'Style','slider', 'String', 'LineWidth','Min',0,'Max',10,'SliderStep',[1/10,1/10],'Tag','sliderLinewidth' );
+            obj.B_LineWidth = uicontrol( 'Parent', HButtonBoxBinari42,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Linewidth','Min',0,'Max',300,'SliderStep',[1/300,1/300],'Tag','sliderLinewidth' );
             
             HButtonBoxBinari43 = uix.HButtonBox('Parent', HBoxBinari4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_LineWidthValue = uicontrol( 'Parent', HButtonBoxBinari43,'Style','edit','FontSize',fontSizeM,'Tag','textLinewidth');
+            obj.B_LineWidthValue = uicontrol( 'Parent', HButtonBoxBinari43,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','textLinewidth');
             
             set( HBoxBinari4, 'Widths', [-1 -2 -1] );
             
@@ -195,13 +228,13 @@ classdef viewEdit < handle
             HBoxBinari5 = uix.HBox('Parent', mainVBoxBinari,'Spacing',5);
             
             HButtonBoxBinari51 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxBinari51,'Style','text','FontSize',fontSizeM, 'String', 'Color:' );
+            ColorText = uicontrol( 'Parent', HButtonBoxBinari51,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Color:' );
             
             HButtonBoxBinari52 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_Color = uicontrol( 'Parent', HButtonBoxBinari52,'Style','popupmenu','FontSize',fontSizeM, 'String', {'White' , 'Black'} ,'Enable','off');
+            obj.B_Color = uicontrol( 'Parent', HButtonBoxBinari52,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', {'White' , 'Black', 'White fill region', 'Black fill region'} ,'Enable','off');
             
             HButtonBoxBinari53 = uix.HButtonBox('Parent', HBoxBinari5,'ButtonSize',[6000 30],'Padding', 1 );
-            obj.B_Invert = uicontrol( 'Parent', HButtonBoxBinari53,'FontSize',fontSizeM, 'String', 'Invert' ,'Enable','off');
+            obj.B_Invert = uicontrol( 'Parent', HButtonBoxBinari53,'FontUnits','normalized','Fontsize',0.5, 'String', 'Invert' ,'Enable','off');
             
             set( HBoxBinari5, 'Widths', [-1 -2 -1] );
 
@@ -214,69 +247,42 @@ classdef viewEdit < handle
             HButtonBoxMorph4 = uix.HButtonBox('Parent', MainVBoxMorph,'ButtonSize',[3000 20]);
             HButtonBoxMorph5 = uix.HButtonBox('Parent', MainVBoxMorph,'ButtonSize',[3000 40]);
             
-            uicontrol( 'Parent', HButtonBoxMorph1,'Style','text','FontSize',fontSizeM, 'String', 'Morphol. operation:');
-            String = {'choose operation' ,'edge smoothing','close small gaps' ,'erode', 'dilate', 'skel' ,'thin','shrink','majority'};
-            obj.B_MorphOP = uicontrol( 'Parent', HButtonBoxMorph1,'Style','popupmenu','FontSize',fontSizeM, 'String', String ,'Enable','off');
+            uicontrol( 'Parent', HButtonBoxMorph1,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Morphol. operation:');
+            String = {'choose operation' ,'remove incomplete objects','close small gaps' ,'smoothing','erode', 'dilate', 'skel' ,'thin','shrink','majority','remove','open','close'};
+            obj.B_MorphOP = uicontrol( 'Parent', HButtonBoxMorph1,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Enable','off');
             
-            uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontSize',fontSizeM, 'String', 'Structuring element:');
-            String = {'choose SE' , 'dimond', 'disk', 'octagon' ,'square'};
-            obj.B_ShapeSE = uicontrol( 'Parent', HButtonBoxMorph2,'Style','popupmenu','FontSize',fontSizeM, 'String', String,'Enable','off' );
+            uicontrol( 'Parent', HButtonBoxMorph2,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Structuring element:');
+            String = {'choose SE' , 'diamond', 'disk', 'octagon' ,'square'};
+            obj.B_ShapeSE = uicontrol( 'Parent', HButtonBoxMorph2,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String,'Enable','off' );
             
-            uicontrol( 'Parent', HButtonBoxMorph3,'Style','text','FontSize',fontSizeM, 'String', 'Size of structuring element:');
-            obj.B_SizeSE = uicontrol( 'Parent', HButtonBoxMorph3,'Style','edit','FontSize',fontSizeM,'String','1','Enable','off' );
+            uicontrol( 'Parent', HButtonBoxMorph3,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Size of structuring element:');
+            obj.B_SizeSE = uicontrol( 'Parent', HButtonBoxMorph3,'Style','edit','FontUnits','normalized','Fontsize',0.6,'String','1','Enable','off' );
             
-            uicontrol( 'Parent', HButtonBoxMorph4,'Style','text','FontSize',fontSizeM, 'String', 'No. of iterations / Size gaps:');
-            obj.B_NoIteration = uicontrol( 'Parent', HButtonBoxMorph4,'Style','edit','FontSize',fontSizeM,'String','1','Enable','off' );
+            uicontrol( 'Parent', HButtonBoxMorph4,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'No. of iterations / Size gaps:');
+            obj.B_NoIteration = uicontrol( 'Parent', HButtonBoxMorph4,'Style','edit','FontUnits','normalized','Fontsize',0.6,'String','1','Enable','off' );
             
-            obj.B_StartMorphOP = uicontrol( 'Parent', HButtonBoxMorph5, 'String', 'Run morphological operation','FontSize',fontSizeM ,'Enable','off' );
+            obj.B_StartMorphOP = uicontrol( 'Parent', HButtonBoxMorph5, 'String', 'Run morphological operation','FontUnits','normalized','Fontsize',0.35 ,'Enable','off' );
             
             %%%%%%%%%%%%%% Panel Info Text %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            obj.B_InfoText = uicontrol('Parent',PanelInfo,'Style','listbox','FontSize',fontSizeM,'String',{''});
+            obj.B_InfoText = uicontrol('Parent',PanelInfo,'Style','listbox','Fontsize', fontSizeM,'String',{''});
             
             %%%%%%%%%%%%%% Set Init Values %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             set(obj.B_LineWidth,'Value',1);
             set(obj.B_Threshold,'Value',0.1);
             set(obj.B_Alpha,'Value',1);
+            set(obj.B_MorphOP,'Value',2);
             
             set(obj.B_LineWidthValue,'String',num2str(get(obj.B_LineWidth,'Value')));
             set(obj.B_ThresholdValue,'String',num2str(get(obj.B_Threshold,'Value')));
             set(obj.B_AlphaValue,'String',num2str(get(obj.B_Alpha,'Value')));
             
-            
+            set(obj.B_ThresholdMode,'Value',4);
             %%%%%%%%%%%%%%% call edit functions for GUI
-%             obj.editToolBar();
             obj.setToolTipStrings();
-            
-            set(obj.hFP,'Visible','on');
+
         end % end constructor
         
-        function editToolBar(obj)
-            % Hide all toolbar elements in the figure created by the
-            % viewEdit condtructor that are not nessesary for the
-            % application. 
-            %
-            %   editToolBar(obj);
-            %
-            %   ARGUMENTS:
-            %
-            %       - Input
-            %           obj:    Handle to viewEdit object
-            %
-            
-            set( findall(obj.hFP,'ToolTipString','Edit Plot') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Rotate 3D') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Data Cursor') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Insert Colorbar') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Insert Legend') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Hide Plot Tools') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','New Figure') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Show Plot Tools') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Brush/Select Data') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Show Plot Tools and Dock Figure') ,'Visible','Off');
-            set( findall(obj.hFP,'ToolTipString','Link Plot') ,'Visible','Off');
-        end
-        
-        function checkPlanes(obj,Pics)
+        function checkPlanes(obj,Pics,mainFig)
             % Opens a new figure to show all founded color plane images.
             % User can change the plane if the program classified these
             % wrong.
@@ -291,80 +297,235 @@ classdef viewEdit < handle
             %                   images and the original RGB image
             %
             
-            obj.hFCP = figure('NumberTitle','off','ToolBar','none','MenuBar','none','Name','Check Color Planes','Units','normalized','Visible','off','Tag','CheckPlanesFigure');
-            set(obj.hFCP, 'position', [0.1 0.1 0.8 0.8]);
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 14; % Font size medium
+                fontSizeB = 18; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 14*0.75; % Font size medium
+                fontSizeB = 18*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 14; % Font size medium
+                fontSizeB = 18; % Font size big
+                
+            end
+            
+            
+            obj.hFCP = figure('NumberTitle','off','ToolBar','none',...
+                'MenuBar','none','Name','Check Color Planes',...
+                'Units','normalized','Visible','off','Tag','CheckPlanesFigure',...
+                'InvertHardcopy','off');
+            %get position of mainFigure
+            posMainFig = get(mainFig,'Position');
+            
+            set(obj.hFCP, 'position', [posMainFig(1) posMainFig(2) 0.8 0.8]);
+            movegui(obj.hFCP,'center')
             set(obj.hFCP,'WindowStyle','modal');
             
-            MainVBox = uix.VBox('Parent',obj.hFCP,'Spacing', 5,'Padding',5);
-            MainGrid = uix.Grid('Parent',MainVBox,'Padding',5);
+            tabPanel = uix.TabPanel( 'Parent', obj.hFCP, 'FontSize',fontSizeB,'Padding',5,'TabWidth',300);
             
-            VBox1 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckRGB = axes('Parent',VBox1,'ActivePositionProperty','position');
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Color Plane Tab
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            MainVBoxColorPlane = uix.VBox('Parent',tabPanel,'Spacing', 5,'Padding',5);
+            MainGridColor = uix.Grid('Parent',MainVBoxColorPlane,'Padding',5);
+            
+            VBox1ColorPlane = uix.VBox('Parent',MainGridColor,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckRGBFRPlane = axes('Parent',VBox1ColorPlane,'ActivePositionProperty','position');
+            axis image
             imshow(Pics{3})
-            axis image
-            uicontrol( 'Parent', VBox1,'Style','text', 'String', 'Original Picture');
-            set(VBox1,'Heights',[-10 -1])
+            uicontrol( 'Parent', VBox1ColorPlane,'Style','text', 'String', 'RGB Image generated from Red Green Blue and FarRed plane','FontUnits','normalized','Fontsize',0.35);
+            set(VBox1ColorPlane,'Heights',[-10 40])
             
-            VBox2 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckRGBPlane = axes('Parent',VBox2,'ActivePositionProperty','position');
-            imshow(Pics{9})
+            VBox2ColorPlane = uix.VBox('Parent',MainGridColor,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckRGBPlane = axes('Parent',VBox2ColorPlane,'ActivePositionProperty','position');
             axis image
-            uicontrol( 'Parent', VBox2,'Style','text', 'String', 'Image generated from Red Green and Blue Plane');
-            set(VBox2,'Heights',[-10 -1])
+            imshow(Pics{9},[])
+            uicontrol( 'Parent', VBox2ColorPlane,'Style','text', 'String', 'RGB Image generated from Red Green and Blue Plane (no FarRed)','FontUnits','normalized','Fontsize',0.35);
+            set(VBox2ColorPlane,'Heights',[-10 40])
             
-            VBox3 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckPlaneGreen = axes('Parent',VBox3,'ActivePositionProperty','position');
+            VBox3ColorPlane = uix.VBox('Parent',MainGridColor,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckPlaneGreen = axes('Parent',uicontainer('Parent', VBox3ColorPlane),'ActivePositionProperty','position','Units','normalized');
             axis image
-            imshow(Pics{5})
-            obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,1);
-            set(VBox3,'Heights',[-10 -1])
+            set(obj.B_AxesCheckPlaneGreen, 'position', [0 0 1 1]);
+            imshow(Pics{5},[])
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3ColorPlane,'Style','popupmenu', 'String', String, 'Value' ,1,'FontUnits','normalized','Fontsize',0.35);
+            set(VBox3ColorPlane,'Heights',[-10 40])
             
-            VBox4 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckPlaneBlue = axes('Parent',VBox4,'ActivePositionProperty','position');
+            VBox4ColorPlane = uix.VBox('Parent',MainGridColor,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckPlaneBlue = axes('Parent',uicontainer('Parent', VBox4ColorPlane),'ActivePositionProperty','position','Units','normalized');
             axis image
+            set(obj.B_AxesCheckPlaneBlue, 'position', [0 0 1 1]);
             imshow(Pics{6})
-            obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,2);
-            set(VBox4,'Heights',[-10 -1])
+%             VButtonBox4 = uix.VButtonBox('Parent', VBox4ColorPlane,'ButtonSize',[400 40]);
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4ColorPlane,'Style','popupmenu', 'String', String , 'Value' ,2,'FontUnits','normalized','Fontsize',0.35);
+            set(VBox4ColorPlane,'Heights',[-10 40])
             
-            VBox5 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckPlaneRed = axes('Parent',VBox5,'ActivePositionProperty','position');
+            VBox5ColorPlane = uix.VBox('Parent',MainGridColor,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckPlaneRed = axes('Parent',uicontainer('Parent', VBox5ColorPlane),'ActivePositionProperty','position','Units','normalized');
             axis image
+            set(obj.B_AxesCheckPlaneRed, 'position', [0 0 1 1]);
             imshow(Pics{7})
-            obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,3);
-            set(VBox5,'Heights',[-10 -1])
+%             VButtonBox5 = uix.VButtonBox('Parent', VBox5ColorPlane,'ButtonSize',[400 40]);
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5ColorPlane,'Style','popupmenu', 'String', String , 'Value' ,3,'FontUnits','normalized','Fontsize',0.35);
+            set(VBox5ColorPlane,'Heights',[-10 40])
             
-            VBox6 = uix.VBox('Parent',MainGrid,'Spacing', 5,'Padding',5);
-            obj.B_AxesCheckPlaneFarRed = axes('Parent',VBox6,'ActivePositionProperty','position');
+            VBox6ColorPlane = uix.VBox('Parent',MainGridColor,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckPlaneFarRed = axes('Parent',uicontainer('Parent', VBox6ColorPlane),'ActivePositionProperty','position','Units','normalized');
             axis image
+            set(obj.B_AxesCheckPlaneFarRed, 'position', [0 0 1 1]);
             imshow(Pics{8})
-            obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6,'Style','popupmenu', 'String', {'Green Plane' , 'Blue Plane', 'Red Plane', 'FarRed Plane'} , 'Value' ,4);
-            set(VBox6,'Heights',[-10 -1])
+%             VButtonBox6 = uix.VButtonBox('Parent', VBox6ColorPlane,'ButtonSize',[400 40]);
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6ColorPlane,'Style','popupmenu', 'String', String , 'Value' ,4,'FontUnits','normalized','Fontsize',0.35);
+            set(VBox6ColorPlane,'Heights',[-10 40])
             
-            set( MainGrid, 'Heights', [-1 -1], 'Widths', [-1 -1] ,'Spacing',10);
+            HBox = uix.HBox('Parent',MainVBoxColorPlane,'Spacing', 5,'Padding',5);
             
-            HBox = uix.HBox('Parent',MainVBox,'Spacing', 5,'Padding',5);
+            HButtonBox1ColorPlane = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
+            obj.B_CheckPText = uicontrol( 'Parent', HButtonBox1ColorPlane,'Style','text', 'String', 'Confirm the changes with OK.','FontSize',fontSizeB);
             
-            HButtonBox1 = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPText = uicontrol( 'Parent', HButtonBox1,'Style','text', 'String', 'Confirm the changes with OK.','FontSize',16);
+            HButtonBox2ColorPlane = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
+            obj.B_CheckPBack = uicontrol( 'Parent', HButtonBox2ColorPlane,'String', 'Back to Edit-Mode','FontSize',fontSizeB);
             
-            HButtonBox2 = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPBack = uicontrol( 'Parent', HButtonBox2,'String', 'Back to Edit-Mode','FontSize',20);
+            HButtonBox3ColorPlane = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
+            obj.B_CheckPOK = uicontrol( 'Parent', HButtonBox3ColorPlane,'String', 'OK','FontSize',fontSizeB);
             
-            HButtonBox3 = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPOK = uicontrol( 'Parent', HButtonBox3,'String', 'OK','FontSize',20);
-            
-            set( MainGrid, 'Heights', [-1 -1 ], 'Widths', [-1 -1 -1] ,'Spacing',10);
-            set(MainVBox,'Heights',[-10 -1])
+            set( MainGridColor, 'Heights', [-1 -1 ], 'Widths', [-1 -1 -1] ,'Spacing',3);
+            set(MainVBoxColorPlane,'Heights',[-10 -1])
             set(HBox,'Widths',[-3 -1 -1])
             
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Brigntness Correction images Tab
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
+            MainVBoxBrightness = uix.VBox('Parent',tabPanel,'Spacing', 5,'Padding',5);
+            MainGridBrightness = uix.Grid('Parent',MainVBoxBrightness,'Padding',5,'Spacing', 5);
+            
+            % Image befor brightness correction
+            VBox1Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckRGB_noBC= axes('Parent',VBox1Brightness,'ActivePositionProperty','position');
+            imshow(Pics{10},[])
+            axis image
+            VButtonBox1 = uix.VButtonBox('Parent', VBox1Brightness,'ButtonSize',[2000 20]);
+            uicontrol( 'Parent', VButtonBox1,'Style','text', 'String', 'RGB Image befor brightness correction','FontUnits','normalized','Fontsize',0.7);
+            uix.Empty( 'Parent', VBox1Brightness );
+            set(VBox1Brightness,'Heights',[-10 30 30])
+            
+            % Image after brightness correction
+            VBox2Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckRGB_BC = axes('Parent',VBox2Brightness,'ActivePositionProperty','position');
+            imshow(Pics{3},[])
+            axis image
+            VButtonBox2 = uix.VButtonBox('Parent', VBox2Brightness,'ButtonSize',[2000 20]);
+            uicontrol( 'Parent', VButtonBox2,'Style','text', 'String', 'RGB Image after brightness correction','FontUnits','normalized','Fontsize',0.7);
+            uix.Empty( 'Parent', VBox2Brightness );
+            set(VBox2Brightness,'Heights',[-10 30 30])
+            
+            % Brightness correction image for Green Plane
+            VBox3Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckBrightnessGreen = axes('Parent',uicontainer('Parent', VBox3Brightness),'ActivePositionProperty','position','Units','normalized');
+            axis image
+            set(obj.B_AxesCheckBrightnessGreen, 'position', [0 0 1 1]);
+            imshow(Pics{11},[])
+            caxis([0, 1])
+            HBox31Brightness = uix.HButtonBox('Parent',VBox3Brightness,'Spacing', 5,'Padding',5,'ButtonSize',[600 20]);
+            uicontrol( 'Parent', HBox31Brightness,'Style','text', 'String', 'Current image Green plane:','FontUnits','normalized','Fontsize',0.6);
+            obj.B_CurBrightImGreen = uicontrol( 'Parent', HBox31Brightness,'Style','text', 'String', Pics{12},'FontUnits','normalized','Fontsize',0.6);
+            HBox32Brightness = uix.HButtonBox('Parent',VBox3Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
+            obj.B_SelectBrightImGreen = uicontrol( 'Parent', HBox32Brightness,'String', 'Select new image','FontUnits','normalized','Fontsize',0.5,'Tag','SelectBCGreen');
+            obj.B_CreateBrightImGreen = uicontrol( 'Parent', HBox32Brightness,'String', 'Create image','FontUnits','normalized','Fontsize',0.5,'Tag','CreateBCGreen');
+            obj.B_DeleteBrightImGreen = uicontrol( 'Parent', HBox32Brightness,'String', 'Delete image','FontUnits','normalized','Fontsize',0.5,'Tag','DeleteBCGreen');
+            
+            set(VBox3Brightness,'Heights',[-10 30 30])
+            
+            % Brightness correction image for Blue Plane
+            VBox4Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckBrightnessBlue = axes('Parent',uicontainer('Parent', VBox4Brightness),'ActivePositionProperty','position','Units','normalized');
+            axis image
+            set(obj.B_AxesCheckBrightnessBlue, 'position', [0 0 1 1]);
+            imshow(Pics{13},[])
+            caxis([0, 1])
+            HBox41Brightness = uix.HButtonBox('Parent',VBox4Brightness,'Spacing', 5,'Padding',5,'ButtonSize',[600 20]);
+            uicontrol( 'Parent', HBox41Brightness,'Style','text', 'String', 'Current image Blue plane:','FontUnits','normalized','Fontsize',0.6);
+            obj.B_CurBrightImBlue = uicontrol( 'Parent', HBox41Brightness,'Style','text', 'String', Pics{14},'FontUnits','normalized','Fontsize',0.6);
+            HBox42Brightness = uix.HButtonBox('Parent',VBox4Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
+            obj.B_SelectBrightImBlue = uicontrol( 'Parent', HBox42Brightness,'String', 'Select new image','FontUnits','normalized','Fontsize',0.5,'Tag','SelectBCBlue');
+            obj.B_CreateBrightImBlue = uicontrol( 'Parent', HBox42Brightness,'String', 'Create image','FontUnits','normalized','Fontsize',0.5,'Tag','CreateBCBlue');
+            obj.B_DeleteBrightImBlue = uicontrol( 'Parent', HBox42Brightness,'String', 'Delete image','FontUnits','normalized','Fontsize',0.5,'Tag','DeleteBCBlue');
+            
+            set(VBox4Brightness,'Heights',[-10 30 30])
+            
+            % Brightness correction image for Red Plane
+            VBox5Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckBrightnessRed = axes('Parent',uicontainer('Parent', VBox5Brightness),'ActivePositionProperty','position','Units','normalized');
+            axis image
+            set(obj.B_AxesCheckBrightnessRed, 'position', [0 0 1 1]);
+            imshow(Pics{15},[])
+            caxis([0, 1])
+            HBox51Brightness = uix.HButtonBox('Parent',VBox5Brightness,'Spacing', 5,'Padding',5,'ButtonSize',[600 20]);
+            uicontrol( 'Parent', HBox51Brightness,'Style','text', 'String', 'Current image Red plane:','FontUnits','normalized','Fontsize',0.6);
+            obj.B_CurBrightImRed = uicontrol( 'Parent', HBox51Brightness,'Style','text', 'String', Pics{16},'FontUnits','normalized','Fontsize',0.6);
+            HBox52Brightness = uix.HButtonBox('Parent',VBox5Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
+            obj.B_SelectBrightImRed = uicontrol( 'Parent', HBox52Brightness,'String', 'Select new image','FontUnits','normalized','Fontsize',0.5,'Tag','SelectBCRed');
+            obj.B_CreateBrightImRed = uicontrol( 'Parent', HBox52Brightness,'String', 'Create image','FontUnits','normalized','Fontsize',0.5,'Tag','CreateBCRed');
+            obj.B_DeleteBrightImRed = uicontrol( 'Parent', HBox52Brightness,'String', 'Delete image','FontUnits','normalized','Fontsize',0.5,'Tag','DeleteBCRed');
+            
+            set(VBox5Brightness,'Heights',[-10 30 30])
+            
+            % Brightness correction image for FarRed Plane
+            VBox6Brightness = uix.VBox('Parent',MainGridBrightness,'Spacing', 5,'Padding',5);
+            obj.B_AxesCheckBrightnessFarRed = axes('Parent',uicontainer('Parent', VBox6Brightness),'ActivePositionProperty','position','Units','normalized');
+            axis image
+            set(obj.B_AxesCheckBrightnessFarRed, 'position', [0 0 1 1]);
+            imshow(Pics{17},[])
+            caxis([0, 1])
+            HBox61Brightness = uix.HButtonBox('Parent',VBox6Brightness,'Spacing', 5,'Padding',5,'ButtonSize',[600 20]);
+            uicontrol( 'Parent', HBox61Brightness,'Style','text', 'String', 'Current image Farred plane:','FontUnits','normalized','Fontsize',0.6);
+            obj.B_CurBrightImFarRed = uicontrol( 'Parent', HBox61Brightness,'Style','text', 'String', Pics{18},'FontUnits','normalized','Fontsize',0.6);
+            HBox62Brightness = uix.HButtonBox('Parent',VBox6Brightness,'Spacing', 1,'Padding',1,'ButtonSize',[600 30]);
+            obj.B_SelectBrightImFarRed = uicontrol( 'Parent', HBox62Brightness,'String', 'Select new image','FontUnits','normalized','Fontsize',0.5,'Tag','SelectBCFarRed');
+            obj.B_CreateBrightImFarRed = uicontrol( 'Parent', HBox62Brightness,'String', 'Create image','FontUnits','normalized','Fontsize',0.5,'Tag','CreateBCFarRed');
+            obj.B_DeleteBrightImFarRed = uicontrol( 'Parent', HBox62Brightness,'String', 'Delete image','FontUnits','normalized','Fontsize',0.5,'Tag','DeleteBCFarRed');
+            
+            set(VBox6Brightness,'Heights',[-10 30 30])
+            
+            set( MainGridBrightness, 'Heights', [-1 -1 ], 'Widths', [-1 -1 -1] ,'Spacing',10);
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Sizes
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            tabPanel.TabTitles = {'Color Plane images', 'Brightness Correction images'};
+            tabPanel.TabWidth = -1;
             set(obj.hFCP,'Visible','on');
             drawnow;
         end
         
+        function infoMessage(obj,Text)
+            % Shows info text to the user.
+            %
+            %   infoMessage(obj,Text);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to viewEdit object
+            %           Text:   Cellaray containing the info text
+            %
+            beep
+            uiwait(msgbox(Text,'Info','warn','modal'));
+        end
+        
         function setToolTipStrings(obj)
             % Set all tooltip strings in the properties of the operationg
-            % elements that are shown in the GUI
+            % elements that are shown in the main Edit GUI.
             %
             %   setToolTipStrings(obj);
             %
@@ -373,12 +534,66 @@ classdef viewEdit < handle
             %       - Input
             %           obj:    Handle to viewEdit object
             %
-            UndoToolTip = sprintf('Undo binary image');
+            UndoToolTip = sprintf('Undo binary image.');
             
-            RedoToolTip = sprintf('Redo binary image');
+            RedoToolTip = sprintf('Redo binary image.');
+            
+            NewPicToolTip = sprintf('Select a new file for further processing.');
+            
+            CheckPlanesToolTip = sprintf(['Opens a menue to check or change the color plane images: \n ',...
+                'Red, Green, Blue and Farred images.']);
+            
+            CheckMaskToolTip = sprintf(['Shows found objects in different RGB colors \n',...
+                'to check the mask for further segmentation.']);
+            
+            StartAnaModeToolTip = sprintf(['Starts image analyzing mode.']);
+            
+            ThreshModeToolTip = sprintf(['Select threshold method for image binarization.']);
+            
+            ThreshToolTip = sprintf(['Select threshold for image binarization.']);
+            
+            AlphaToolTip = sprintf(['Change transparency of the binary image.']);
+            
+            LineWidthToolTip = sprintf(['Change linewidth for drawing into the binary image.']);
+            
+            ColorToolTip = sprintf(['Choose color mode for drawing into the binary image.']);
+            
+            InvertToolTip = sprintf(['Invert the binary image. \n',...
+                'Has no effect on segmentation.']);
+            
+            MorphToolTip = sprintf(['Select morphological method.']);
+            
+            StructuringToolTip = sprintf(['Select structuring element']);
+            
+            StructuringSizeToolTip = sprintf(['Select the size of the structuring element']);
+            
+            NoOfIterationsToolTip = sprintf(['Select the number of iterations']);
+            
+            RunMorphToolTip = sprintf(['Perform the morphological operation \n',...
+                'to the binary image']);
             
             set(obj.B_Undo,'tooltipstring',UndoToolTip);
             set(obj.B_Redo,'tooltipstring',RedoToolTip);
+            set(obj.B_NewPic,'tooltipstring',NewPicToolTip);
+            set(obj.B_CheckPlanes,'tooltipstring',CheckPlanesToolTip);
+            set(obj.B_CheckMask,'tooltipstring',CheckMaskToolTip);
+            set(obj.B_StartAnalyzeMode,'tooltipstring',StartAnaModeToolTip);
+            
+            set(obj.B_ThresholdMode,'tooltipstring',ThreshModeToolTip);
+            set(obj.B_Threshold,'tooltipstring',ThreshToolTip);
+            set(obj.B_ThresholdValue,'tooltipstring',ThreshToolTip);
+            set(obj.B_Alpha,'tooltipstring',AlphaToolTip);
+            set(obj.B_AlphaValue,'tooltipstring',AlphaToolTip);
+            set(obj.B_LineWidth,'tooltipstring',LineWidthToolTip);
+            set(obj.B_LineWidthValue,'tooltipstring',LineWidthToolTip);
+            set(obj.B_Color,'tooltipstring',ColorToolTip);
+            set(obj.B_Invert,'tooltipstring',InvertToolTip);
+            
+            set(obj.B_MorphOP,'tooltipstring',MorphToolTip);
+            set(obj.B_ShapeSE,'tooltipstring',StructuringToolTip);
+            set(obj.B_SizeSE,'tooltipstring',StructuringSizeToolTip);
+            set(obj.B_NoIteration,'tooltipstring',NoOfIterationsToolTip);
+            set(obj.B_StartMorphOP,'tooltipstring',RunMorphToolTip);
         end
         
         function delete(obj)

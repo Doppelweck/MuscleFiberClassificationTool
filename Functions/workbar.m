@@ -1,4 +1,4 @@
-function workbar(fractiondone, message, progtitle)
+function workbar(fractiondone, message, progtitle, mainFig)
 % WORKBAR Graphically monitors progress of calculations
 %   WORKBAR(X) creates and displays the workbar with the fractional length
 %   "X". It is an alternative to the built-in matlab function WAITBAR,
@@ -79,16 +79,21 @@ if nargin < 2 & isempty(progfig),
 end
 if nargin < 3 & isempty(progfig),
     progtitle = '';
+    mainFig =[];
 end
 
 % If task completed, close figure and clear vars, then exit
 percentdone = floor(100*fractiondone);
 if percentdone == 100 % Task completed
+   
     delete(progfig) % Close progress bar
     clear progfig progpatch starttime lastupdate % Clear persistent vars
     return
 end
 
+if percentdone == 0
+    starttime = clock;
+end
 % Create new progress bar if needed
 if isempty(progfig)
     
@@ -96,12 +101,23 @@ if isempty(progfig)
     %%%%%%%%%% SET WINDOW SIZE AND POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     winwidth = 300;                                         % Width of timebar window
     winheight = 75;                                         % Height of timebar window
+    
+    if ~isempty(mainFig)
+    set(mainFig,'Units','pixels');  
+    posMainFig = get(mainFig,'Position');
+    set(mainFig,'Units','normalized');
+    winpos = [posMainFig(1), posMainFig(2),...
+        winwidth, winheight]; 
+    
+    else
     screensize = get(0,'screensize');                       % User's screen size [1 1 width height]
     screenwidth = screensize(3);                            % User's screen width
     screenheight = screensize(4);                           % User's screen height
     winpos = [0.5*(screenwidth-winwidth), ...
             0.5*(screenheight-winheight),...
             winwidth, winheight];                           % Position of timebar window origin
+        
+    end    
     wincolor = [ 0.9254901960784314,...
             0.9137254901960784,...
             0.8470588235294118 ];                           % Define window color
@@ -119,7 +135,12 @@ if isempty(progfig)
          'position',winpos,...                              % Set the position of the figure as above
          'color',wincolor,...                               % Set the figure color
          'resize','off',...                                 % Turn of figure resizing
-         'tag','timebar');                                  % Tag the figure for later checking
+         'tag','timebar',...                                % Tag the figure for later checking
+         'WindowStyle','modal',...                            % Stay figure in forground                          
+         'Visible','off');
+     
+    movegui(progfig,'center');
+    set(progfig,'Visible','on') 
     
     work.progtitle = progtitle;                             % Store initial values for title
     work.message = message;                                 % Store initial value for message

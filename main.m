@@ -1,23 +1,54 @@
 
-
+% find starting path
 path = cd;
-
-addpath(genpath(path));
+% add files to the current matalb path
+addpath(genpath('MVC'));
+addpath(genpath('Functions'));
+addpath(genpath('NotifySounds'));
 
 cl;
 pause(0.1);
 
-if checkSystem()
+% if checkSystem()
 
-% Init View's
+% create starting screen
+if ismac
+    fontSizeS = 18; % Font size small
+    fontSizeB = 20; % Font size big
+elseif ispc
+    fontSizeS = 20*0.75; % Font size small
+    fontSizeB = 20*0.75; % Font size big
+else
+    fontSizeS = 18; % Font size small
+    fontSizeB = 20; % Font size big 
+end
 
-mainFig = figure('Units','pixels','Position',[1 50 1900 900],...
-    'Name','Fiber types classification tool','DockControls','off',...
-    'doublebuffer', 'off','Menubar','figure','Visible','on');
+%Create Start Screen
+hf = startSrcreen();
+TitleText1=text(hf.Children,0.45,0.92,'Muscle Fiber',...
+    'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
+TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
+    'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
+VersionText=text(hf.Children,0.45,0.75,'Version 1.0 14-July-2017','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
+text(hf.Children,0.05,0.3,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+text(hf.Children,0.05,0.15,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
+% setAlwaysOnTop(hf,true);
 
+
+% create main figure
+mainFig = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85],...
+    'Name','Muscle-Fiber-Classification-Tool','DockControls','off',...
+    'doublebuffer', 'off','Menubar','figure','Visible','on',...
+    'WindowStyle','normal','NumberTitle','off',...
+    'PaperPositionMode','auto',...
+    'InvertHardcopy','off');
+figure(hf)
+set(hf,'WindowStyle','modal');
+
+% hide needless ToogleTool objects in the main figure
 set( findall(mainFig,'ToolTipString','Edit Plot') ,'Visible','Off');
-% set( findall(mainFig,'ToolTipString','Rotate 3D') ,'Visible','Off');
-set( findall(mainFig,'ToolTipString','Data Cursor') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Colorbar') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Insert Legend') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Hide Plot Tools') ,'Visible','Off');
@@ -27,42 +58,59 @@ set( findall(mainFig,'ToolTipString','Brush/Select Data') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Show Plot Tools and Dock Figure') ,'Visible','Off');
 set( findall(mainFig,'ToolTipString','Link Plot') ,'Visible','Off');
 
+%create card panel onbject
 mainCard = uix.CardPanel('Parent', mainFig,'Selection',0);
-
-movegui(mainFig,'center');
-
-
-
+InfoText.String='Loading please wait...   Initialize VIEW-Components...';
+%Init VIEW's
 viewEditHandle = viewEdit(mainCard);
-pause(0.1);
+InfoText.String='Loading please wait...   Initialize VIEW-Edit...';
 mainCard.Selection = 1;
+drawnow;pause(0.5);
 viewAnalyzeHandle = viewAnalyze(mainCard);
-mainCard.Selection = 1;
-pause(0.1);
+InfoText.String='Loading please wait...   Initialize VIEW-Analyze...';
+mainCard.Selection = 2;
+drawnow;pause(0.5);
 viewResultsHandle = viewResults(mainCard);
+InfoText.String='Loading please wait...   Initialize VIEW-Results...';
+mainCard.Selection = 3;
+drawnow;pause(0.5);
 mainCard.Selection = 1;
-pause(0.1);
+drawnow;
 
-set(mainFig,'Visible','on');
-%Init Model's
+InfoText.String='Loading please wait...   Initialize MODEL-Components...';
+%Init MODEL's
 modelEditHandle = modelEdit();
 modelAnalyzeHandle = modelAnalyze();
 modelResultsHandle = modelResults();
+pause(0.2)
 
-%Init Controller's
-controllerEditHandle = controllerEdit(mainFig,mainCard,viewEditHandle,modelEditHandle);
-controllerAnalyzeHandle = controllerAnalyze(mainFig,mainCard,viewAnalyzeHandle,modelAnalyzeHandle);
-controllerResultsHandle = controllerResults(mainFig,mainCard,viewResultsHandle,modelResultsHandle);
+InfoText.String='Loading please wait...   Initialize CONTROLLER-Components...';
+%Init CONTROLLER's
+controllerEditHandle = controllerEdit(mainFig, mainCard, viewEditHandle, modelEditHandle);
+controllerAnalyzeHandle = controllerAnalyze(mainFig, mainCard, viewAnalyzeHandle, modelAnalyzeHandle);
+controllerResultsHandle = controllerResults(mainFig, mainCard, viewResultsHandle, modelResultsHandle);
+pause(0.2)
 
+InfoText.String='Loading please wait...   Connecting components...';
 %Connecting Model's and their Controller's
 modelEditHandle.controllerEditHandle = controllerEditHandle;
 modelAnalyzeHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
 modelResultsHandle.controllerResultsHandle = controllerResultsHandle;
+pause(0.2)
 
+InfoText.String='Loading please wait...   Start application...';
 %Connecting Controller's to each other
 controllerEditHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
 controllerAnalyzeHandle.controllerEditHandle = controllerEditHandle;
 controllerAnalyzeHandle.controllerResultsHandle = controllerResultsHandle;
 controllerResultsHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
+pause(0.2)
 
-end
+InfoText.String='Run application';
+pause(0.5);
+drawnow;
+% delete starting screen
+delete(hf);
+delete(InfoText);
+delete(VersionText);
+% end
