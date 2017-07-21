@@ -1515,6 +1515,8 @@ classdef controllerAnalyze < handle
                         Color = 'w';
                     case 'Type 1'
                         Color = 'b';
+                    case 'Type 2'
+                        Color = 'r';    
                     case 'Type 2x'
                         Color = 'r';
                     case 'Type 2a'
