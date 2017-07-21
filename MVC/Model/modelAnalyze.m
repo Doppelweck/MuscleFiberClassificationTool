@@ -540,8 +540,12 @@ classdef modelAnalyze < handle
             elseif obj.AnalyzeMode == 5 || obj.AnalyzeMode == 6
                 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 %Manual labeling 
-                obj.classifyMANUAL();  
-
+                obj.classifyMANUAL(); 
+                
+            elseif  obj.AnalyzeMode == 7   
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %No classification only propertie calculation
+                obj.classifyNONE();
             end
             
         end
@@ -847,7 +851,7 @@ classdef modelAnalyze < handle
                     [tempStats.FiberType] = deal('Type 1');
                     [tempStats.FiberTypeMainGroup] = deal(1);
                 else
-                    [tempStats.FiberType] = deal('Type 2x');
+                    [tempStats.FiberType] = deal('Type 2');
                     [tempStats.FiberTypeMainGroup] = deal(2);
                 end
                 
@@ -893,6 +897,7 @@ classdef modelAnalyze < handle
                 sortedmatrix = dC(order,:);
                 
                 [tempStats(Class==sortedmatrix(1,2)).FiberTypeMainGroup] = deal(2);
+                [tempStats(Class==sortedmatrix(1,2)).FiberType] = deal('Type 2');
                 [tempStats(Class==sortedmatrix(2,2)).FiberTypeMainGroup] = deal(1);
                 [tempStats(Class==sortedmatrix(2,2)).FiberType] = deal('Type 1');
                 
@@ -1257,8 +1262,8 @@ classdef modelAnalyze < handle
                 end  %end if cluster
             else
                 %Quad labeling is not active. All Main Type 2 fibers
-                %are classified as Type 2x fiber
-                [tempStats([tempStats.FiberTypeMainGroup]==2).FiberType] = deal('Type 2x');
+                %are classified as Type 2 (all Type 2) fiber
+                [tempStats([tempStats.FiberTypeMainGroup]==2).FiberType] = deal('Type 2');
             end
             
             %write Data from tempStats in main Stats structure
@@ -1289,7 +1294,7 @@ classdef modelAnalyze < handle
                         obj.Stats(i).FiberType = 'Type 1';
                     elseif obj.Stats(i).ColorRatioBlueRed <= obj.BlueRedThresh*(1 - obj.BlueRedDistRed)
                         obj.Stats(i).FiberTypeMainGroup = 2;
-                        obj.Stats(i).FiberType = 'Type 2x';
+                        obj.Stats(i).FiberType = 'Type 2';
                     else
                         % Type 1 2 hybrid
                         obj.Stats(i).FiberTypeMainGroup = 3;
@@ -1305,7 +1310,7 @@ classdef modelAnalyze < handle
                     else
                         % Type 2 fiber (red)
                         obj.Stats(i).FiberTypeMainGroup = 2;
-                        obj.Stats(i).FiberType = 'Type 2x';
+                        obj.Stats(i).FiberType = 'Type 2';
                     end
                 end
                         
@@ -1525,51 +1530,9 @@ classdef modelAnalyze < handle
         end
         
         function classifyMANUAL(obj)
-            noElements = size(obj.Stats,1);
+            noElements = size(obj.Stats,1); %Number of fiber objects
             
-%             %find all fiber types that are undefined (out of the
-%             %parameter range).
-%             for i=1:1:noElements
-%                 
-%                 if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
-%                     
-%                     % Object Area is to big. FiberType 0: No Fiber (white)
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                     
-%                 elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
-%                         obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
-%                     
-%                     % ApsectRatio is to small or to great.
-%                     % FiberType 0: No Fiber (white)
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                     
-%                 elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
-%                     
-%                     % Object Roundness is to small. FiberType 0: No Fiber (white))
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                     
-%                 elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
-%                     
-%                     % Object ColorValue is to small. FiberType 0: No Fiber (white))
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                 else
-%                     
-%                 end
-%             end
-            
-            %create temp stats with label number for further
-            %processing that contains only fibers that are not
-            %Type-0 undefined 
-            
-            tempStats = obj.Stats;
+            tempStats = obj.Stats; %save Stats strukt temporary
             [tempStats.Label] = deal(0);
             
             for i=1:1:noElements
@@ -1627,8 +1590,10 @@ classdef modelAnalyze < handle
                             Color(i,:)=[51 51 255]/255;
                         case 'Type 12h'
                             Color(i,:)=[255 51 255]/255;
-                        case 'Type 2x'
+                        case 'Type 2'
                             Color(i,:)=[255 51 51]/255;
+                        case 'Type 2x'
+                            Color(i,:)=[255 51 51]/255;    
                         case 'Type 2a'
                             Color(i,:)=[255 255 51]/255; % Yellow Fiber Type 2a
                         case 'Type 2ax'
@@ -1638,7 +1603,7 @@ classdef modelAnalyze < handle
                     end
                 end
                 
-                if obj.ManualClassifyMode == 1
+                if obj.ManualClassifyMode == 1 % For main fiber groups 1,2 and 12h
                     
                     figure(fig)
 %                     InfoText = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualInfoText;
@@ -1649,8 +1614,13 @@ classdef modelAnalyze < handle
                     if isempty(hAM.Children)
                     h = scatter([tempStats.ColorRed],[tempStats.ColorBlue],20,Color,'filled');
                     set(h,'MarkerEdgeColor','k')
-                    title({'\fontsize{16}Select a Area by clicking the mouse and choose fiber type:';...
-                        ['\fontsize{16}Classify {\color{blue}Type 1 ','\color{magenta}Type 12h \color{red}Type 2}']},'interpreter','tex');
+                    if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 3 || obj.AnalyzeMode == 5
+                        title({'\fontsize{16}Triple labeling: Select a Area by clicking the mouse and choose fiber type:';...
+                            ['\fontsize{16}Classify {\color{blue}Type 1 ','\color{magenta}Type 12h \color{red}Type 2}']},'interpreter','tex');
+                    else
+                        title({'\fontsize{16}Quad labeling: Select a Area by clicking the mouse and choose fiber type:';...
+                            ['\fontsize{16}Classify {\color{blue}Type 1 ','\color{magenta}Type 12h \color{red}Type 2 (Type 2x is default during quad labeling)}']},'interpreter','tex');
+                    end
                     ylabel('y: mean Blue (B)','FontSize',16);
                     xlabel('x: mean Red (R)','FontSize',16);
                     maxLim = max(max([[tempStats.ColorRed] [tempStats.ColorBlue]]));
@@ -1678,16 +1648,16 @@ classdef modelAnalyze < handle
                             
                             if ~isempty(s)
                                 switch s
-                                    case 1
+                                    case 1 %Type 1
                                         [tempStats(in).FiberType] = deal('Type 1');
                                         [tempStats(in).FiberTypeMainGroup] = deal(1);
-                                    case 2
+                                    case 2 %Type 12h
                                         [tempStats(in).FiberType] = deal('Type 12h');
                                         [tempStats(in).FiberTypeMainGroup] = deal(3);
-                                    case 3
-                                        [tempStats(in).FiberType] = deal('Type 2x');
+                                    case 3 %Type 2
+                                        [tempStats(in).FiberType] = deal('Type 2');
                                         [tempStats(in).FiberTypeMainGroup] = deal(2);
-                                    case 4
+                                    case 4 %Type 0
                                         [tempStats(in).FiberType] = deal('undefined');
                                         [tempStats(in).FiberTypeMainGroup] = deal(0);
                                 end
@@ -1701,11 +1671,14 @@ classdef modelAnalyze < handle
                                 %fibers only
                                 hForBut = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualClassForward;
                                 set(hForBut,'Enable','off');
-                            else
+                            elseif ~isempty(type2Stats) && (obj.AnalyzeMode == 2 || obj.AnalyzeMode == 4 || obj.AnalyzeMode == 6)
                                 %get handle to Forward Button manual fibers to specify type 2
                                 %fibers only
                                 hForBut = obj.controllerAnalyzeHandle.viewAnalyzeHandle.B_ManualClassForward;
                                 set(hForBut,'Enable','on');
+                                % During quad labeling, every Type2 fiber
+                                % will be first classified as Type-2x
+                                [tempStats(strcmp({tempStats.FiberType},'Type 2')).FiberType] = deal('Type 2x');
                             end
                             
                         end
@@ -1813,6 +1786,11 @@ classdef modelAnalyze < handle
             
         end
         
+        function classifyNONE(obj)
+            [obj.Stats.FiberType] = deal('undefined');
+            [obj.Stats.FiberTypeMainGroup] = deal(0);
+        end
+        
         function endManualClassify(obj,~,~)
             hAM = obj.controllerAnalyzeHandle.viewAnalyzeHandle.hAMC;
             cla(hAM);
@@ -1876,34 +1854,57 @@ classdef modelAnalyze < handle
             %           src:    source of the callback.
             %           evnt:   callback event data.
             %
-            
-            switch newFiberType %Fiber Type
-                case 1
-                    %Fiber Type 1 (blue)
-                    newFiberType = 'Type 1';
-                    newFiberTypeMainGroup = 1;
-                case 2
-                    %Fiber Type 12h (hybird fiber) (magenta)
-                    newFiberType = 'Type 12h';
-                    newFiberTypeMainGroup = 3;
-                case 3
-                    %Fiber Type 2x (red)
-                    newFiberType = 'Type 2x';
-                    newFiberTypeMainGroup = 2;
-                case 4
-                    %Fiber Type 2a (yellow)
-                    newFiberType = 'Type 2a';
-                    newFiberTypeMainGroup = 2;
-                case 5
-                    %Fiber Type 2ax (orange)
-                    newFiberType = 'Type 2ax'; 
-                    newFiberTypeMainGroup = 2;
-                case 6
-                    %Fiber Type 0 (white)
-                    newFiberType = 'undefined';
-                    newFiberTypeMainGroup = 0;
+            if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 3 || obj.AnalyzeMode == 5 || obj.AnalyzeMode == 7
+                %tripple labeling was active. Only type 1,2 and 12h fibers
+                %allowed
+                switch newFiberType %Fiber Type
+                    case 1
+                        %Fiber Type 1 (blue)
+                        newFiberType = 'Type 1';
+                        newFiberTypeMainGroup = 1;
+                    case 2
+                        %Fiber Type 12h (hybird fiber) (magenta)
+                        newFiberType = 'Type 12h';
+                        newFiberTypeMainGroup = 3;
+                    case 3
+                        %Fiber Type 2x (red)
+                        newFiberType = 'Type 2';
+                        newFiberTypeMainGroup = 2;
+                    case 4
+                        %Fiber Type 0 (white)
+                        newFiberType = 'undefined';
+                        newFiberTypeMainGroup = 0;
+                end
+                
+            else
+                %quad labeling was active, all fibers allowed
+                switch newFiberType %Fiber Type
+                    case 1
+                        %Fiber Type 1 (blue)
+                        newFiberType = 'Type 1';
+                        newFiberTypeMainGroup = 1;
+                    case 2
+                        %Fiber Type 12h (hybird fiber) (magenta)
+                        newFiberType = 'Type 12h';
+                        newFiberTypeMainGroup = 3;
+                    case 3
+                        %Fiber Type 2x (red)
+                        newFiberType = 'Type 2x';
+                        newFiberTypeMainGroup = 2;
+                    case 4
+                        %Fiber Type 2a (yellow)
+                        newFiberType = 'Type 2a';
+                        newFiberTypeMainGroup = 2;
+                    case 5
+                        %Fiber Type 2ax (orange)
+                        newFiberType = 'Type 2ax';
+                        newFiberTypeMainGroup = 2;
+                    case 6
+                        %Fiber Type 0 (white)
+                        newFiberType = 'undefined';
+                        newFiberTypeMainGroup = 0;
+                end
             end
-            
             
             %get old fiber type
             oldFiberType = obj.Stats(labelNo).FiberType;
@@ -1938,6 +1939,8 @@ classdef modelAnalyze < handle
                         Color = 'b';
                     case 'Type 2x'
                         Color = 'r';
+                    case 'Type 2'
+                        Color = 'r';    
                     case 'Type 2a'
                         Color = 'y';    
                     case 'Type 2ax'
@@ -2101,6 +2104,7 @@ classdef modelAnalyze < handle
             %               Info{12}: FiberType
             %               Info{13}: Cropped image of fiber type
             %               Info{14}: Boundarie of object
+            %               Info{15}: Analyze Mode
             
             PosOut = obj.checkPosition(Pos);
             
@@ -2137,6 +2141,8 @@ classdef modelAnalyze < handle
                     
                     obj.FiberInfo{13} = y;
                     obj.FiberInfo{14} = Bound;
+                    obj.FiberInfo{15} = obj.AnalyzeMode;
+                    
                     Info = obj.FiberInfo;
 
                 else
@@ -2161,6 +2167,7 @@ classdef modelAnalyze < handle
                 
                 obj.FiberInfo{13} = [];
                 obj.FiberInfo{14} = [];
+                obj.FiberInfo{15} = [];
                 
                 Info = obj.FiberInfo;
                 

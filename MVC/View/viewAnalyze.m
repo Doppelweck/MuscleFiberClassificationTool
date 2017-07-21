@@ -164,7 +164,7 @@ classdef viewAnalyze < handle
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
             String= {sprintf('Color-Ratio-Based triple labeling') ; sprintf('Color-Ratio-Based quad labeling');...
-            'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'};
+            'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'; 'Collagen / dystrophin'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Value',2);
             
             set( HBoxPara1, 'Widths', [-2 -5] );
@@ -576,8 +576,16 @@ classdef viewAnalyze < handle
             
             uicontrol( 'Parent', HBBoxType,'Style','text','FontUnits','normalized','Fontsize',0.5, 'String', 'Fiber type :' );
             obj.B_FiberTypeManipulate = uicontrol( 'Parent', HBBoxType,'Style','popupmenu','FontUnits','normalized','Fontsize',0.4 );
-            set(obj.B_FiberTypeManipulate,'String',{'Type 1 (blue)' , 'Type 12h (magenta)', 'Type 2x (red)', 'Type 2a (yellow)', 'Type 2ax (orange)' ,'undefined (white)' })
             
+            analyzeMode = Info{15}; % last performed analyz mode 
+            if analyzeMode == 1 || analyzeMode == 3 || analyzeMode == 5 || analyzeMode == 7
+                %tripple labeling was active only Type 1,2 and 12h fibers
+                %allowed
+            set(obj.B_FiberTypeManipulate,'String',{'Type 1 (blue)' , 'Type 12h (magenta)', 'Type 2 (red)','Type 0 undefined (white)'})
+            else
+                %quad labeling was active all fibers allowed
+            set(obj.B_FiberTypeManipulate,'String',{'Type 1 (blue)' , 'Type 12h (magenta)', 'Type 2x (red)', 'Type 2a (yellow)', 'Type 2ax (orange)' ,'Type 0 undefined (white)' })    
+            end
 %             uix.Empty( 'Parent', VButtonBoxleftInfo);
 %             uix.Empty( 'Parent', VButtonBoxleftValue);
             
@@ -586,28 +594,44 @@ classdef viewAnalyze < handle
             obj.B_ManipulateOK = uicontrol( 'Parent', HBBoxCont, 'String', 'Change Info','FontUnits','normalized','Fontsize',0.6 );
             set( mainVBoxInfo, 'Heights', [-4 -1 -1], 'Spacing', 1 );
             
-            switch Info{12} %Fiber Type
-                case 'Type 1'
-                    %Fiber Type 1 (blue)
-                    set(obj.B_FiberTypeManipulate,'Value',1);
-                case 'Type 12h'
-                    %Fiber Type 2 (red)
-                    set(obj.B_FiberTypeManipulate,'Value',2);
-                case 'Type 2x'
-                    %Fiber Type 3 (magenta)
-                    set(obj.B_FiberTypeManipulate,'Value',3);
-                case 'Type 2a'
-                    %Fiber Type 3 (magenta)
-                    set(obj.B_FiberTypeManipulate,'Value',4);
-                case 'Type 2ax'
-                    %Fiber Type 3 (magenta)
-                    set(obj.B_FiberTypeManipulate,'Value',5);       
-                case 'undefined'
-                    %Fiber Type 0 (white)
-                    set(obj.B_FiberTypeManipulate,'Value',6);
+            if analyzeMode == 1 || analyzeMode == 3 || analyzeMode == 5 || analyzeMode == 7
+                switch Info{12} %Fiber Type
+                    case 'Type 1'
+                        %Fiber Type 1 (blue)
+                        set(obj.B_FiberTypeManipulate,'Value',1);
+                    case 'Type 12h'
+                        %Fiber Type 12h (magenta)
+                        set(obj.B_FiberTypeManipulate,'Value',2);
+                    case 'Type 2'
+                        %Fiber Type 3 (red)
+                        set(obj.B_FiberTypeManipulate,'Value',3);
+                    case 'undefined'
+                        %Fiber Type 0 (white)
+                        set(obj.B_FiberTypeManipulate,'Value',4);    
+                end
+            else
+                switch Info{12} %Fiber Type
+                    case 'Type 1'
+                        %Fiber Type 1 (blue)
+                        set(obj.B_FiberTypeManipulate,'Value',1);
+                    case 'Type 12h'
+                        %Fiber Type 12h (magenta)
+                        set(obj.B_FiberTypeManipulate,'Value',2);
+                    case 'Type 2x'
+                        %Fiber Type 3 (red)
+                        set(obj.B_FiberTypeManipulate,'Value',3);
+                    case 'Type 2a'
+                        %Fiber Type 3 (yellow)
+                        set(obj.B_FiberTypeManipulate,'Value',4);
+                    case 'Type 2ax'
+                        %Fiber Type 3 (orange)
+                        set(obj.B_FiberTypeManipulate,'Value',5);
+                    case 'undefined'
+                        %Fiber Type 0 (white)
+                        set(obj.B_FiberTypeManipulate,'Value',6);
+                end
+                
             end
-            
-            
             set(obj.hFM,'Visible','on')
         end
         

@@ -391,15 +391,24 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle.InfoMessage = '   - plot data into GUI axes...';
             
+            AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
+            
             % Define costom color map
-            ColorMap(1,:) = [51 51 255]; % Blue Fiber Type 1
-            ColorMap(2,:) = [255 51 255]; % Magenta Fiber Type 12h
-            ColorMap(3,:) = [255 51 51]; % Red Fiber Type 2x
-            ColorMap(4,:) = [255 255 51]; % Yellow Fiber Type 2a
-            ColorMap(5,:) = [255 153 51]; % orange Fiber Type 2ax
-            ColorMap(6,:) = [224 224 224]; % Grey Fiber Type undifiend
-            ColorMap(7,:) = [51 255 51]; % Green Collagen
-            ColorMap = ColorMap/255;
+            ColorMapMain(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapMain(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapMain(3,:) = [255 51 51]; % Red Fiber Type 2
+            ColorMapMain(4,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapMain(5,:) = [51 255 51]; % Green Collagen
+            ColorMapMain = ColorMapMain/255;
+            
+            ColorMapAll(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapAll(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapAll(3,:) = [255 51 51]; % Red Fiber Type 2x
+            ColorMapAll(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+            ColorMapAll(5,:) = [255 153 51]; % orange Fiber Type 2ax
+            ColorMapAll(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapAll(7,:) = [51 255 51]; % Green Collagen
+            ColorMapAll = ColorMapAll/255;
             
             % Define costom fonts
             if ismac
@@ -421,44 +430,67 @@ classdef controllerResults < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             obj.modelResultsHandle.InfoMessage = '      - plot number of types...';
-
             
-            B = [obj.modelResultsHandle.NoTyp1 obj.modelResultsHandle.NoTyp12h ...
-                obj.modelResultsHandle.NoTyp2x obj.modelResultsHandle.NoTyp2a ...
-                obj.modelResultsHandle.NoTyp2ax obj.modelResultsHandle.NoTyp0];
-            
-            x = 1:length(B);
             % make Axes for Count Data the current Axes
             axes(obj.viewResultsHandle.hACount);
             % clear old Data in current Axes
             cla(obj.viewResultsHandle.hACount)
-            
-           
-            for b = 1 : length(B)
-                hold on;
-                % Plot one single bar as a separate bar series.
-                handleToThisBarSeries(b) = bar(x(b), B(b), 'BarWidth', 0.9);
-                % Apply the color to this bar series.
-                set(handleToThisBarSeries(b),'FaceColor', ColorMap(b,:));
-                % Place text atop the bar
-                barTopper = sprintf('%d',B(b));
-                hText(b) = text(x(b), B(b), barTopper,'HorizontalAlignment','center',...
-                    'VerticalAlignment','bottom', 'FontSize', 15);
+                
+            if AnalyzeMode == 1 || AnalyzeMode == 3 || AnalyzeMode == 5 || AnalyzeMode == 7 %tripple labeling
+                B = [obj.modelResultsHandle.NoTyp1 obj.modelResultsHandle.NoTyp12h ...
+                    obj.modelResultsHandle.NoTyp2 obj.modelResultsHandle.NoTyp0];
+                
+                x = 1:length(B);
+                for b = 1 : length(B)
+                    hold on;
+                    % Plot one single bar as a separate bar series.
+                    handleToThisBarSeries(b) = bar(x(b), B(b), 'BarWidth', 0.9);
+                    % Apply the color to this bar series.
+                    set(handleToThisBarSeries(b),'FaceColor', ColorMapMain(b,:));
+                    % Place text atop the bar
+                    barTopper = sprintf('%d',B(b));
+                    hText(b) = text(x(b), B(b), barTopper,'HorizontalAlignment','center',...
+                        'VerticalAlignment','bottom', 'FontSize', 15);
+                end
+                
+                l1 = legend('Type 1','Type 12h','Type 2','undefind',...
+                    'Location','Best');
+                set(gca,'XTickLabel',{'Type 1','Type 12h','Type 2','undefind'},'FontUnits','normalized','Fontsize',0.03);
+                set(gca,'XTick',[1 2 3 4]);
+                
+            else %quad labeling
+                B = [obj.modelResultsHandle.NoTyp1 obj.modelResultsHandle.NoTyp12h ...
+                    obj.modelResultsHandle.NoTyp2x obj.modelResultsHandle.NoTyp2a ...
+                    obj.modelResultsHandle.NoTyp2ax obj.modelResultsHandle.NoTyp0];
+                
+                x = 1:length(B);
+                for b = 1 : length(B)
+                    hold on;
+                    % Plot one single bar as a separate bar series.
+                    handleToThisBarSeries(b) = bar(x(b), B(b), 'BarWidth', 0.9);
+                    % Apply the color to this bar series.
+                    set(handleToThisBarSeries(b),'FaceColor', ColorMapAll(b,:));
+                    % Place text atop the bar
+                    barTopper = sprintf('%d',B(b));
+                    hText(b) = text(x(b), B(b), barTopper,'HorizontalAlignment','center',...
+                        'VerticalAlignment','bottom', 'FontSize', 15);
+                end
+                
+                l1 = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind',...
+                    'Location','Best');
+                set(gca,'XTickLabel',{'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind'},'FontUnits','normalized','Fontsize',0.03);
+                set(gca,'XTick',[1 2 3 4 5 6]);
                 
             end
             
             % get highest position of text objects
             maxTextPos = max(max([hText.Position]));
-            
             ylim([0 maxTextPos+round(maxTextPos/10)]);
-            set(obj.viewResultsHandle.hACount,'FontUnits','normalized','Fontsize',0.03);
-            l1 = legend('Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind',...
-                    'Location','Best');
             l1.FontSize=fontSizeM;
-            set(l1,'Tag','LegendNumberPlot');
             
-            set(gca,'XTickLabel',{'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind'},'FontUnits','normalized','Fontsize',0.03);
-            set(gca,'XTick',[1 2 3 4 5 6]);
+            set(l1,'Tag','LegendNumberPlot');
+            set(obj.viewResultsHandle.hACount,'FontUnits','normalized','Fontsize',0.03);
+
             ylabel('Numbers','FontUnits','normalized','Fontsize',0.045);
             title(['Number of fiber types (Total: ' num2str(sum(B)) ')'],'FontUnits','normalized','Fontsize',0.06)
             grid on
@@ -474,38 +506,67 @@ classdef controllerResults < handle
             cla(obj.viewResultsHandle.hAArea)
             axes(obj.viewResultsHandle.hAArea);
             
+            B_main = [obj.modelResultsHandle.AreaType1PC obj.modelResultsHandle.AreaType12hPC ...
+                obj.modelResultsHandle.AreaType2PC obj.modelResultsHandle.AreaType0PC ...
+                obj.modelResultsHandle.AreaNoneObjPC];
             
             B = [obj.modelResultsHandle.AreaType1PC obj.modelResultsHandle.AreaType12hPC ...
                 obj.modelResultsHandle.AreaType2xPC obj.modelResultsHandle.AreaType2aPC ...
                 obj.modelResultsHandle.AreaType2axPC obj.modelResultsHandle.AreaType0PC ...
                 obj.modelResultsHandle.AreaNoneObjPC];
             
-%             B(B==0) = 0.001; % Values of 0 cause an Error
-            
-            hPie = pie(B);
-            
-            No = length(B);
-            z =~(B == 0);
-            j = 1:2:2*No;
-            index = 0;
-            for i = 1:No
-                if(z(i) ~= 0)
-                    index = index +1;
-                    set(hPie(j(index)),'facecolor',ColorMap(i,:))
-                    set(hPie(j(index)+1),'FontSize',13)
+            if AnalyzeMode == 1 || AnalyzeMode == 3 || AnalyzeMode == 5 || AnalyzeMode == 7 %tripple labeling
+                hPie = pie(B_main);
+                
+                No = length(B_main);
+                z =~(B_main == 0);
+                j = 1:2:2*No;
+                index = 0;
+                for i = 1:No
+                    if(z(i) ~= 0)
+                        index = index +1;
+                        set(hPie(j(index)),'facecolor',ColorMapMain(i,:))
+                        set(hPie(j(index)+1),'FontSize',13)
+                    end
                 end
-            end
-            
-            StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
-            StringLegend(z==0)=[];
-            
-            title('Area of fiber types','FontUnits','normalized','Fontsize',0.06)
-            
-            if ~isempty(StringLegend)
+                
+                StringLegend = {'Type 1','Type 12h','Type 2','undefind','Collagen'};
+                StringLegend(z==0)=[];
+                title('Area of fiber types','FontUnits','normalized','Fontsize',0.06)
+                
+                if ~isempty(StringLegend)
                 l2 = legend(StringLegend,'Location','Best');
                 set(l2,'Tag','LegendAreaPlot');
                 l2.FontSize=fontSizeM;
+                end
+                
+            else %Quad labeling was active during calssification    
+
+                hPie = pie(B);
+                
+                No = length(B);
+                z =~(B == 0);
+                j = 1:2:2*No;
+                index = 0;
+                for i = 1:No
+                    if(z(i) ~= 0)
+                        index = index +1;
+                        set(hPie(j(index)),'facecolor',ColorMapAll(i,:))
+                        set(hPie(j(index)+1),'FontSize',13)
+                    end
+                end
+                
+                StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
+                StringLegend(z==0)=[];
+                title('Area of all fiber types','FontUnits','normalized','Fontsize',0.06)
+                
+                if ~isempty(StringLegend)
+                l2_1 = legend(StringLegend,'Location','Best');
+                set(l2_1,'Tag','LegendAreaPlot');
+                l2_1.FontSize=fontSizeM;
+                end
             end
+            
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Plot Scatter Blue/Red Classification %%%%%%%%%%%%%%%%%%%%%%%%
@@ -526,7 +587,7 @@ classdef controllerResults < handle
             if ~isempty(obj.modelResultsHandle.StatsMatDataT1)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,PosColorRed)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,PosColorBlue)); %meanBlue Values
-                hScat(1) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(1,:)); 
+                hScat(1) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(1,:)); 
                 LegendString{end+1} = 'Type 1';
             end
             
@@ -537,33 +598,43 @@ classdef controllerResults < handle
             if ~isempty(obj.modelResultsHandle.StatsMatDataT12h)
                 x = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,PosColorRed)); %meanRed Values
                 y = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,PosColorBlue)); %meanBlue Values
-                hScat(2) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(2,:));
+                hScat(2) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(2,:));
                 LegendString{end+1} = 'Type 12h';
             end
             
-            
-            % Type 2x Fibers
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
-                x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorRed)); %meanRed Values
-                y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorBlue)); %meanBlue Values
-                hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:));
-                LegendString{end+1} = 'Type 2x';
-            end
-            
-            % Type 2a Fibers
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
-                x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorRed)); %meanRed Values
-                y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorBlue)); %meanBlue Values
-                hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:));
-                LegendString{end+1} = 'Type 2a';
-            end
-            
-            % Type 2ax Fibers
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
-                x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorRed)); %meanRed Values
-                y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorBlue)); %meanBlue Values
-                hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:));
-                LegendString{end+1} = 'Type 2ax';
+            if AnalyzeMode == 1 || AnalyzeMode == 3 || AnalyzeMode == 5 || AnalyzeMode == 7 %tripple labeling
+                % Type 2 Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorBlue)); %meanBlue Values
+                    hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(3,:));
+                    LegendString{end+1} = 'Type 2';
+                end
+                
+            else %quad labeling
+                % Type 2x Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorBlue)); %meanBlue Values
+                    hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(3,:));
+                    LegendString{end+1} = 'Type 2x';
+                end
+                
+                % Type 2a Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorBlue)); %meanBlue Values
+                    hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(4,:));
+                    LegendString{end+1} = 'Type 2a';
+                end
+                
+                % Type 2ax Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorBlue)); %meanBlue Values
+                    hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(5,:));
+                    LegendString{end+1} = 'Type 2ax';
+                end
             end
             
             if obj.modelResultsHandle.AnalyzeMode == 1 || obj.modelResultsHandle.AnalyzeMode == 2
@@ -629,6 +700,8 @@ classdef controllerResults < handle
                 title('luster-Based Quad Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 5 || obj.modelResultsHandle.AnalyzeMode == 6
                 title('Manual Classification (Main Groups)','FontUnits','normalized','Fontsize',0.06);
+            elseif obj.modelResultsHandle.AnalyzeMode == 7   
+                title('No Classification (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             end
             
             if ~isempty(LegendString)
@@ -661,28 +734,41 @@ classdef controllerResults < handle
             LegendString = {};
             
             hold on
-            % Type 2x Fibers
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
-                x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorRed)); %meanRed Values
-                y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorFarRed)); %meanFarred Values
-                hScatFRR(1) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:));
-                LegendString{end+1} = 'Type 2x';
-            end
             
-            % Type 2a Fibers
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
-                x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorRed)); %meanRed Values
-                y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorFarRed)); %meanFarred Values
-                hScatFRR(2) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:));
-                LegendString{end+1} = 'Type 2a';
-            end
-            
-            % Type 2ax Fibers
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
-                x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorRed)); %meanRed Values
-                y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorFarRed)); %meanFarred Values
-                hScatFRR(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:));
-                LegendString{end+1} = 'Type 2ax';
+            if AnalyzeMode == 1 || AnalyzeMode == 3 || AnalyzeMode == 5 || AnalyzeMode == 7 %tripple labeling
+                % Type 2 Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorFarRed)); %meanBlue Values
+                    hScat(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(3,:));
+                    LegendString{end+1} = 'Type 2';
+                end
+                
+            else %quad labeling
+                
+                % Type 2x Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorFarRed)); %meanFarred Values
+                    hScatFRR(1) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(3,:));
+                    LegendString{end+1} = 'Type 2x';
+                end
+                
+                % Type 2a Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorFarRed)); %meanFarred Values
+                    hScatFRR(2) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(4,:));
+                    LegendString{end+1} = 'Type 2a';
+                end
+                
+                % Type 2ax Fibers
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorFarRed)); %meanFarred Values
+                    hScatFRR(3) = scatter(x,y,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(5,:));
+                    LegendString{end+1} = 'Type 2ax';
+                end
             end
             hold on
             
@@ -740,6 +826,8 @@ classdef controllerResults < handle
                 title('Cluster-Based Quad Labeling (Type-2 Subgroups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 5 || obj.modelResultsHandle.AnalyzeMode == 6
                 title('Manual Classification (Type-2 Subgroups)','FontUnits','normalized','Fontsize',0.06);
+            elseif obj.modelResultsHandle.AnalyzeMode == 7   
+                title('No Classification (Type-2 Subgroups)','FontUnits','normalized','Fontsize',0.06);
             end
                 maxFarredValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,14)));
                 maxRedValue = max(cell2mat(obj.modelResultsHandle.StatsMatData(:,PosColorRed)));
@@ -772,7 +860,7 @@ classdef controllerResults < handle
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,PosColorRed)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,PosColorBlue)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,PosColorFarRed)); %meanFarred Values
-            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(1,:));
+            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(1,:));
             LegendString{end+1} = 'Type 1';
             end
             hold on
@@ -780,32 +868,44 @@ classdef controllerResults < handle
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,PosColorRed)); %meanRed Values
             y = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,PosColorBlue)); %meanBlue Values
             z = cell2mat(obj.modelResultsHandle.StatsMatDataT12h(:,PosColorFarRed)); %meanFarred Values
-            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(2,:));
+            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(2,:));
             LegendString{end+1} = 'Type 12h';
             end
             hold on
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
-            x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorRed)); %meanRed Values
-            y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorBlue)); %meanBlue Values
-            z = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorFarRed)); %meanFarred Values
-            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(3,:));
-            LegendString{end+1} = 'Type 2x';
-            end
-            hold on
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
-            x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorRed)); %meanRed Values
-            y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorBlue)); %meanBlue Values
-            z = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorFarRed)); %meanFarred Values
-            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(4,:));
-            LegendString{end+1} = 'Type 2a';
-            end
-            hold on
-            if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
-            x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorRed)); %meanRed Values
-            y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorBlue)); %meanBlue Values
-            z = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorFarRed)); %meanFarred Values
-            scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMap(5,:));
-            LegendString{end+1} = 'Type 2ax';
+            
+            if AnalyzeMode == 1 || AnalyzeMode == 3 || AnalyzeMode == 5 || AnalyzeMode == 7 %tripple labeling
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorBlue)); %meanBlue Values
+                    z = cell2mat(obj.modelResultsHandle.StatsMatDataT2(:,PosColorFarRed)); %meanFarred Values
+                    scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(3,:));
+                    LegendString{end+1} = 'Type 2';
+                end
+                hold on
+            else
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2x)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorBlue)); %meanBlue Values
+                    z = cell2mat(obj.modelResultsHandle.StatsMatDataT2x(:,PosColorFarRed)); %meanFarred Values
+                    scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(3,:));
+                    LegendString{end+1} = 'Type 2x';
+                end
+                hold on
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2a)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorBlue)); %meanBlue Values
+                    z = cell2mat(obj.modelResultsHandle.StatsMatDataT2a(:,PosColorFarRed)); %meanFarred Values
+                    scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(4,:));
+                    LegendString{end+1} = 'Type 2a';
+                end
+                hold on
+                if ~isempty(obj.modelResultsHandle.StatsMatDataT2ax)
+                    x = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorRed)); %meanRed Values
+                    y = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorBlue)); %meanBlue Values
+                    z = cell2mat(obj.modelResultsHandle.StatsMatDataT2ax(:,PosColorFarRed)); %meanFarred Values
+                    scatter3(x,y,z,20,'MarkerEdgeColor','k','MarkerFaceColor',ColorMapAll(5,:));
+                    LegendString{end+1} = 'Type 2ax';
+                end
             end
             hold on
             title({'Scatter Plot all Fiber Types'},'FontUnits','normalized','Fontsize',0.05);
@@ -883,9 +983,9 @@ classdef controllerResults < handle
             
             AMode = obj.modelResultsHandle.AnalyzeMode;
             
-            if AMode == 1 || AMode == 3 || AMode == 5
+            if AMode == 1 || AMode == 3 || AMode == 5 || AMode == 7
                 imshow(obj.modelResultsHandle.PicPRGBPlanes);
-            elseif AMode == 2 || AMode == 4 || AMode == 6
+            elseif AMode == 2 || AMode == 4 || AMode == 6 
                 imshow(obj.modelResultsHandle.PicPRGBFRPlanes);
             end
             
@@ -919,44 +1019,7 @@ classdef controllerResults < handle
             axesResultsPicProc.YTickLabel = axesResultsPicProc.XTick*Yvalue;
             t=title(['Total Area = ' num2str(obj.modelResultsHandle.AreaPic) ' ' sprintf('\x3BCm^2') ' = ' num2str(obj.modelResultsHandle.AreaPic*(10^(-6))) ' mm^2']);
             set(t,'FontUnits','normalized','Fontsize',0.03);
-            
-%             obj.modelResultsHandle.InfoMessage = '      - load RGB image without Farred plane';
-%             % get axes in the results GUI
-%             axesResultsRGB = obj.viewResultsHandle.hAPGroups;
-%             % show RGB image with farred plane
-%             axes(axesResultsRGB)
-%             imshow(obj.modelResultsHandle.PicPRGBPlanes);
-%             copyobj(hBounds ,axesResultsRGB);
-%             hold on
-%             %Show labels
-%             obj.modelResultsHandle.InfoMessage = '         - show labels...';
-%             
-%             %plot labels in the image
-%             for k = 1:size(obj.modelResultsHandle.Stats,1)
-%                 hold on
-%                 c = obj.modelResultsHandle.Stats(k).Centroid;
-%                 text(c(1)/obj.modelResultsHandle.XScale, c(2)/obj.modelResultsHandle.YScale, sprintf('%d', k),'Color','g', ...
-%                     'HorizontalAlignment', 'center', ...
-%                     'VerticalAlignment', 'middle','FontSize',11);
-%             end
-%             axis image
-%             axis on
-%             hold off
-%             lhx=xlabel(axesResultsRGB, 'x/?m','Fontsize',14);
-%             lhy=ylabel(axesResultsRGB, 'y/?m','Fontsize',14);
-%             set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
-%             maxPixelX = size(obj.modelResultsHandle.PicPRGBFRPlanes,2);
-%             Xvalue = obj.modelResultsHandle.XScale;
-%             axesResultsRGB.XTick = [0:100:maxPixelX];
-%             axesResultsRGB.XTickLabel = axesResultsRGB.XTick*Xvalue;
-%             maxPixelY = size(obj.modelResultsHandle.PicPRGBFRPlanes,1);
-%             Yvalue = obj.modelResultsHandle.YScale;
-%             axesResultsRGB.YTick = [0:100:maxPixelY];
-%             axesResultsRGB.YTickLabel = axesResultsRGB.XTick*Yvalue;
-%             t=title(['Total Area = ' num2str(obj.modelResultsHandle.AreaPic) ' ?m^2 = ' num2str(obj.modelResultsHandle.AreaPic*(10^(-6))) ' mm^2']);
-%             set(t,'Fontsize',14)
-%             obj.modelResultsHandle.InfoMessage = '   - load images complete';
-            
+           
         end
         
         function showPicGroupsGUI(obj)
@@ -997,9 +1060,9 @@ classdef controllerResults < handle
             
             AMode = obj.modelResultsHandle.AnalyzeMode;
             
-            if AMode == 1 || AMode == 3 || AMode == 5
+            if AMode == 1 || AMode == 3 || AMode == 5 || AMode == 7
                 imshow(obj.modelResultsHandle.PicPRGBPlanes);
-            elseif AMode == 2 || AMode == 4 || AMode == 6
+            elseif AMode == 2 || AMode == 4 || AMode == 6 
                 imshow(obj.modelResultsHandle.PicPRGBFRPlanes);
             end
             
@@ -1056,69 +1119,94 @@ classdef controllerResults < handle
                 end
             end
             
-            obj.modelResultsHandle.InfoMessage = '         - show Type 2x Groups';
-            if ~isempty(GroupStats.BoundT2x)
-                hold on
-                visboundaries(GroupStats.BoundT2x,'Color','r','LineWidth', 2)
-                n=max(max(GroupStats.LabelT2x));
-                tempStats=regionprops('struct',GroupStats.LabelT2x,'Centroid');
-                for i=1:1:n
-%                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2x==i));
-%                     Vec(Vec==0)=[];
-                    NoObj=GroupStats.NoObjT2x(i);
-                    c=tempStats(i).Centroid;
+            if AMode == 1 || AMode == 3 || AMode == 5 || AMode == 7 %tripple labeling. only shoe Type 2 fibers (no subgroups)
+                
+                obj.modelResultsHandle.InfoMessage = '         - show Type 2 Groups';
+                if ~isempty(GroupStats.BoundT2)
                     hold on
-                    text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
-                    'HorizontalAlignment', 'center', 'EdgeColor','r', ...
-                    'BackgroundColor','r','Margin',1,...
-                    'LineWidth', 2,'FontWeight','bold',...
-                    'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                    'Clipping','on');
+                    visboundaries(GroupStats.BoundT2,'Color','r','LineWidth', 2)
+                    n=max(max(GroupStats.LabelT2));
+                    tempStats=regionprops('struct',GroupStats.LabelT2,'Centroid');
+                    for i=1:1:n
+                        %                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2x==i));
+                        %                     Vec(Vec==0)=[];
+                        NoObj=GroupStats.NoObjT2(i);
+                        c=tempStats(i).Centroid;
+                        hold on
+                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                            'HorizontalAlignment', 'center', 'EdgeColor','r', ...
+                            'BackgroundColor','r','Margin',1,...
+                            'LineWidth', 2,'FontWeight','bold',...
+                            'VerticalAlignment', 'middle','FontSize',fontSizeB,...
+                            'Clipping','on');
+                    end
+                end
+                
+            else %quad labeling. show Type 2 fiber subgroups
+                
+                obj.modelResultsHandle.InfoMessage = '         - show Type 2x Groups';
+                if ~isempty(GroupStats.BoundT2x)
+                    hold on
+                    visboundaries(GroupStats.BoundT2x,'Color','r','LineWidth', 2)
+                    n=max(max(GroupStats.LabelT2x));
+                    tempStats=regionprops('struct',GroupStats.LabelT2x,'Centroid');
+                    for i=1:1:n
+                        %                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2x==i));
+                        %                     Vec(Vec==0)=[];
+                        NoObj=GroupStats.NoObjT2x(i);
+                        c=tempStats(i).Centroid;
+                        hold on
+                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                            'HorizontalAlignment', 'center', 'EdgeColor','r', ...
+                            'BackgroundColor','r','Margin',1,...
+                            'LineWidth', 2,'FontWeight','bold',...
+                            'VerticalAlignment', 'middle','FontSize',fontSizeB,...
+                            'Clipping','on');
+                    end
+                end
+                
+                obj.modelResultsHandle.InfoMessage = '         - show Type 2a Groups';
+                if ~isempty(GroupStats.BoundT2a)
+                    hold on
+                    visboundaries(GroupStats.BoundT2a,'Color','y','LineWidth', 2)
+                    n=max(max(GroupStats.LabelT2a));
+                    tempStats=regionprops('struct',GroupStats.LabelT2a,'Centroid');
+                    for i=1:1:n
+                        %                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2a==i));
+                        %                     Vec(Vec==0)=[];
+                        NoObj=GroupStats.NoObjT2a(i);
+                        c=tempStats(i).Centroid;
+                        hold on
+                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                            'HorizontalAlignment', 'center', 'EdgeColor','y', ...
+                            'BackgroundColor','y','Margin',1,...
+                            'LineWidth', 2,'FontWeight','bold',...
+                            'VerticalAlignment', 'middle','FontSize',fontSizeB,...
+                            'Clipping','on');
+                    end
+                end
+                
+                obj.modelResultsHandle.InfoMessage = '         - show Type 2ax Groups';
+                if ~isempty(GroupStats.BoundT2ax)
+                    hold on
+                    visboundaries(GroupStats.BoundT2ax,'Color',[255/255 100/255 0],'LineWidth', 2)
+                    n=max(max(GroupStats.LabelT2ax));
+                    tempStats=regionprops('struct',GroupStats.LabelT2ax,'Centroid');
+                    for i=1:1:n
+                        %                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2ax==i));
+                        %                     Vec(Vec==0)=[];
+                        NoObj=GroupStats.NoObjT2ax(i);
+                        c=tempStats(i).Centroid;
+                        hold on
+                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                            'HorizontalAlignment', 'center', 'EdgeColor',[255/255 100/255 0], ...
+                            'BackgroundColor',[255/255 100/255 0],'Margin',1,...
+                            'LineWidth', 2,'FontWeight','bold',...
+                            'VerticalAlignment', 'middle','FontSize',fontSizeB,...
+                            'Clipping','on');
+                    end
                 end
             end
-            
-            obj.modelResultsHandle.InfoMessage = '         - show Type 2a Groups';
-            if ~isempty(GroupStats.BoundT2a)
-                hold on
-                visboundaries(GroupStats.BoundT2a,'Color','y','LineWidth', 2)
-                n=max(max(GroupStats.LabelT2a));
-                tempStats=regionprops('struct',GroupStats.LabelT2a,'Centroid');
-                for i=1:1:n
-%                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2a==i));
-%                     Vec(Vec==0)=[];
-                    NoObj=GroupStats.NoObjT2a(i);
-                    c=tempStats(i).Centroid;
-                    hold on
-                    text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
-                    'HorizontalAlignment', 'center', 'EdgeColor','y', ...
-                    'BackgroundColor','y','Margin',1,...
-                    'LineWidth', 2,'FontWeight','bold',...
-                    'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                    'Clipping','on');
-                end
-            end
-            
-            obj.modelResultsHandle.InfoMessage = '         - show Type 2ax Groups';
-            if ~isempty(GroupStats.BoundT2ax)
-                hold on
-                visboundaries(GroupStats.BoundT2ax,'Color',[255/255 100/255 0],'LineWidth', 2)
-                n=max(max(GroupStats.LabelT2ax));
-                tempStats=regionprops('struct',GroupStats.LabelT2ax,'Centroid');
-                for i=1:1:n
-%                     Vec=unique(GroupStats.LabelMat(GroupStats.LabelT2ax==i));
-%                     Vec(Vec==0)=[];
-                    NoObj=GroupStats.NoObjT2ax(i);
-                    c=tempStats(i).Centroid;
-                    hold on
-                    text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
-                    'HorizontalAlignment', 'center', 'EdgeColor',[255/255 100/255 0], ...
-                    'BackgroundColor',[255/255 100/255 0],'Margin',1,...
-                    'LineWidth', 2,'FontWeight','bold',...
-                    'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                    'Clipping','on');
-                end
-            end
-            
             textObj = findobj(axesResultsGroups,'Type','text');
             uistack(textObj,'top');
             

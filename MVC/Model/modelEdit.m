@@ -360,228 +360,395 @@ classdef modelEdit < handle
             %get Number of Color Planes
             NumberOfPlanes = size(data{1,1},1);
             
-            if (NumberOfPlanes == 3 || NumberOfPlanes == 4) && seriesCount == 1
+            if (NumberOfPlanes <= 4) && seriesCount == 1
                 
-                if NumberOfPlanes == 3
-                    
-                    obj.InfoMessage = '   - 3 plane images';
-                    
-                    obj.PicPlane1 = bfGetPlane(reader,1);
-                    obj.PicPlane2 = bfGetPlane(reader,2);
-                    obj.PicPlane3 = bfGetPlane(reader,3);
-                    
-                    %Set Farred to zero
-                    obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
-                    
-                    obj.InfoMessage = '   - indentifing planes';
-                    
-                    %get ColorPlane Info from metaData
-                    [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
-                    
-                    if size(ch_wave_name,2) ~= 3
+                switch NumberOfPlanes
+                    case 1 %Number of Planes is 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        obj.InfoMessage = '   - 2 plane images within the file';
+                        obj.PicPlane1 = bfGetPlane(reader,1);
+                        obj.PicPlane2 = bfGetPlane(reader,2);
+                        obj.PicPlane3 = zeros(size(obj.PicPlane1));
+                        obj.PicPlane4 = zeros(size(obj.PicPlane1));
                         
-                        obj.InfoMessage = '   -ERROR while indentifing planes';
-                        obj.InfoMessage = '      -can not indentifing planes';
-                        obj.InfoMessage = '      -no channel color name was found in meta data';
+                        obj.InfoMessage = '   - indentifing planes';
+                        %get ColorPlane Info from metaData
+                        [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
                         
-                        %find RGB image with the same file name and use
-                        %this for plane identification
-                        sucsess = obj.planeIdentifier();
+                        PlaneIdentifyOK = 0;
+                        foundGreen = 0;
+                        foundBlue = 0;
+                        foundRed = 0;
+                        foundFarRed = 0;
                         
-                        if sucsess == true
+                        if size(ch_wave_name,2) == NumberOfPlanes
+                            
+                            for i=1:1:NumberOfPlanes
+                                if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
+                                    obj.PicPlaneBlue = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundBlue = 1;
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
+                                    obj.PicPlaneFarRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundFarRed = 1;
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
+                                    obj.PicPlaneRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundRed = 1;
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
+                                    obj.PicPlaneGreen = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundGreen = 1;
+                                else
+                                    obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
+                                    obj.InfoMessage = '      -no channel color name was found in meta data';
+                                end
+                            end %end for I:noPlanes
+                            
+                            if sum([foundBlue,foundRed,foundGreen,foundFarRed]) == NumberOfPlanes %all planes identified
+                                if isempty(obj.PicPlaneBlue)
+                                    obj.PicPlaneBlue = zeros(size(obj.PicPlane1));
+                                end
+                                if isempty(obj.PicPlaneGreen)
+                                    obj.PicPlaneGreen = zeros(size(obj.PicPlane1));
+                                end
+                                if isempty(obj.PicPlaneRed)
+                                    obj.PicPlaneRed = zeros(size(obj.PicPlane1));
+                                end
+                                if isempty(obj.PicPlaneFarRed)
+                                    obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
+                                end
+                                PlaneIdentifyOK = 1;
+                            else
+                                PlaneIdentifyOK = 0;
+                            end
+                        else %if size(ch_wave_name,2) == NumberOfPlanes
+                            %Useing RGB Image to identify planes is not
+                            %supporte with only 2 image files at this point
+                            PlaneIdentifyOK = 0;
+                        end %if size(ch_wave_name,2) == NumberOfPlanes
+                        
+                        if PlaneIdentifyOK == true
                             status = 'SuccessIndentify';
-                            foundBlue = 1;
-                            foundGreen = 1;
-                            foundRed = 1;
+                            obj.InfoMessage = '   - indentifing planes successfully';
                         else
                             obj.InfoMessage = 'ERROR while indentifing planes';
                             obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
                             status = 'ErrorIndentify';
-                            foundBlue = 0;
-                            foundGreen = 0;
-                            foundRed = 0;
-                            obj.PicPlaneBlue = obj.PicPlane1;
+                            obj.PicPlaneGreen = obj.PicPlane1;
                             obj.PicPlaneRed = obj.PicPlane2;
-                            obj.PicPlaneGreen = obj.PicPlane3;
-                            obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
+                            obj.PicPlaneBlue = obj.PicPlane3;
+                            obj.PicPlaneFarRed = obj.PicPlane4;
+                        end
+                    case 2 %Number of Planes is 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        obj.InfoMessage = '   - 2 plane images within the file';
+                        obj.PicPlane1 = bfGetPlane(reader,1);
+                        obj.PicPlane2 = bfGetPlane(reader,2);
+                        obj.PicPlane3 = zeros(size(obj.PicPlane1));
+                        obj.PicPlane4 = zeros(size(obj.PicPlane1));
+                        
+                        obj.InfoMessage = '   - indentifing planes';
+                        %get ColorPlane Info from metaData
+                        [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
+                        
+                        PlaneIdentifyOK = 0;
+                        foundGreen = 0;
+                        foundBlue = 0;
+                        foundRed = 0;
+                        foundFarRed = 0;
+                        
+                        if size(ch_wave_name,2) == NumberOfPlanes
+                            
+                            for i=1:1:NumberOfPlanes
+                                if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
+                                    obj.PicPlaneBlue = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundBlue = 1;
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
+                                    obj.PicPlaneFarRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundFarRed = 1;
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
+                                    obj.PicPlaneRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundRed = 1;
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
+                                    obj.PicPlaneGreen = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundGreen = 1;
+                                else
+                                    obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
+                                    obj.InfoMessage = '      -no channel color name was found in meta data';
+                                end
+                            end %end for I:noPlanes
+                            
+                            if sum([foundBlue,foundRed,foundGreen,foundFarRed]) == NumberOfPlanes %all planes identified
+                                if isempty(obj.PicPlaneBlue)
+                                    obj.PicPlaneBlue = zeros(size(obj.PicPlane1));
+                                end
+                                if isempty(obj.PicPlaneGreen)
+                                    obj.PicPlaneGreen = zeros(size(obj.PicPlane1));
+                                end
+                                if isempty(obj.PicPlaneRed)
+                                    obj.PicPlaneRed = zeros(size(obj.PicPlane1));
+                                end
+                                if isempty(obj.PicPlaneFarRed)
+                                    obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
+                                end
+                                PlaneIdentifyOK = 1;
+                            else
+                                PlaneIdentifyOK = 0;
+                            end
+                        else %if size(ch_wave_name,2) == NumberOfPlanes
+                            %Useing RGB Image to identify planes is not
+                            %supporte with only 2 image files at this point
+                            PlaneIdentifyOK = 0;
+                        end %if size(ch_wave_name,2) == NumberOfPlanes
+                        
+                        if PlaneIdentifyOK == true
+                            status = 'SuccessIndentify';
+                            obj.InfoMessage = '   - indentifing planes successfully';
+                        else
+                            obj.InfoMessage = 'ERROR while indentifing planes';
+                            obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                            status = 'ErrorIndentify';
+                            obj.PicPlaneGreen = obj.PicPlane1;
+                            obj.PicPlaneRed = obj.PicPlane2;
+                            obj.PicPlaneBlue = obj.PicPlane3;
+                            obj.PicPlaneFarRed = obj.PicPlane4;
                         end
                         
+                    case 3 %Number of Planes is 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                       
+                        obj.InfoMessage = '   - 3 plane images within the file';
+                        obj.PicPlane1 = bfGetPlane(reader,1);
+                        obj.PicPlane2 = bfGetPlane(reader,2);
+                        obj.PicPlane3 = bfGetPlane(reader,3);
                         
-                    else
-                        foundBlue = 0;
-                        foundGreen = 0;
-                        foundRed = 0;
+                        %Set Farred to zero
+                        obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
                         
-                        for i=1:1:NumberOfPlanes
+                        obj.InfoMessage = '   - indentifing planes';
+                        %get ColorPlane Info from metaData
+                        [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
+                        
+                        if size(ch_wave_name,2) ~= 3
+                            obj.InfoMessage = '   -ERROR while indentifing planes';
+                            obj.InfoMessage = '      -can not indentifing planes';
+                            obj.InfoMessage = '      -no channel color name was found in meta data';
                             
-                            if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
-                                
-                                obj.PicPlaneBlue = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundBlue = 1;
-                                
-                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
-                                
-                                obj.PicPlaneRed = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundRed = 1;
-                                
-                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
-                                
-                                obj.PicPlaneGreen = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundGreen = 1;
-                                
-                            else
-                                
-                                obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
-                                obj.InfoMessage = '      -no channel color name was found in meta data';
-                                
-                            end
-                            
-                        end %end for I:noPlanes
-                        
-                        
-                        
-                        if foundBlue && foundRed && foundGreen
-                            status = 'SucsessIndentify';
-                        else
                             %find RGB image with the same file name and use
                             %this for plane identification
                             sucsess = obj.planeIdentifier();
                             
                             if sucsess == true
                                 status = 'SuccessIndentify';
+                                foundBlue = 1;
+                                foundGreen = 1;
+                                foundRed = 1;
                             else
                                 obj.InfoMessage = 'ERROR while indentifing planes';
                                 obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
                                 status = 'ErrorIndentify';
+                                foundBlue = 0;
+                                foundGreen = 0;
+                                foundRed = 0;
                                 obj.PicPlaneBlue = obj.PicPlane1;
                                 obj.PicPlaneRed = obj.PicPlane2;
                                 obj.PicPlaneGreen = obj.PicPlane3;
                                 obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
                             end
-                        end
-                    end %end size Channel Name
-                    
-                elseif NumberOfPlanes == 4
-                    obj.InfoMessage = '   - 4 plane images';
-                    
-                    obj.PicPlane1 = bfGetPlane(reader,1);
-                    obj.PicPlane2 = bfGetPlane(reader,2);
-                    obj.PicPlane3 = bfGetPlane(reader,3);
-                    obj.PicPlane4 = bfGetPlane(reader,4);
-                    
-                    obj.InfoMessage = '   - indentifing planes';
-                    
-                    %get ColorPlane Info from metaData
-                    [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
-                    
-                    
-                    if size(ch_wave_name,2) ~= 4
-                        
-                        obj.InfoMessage = '   -ERROR while indentifing planes';
-                        obj.InfoMessage = '      -can not indentifing planes';
-                        obj.InfoMessage = '      -no channel color name was found in meta data';
-                        
-                        %find RGB image with the same file name and use
-                        %this for plane identification
-                        sucsess = obj.planeIdentifier();
-                        
-                        if sucsess == true
-                            status = 'SuccessIndentify';
-                            foundBlue = 1;
-                            foundGreen = 1;
-                            foundRed = 1;
-                            foundFarRed = 1;
+                            
+                            
                         else
-                            obj.InfoMessage = 'ERROR while indentifing planes';
-                            obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
-                            status = 'ErrorIndentify';
                             foundBlue = 0;
                             foundGreen = 0;
                             foundRed = 0;
-                            foundFarRed = 0;
-                            obj.PicPlaneBlue = obj.PicPlane1;
-                            obj.PicPlaneRed = obj.PicPlane2;
-                            obj.PicPlaneGreen = obj.PicPlane3;
-                            obj.PicPlaneFarRed = obj.PicPlane4;
-                        end
-                        
-                        
-                    else
-                        foundBlue = 0;
-                        foundGreen = 0;
-                        foundRed = 0;
-                        foundFarRed = 0;
-                        
-                        for i=1:1:NumberOfPlanes
                             
-                            if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
+                            for i=1:1:NumberOfPlanes
                                 
-                                obj.PicPlaneBlue = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundBlue = 1;
+                                if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
+                                    
+                                    obj.PicPlaneBlue = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundBlue = 1;
+                                    
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
+                                    
+                                    obj.PicPlaneRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundRed = 1;
+                                    
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
+                                    
+                                    obj.PicPlaneGreen = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundGreen = 1;
+                                    
+                                else
+                                    
+                                    obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
+                                    obj.InfoMessage = '      -no channel color name was found in meta data';
+                                    
+                                end
                                 
-                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
-                                
-                                obj.PicPlaneFarRed = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundFarRed = 1;
-                                
-                                
-                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
-                                
-                                obj.PicPlaneRed = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundRed = 1;
-                                
-                            elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
-                                    ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
-                                
-                                obj.PicPlaneGreen = bfGetPlane(reader,i);
-                                obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
-                                foundGreen = 1;
-                                
+                            end %end for I:noPlanes
+                            
+                            
+                            
+                            if foundBlue && foundRed && foundGreen
+                                status = 'SucsessIndentify';
                             else
+                                %find RGB image with the same file name and use
+                                %this for plane identification
+                                sucsess = obj.planeIdentifier();
                                 
-                                obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
-                                obj.InfoMessage = '      -no channel color name was found in meta data';
-                                
+                                if sucsess == true
+                                    status = 'SuccessIndentify';
+                                else
+                                    obj.InfoMessage = 'ERROR while indentifing planes';
+                                    obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                                    status = 'ErrorIndentify';
+                                    obj.PicPlaneBlue = obj.PicPlane1;
+                                    obj.PicPlaneRed = obj.PicPlane2;
+                                    obj.PicPlaneGreen = obj.PicPlane3;
+                                    obj.PicPlaneFarRed = zeros(size(obj.PicPlane1));
+                                end
                             end
-                        end %end for I:noPlanes
+                        end %end size Channel Name
+                        
+                    case 4 %Number of Planes is 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                        
+                        obj.InfoMessage = '   - 4 plane images';
+                        
+                        obj.PicPlane1 = bfGetPlane(reader,1);
+                        obj.PicPlane2 = bfGetPlane(reader,2);
+                        obj.PicPlane3 = bfGetPlane(reader,3);
+                        obj.PicPlane4 = bfGetPlane(reader,4);
+                        
+                        obj.InfoMessage = '   - indentifing planes';
+                        
+                        %get ColorPlane Info from metaData
+                        [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
                         
                         
-                        if foundBlue && foundRed && foundGreen && foundFarRed
-                            status = 'SucsessIndentify';
-                        else
+                        if size(ch_wave_name,2) ~= 4
+                            
+                            obj.InfoMessage = '   -ERROR while indentifing planes';
+                            obj.InfoMessage = '      -can not indentifing planes';
+                            obj.InfoMessage = '      -no channel color name was found in meta data';
+                            
                             %find RGB image with the same file name and use
                             %this for plane identification
                             sucsess = obj.planeIdentifier();
                             
                             if sucsess == true
                                 status = 'SuccessIndentify';
+                                foundBlue = 1;
+                                foundGreen = 1;
+                                foundRed = 1;
+                                foundFarRed = 1;
                             else
                                 obj.InfoMessage = 'ERROR while indentifing planes';
                                 obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
                                 status = 'ErrorIndentify';
+                                foundBlue = 0;
+                                foundGreen = 0;
+                                foundRed = 0;
+                                foundFarRed = 0;
                                 obj.PicPlaneBlue = obj.PicPlane1;
                                 obj.PicPlaneRed = obj.PicPlane2;
                                 obj.PicPlaneGreen = obj.PicPlane3;
                                 obj.PicPlaneFarRed = obj.PicPlane4;
                             end
                             
-                        end
-                    end %end size Channel Name
-                    
+                            
+                        else
+                            foundBlue = 0;
+                            foundGreen = 0;
+                            foundRed = 0;
+                            foundFarRed = 0;
+                            
+                            for i=1:1:NumberOfPlanes
+                                
+                                if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
+                                    
+                                    obj.PicPlaneBlue = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundBlue = 1;
+                                    
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
+                                    
+                                    obj.PicPlaneFarRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundFarRed = 1;
+                                    
+                                    
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
+                                    
+                                    obj.PicPlaneRed = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundRed = 1;
+                                    
+                                elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
+                                        ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
+                                    
+                                    obj.PicPlaneGreen = bfGetPlane(reader,i);
+                                    obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
+                                    foundGreen = 1;
+                                    
+                                else
+                                    
+                                    obj.InfoMessage = ['   -ERROR while indentifing plane ' num2str(i)];
+                                    obj.InfoMessage = '      -no channel color name was found in meta data';
+                                    
+                                end
+                            end %end for I:noPlanes
+                            
+                            if foundBlue && foundRed && foundGreen && foundFarRed
+                                status = 'SucsessIndentify';
+                            else
+                                %find RGB image with the same file name and use
+                                %this for plane identification
+                                sucsess = obj.planeIdentifier();
+                                
+                                if sucsess == true
+                                    status = 'SuccessIndentify';
+                                else
+                                    obj.InfoMessage = 'ERROR while indentifing planes';
+                                    obj.InfoMessage = '   -cange planes by pressing the "Check planes" button';
+                                    status = 'ErrorIndentify';
+                                    obj.PicPlaneBlue = obj.PicPlane1;
+                                    obj.PicPlaneRed = obj.PicPlane2;
+                                    obj.PicPlaneGreen = obj.PicPlane3;
+                                    obj.PicPlaneFarRed = obj.PicPlane4;
+                                end
+                                
+                            end
+                        end %end size Channel Name
+                        
+                    otherwise
+                        
                 end %end NumerPlanes =3 elseif = 4
                 
                 % Searching for brightness adjustment Pics

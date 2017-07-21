@@ -87,6 +87,7 @@ classdef modelResults < handle
         NoOfObjects; %Number of objects.
         NoTyp1; %Number of Type 1 fibers.
         NoTyp12h; %Number of Type 12 hybeid fibers.
+        NoTyp2; %Number of Type 2 fibers.
         NoTyp2a; %Number of Type 2a fibers.
         NoTyp2x; %Number of Type 2x fibers.
         NoTyp2ax; %Number of Type 2ax fibers.
@@ -94,6 +95,7 @@ classdef modelResults < handle
         
         AreaPic; % Total area of the RGB image.
         AreaType1; % Total area of all type 1 fibers.
+        AreaType2; % Total area of all type 2 fibers.
         AreaType2a; % Total area of all type 2a fibers.
         AreaType2x; % Total area of all type 2x fibers.
         AreaType2ax; % Total area of all type 2ax (2a 2x hybrid) fibers.
@@ -104,6 +106,7 @@ classdef modelResults < handle
         
         AreaType1PC; % Area of all type 1 fibers in percent.
         AreaType12hPC; % Aarea of all type 12 hybrid fibers in percent.
+        AreaType2PC; % Aarea of all type 2 hybrid fibers in percent.
         AreaType2aPC; % Area of all type 1 fibers in percent.
         AreaType2xPC; % Area of all type 1 fibers in percent.
         AreaType2axPC; % Area of all type 1 fibers in percent.
@@ -117,6 +120,8 @@ classdef modelResults < handle
         AreaMinMaxObjT1; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 1 fibers.
         AreaMinMaxT12h; %Vector, contains the [min max] area in pixel of Type 12 hybrid fibers.
         AreaMinMaxObjT12h; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 12 hybrid fibers.
+        AreaMinMaxT2; %Vector, contains the [min max] area in pixel of all Type 2 hybrid fibers.
+        AreaMinMaxObjT2; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of all Type 2 hybrid fibers.
         AreaMinMaxT2a; %Vector, contains the [min max] area in pixel of Type 2a fibers.
         AreaMinMaxObjT2a; %Vector, concontainsteins the [lmin lmax] label of the objects with the min max area in pixel of Type 2a fibers.
         AreaMinMaxT2x; %Vector, contains the [min max] area in pixel of Type 2x fibers.
@@ -135,6 +140,7 @@ classdef modelResults < handle
         %  Blue/Red Farred/Red MainType Type]
         StatsMatDataT1; % Contains the data of all type 1 fiber objets.
         StatsMatDataT12h; % Contains the data of all type 12 hybrid fiber objets.
+        StatsMatDataT2; % Contains the data of all type 2 fiber objets. 
         StatsMatDataT2a; % Contains the data of all type 2a fiber objets.
         StatsMatDataT2x; % Contains the data of all type 2x fiber objets.
         StatsMatDataT2ax; % Contains the data of all type 2ax fiber objets.
@@ -282,6 +288,10 @@ classdef modelResults < handle
             Index = find(IndexC==1);
             obj.StatsMatDataT12h = obj.StatsMatData(Index,:);
             
+            % Create CellArray only for Type 2 Fiber objects
+            IndexC = find( [obj.StatsMatData{:,end-1}] == 2 );
+            obj.StatsMatDataT2 = obj.StatsMatData(IndexC,:);
+            
             % Create CellArray only for Type 2a Fiber objects
             IndexC = strcmp(obj.StatsMatData(:,end), 'Type 2a');
             Index = find(IndexC==1);
@@ -319,6 +329,7 @@ classdef modelResults < handle
             %Area Image in um^2
             obj.AreaPic = size(obj.PicPRGBFRPlanes,1) * size(obj.PicPRGBFRPlanes,2) * obj.XScale * obj.YScale;
             obj.AreaType1 = 0;
+            obj.AreaType2 = 0;
             obj.AreaType2a = 0;
             obj.AreaType2x = 0;
             obj.AreaType2ax = 0;
@@ -326,47 +337,23 @@ classdef modelResults < handle
             obj.AreaType0 = 0;
             obj.AreaFibers = 0;
             
-%             obj.NoOfObjects = size(obj.Stats,1);
-%             
-%             for i=1:1:obj.NoOfObjects;
-%                 
-%                 switch obj.Stats(i).FiberType
-%                     case 'Type 1'
-%                         % Type1 Fiber (blue)
-%                         % Total area of all type 1 fibers
-%                         obj.AreaType1 = obj.AreaType1 + obj.Stats(i).Area;
-%                     case 'Type 12h'
-%                         %Type 12 hybrid fiber (between Red and Blue)
-%                         % Total area of all type 3 fibers
-%                         obj.AreaType12h = obj.AreaType12h + obj.Stats(i).Area;
-%                     case 'Type 2x'
-%                         % Type 2x fiber (red)
-%                         % Total area of all type 2x fibers
-%                         obj.AreaType2x = obj.AreaType2x + obj.Stats(i).Area;
-%                     case 'Type 2a'
-%                         % Type 2a fiber (yellow)
-%                         % Total area of all type 2a fibers
-%                         obj.AreaType2a = obj.AreaType2a + obj.Stats(i).Area;
-%                     case 'Type 2ax'
-%                         % Type 2ax fiber (orange)
-%                         % Total area of all type 2ax fibers
-%                         obj.AreaType2ax = obj.AreaType2ax + obj.Stats(i).Area;
-%                     case 'undefined'
-%                         % Type 0 fiber (white, no fiber)
-%                         % Total area of all undefined fibers
-%                         obj.AreaType0 = obj.AreaType0 + obj.Stats(i).Area;
-%                     otherwise
-%                         obj.InfoMessage = 'ERROR in calculateAreaFeatures() Fcn';
-%                 end
-%                 
-%             end
-            
+            obj.AreaType1PC = 0;
+            obj.AreaType2PC = 0;
+            obj.AreaType2aPC = 0;
+            obj.AreaType2xPC = 0;
+            obj.AreaType2axPC = 0;
+            obj.AreaType12hPC = 0;
+            obj.AreaType0PC = 0;
+
             %Total area of all Type-1 fibers.
             IsType1 = find( strcmp({obj.Stats.FiberType} , 'Type 1') );
             obj.AreaType1 = sum([obj.Stats(IsType1).Area]);
             %Total area of all Type-12h fibers.
             IsType12h = find( strcmp({obj.Stats.FiberType} , 'Type 12h') );
             obj.AreaType12h = sum([obj.Stats(IsType12h).Area]);
+            %Total area of all Type-2 fibers.
+            IsType2 = find( [obj.Stats.FiberTypeMainGroup] == 2 );
+            obj.AreaType2 = sum([obj.Stats(IsType2).Area]);
             %Total area of all Type-2a fibers.
             IsType2a = find( strcmp({obj.Stats.FiberType} , 'Type 2a') );
             obj.AreaType2a = sum([obj.Stats(IsType2a).Area]);
@@ -381,7 +368,7 @@ classdef modelResults < handle
             obj.AreaType0 = sum([obj.Stats(IsType0).Area]);
             
             % Total area of all fiber objects including Type 0
-            obj.AreaFibers = obj.AreaType1+obj.AreaType12h+obj.AreaType2x+obj.AreaType2a+obj.AreaType2ax+obj.AreaType0;
+            obj.AreaFibers = obj.AreaType1+obj.AreaType12h+obj.AreaType2+obj.AreaType0;
             % Total area that consists no Objects. Collagen (green)
             obj.AreaNoneObj = obj.AreaPic - obj.AreaFibers;
             
@@ -392,14 +379,19 @@ classdef modelResults < handle
             obj.AreaType12hPC = obj.AreaType12h/obj.AreaPic * 100;
             obj.InfoMessage = ['      - ' num2str(obj.AreaType12hPC) ' % of the image consists of Type 12 hybrid fibers'];
             
-            obj.AreaType2xPC = obj.AreaType2x/obj.AreaPic * 100;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaType2xPC) ' % of the image consists of Type 2x fibers'];
+            obj.AreaType2PC = obj.AreaType2/obj.AreaPic * 100;
+            obj.InfoMessage = ['      - ' num2str(obj.AreaType2PC) ' % of the image consists of Type 2 fibers'];
             
-            obj.AreaType2aPC = obj.AreaType2a/obj.AreaPic * 100;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaType2aPC) ' % of the image consists of Type 2a fibers'];
-            
-            obj.AreaType2axPC = obj.AreaType2ax/obj.AreaPic * 100;
-            obj.InfoMessage = ['      - ' num2str(obj.AreaType2axPC) ' % of the image consists of Type 2ax fibers'];
+            if obj.AnalyzeMode == 2 || obj.AnalyzeMode == 4 || obj.AnalyzeMode == 6
+                obj.AreaType2xPC = obj.AreaType2x/obj.AreaPic * 100;
+                obj.InfoMessage = ['         - ' num2str(obj.AreaType2xPC) ' % of the image consists of Type 2x fibers'];
+                
+                obj.AreaType2aPC = obj.AreaType2a/obj.AreaPic * 100;
+                obj.InfoMessage = ['         - ' num2str(obj.AreaType2aPC) ' % of the image consists of Type 2a fibers'];
+                
+                obj.AreaType2axPC = obj.AreaType2ax/obj.AreaPic * 100;
+                obj.InfoMessage = ['         - ' num2str(obj.AreaType2axPC) ' % of the image consists of Type 2ax fibers'];
+            end
             
             obj.AreaType0PC = obj.AreaType0/obj.AreaPic * 100;
             obj.InfoMessage = ['      - ' num2str(obj.AreaType0PC) ' % of the image consists undefined fibers'];
@@ -436,6 +428,17 @@ classdef modelResults < handle
             else
                 obj.AreaMinMaxT12h = '--';
                 obj.AreaMinMaxObjT12h = '--';
+
+            end
+            
+            if ~isempty(obj.StatsMatDataT2)
+                obj.AreaMinMaxT2(1) = min(cell2mat(obj.StatsMatDataT2(:,4)));
+                obj.AreaMinMaxObjT2(1) = cell2mat(obj.StatsMatDataT2( find([obj.StatsMatDataT2{:,4}]==obj.AreaMinMaxT2(1),1) ,1));
+                obj.AreaMinMaxT2(2) = max(cell2mat(obj.StatsMatDataT2(:,4)));
+                obj.AreaMinMaxObjT2(2) = cell2mat(obj.StatsMatDataT2( find([obj.StatsMatDataT2{:,4}]==obj.AreaMinMaxT2(2),1) ,1));
+            else
+                obj.AreaMinMaxT2a = '--';
+                obj.AreaMinMaxObjT2a = '--';
 
             end
             
@@ -487,6 +490,13 @@ classdef modelResults < handle
             
             obj.InfoMessage = '   - Calculate fiber type numbers';
             
+            obj.NoTyp1 = 0;
+            obj.NoTyp12h = 0;
+            obj.NoTyp2 = 0;
+            obj.NoTyp2x = 0;
+            obj.NoTyp2a = 0;
+            obj.NoTyp2ax = 0;
+            
             % Number of Fiber Objects
             obj.NoOfObjects = size(obj.Stats,1); %all objects
 
@@ -496,14 +506,20 @@ classdef modelResults < handle
             obj.NoTyp12h = size(obj.StatsMatDataT12h,1); % Type 12h
             obj.InfoMessage = ['      - ' num2str(obj.NoTyp12h) ' Type 12 hybrid fibers'];
             
-            obj.NoTyp2a = size(obj.StatsMatDataT2a,1); % Type 2a
-            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2a) ' Type 2a fibers'];
+            obj.NoTyp2 = size(obj.StatsMatDataT2,1); % Type 12h
+            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2) ' Type 2 fibers'];
             
-            obj.NoTyp2x = size(obj.StatsMatDataT2x,1); % Type 2x
-            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2x) ' Type 2x fibers'];
-            
-            obj.NoTyp2ax = size(obj.StatsMatDataT2ax,1); % Type 2ax
-            obj.InfoMessage = ['      - ' num2str(obj.NoTyp2ax) ' Type 2ax fibers'];
+            if obj.AnalyzeMode == 2 || obj.AnalyzeMode == 4 || obj.AnalyzeMode == 6 
+                %quad labeling was active during classification
+                obj.NoTyp2a = size(obj.StatsMatDataT2a,1); % Type 2a
+                obj.InfoMessage = ['         - ' num2str(obj.NoTyp2a) ' Type 2a fibers'];
+                
+                obj.NoTyp2x = size(obj.StatsMatDataT2x,1); % Type 2x
+                obj.InfoMessage = ['         - ' num2str(obj.NoTyp2x) ' Type 2x fibers'];
+                
+                obj.NoTyp2ax = size(obj.StatsMatDataT2ax,1); % Type 2ax
+                obj.InfoMessage = ['         - ' num2str(obj.NoTyp2ax) ' Type 2ax fibers'];
+            end
             
             obj.NoTyp0 = size(obj.StatsMatDataT0,1); % Type 0 undefined
             obj.InfoMessage = ['      - ' num2str(obj.NoTyp0) ' undefined fibers'];
@@ -535,23 +551,27 @@ classdef modelResults < handle
                 case 5
                     obj.StatisticMat{end,2} =  'Manual Classification triple labeling';
                 case 6
-                    obj.StatisticMat{end,2} =  'Manual Classification quad labeling';    
+                    obj.StatisticMat{end,2} =  'Manual Classification quad labeling'; 
+                case 7
+                    obj.StatisticMat{end,2} =  'Collagen/dystrophin'; 
             end
 
             obj.StatisticMat{end+1,1} = 'Searching for:';
             switch obj.AnalyzeMode
                 case 1
-                    obj.StatisticMat{end,2} =  '1 2 12h 2x fibers';
+                    obj.StatisticMat{end,2} =  'Type 1 2 12h fibers';
                 case 2
-                    obj.StatisticMat{end,2} =  '1 2 12h 2x 2a 2ax fibers';
+                    obj.StatisticMat{end,2} =  'Type 1 12h 2x 2a 2ax fibers';
                 case 3
-                    obj.StatisticMat{end,2} =  '1 2 12h 2x fibers';
+                    obj.StatisticMat{end,2} =  'Type 1 2 12h fibers';
                 case 4
-                    obj.StatisticMat{end,2} =  '1 2 12h 2x 2a 2ax fibers';
+                    obj.StatisticMat{end,2} =  'Type 1 12h 2x 2a 2ax fibers';
                 case 5
-                    obj.StatisticMat{end,2} =  'Manual Classification';
+                    obj.StatisticMat{end,2} =  'Type 1 2 12h fibers (manual)';
                 case 6
-                    obj.StatisticMat{end,2} =  'Manual Classification';    
+                    obj.StatisticMat{end,2} =  'Type 1 12h 2x 2a 2ax fibers (manual)';
+                case 7
+                    obj.StatisticMat{end,2} =  'No Classification'; 
             end
             
             obj.StatisticMat{end+1,1} = sprintf('Para min Area (\x3BCm^2):');
@@ -597,33 +617,36 @@ classdef modelResults < handle
             obj.StatisticMat{end+1,1} = 'Para Blue/Red thresh:';
             obj.StatisticMat{end+1,1} = 'Para Blue distance:';
             obj.StatisticMat{end+1,1} = 'Para Red distance:';
+            
             if obj.BlueRedThreshActive
                 obj.StatisticMat{end-2,2} =  obj.BlueRedThresh;
                 obj.StatisticMat{end-1,2} =  obj.BlueRedDistBlue;
                 obj.StatisticMat{end,2} =  obj.BlueRedDistRed;
             else
-                obj.StatisticMat{end-2,2} =  'not active';
-                obj.StatisticMat{end-1,2} =  'not active';
-                obj.StatisticMat{end,2} =  'not active';
+                obj.StatisticMat{end-2,2} = 'not active';
+                obj.StatisticMat{end-1,2} = 'not active';
+                obj.StatisticMat{end,2} = 'not active';
             end
             
             obj.StatisticMat{end+1,1} = 'Para Farred/Red thresh:';
             obj.StatisticMat{end+1,1} = 'Para Farred distance:';
             obj.StatisticMat{end+1,1} = 'Para Red distance:';
+            
             if obj.FarredRedThreshActive
-                obj.StatisticMat{end-2,2} =  obj.FarredRedThresh;
-                obj.StatisticMat{end-1,2} =  obj.FarredRedDistFarred;
-                obj.StatisticMat{end,2} =  obj.FarredRedDistRed;
+                obj.StatisticMat{end-2,2} = obj.FarredRedThresh;
+                obj.StatisticMat{end-1,2} = obj.FarredRedDistFarred;
+                obj.StatisticMat{end,2} = obj.FarredRedDistRed;
             else
-                obj.StatisticMat{end-2,2} =  'not active';
-                obj.StatisticMat{end-1,2} =  'not active';
-                obj.StatisticMat{end,2} =  'not active';
+                obj.StatisticMat{end-2,2} = 'not active';
+                obj.StatisticMat{end-1,2} = 'not active';
+                obj.StatisticMat{end,2} = 'not active';
             end
             
             obj.StatisticMat{end+1,1} = 'Para min Points per Cluster:';
             obj.StatisticMat{end,2} = obj.minPointsPerCluster;
             
             obj.StatisticMat{end+1,1} = 'Para Cluster 1/2 Hybrid Fibers:';
+            
             if obj.Hybrid12FiberActive && (obj.AnalyzeMode == 3 || obj.AnalyzeMode == 4)
                 obj.StatisticMat{end,2} = '12h Fibers allowed';
             elseif ~obj.Hybrid12FiberActive && (obj.AnalyzeMode == 3 || obj.AnalyzeMode == 4)
@@ -656,6 +679,9 @@ classdef modelResults < handle
            
             obj.StatisticMat{end+1,1} = 'Number Type 12h:';
             obj.StatisticMat{end,2} =  obj.NoTyp12h;
+            
+            obj.StatisticMat{end+1,1} = 'Number all Type 2:';
+            obj.StatisticMat{end,2} =  obj.NoTyp2;
            
             obj.StatisticMat{end+1,1} = 'Number Type 2a:';
             obj.StatisticMat{end,2} =  obj.NoTyp2a;
@@ -674,6 +700,9 @@ classdef modelResults < handle
 
             obj.StatisticMat{end+1,1} =  sprintf('Area Type 12h (\x3BCm^2):');
             obj.StatisticMat{end,2} =  obj.AreaType12h;
+            
+            obj.StatisticMat{end+1,1} =  sprintf('Area all Type 2 (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaType2;
            
             obj.StatisticMat{end+1,1} =  sprintf('Area Type 2a (\x3BCm^2):');
             obj.StatisticMat{end,2} =  obj.AreaType2a;
@@ -692,6 +721,9 @@ classdef modelResults < handle
             
             obj.StatisticMat{end+1,1} = 'Area Type 12h (%):';
             obj.StatisticMat{end,2} =  obj.AreaType12hPC;
+            
+            obj.StatisticMat{end+1,1} = 'Area all Type 2 (%):';
+            obj.StatisticMat{end,2} =  obj.AreaType2PC;
             
             obj.StatisticMat{end+1,1} = 'Area Type 2a (%):';
             obj.StatisticMat{end,2} =  obj.AreaType2aPC;
@@ -740,6 +772,20 @@ classdef modelResults < handle
             
             obj.StatisticMat{end+1,1} = 'Largest T12h Fiber:';
             obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT12h(2);
+            
+            
+            obj.StatisticMat{end+1,1} = sprintf('Smallest Area T2 (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2(1);
+
+            obj.StatisticMat{end+1,1} = 'Smallest T2 Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2(1);
+    
+            obj.StatisticMat{end+1,1} = sprintf('Largest Area T2 (\x3BCm^2):');
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxT2(2);
+            
+            obj.StatisticMat{end+1,1} = 'Largest T2 Fiber:';
+            obj.StatisticMat{end,2} =  obj.AreaMinMaxObjT2(2);
+            
     
             obj.StatisticMat{end+1,1} = sprintf('Smallest Area T2a (\x3BCm^2):');
             obj.StatisticMat{end,2} =  obj.AreaMinMaxT2a(1);
@@ -843,6 +889,7 @@ classdef modelResults < handle
             obj.InfoMessage = '      - searching for fiber type groups...';
             IsType1 = find( strcmp({obj.Stats.FiberType} , 'Type 1') );
             IsType12h = find( strcmp({obj.Stats.FiberType} , 'Type 12h') );
+            IsType2 = find( strcmp({obj.Stats.FiberType} , 'Type 2') );
             IsType2a = find( strcmp({obj.Stats.FiberType} , 'Type 2a') );
             IsType2ax = find( strcmp({obj.Stats.FiberType} , 'Type 2ax') );
             IsType2x = find( strcmp({obj.Stats.FiberType} , 'Type 2x') );
@@ -866,8 +913,9 @@ classdef modelResults < handle
             se = strel('disk',1);
             
             %%%%%%%%%%%%%%%%%%%%% Type-1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            obj.InfoMessage = '         - find Type-1 groups';
+            
             if ~isempty(IsType1)
+                obj.InfoMessage = '         - find Type-1 groups';
                 IBWT1=zeros(size(I_Label));  
                 for i=1:1:size(IsType1,2)
                     IBWT1(I_Label==IsType1(i))=1;
@@ -904,8 +952,9 @@ classdef modelResults < handle
             end
             
             %%%%%%%%%%%%%%%%%%%%% Type-12h %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            obj.InfoMessage = '         - find Type-12h groups';
+            
             if ~isempty(IsType12h)
+                obj.InfoMessage = '         - find Type-12h groups';
                 IBWT12h=zeros(size(I_Label));   
                 for i=1:1:size(IsType12h,2)
                     IBWT12h(I_Label==IsType12h(i))=1;
@@ -940,9 +989,51 @@ classdef modelResults < handle
                 obj.GroupStats.LabelT12h = [];
                 obj.GroupStats.NoObjT12h = [];
             end
+            
+             %%%%%%%%%%%%%%%%%%%%% Type-2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            if ~isempty(IsType2)
+                obj.InfoMessage = '         - find Type-2 groups';
+                IBWT2=zeros(size(I_Label));  
+                for i=1:1:size(IsType2,2)
+                    IBWT2(I_Label==IsType2(i))=1;
+                end
+                IBWT2_C=imclose(IBWT2,se);
+%                 IBWT2 = bwmorph(IBWT2_C,'thin',2);
+                [BWT2_Bound,BWT2_Label] = bwboundaries(IBWT2_C,8,'noholes');
+                LrgbT2(:,:,1)=IBWT2_C*1;
+                LrgbT2(:,:,2)=IBWT2_C*0;
+                LrgbT2(:,:,3)=IBWT2_C*0;
+                
+                nG = max(max(BWT2_Label)); %find number of fiber type groups
+                NoObj = [];
+                for i=1:1:nG
+                    %Find number of fibers within each group
+                    Vec=unique(obj.LabelMat(BWT2_Label==i));
+                    Vec(Vec==0)=[];
+                    NoObj(i)=length(Vec);
+                end
+                
+                %Store Data in GroupStats
+                obj.GroupStats.BoundT2 = BWT2_Bound;
+                obj.GroupStats.LabelT2 = BWT2_Label;
+                obj.GroupStats.NoObjT2 = NoObj;
+                
+                
+            else
+                LrgbT2(:,:,1)=zeros(size(I_Label));
+                LrgbT2(:,:,2)=zeros(size(I_Label));
+                LrgbT2(:,:,3)=zeros(size(I_Label)); 
+                
+                obj.GroupStats.BoundT2 = [];
+                obj.GroupStats.LabelT2 = [];
+                obj.GroupStats.NoObjT2 = [];
+                
+            end
+            
             %%%%%%%%%%%%%%%%%%%%% Type-2x %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            obj.InfoMessage = '         - find Type-2x groups';
             if ~isempty(IsType2x)
+                obj.InfoMessage = '         - find Type-2x groups';
                 IBWT2x=zeros(size(I_Label));  
                 for i=1:1:size(IsType2x,2)
                     IBWT2x(I_Label==IsType2x(i))=1;
@@ -980,8 +1071,8 @@ classdef modelResults < handle
                 
             end
             %%%%%%%%%%%%%%%%%%%%% Type-2a %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            obj.InfoMessage = '         - find Type-2a groups';
             if ~isempty(IsType2a)
+                obj.InfoMessage = '         - find Type-2a groups';
                 IBWT2a=zeros(size(I_Label));  
                 for i=1:1:size(IsType2a,2)
                     IBWT2a(I_Label==IsType2a(i))=1;
@@ -1017,8 +1108,9 @@ classdef modelResults < handle
                 obj.GroupStats.NoObjT2a = [];
             end
             %%%%%%%%%%%%%%%%%%%%% Type-2ax %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            obj.InfoMessage = '         - find Type-2ax groups';
+            
             if ~isempty(IsType2ax)
+                obj.InfoMessage = '         - find Type-2ax groups';
                 IBWT2ax=zeros(size(I_Label));  
                 for i=1:1:size(IsType2ax,2)
                     IBWT2ax(I_Label==IsType2ax(i))=1;
@@ -1054,7 +1146,13 @@ classdef modelResults < handle
                 obj.GroupStats.NoObjT2ax = [];
             end
             
-            Lrgb = LrgbT1+LrgbT12h+LrgbT2x+LrgbT2a+LrgbT2ax;
+            
+            if obj.AnalyzeMode == 1 || obj.AnalyzeMode == 3 || obj.AnalyzeMode == 5 || obj.AnalyzeMode == 7
+                Lrgb = LrgbT1+LrgbT12h+LrgbT2;
+            else 
+                Lrgb = LrgbT1+LrgbT12h+LrgbT2x+LrgbT2a+LrgbT2ax;
+            end
+            
             obj.GroupStats.Lrgb = Lrgb;
             obj.GroupStats.LabelMat = obj.LabelMat;
         end
@@ -1352,6 +1450,7 @@ classdef modelResults < handle
                 InfoAnimal = cell(size(obj.StatsMatData,1),size(prompt,2));
                 InfoAnimalT1 = cell(size(obj.StatsMatDataT1,1),size(prompt,2));
                 InfoAnimalT12h = cell(size(obj.StatsMatDataT12h,1),size(prompt,2));
+                InfoAnimalT2 = cell(size(obj.StatsMatDataT2,1),size(prompt,2));
                 InfoAnimalT2x = cell(size(obj.StatsMatDataT2x,1),size(prompt,2));
                 InfoAnimalT2a = cell(size(obj.StatsMatDataT2a,1),size(prompt,2));
                 InfoAnimalT2ax = cell(size(obj.StatsMatDataT2ax,1),size(prompt,2));
@@ -1361,6 +1460,7 @@ classdef modelResults < handle
                     [InfoAnimal{:,i}] = deal(answer{1,i});
                     [InfoAnimalT1{:,i}] = deal(answer{1,i});
                     [InfoAnimalT12h{:,i}] = deal(answer{1,i});
+                    [InfoAnimalT2{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2x{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2a{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2ax{:,i}] = deal(answer{1,i});
@@ -1368,8 +1468,8 @@ classdef modelResults < handle
                 
                 Header = {'Label' sprintf('XPos (\x3BCm)') sprintf('YPos (\x3BCm)')... 
                     sprintf('Area (\x3BCm^2)') sprintf('min Cross Section Area (\x3BCm^2)'),sprintf('max Cross Section Area (\x3BCm^2)')...
-                    sprintf('Perimeter (\x3BCm)') sprintf('maxDiameter (\x3BCm)') ...
-                    sprintf('minDiameter (\x3BCm)')  'Roundness' ...
+                    sprintf('Perimeter (\x3BCm)') sprintf('minDiameter (\x3BCm)') ...
+                    sprintf('maxDiameter (\x3BCm)')  'Roundness' ...
                     'AspectRatio' 'ColorValue' 'meanRed' 'meanGreen' ...
                     'meanBlue' 'meanFarred' 'Blue/Red' 'Farred/Red'...
                     'FiberMainGroup' 'FiberType'};
@@ -1380,6 +1480,7 @@ classdef modelResults < handle
                 CellFiberTable = cat(1,Header,cat(2,InfoAnimal,obj.StatsMatData));
                 CellFiberTableT1 = cat(1,Header,cat(2,InfoAnimalT1,obj.StatsMatDataT1));
                 CellFiberTableT12h = cat(1,Header,cat(2,InfoAnimalT12h,obj.StatsMatDataT12h));
+                CellFiberTableT2 = cat(1,Header,cat(2,InfoAnimalT2,obj.StatsMatDataT2));
                 CellFiberTableT2x = cat(1,Header,cat(2,InfoAnimalT2x,obj.StatsMatDataT2x));
                 CellFiberTableT2a = cat(1,Header,cat(2,InfoAnimalT2a,obj.StatsMatDataT2a));
                 CellFiberTableT2ax = cat(1,Header,cat(2,InfoAnimalT2ax,obj.StatsMatDataT2ax));
@@ -1441,6 +1542,11 @@ classdef modelResults < handle
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 12h fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
+                    
+                    sheetName = 'Type 2';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 2 fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
                     
                     sheetName = 'Type 2x';
                     startRange = 'B2';
@@ -1521,6 +1627,11 @@ classdef modelResults < handle
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 12h fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
+                    
+                    sheetName = 'Type 2';
+                    startRange = 'B2';
+                    obj.InfoMessage = '            - write Type 2 fibers ';
+                    status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
                     
                     sheetName = 'Type 2x';
                     startRange = 'B2';
