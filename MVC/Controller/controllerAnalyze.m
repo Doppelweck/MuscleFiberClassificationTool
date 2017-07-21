@@ -363,7 +363,7 @@ classdef controllerAnalyze < handle
                             set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String','0');
                         else
                             % Set BlueRedThresh to Value
-                            set(obj.viewAnalyzeHandle.BlueRedThresh,'String',num2str(Value));
+                            set(obj.viewAnalyzeHandle.B_BlueRedThresh,'String',num2str(Value));
                         end
                     else
                         % Value is not numerical. Set value to 0
@@ -575,6 +575,17 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
                 
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
@@ -602,6 +613,17 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
                 
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
+                
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
@@ -627,6 +649,17 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',1)
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
+                
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
@@ -653,6 +686,17 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',1)
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',1)
+                
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
@@ -678,6 +722,18 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
+                
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
+
 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
@@ -701,8 +757,51 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
                 set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
+                
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',1);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
 
-                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';    
+                obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane'; 
+                
+            elseif src.Value == 7    
+                obj.modelAnalyzeHandle.InfoMessage = '   - No Classif. only fiber props. calculation ';
+                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedThreshActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_FarredRedThresh,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','off')
+                
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_12HybridFiberActive,'Value',0)
+                set(obj.viewAnalyzeHandle.B_2axHybridFiberActive,'Value',0)
+                
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_RoundnessActive,'Value',0);
+                set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Value',0);
+                set(obj.viewAnalyzeHandle.B_AspectRatioActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
+                set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',0);
                 
             end
             
@@ -903,7 +1002,13 @@ classdef controllerAnalyze < handle
                 %Show image for quad labeling
                 obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
                 axis on
-                axis image         
+                axis image  
+            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value ==7
+                
+                %Show image for quad labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
+                axis on
+                axis image     
             end
             
             lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',14);
@@ -1169,6 +1274,8 @@ classdef controllerAnalyze < handle
                         Color = 'w';
                     case 'Type 1'
                         Color = 'b';
+                    case 'Type 2'
+                        Color = 'r';
                     case 'Type 2x'
                         Color = 'r';
                     case 'Type 2a'
@@ -1504,7 +1611,8 @@ classdef controllerAnalyze < handle
                 else
                 % click was on the background
                 % refresh Callback function in figure AnalyzeMode
-                set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+%                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+                obj.addWindowCallbacks();
                 end
             end
         end
@@ -1533,6 +1641,9 @@ classdef controllerAnalyze < handle
             obj.busyIndicator(0);
             
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            %refresh main figure callbacks 
+            obj.addWindowCallbacks();
+            
             % If a window for Fibertype manipulation already exists,
             % delete it
             OldFig = findobj('Tag','FigureManipulate');
@@ -1569,10 +1680,13 @@ classdef controllerAnalyze < handle
             
             % refresh Callback function in figure AnalyzeMode
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+            %refresh main figure callbacks 
+            obj.addWindowCallbacks();
         end
         
         function showPreResultsEvent(obj,src,evnt)
-            
+            %refresh main figure callbacks 
+            addWindowCallbacks(obj);
             % If a window already exists, delete it
             OldFig = findobj('Tag','FigureManipulate');
             if ~isempty(OldFig) && isvalid(OldFig)
@@ -1613,6 +1727,10 @@ classdef controllerAnalyze < handle
                     Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 12h');
                     T12h = obj.modelAnalyzeHandle.Stats(Index);
                     
+                    %find all Type 2 Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2');
+                    T2 = obj.modelAnalyzeHandle.Stats(Index);
+                    
                     %find all Type 2x Fibers
                     Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2x');
                     T2x = obj.modelAnalyzeHandle.Stats(Index);
@@ -1624,6 +1742,10 @@ classdef controllerAnalyze < handle
                     %find all Type 2ax Fibers
                     Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2ax');
                     T2ax = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 0 Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'undefined');
+                    T0 = obj.modelAnalyzeHandle.Stats(Index);
                     
                     ax = obj.viewAnalyzeHandle.hAPRBR;
                     
@@ -1643,6 +1765,12 @@ classdef controllerAnalyze < handle
                         LegendString{end+1} = 'Type 12h';
                     end
                     hold on
+                    if ~isempty(T2)
+                        h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2';
+                    end
+                    hold on
                     if ~isempty(T2x)
                         h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
                         set(h,'MarkerEdgeColor','k');
@@ -1659,6 +1787,11 @@ classdef controllerAnalyze < handle
                         h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
                         set(h,'MarkerEdgeColor','k');
                         LegendString{end+1} = 'Type 2a';
+                    end
+                    if ~isempty(T0)
+                        h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type-0 (undefined)';
                     end
                     
                     Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
@@ -1707,7 +1840,7 @@ classdef controllerAnalyze < handle
                     ylim([ 0 maxLim+10 ] );
                     xlim([ 0 maxLim+10 ] );
                     grid on
-                    title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h)'},'FontSize',14)
+                    title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
                     legend(LegendString,'Location','best')
                     
                     %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1716,6 +1849,11 @@ classdef controllerAnalyze < handle
                     LegendString = {};
                     
                     hold on
+                    if ~isempty(T2)
+                        h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
+                        set(h,'MarkerEdgeColor','k');
+                        LegendString{end+1} = 'Type 2';
+                    end
                     if ~isempty(T2x)
                         h=scatter([T2x.ColorRed],[T2x.ColorFarRed],20,ColorMap(3,:),'filled');
                         set(h,'MarkerEdgeColor','k');
@@ -1771,7 +1909,6 @@ classdef controllerAnalyze < handle
                         LegendString{end+1} = ['f_{FRthresh}(R) = R (not active)'];
                         hold on
                         plot(R,f_BRthresh,'k');
-                    
                     end
                     
                     maxLim =  max([Rmax FRmax]);
@@ -1780,7 +1917,12 @@ classdef controllerAnalyze < handle
                     ylim([ 0 maxLim+10 ] );
                     xlim([ 0 maxLim+10 ] );
                     grid on
-                    title({'Fiber Type-2 specification classification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
+                    if obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 3 || ...
+                            obj.modelAnalyzeHandle.AnalyzeMode == 5 || obj.modelAnalyzeHandle.AnalyzeMode == 7
+                        title({'Trible labeling: Type-2 specification classification' ;'(Type-2)'},'FontSize',14)
+                    else
+                        title({'Quad labeling: Fiber Type-2 specification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
+                    end
                     legend(LegendString,'Location','Best')
                     
                 end
