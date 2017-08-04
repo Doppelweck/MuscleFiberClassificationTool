@@ -173,6 +173,7 @@ classdef controllerResults < handle
             %           InfoText:   Info text log.
             %
             
+            try
             % Set PicData Properties in the Results Model
             obj.modelResultsHandle.FileName = Data{1};
             obj.modelResultsHandle.PathName = Data{2};
@@ -241,11 +242,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
             
             %show results data in the GUI
-            try
-                obj.modelResultsHandle.startResultMode();
-            catch
-                obj.errorMessage(lasterror);
-            end
+            obj.modelResultsHandle.startResultMode();
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
             set(obj.viewResultsHandle.B_Save,'Enable','on');
@@ -271,6 +268,10 @@ classdef controllerResults < handle
                 % create new folder to save results
                 set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
 
+            end
+            
+            catch
+                obj.errorMessage(lasterror);
             end
             
         end
@@ -315,7 +316,7 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResults object.
             %
-            
+            try
             obj.modelResultsHandle.SaveFiberTable = obj.viewResultsHandle.B_SaveFiberTable.Value;
             obj.modelResultsHandle.SaveScatterAll = obj.viewResultsHandle.B_SaveScatterAll.Value;
             obj.modelResultsHandle.SavePlots = obj.viewResultsHandle.B_SavePlots.Value;
@@ -353,6 +354,9 @@ classdef controllerResults < handle
             
             [y,Fs] = audioread('filling-your-inbox.mp3');
             sound(y*0.4,Fs);
+            catch
+                obj.errorMessage(lasterror);
+            end
         end
         
         function showInfoInTableGUI(obj)
@@ -366,6 +370,8 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResults object.
             %
+            try
+                
             obj.viewResultsHandle.B_TableMain.RowName = [];
             obj.viewResultsHandle.B_TableMain.ColumnName = {'Label'  sprintf('XPos |(\x3BCm)') sprintf('YPos |(\x3BCm)')...
                 sprintf('Area |(\x3BCm^2)') sprintf('min Area Cross|Section (\x3BCm^2)'), sprintf('max Area Cross|Section (\x3BCm^2)')...
@@ -380,6 +386,10 @@ classdef controllerResults < handle
             obj.viewResultsHandle.B_TableStatistic.ColumnName = {'Name of parameter           ','Value of parameter           '};
             obj.viewResultsHandle.B_TableStatistic.Data = obj.modelResultsHandle.StatisticMat;
             obj.viewResultsHandle.B_TableStatistic.ColumnWidth={'auto'};
+            
+            catch
+                obj.errorMessage(lasterror);
+            end
         end
         
         function showAxesDataInGUI(obj)
@@ -395,7 +405,7 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResults object.
             %
-            
+                
             obj.modelResultsHandle.InfoMessage = '   - plot data into GUI axes...';
             
             AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
@@ -1565,27 +1575,32 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResult object
             %
-
-            if exist(obj.modelResultsHandle.SavePath,'dir') == 7
+            try
                 
-                if ismac
-                    obj.modelResultsHandle.InfoMessage = '   - open save directory';
-                    path = obj.modelResultsHandle.SavePath;
+                if exist(obj.modelResultsHandle.SavePath,'dir') == 7
                     
-                    % transforl space char into mac compatible '/ ' char
-                    path = strrep(path,' ','\ ');
-                    unix(['open ' path]);
-                    
-                elseif ispc
-                    obj.modelResultsHandle.InfoMessage = '   - open save directory';
-                    winopen(obj.modelResultsHandle.SavePath);
+                    if ismac
+                        obj.modelResultsHandle.InfoMessage = '   - open save directory';
+                        path = obj.modelResultsHandle.SavePath;
+                        
+                        % transforl space char into mac compatible '/ ' char
+                        path = strrep(path,' ','\ ');
+                        unix(['open ' path]);
+                        
+                    elseif ispc
+                        obj.modelResultsHandle.InfoMessage = '   - open save directory';
+                        winopen(obj.modelResultsHandle.SavePath);
+                    else
+                        obj.modelResultsHandle.InfoMessage = '   - Error while opening save directory';
+                    end
                 else
-                    obj.modelResultsHandle.InfoMessage = '   - Error while opening save directory';
+                    obj.modelResultsHandle.InfoMessage = '   - save directory dont exist';
+                    obj.modelResultsHandle.InfoMessage = '      - no data has been saved';
+                    obj.modelResultsHandle.InfoMessage = '      - press Save button to saving data and creating directory';
                 end
-            else
-                obj.modelResultsHandle.InfoMessage = '   - save directory dont exist';
-                obj.modelResultsHandle.InfoMessage = '      - no data has been saved';
-                obj.modelResultsHandle.InfoMessage = '      - press Save button to saving data and creating directory';
+                
+            catch
+                obj.errorMessage(lasterror);
             end
             
         end
@@ -1662,7 +1677,7 @@ classdef controllerResults < handle
             end
             
             mode = struct('WindowStyle','modal','Interpreter','tex');
-            
+            beep
             uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
             
             obj.busyIndicator(0);
