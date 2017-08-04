@@ -164,7 +164,7 @@ classdef viewAnalyze < handle
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
             String= {sprintf('Color-Ratio-Based triple labeling') ; sprintf('Color-Ratio-Based quad labeling');...
-            'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'; 'Collagen / dystrophin'};
+            'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'; 'Collagen / Dystrophin'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Value',2);
             
             set( HBoxPara1, 'Widths', [-2 -5] );
@@ -718,7 +718,7 @@ classdef viewAnalyze < handle
             
             set(obj.hFPR, 'position', [posMainFig(1) posMainFig(2) 0.8 0.8]);
             movegui(obj.hFPR,'center')
-
+            
             set(obj.hFPR,'WindowStyle','normal');
             
             AxesBox = uix.HBox('Parent', obj.hFPR,'Padding', 25,'Spacing', 10);
@@ -727,6 +727,7 @@ classdef viewAnalyze < handle
             %daspect(obj.hAPRBR,[1 1 1]);
             obj.hAPRFRR = axes('Parent',uicontainer('Parent', AxesBox), 'FontUnits','normalized','Fontsize',0.015,'Tag','AxesManualClassify');
             set(obj.hAPRFRR, 'LooseInset', [0,0,0,0]);
+            
             %daspect(obj.hAPRFRR,[1 1 1]);
             set(obj.hFPR, 'Visible', 'on');
         end

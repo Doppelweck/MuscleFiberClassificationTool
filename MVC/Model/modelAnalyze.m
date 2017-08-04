@@ -85,6 +85,8 @@ classdef modelAnalyze < handle
         
         minPointsPerCluster;
         
+        ClusterData;
+        
         XScale; %Inicates the um/pixels in X direction to change values in micro meter
         YScale; %Inicates the um/pixels in Y direction to change values in micro meter
         CalculationRunning; %Indicates if any caluclation is still running.
@@ -602,46 +604,10 @@ classdef modelAnalyze < handle
             obj.InfoMessage = '      - use OPTICS clustering';
             noElements = size(obj.Stats,1);
             
-%             %find all fiber types that are undefined (out of the
-%             %parameter range).
-%             obj.InfoMessage = '         - find objects that are out of parameter range';
-%             for i=1:1:noElements
-%                 percent=(i-0.1)/noElements;
-%                 workbar(percent,'Please Wait...pre-classification','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
-%                 
-%                 if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
-%                     
-%                     % Object Area is to big. FiberType 0: No Fiber (white)
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                     
-%                 elseif obj.AspectRatioActive && ( obj.Stats(i).AspectRatio < obj.MinAspectRatio || ...
-%                         obj.Stats(i).AspectRatio > obj.MaxAspectRatio )
-%                     
-%                     % ApsectRatio is to small or to great.
-%                     % FiberType 0: No Fiber (white)
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                     
-%                 elseif obj.RoundnessActive && ( obj.Stats(i).Roundness < obj.MinRoundness )
-%                     
-%                     % Object Roundness is to small. FiberType 0: No Fiber (white))
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                     
-%                 elseif obj.ColorValueActive && ( obj.Stats(i).ColorValue < obj.ColorValue )
-%                     
-%                     % Object ColorValue is to small. FiberType 0: No Fiber (white))
-%                     obj.Stats(i).FiberTypeMainGroup = 0;
-%                     obj.Stats(i).FiberType = 'undefined';
-%                     
-%                 else
-%                     
-%                 end
-%             end
+            obj.ClusterData.ReachPlotMain = [];
+            obj.ClusterData.EpsilonMain = [];
+            obj.ClusterData.ReachPlotSub = [];
+            obj.ClusterData.EpsilonSub = [];
 
             obj.InfoMessage = '         - create temp stats struct';
             %create temp stats with label number for further
@@ -710,6 +676,10 @@ classdef modelAnalyze < handle
             obj.InfoMessage = '         - searching for clusters...';
             
             ReachPlot = RD(order);
+            
+            pks = findpeaks(ReachPlot);
+            pks(end+1) = max(ReachPlot);
+            
             ReachPlot(end+1)=max(ReachPlot);
             ReachValues = sort(unique(ReachPlot));
             epsilon = ReachValues(1);
@@ -721,6 +691,10 @@ classdef modelAnalyze < handle
                 for i=1:1:size(tempStats,1)
                     
                     if ReachPlot(i+1) <= epsilon %found new cluster
+                        if ReachPlot(i+1) == epsilon
+                            disp(epsilon)
+                        end
+                        
                         if newCluster
                             Cluster = Cluster +1;
                             newCluster = false;
@@ -755,7 +729,7 @@ classdef modelAnalyze < handle
 %                     [n, index] = histc(Class, list);
                     ClassNoNoise = Class(Class~=0);
                     n =  histcounts(ClassNoNoise);
-                    if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)*(0.05) %nnz(Class)/length(n)
+                    if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)*(0.3) %nnz(Class)/length(n)
                         searchForClusters = false;
                     else
 %                         epsilon = epsilon + 1;
@@ -769,12 +743,17 @@ classdef modelAnalyze < handle
             end %end while searchForClusters
             obj.InfoMessage = ['         - ' num2str(Cluster) ' clusters were found'];
             
+            obj.ClusterData.ReachPlotMain = ReachPlot;
+            obj.ClusterData.EpsilonMain = epsilon;
+            
 %             f0=figure();
 %             bar(ReachPlot)
 %             title({['Reachability-Distance-Plot (P_{min} = ' num2str(minPoints) ')'],...
 %                 ['Found Clusters = ' num2str(Cluster)] })
 %             hold on
 %             plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+%             pks = findpeaks(ReachPlot);
+%             disp(epsilon)
 %             set(gca,'xlim',[0 length(ReachPlot)])
 %             grid on
 %             set(f0,'Position',[100,100,250,200]);
@@ -1028,13 +1007,18 @@ classdef modelAnalyze < handle
                 RD(end+1)=max(RD);
                 ReachPlot = RD(order);
                 ReachPlot(end+1)=max(ReachPlot);
+                
+                
+                [pks, locs] = findpeaks(ReachPlot);
+                pks(end+1) = max(ReachPlot);
+                
                 ReachValues = sort(unique(ReachPlot));
                 epsilon = ReachValues(1);
                 posReach=1;
                 
                 while searchForClusters
-                Cluster = 0;
-                Class(order(1)) = Cluster;
+                    Cluster = 0;
+                    Class(order(1)) = Cluster;
                 newCluster=true;
                 for i=1:1:size(tempStats,1)
                     
@@ -1070,7 +1054,7 @@ classdef modelAnalyze < handle
 %                         list = unique(Class);
                         ClassNoNoise = Class(Class~=0);
                         n =  histcounts(ClassNoNoise);
-                        if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)*(0.05)
+                        if length(n(n>=minPoints)) == length(n) && sum(Class(:)==0) < length(Class)*(0.3)
                             searchForClusters = false;
                         else
                             posReach = posReach+1;
@@ -1079,6 +1063,10 @@ classdef modelAnalyze < handle
                         end
                     end
                 end %end while searchForClusters
+                
+                obj.ClusterData.ReachPlotSub = ReachPlot;
+                obj.ClusterData.EpsilonSub = epsilon;
+                
 %             figure
 %             bar(ReachPlot)
 %             hold on
