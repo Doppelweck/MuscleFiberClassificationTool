@@ -35,7 +35,7 @@ text(hf.Children,0.05,0.3,'Developed by:','units','normalized','FontUnits','norm
 text(hf.Children,0.05,0.15,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
 text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
 % setAlwaysOnTop(hf,true);
-
+drawnow;
 
 % create main figure
 mainFig = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85],...

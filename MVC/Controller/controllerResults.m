@@ -241,7 +241,11 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
             
             %show results data in the GUI
-            obj.modelResultsHandle.startResultMode();
+            try
+                obj.modelResultsHandle.startResultMode();
+            catch
+                obj.errorMessage(lasterror);
+            end
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
             set(obj.viewResultsHandle.B_Save,'Enable','on');
@@ -346,6 +350,9 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.InfoMessage = '- no data has been saved';
             end
             obj.busyIndicator(0);
+            
+            [y,Fs] = audioread('filling-your-inbox.mp3');
+            sound(y*0.4,Fs);
         end
         
         function showInfoInTableGUI(obj)
@@ -558,7 +565,7 @@ classdef controllerResults < handle
                 
                 StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
                 StringLegend(z==0)=[];
-                title('Area of all fiber types','FontUnits','normalized','Fontsize',0.06)
+                title('Area of fiber in relation to the image','FontUnits','normalized','Fontsize',0.06)
                 
                 if ~isempty(StringLegend)
                 l2_1 = legend(StringLegend,'Location','Best');
@@ -697,7 +704,7 @@ classdef controllerResults < handle
             elseif obj.modelResultsHandle.AnalyzeMode == 3
                 title('Cluster-Based Triple Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
-                title('luster-Based Quad Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
+                title('Cluster-Based Quad Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 5 || obj.modelResultsHandle.AnalyzeMode == 6
                 title('Manual Classification (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 7   
@@ -1634,6 +1641,31 @@ classdef controllerResults < handle
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
                 end
             end
+        end
+        
+        function errorMessage(obj,ErrorInfo)
+            Text = [];
+            Text{1,1} = ErrorInfo.message;
+            Text{2,1} = '';
+            
+            if any(strcmp('stack',fieldnames(ErrorInfo)))
+                
+                for i=1:size(ErrorInfo.stack,1)
+                    
+                    Text{end+1,1} = [ErrorInfo.stack(i).file];
+                    Text{end+1,1} = [ErrorInfo.stack(i).name];
+                    Text{end+1,1} = ['Line: ' num2str(ErrorInfo.stack(i).line)];
+                    Text{end+1,1} = '------------------------------------------';
+                    
+                end
+                
+            end
+            
+            mode = struct('WindowStyle','modal','Interpreter','tex');
+            
+            uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
+            
+            obj.busyIndicator(0);
         end
         
         function closeProgramEvent(obj,~,~)

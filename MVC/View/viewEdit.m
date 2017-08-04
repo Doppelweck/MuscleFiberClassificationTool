@@ -352,7 +352,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneGreen, 'position', [0 0 1 1]);
             imshow(Pics{5},[])
-            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneGreen = uicontrol( 'Parent', VBox3ColorPlane,'Style','popupmenu', 'String', String, 'Value' ,1,'FontUnits','normalized','Fontsize',0.35);
             set(VBox3ColorPlane,'Heights',[-10 40])
             
@@ -362,7 +362,7 @@ classdef viewEdit < handle
             set(obj.B_AxesCheckPlaneBlue, 'position', [0 0 1 1]);
             imshow(Pics{6})
 %             VButtonBox4 = uix.VButtonBox('Parent', VBox4ColorPlane,'ButtonSize',[400 40]);
-            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4ColorPlane,'Style','popupmenu', 'String', String , 'Value' ,2,'FontUnits','normalized','Fontsize',0.35);
             set(VBox4ColorPlane,'Heights',[-10 40])
             
@@ -372,7 +372,7 @@ classdef viewEdit < handle
             set(obj.B_AxesCheckPlaneRed, 'position', [0 0 1 1]);
             imshow(Pics{7})
 %             VButtonBox5 = uix.VButtonBox('Parent', VBox5ColorPlane,'ButtonSize',[400 40]);
-            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5ColorPlane,'Style','popupmenu', 'String', String , 'Value' ,3,'FontUnits','normalized','Fontsize',0.35);
             set(VBox5ColorPlane,'Heights',[-10 40])
             
@@ -382,7 +382,7 @@ classdef viewEdit < handle
             set(obj.B_AxesCheckPlaneFarRed, 'position', [0 0 1 1]);
             imshow(Pics{8})
 %             VButtonBox6 = uix.VButtonBox('Parent', VBox6ColorPlane,'ButtonSize',[400 40]);
-            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2x fibers (pseudo color: red)', 'FarRed Plane - Type 2a fibers (pseudo color: yellow)'};
+            String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6ColorPlane,'Style','popupmenu', 'String', String , 'Value' ,4,'FontUnits','normalized','Fontsize',0.35);
             set(VBox6ColorPlane,'Heights',[-10 40])
             
