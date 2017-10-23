@@ -30,7 +30,7 @@ try
         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
     TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
-    VersionText=text(hf.Children,0.45,0.75,'Version 1.0 14-July-2017','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+    VersionText=text(hf.Children,0.45,0.75,'Version 1.2 30-Aug-2017','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
     text(hf.Children,0.05,0.3,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     text(hf.Children,0.05,0.15,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
@@ -58,6 +58,8 @@ try
     set( findall(mainFig,'ToolTipString','Brush/Select Data') ,'Visible','Off');
     set( findall(mainFig,'ToolTipString','Show Plot Tools and Dock Figure') ,'Visible','Off');
     set( findall(mainFig,'ToolTipString','Link Plot') ,'Visible','Off');
+    set( findall(mainFig,'ToolTipString','Save Figure') ,'Visible','Off');
+    set( findall(mainFig,'ToolTipString','Open File') ,'Visible','Off');
     
     %create card panel onbject
     mainCard = uix.CardPanel('Parent', mainFig,'Selection',0);

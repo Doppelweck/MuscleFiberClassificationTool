@@ -1277,7 +1277,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hAAreaHist,'FontUnits','normalized','Fontsize',0.03);
             title('Area Histogram','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Area in \mum^2 ( Stepsize bins: ' num2str(h.BinWidth) ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             grid on
             
             %%%%%%%%% Aspect Ratio Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1291,7 +1291,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hAAspectHist,'FontUnits','normalized','Fontsize',0.03);
             title('Aspect Ratio Histogram','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Aspect Ratio ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             
             grid on
             
@@ -1310,7 +1310,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hADiaHist,'FontUnits','normalized','Fontsize',0.03);
             title('Diameter Histogram, minimum Fertet-Diameter (Breadth) ','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Diameters in \mum ( Stepsize bins: ' num2str(h.BinWidth) ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             grid on
             
             %%%%%%%%% Roundness Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1324,7 +1324,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hARoundHist,'FontUnits','normalized','Fontsize',0.03);
             title('Roundness Histogram','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Roundness ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             grid on
             
             else
