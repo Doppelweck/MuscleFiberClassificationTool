@@ -847,7 +847,7 @@ classdef modelResults < handle
                     FCPY = m;
                 end
                 
-                BW_C(FCPX,FCPY)=1;
+                BW_C(FCPY,FCPX)=1;
             end
             
             BW_C = bwconvhull(BW_C);

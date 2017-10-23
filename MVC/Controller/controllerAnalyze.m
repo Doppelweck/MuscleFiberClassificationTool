@@ -1249,7 +1249,7 @@ classdef controllerAnalyze < handle
                 
                 
                 drawnow limitrate
-                htemp = line(axesh,obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,2),obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',1.5);
+                htemp = line(axesh,obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,2),obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
 %                 htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
                 % Tag every Boundarie Line Object with his own Label number
                 % to find them later for manipualtion
@@ -1715,6 +1715,7 @@ classdef controllerAnalyze < handle
                         %Handle to axes Pre-Results Blue over Red
                         ax = obj.viewAnalyzeHandle.hAPRBR;
                         axes(ax)
+                         
                         subplot(2,1,1) %Plot for main Fibers
                         LegendString = {};
                         
@@ -1752,8 +1753,9 @@ classdef controllerAnalyze < handle
                         if ~isempty(T2ax)
                             h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
                             set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
+                            LegendString{end+1} = 'Type 2ax';
                         end
+                        hold on
                         if ~isempty(T0)
                             h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
                             set(h,'MarkerEdgeColor','k');
@@ -1766,15 +1768,27 @@ classdef controllerAnalyze < handle
                         grid on
                         legend(LegendString,'Location','best')
                         title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
+                        maxLim = max([Rmax Bmax]);
+                        xlabel('x: mean Red','FontSize',12);
+                        ylabel('y: mean Blue','FontSize',12);
+                        ylim([ 0 maxLim+10 ] );
+                        xlim([ 0 maxLim+10 ] );
+%                         saveTightFigureOrAxes(gca,'ScatMainTest.pdf');
                         
                         subplot(2,1,2) %Plot Reachability Plot for main Fibers
-                        bar(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain);
-                        set(gca,'xlim',[0 length(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)])
-                        hold on
-                        epsilon = obj.modelAnalyzeHandle.ClusterData.EpsilonMain;
-                        plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
-                        grid on
+                        if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)
+                            bar(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain);
+                            set(gca,'xlim',[0 length(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)])
+                            hold on
+                            epsilon = obj.modelAnalyzeHandle.ClusterData.EpsilonMain;
+                            plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+                            grid on
+                        end
                         title('OPTICS-Clustering: Reachability Plot for Fiber Type Maingroups','FontSize',14)
+                        xlabel('x: Order','FontSize',12);
+                        ylabel('y: Reachability distance R_D','FontSize',12);
+                            %                         saveTightFigureOrAxes(gca,'ReachMainTest.pdf');
+                            
                         
                         %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                         ax = obj.viewAnalyzeHandle.hAPRFRR;
@@ -1784,7 +1798,7 @@ classdef controllerAnalyze < handle
                         
                         hold on
                         if ~isempty(T2)
-                            h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
+                            h=scatter([T2.ColorRed],[T2.ColorFarRed],20,ColorMap(3,:),'filled');
                             set(h,'MarkerEdgeColor','k');
                             LegendString{end+1} = 'Type 2';
                         end
@@ -1803,7 +1817,7 @@ classdef controllerAnalyze < handle
                         if ~isempty(T2ax)
                             h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
                             set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
+                            LegendString{end+1} = 'Type 2ax';
                         end
                         
                         Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
@@ -1817,6 +1831,11 @@ classdef controllerAnalyze < handle
                         else
                             title({'Quad labeling: Fiber Type-2 specification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
                         end
+                        maxLim = max([Rmax FRmax]);
+                        xlabel('x: mean Red','FontSize',12);
+                        ylabel('y: mean Farred','FontSize',12);
+                        ylim([ 0 maxLim+10 ] );
+                        xlim([ 0 maxLim+10 ] );
                         
                         subplot(2,1,2) %Plot Reachability Plot for sub Type-2 Fibers
                         if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub)
@@ -1828,6 +1847,8 @@ classdef controllerAnalyze < handle
                             grid on
                         end
                         title('OPTICS-Clustering: Reachability Plot for Fiber Type-2 Subgroups','FontSize',14)
+                        xlabel('x: Order','FontSize',12);
+                        ylabel('y: Reachability distance R_D','FontSize',12);
                        
                     otherwise
                         
@@ -1871,7 +1892,7 @@ classdef controllerAnalyze < handle
                         if ~isempty(T2ax)
                             h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
                             set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
+                            LegendString{end+1} = 'Type 2ax';
                         end
                         if ~isempty(T0)
                             h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
@@ -1954,7 +1975,7 @@ classdef controllerAnalyze < handle
                         if ~isempty(T2ax)
                             h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
                             set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
+                            LegendString{end+1} = 'Type 2ax';
                         end
                         
                         Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);

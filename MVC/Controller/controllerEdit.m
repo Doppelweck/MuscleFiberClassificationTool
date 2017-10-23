@@ -79,7 +79,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.InfoMessage = 'In cooperation with:';
             obj.modelEditHandle.InfoMessage = 'The Royal Veterinary College, UK';
             obj.modelEditHandle.InfoMessage = ' ';
-            obj.modelEditHandle.InfoMessage = 'Version 1.1 2017';
+            obj.modelEditHandle.InfoMessage = 'Version 1.2 2017';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Press "New file" to start';
             
@@ -374,6 +374,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                    obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -409,6 +410,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                                 if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                        obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                         obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                                     set(obj.viewEditHandle.B_Threshold,'Enable','on');
                                     set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -472,6 +474,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                    obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -531,6 +534,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                    obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -566,6 +570,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                                 if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                        obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                         obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                                     set(obj.viewEditHandle.B_Threshold,'Enable','on');
                                     set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -606,6 +611,7 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                         if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                 obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                             set(obj.viewEditHandle.B_Threshold,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -658,6 +664,7 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
                         if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
+                                obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                 obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                             set(obj.viewEditHandle.B_Threshold,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
@@ -1611,8 +1618,8 @@ classdef controllerEdit < handle
                 
             elseif Mode == 2
                 % Use automatic adaptive threshold for binarization
-                set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
-                set(obj.viewEditHandle.B_Threshold,'Enable','off');
+                set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
+                set(obj.viewEditHandle.B_Threshold,'Enable','on');
                 
                 obj.busyIndicator(1);
                 

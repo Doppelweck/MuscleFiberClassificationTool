@@ -1569,13 +1569,13 @@ classdef modelEdit < handle
 % imhist(obj.PicPlaneGreen_adj)
                         case 2 % Use automatic adaptive threshold for binarization
                             
-                            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+                            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 3 % Use automatic adaptive and manual global threshold for binarization
                             
-                            PicBW1 = im2bw(obj.PicPlaneGreen_adj,thresh);
-                            PicBW2 = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+                            PicBW1 = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
+                            PicBW2 = im2bw(obj.PicPlaneGreen_adj,thresh);
                             obj.PicBW = PicBW1 | PicBW2;
                             obj.handlePicBW.CData = obj.PicBW;
                             
@@ -1595,14 +1595,14 @@ classdef modelEdit < handle
                             
                         case 2 % Use automatic adaptive threshold for binarization
                             
-                            temp = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+                            temp = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
                             obj.PicBW = ~temp;
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 3 % Use automatic adaptive and manual global threshold for binarization
                             
                             temp1 = im2bw(obj.PicPlaneGreen_adj,thresh);
-                            temp2 = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+                            temp2 = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
                             obj.PicBW = ~(temp1 | temp2);
                             obj.handlePicBW.CData = obj.PicBW;
                             
@@ -2121,7 +2121,7 @@ classdef modelEdit < handle
         function autoSetupBinarization(obj)
             obj.InfoMessage = '   - running auto setup binarization';
             
-            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright');
+            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',0.5);
             obj.PicBWisInvert = 'false';
             
             %create Gradient Magnitude image
