@@ -143,6 +143,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_NoIteration,'Callback',@obj.morphValuesEvent);
             set(obj.viewEditHandle.B_StartMorphOP,'Callback',@obj.startMorphOPEvent);
             set(obj.viewEditHandle.B_ThresholdMode,'Callback',@obj.thresholdModeEvent);
+            set(obj.viewEditHandle.B_FiberForeBackGround,'Callback',@obj.fibersInForeOrBackground);
             
         end
         
@@ -179,6 +180,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.ThresholdMode = obj.viewEditHandle.B_ThresholdMode.Value;
             obj.modelEditHandle.ThresholdValue = obj.viewEditHandle.B_Threshold.Value;
             obj.modelEditHandle.AlphaMapValue = obj.viewEditHandle.B_Alpha.Value;
+            obj.modelEditHandle.FiberForeBackGround = obj.viewEditHandle.B_FiberForeBackGround.Value;
         end
         
         function setInitPicsGUI(obj)
@@ -266,6 +268,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
             set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+            set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
             set(obj.viewEditHandle.B_Threshold,'Enable','off');
             set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
             set(obj.viewEditHandle.B_Color,'Enable','off');
@@ -318,6 +321,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                            set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
                                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -373,6 +377,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                            set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -409,6 +414,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                                set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                                 if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                         obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                         obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -473,6 +479,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                            set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -533,6 +540,7 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                            set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                             if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                     obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -569,6 +577,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                                set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                                 if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                         obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                         obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -610,6 +619,7 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                        set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                         if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                 obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                 obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -663,6 +673,7 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                        set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                         if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                                 obj.viewEditHandle.B_ThresholdMode.Value == 2 ||...
                                 obj.viewEditHandle.B_ThresholdMode.Value == 3 )
@@ -708,6 +719,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
             set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+            set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
             set(obj.viewEditHandle.B_Threshold,'Enable','off');
             set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
             set(obj.viewEditHandle.B_Color,'Enable','off');
@@ -762,6 +774,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
                     set(obj.viewEditHandle.B_Threshold,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                     set(obj.viewEditHandle.B_Color,'Enable','off');
@@ -813,6 +826,7 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                        set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                         if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                             obj.viewEditHandle.B_ThresholdMode.Value == 3 )   
                             set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -841,6 +855,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
                     set(obj.viewEditHandle.B_Threshold,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                     set(obj.viewEditHandle.B_Color,'Enable','off');
@@ -870,6 +885,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                     set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
                     set(obj.viewEditHandle.B_Threshold,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                     set(obj.viewEditHandle.B_Color,'Enable','off');
@@ -921,6 +937,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                    set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                     if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                        obj.viewEditHandle.B_ThresholdMode.Value == 3 )   
                         set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -956,6 +973,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_CheckMask,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                    set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
                     set(obj.viewEditHandle.B_Threshold,'Enable','off');
                     set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                     set(obj.viewEditHandle.B_Invert,'Enable','off');
@@ -975,6 +993,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_CheckMask,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                    set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                     if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
                        obj.viewEditHandle.B_ThresholdMode.Value == 3 )   
                         set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -1078,6 +1097,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
+                set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                 set(obj.viewEditHandle.B_LineWidth,'Enable','off');
@@ -1105,6 +1125,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
+                set(obj.viewEditHandle.B_FiberForeBackGround,'Enable','on');
                 set(obj.viewEditHandle.B_LineWidth,'Enable','on');
                 set(obj.viewEditHandle.B_LineWidthValue,'Enable','on');
                 if (obj.viewEditHandle.B_ThresholdMode.Value == 1 || ...
@@ -1578,6 +1599,35 @@ classdef controllerEdit < handle
                 
                 set(h,'CloseRequestFcn',@obj.checkPlanesBackEvent);
                 obj.busyIndicator(0);
+        end
+        
+        function fibersInForeOrBackground(obj,src,evnt)
+            % Callback function of the Fiber in Fore or Background popupmenu in the
+            % GUI. Checks whether the value is within the
+            % permitted value range. Sets the corresponding values in the
+            % model depending on the selection. Calls the
+            % createBinary() function in the model. 
+            %
+            %   fibersInForeOrBackground(obj,src,evnt);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerEdit object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
+            
+            %Check if Fibers are shown as Black or White Pixel within the
+            %green Plane and change Value in the Model
+
+            obj.modelEditHandle.FiberForeBackGround = src.Value;
+            %Create binary image with current Threshold Mode.
+           
+            obj.busyIndicator(1);
+            obj.modelEditHandle.createBinary();
+            obj.busyIndicator(0);
+            obj.modelEditHandle.addToBuffer();
         end
         
         function thresholdModeEvent(obj,src,evnt)

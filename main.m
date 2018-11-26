@@ -138,6 +138,11 @@ catch
     
     mode = struct('WindowStyle','modal','Interpreter','tex');
     
+    % delete starting screen
+    delete(hf);
+    delete(InfoText);
+    delete(VersionText);
+    
     uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
     
 end

@@ -73,6 +73,7 @@ classdef modelEdit < handle
         
         ThresholdMode; %Selected threshold mode.
         ThresholdValue; %Selected threshold value.
+        FiberForeBackGround; 
         
         AlphaMapValue; %Selected alphamap value (transparency).
         
@@ -1555,7 +1556,16 @@ classdef modelEdit < handle
             
             thresh = obj.ThresholdValue;
             
-            if ~isempty(obj.PicPlaneGreen_adj)
+            %Check if Fibers are shown as Black or White Pixel within the
+            %green Plane
+            switch obj.FiberForeBackGround
+                case 1 %Background. Fibers are shown as black Pixels.
+                    tempGreenPlane = obj.PicPlaneGreen_adj;
+                case 2 %Foreground. Fibers are shown as white Pixels.
+                    tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
+            end
+            
+            if ~isempty(tempGreenPlane)
                 % Picture was choosen by User.
                 if strcmp (obj.PicBWisInvert , 'false')
                     % Binary pictur is not invert
@@ -1563,19 +1573,19 @@ classdef modelEdit < handle
                         
                         case 1 % Use manual global threshold for binarization
                             
-                            obj.PicBW = im2bw(obj.PicPlaneGreen_adj,thresh);
+                            obj.PicBW = im2bw(tempGreenPlane,thresh);
                             obj.handlePicBW.CData = obj.PicBW;
 %                             figure
 % imhist(obj.PicPlaneGreen_adj)
                         case 2 % Use automatic adaptive threshold for binarization
                             
-                            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
+                            obj.PicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 3 % Use automatic adaptive and manual global threshold for binarization
                             
-                            PicBW1 = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
-                            PicBW2 = im2bw(obj.PicPlaneGreen_adj,thresh);
+                            PicBW1 = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
+                            PicBW2 = im2bw(tempGreenPlane,thresh);
                             obj.PicBW = PicBW1 | PicBW2;
                             obj.handlePicBW.CData = obj.PicBW;
                             
@@ -1589,20 +1599,20 @@ classdef modelEdit < handle
                         
                         case 1 % Use manual global threshold for binarization
                             
-                            temp = im2bw(obj.PicPlaneGreen_adj,thresh);
+                            temp = im2bw(tempGreenPlane,thresh);
                             obj.PicBW = ~temp;
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 2 % Use automatic adaptive threshold for binarization
                             
-                            temp = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
+                            temp = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
                             obj.PicBW = ~temp;
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 3 % Use automatic adaptive and manual global threshold for binarization
                             
-                            temp1 = im2bw(obj.PicPlaneGreen_adj,thresh);
-                            temp2 = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
+                            temp1 = im2bw(tempGreenPlane,thresh);
+                            temp2 = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
                             obj.PicBW = ~(temp1 | temp2);
                             obj.handlePicBW.CData = obj.PicBW;
                             
@@ -2017,7 +2027,7 @@ classdef modelEdit < handle
                 case 'smoothing'
                     
                     %performs the majority morph 500 times
-                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',Inf);
+                    obj.handlePicBW.CData = bwmorph(obj.handlePicBW.CData,'majority',500);
                     obj.InfoMessage = '      - edge smoothing completed';
                     
                 case 'close small gaps'
@@ -2121,15 +2131,24 @@ classdef modelEdit < handle
         function autoSetupBinarization(obj)
             obj.InfoMessage = '   - running auto setup binarization';
             
-            obj.PicBW = imbinarize(obj.PicPlaneGreen_adj,'adaptive','ForegroundPolarity','bright','Sensitivity',0.5);
+            %Check if Fibers are shown as Black or White Pixel within the
+            %green Plane
+            switch obj.FiberForeBackGround
+                case 1 %Background. Fibers are shown as black Pixels.
+                    tempGreenPlane = obj.PicPlaneGreen_adj;
+                case 2 %Foreground. Fibers are shown as white Pixels.
+                    tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
+            end
+            
+            obj.PicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',0.9);
             obj.PicBWisInvert = 'false';
             
             %create Gradient Magnitude image
             obj.InfoMessage = '      - compute Gradient-Magnitude image';
             hy = fspecial('sobel');
             hx = hy';
-            Iy = imfilter(double(obj.PicPlaneGreen_adj), hy, 'replicate');
-            Ix = imfilter(double(obj.PicPlaneGreen_adj), hx, 'replicate');
+            Iy = imfilter(double(tempGreenPlane), hy, 'replicate');
+            Ix = imfilter(double(tempGreenPlane), hx, 'replicate');
             gradmag = sqrt(Ix.^2 + Iy.^2); %image of Gradient Magnitude
             gradmag = medfilt2(gradmag,[5 5],'symmetric');
 %             test = gradmag;
