@@ -143,7 +143,17 @@ catch
     delete(InfoText);
     delete(VersionText);
     
-    uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
+    uiwait(errordlg(Text,'ERROR: Initalize Program failed:',mode));
+    
+                    
+    %find all objects
+    object_handles = findall(mainFig);
+    %delete objects
+    delete(object_handles);
+    %find all figures and delete them
+    figHandles = findobj('Type','figure');
+    delete(figHandles);
+    
     
 end
 % end
