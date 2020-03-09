@@ -5,9 +5,7 @@ function bfsave(varargin)
 %    specified by outputPath.
 %
 %    bfsave(I, outputPath, dimensionOrder) specifies the dimension order of
-%    the input matrix. This value will be ignored if an OME-XML metadata
-%    object is also passed to bfsave via the metadata key/value parameter.
-%    Default value is XYZCT.
+%    the input matrix. Default valuse is XYZCT.
 %
 %    bfsave(I, outputPath, 'Compression', compression) specifies the
 %    compression to use when writing the OME-TIFF file.
@@ -65,13 +63,9 @@ ip.addRequired('I', @isnumeric);
 ip.addRequired('outputPath', @ischar);
 ip.addOptional('dimensionOrder', 'XYZCT', @(x) ismember(x, getDimensionOrders()));
 ip.addParamValue('metadata', [], @(x) isa(x, 'loci.formats.ome.OMEXMLMetadata'));
-ip.addParamValue('Compression', '',  @ischar);
+ip.addParamValue('Compression', '',  @(x) ismember(x, getCompressionTypes()));
 ip.addParamValue('BigTiff', false , @islogical);
 ip.parse(varargin{:});
-
-% Create Writer object from output path
-imageWriter = javaObject('loci.formats.ImageWriter');
-writer = imageWriter.getWriter(ip.Results.outputPath);
 
 % Create metadata
 if isempty(ip.Results.metadata)
@@ -79,24 +73,17 @@ if isempty(ip.Results.metadata)
         ip.Results.dimensionOrder);
 else
     metadata = ip.Results.metadata;
-    if ~ismember('dimensionOrder', ip.UsingDefaults)
-        warning('''dimensionOrders'' is ignored if passing ''metadata''');
-    end
 end
 
+% Create ImageWriter
+writer = javaObject('loci.formats.ImageWriter');
 writer.setWriteSequentially(true);
 writer.setMetadataRetrieve(metadata);
 if ~isempty(ip.Results.Compression)
-    compressionTypes = getCompressionTypes(writer);
-    if ~ismember(ip.Results.Compression, compressionTypes)
-        e = MException('bfsave:unsupportedCompression', ...
-            'Unsupported compression: %s.', ip.Results.Compression);
-        throw(e);
-    end
     writer.setCompression(ip.Results.Compression);
 end
 if ip.Results.BigTiff
-    writer.setBigTiff(ip.Results.BigTiff);
+    writer.getWriter(ip.Results.outputPath).setBigTiff(ip.Results.BigTiff);
 end
 writer.setId(ip.Results.outputPath);
 
@@ -133,13 +120,14 @@ function dimensionOrders = getDimensionOrders()
 % List all values of DimensionOrder
 dimensionOrderValues = javaMethod('values', 'ome.xml.model.enums.DimensionOrder');
 dimensionOrders = cell(numel(dimensionOrderValues), 1);
-for i = 1 :numel(dimensionOrderValues)
+for i = 1 :numel(dimensionOrderValues),
     dimensionOrders{i} = char(dimensionOrderValues(i).toString());
 end
 end
 
-function compressionTypes = getCompressionTypes(writer)
+function compressionTypes = getCompressionTypes()
 % List all values of Compression
+writer = javaObject('loci.formats.ImageWriter');
 if is_octave()
     %% FIXME when https://savannah.gnu.org/bugs/?42700 gets fixed
     types = writer.getCompressionTypes();
