@@ -6,6 +6,7 @@ try
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
     addpath(genpath('NotifySounds'));
+%     javaaddpath(genpath('bioformats_package.jar'),'-end')
     
     cl;
     pause(0.1);

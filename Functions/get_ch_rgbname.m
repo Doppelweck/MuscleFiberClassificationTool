@@ -16,7 +16,11 @@ ch_rgb = regexprep(ch_rgb, '\s+',','); % replace remaining spaces with commas
 % create cell array of channel color names
 ch_rgbname = repmat({''},numel(ch_rgb),1);
 for n = 1:numel(ch_rgb)
-    ch_rgbname{n} = mapTriplet(ch_rgb{n});
+    try
+        ch_rgbname{n} = mapTriplet(ch_rgb{n});
+    catch
+        ch_rgbname{n} = 'noMatch';
+    end
 end
 
 %% generate channel order
