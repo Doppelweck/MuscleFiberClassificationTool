@@ -337,7 +337,7 @@ classdef modelEdit < handle
             %Get filename and path of the new image
             obj.InfoMessage = '- select new file';
             
-            fileSelectStrings = {'*.lsm;*.zvi;*.ics;*.nd2;*.dv;*.img','Bioformat files (*.lsm,*.zvi,*.ics,*.nd2,*.dv,*.img)';...
+            fileSelectStrings = {'*.lsm;*.zvi;*.ics;*.nd2;*.dv;*.img;*.czi','Bioformat files (*.lsm,*.zvi,*.ics,*.nd2,*.dv,*.img,*.czi)';...
                '*.bmp;*.png;*.tiff;*.tif;*.jpeg;*.jpg','Image files (*.bmp,*.png,*.tiff,*.tif,*.jpeg,*.jpg)' ;...
                '*.*','All Files (*.*)'};
             
@@ -371,7 +371,8 @@ classdef modelEdit < handle
                     elseif strcmp(ext,'.lsm') || strcmp(ext,'.zvi') || ...
                             strcmp(ext,'.ics') || strcmp(ext,'.nd2') || ...
                             strcmp(ext,'.pic') || strcmp(ext,'.dv') || ...
-                            strcmp(ext,'.img') || strcmp(ext,'.dv')
+                            strcmp(ext,'.img') || strcmp(ext,'.dv')|| ...
+                            strcmp(ext,'.czi')
                         
                         % .lsm files produced by Zeiss LSM 510 confocal microscopes
                         % .nd2 files produced by Nikon ND2
@@ -512,8 +513,26 @@ classdef modelEdit < handle
             
             Parameters = {MetaData{:,1}};
             Parameters = regexprep(Parameters, '\W', '');
+            Parameters = regexprep(Parameters, '|', '');
             Values = {MetaData{:,2}};
-            obj.MetaData = cell2struct(MetaData, Parameters, 1);
+            try
+                
+                obj.MetaData = cell2struct( MetaData, Parameters', 1);
+                obj.InfoMessage = '     - Read Meta Data From Image';
+            catch
+                try
+                    ParametersNewValid = matlab.lang.makeValidName(Parameters);
+                    ParametersNewValidUnique =  matlab.lang.makeUniqueStrings(ParametersNewValid,namelengthmax);
+                    ParametersNewValidUnique = matlab.lang.makeUniqueStrings(ParametersNewValidUnique);
+                    MetaDataTemp=MetaData;
+                    MetaDataTemp(:,1)=ParametersNewValidUnique;
+                    obj.MetaData = cell2struct(MetaDataTemp, ParametersNewValidUnique, 1);
+                    obj.InfoMessage = '     - Read Meta Data From Image';
+                catch
+                    obj.MetaData = [];
+                    obj.InfoMessage = '     - Meta Data could not be read';
+                end
+            end
 %            
             %get Number of Color Planes
             NumberOfPlanes = size(data{1,1},1);
@@ -522,7 +541,7 @@ classdef modelEdit < handle
                 
                 switch NumberOfPlanes %check numer of images within the file
                     case 1
-                        obj.InfoMessage = '   - 1 plane images within the file';
+                        obj.InfoMessage = '   - 1 plane image within the file';
                         obj.PicPlane1 = bfGetPlane(reader,1);
                         obj.PicPlane2 = zeros(size(obj.PicPlane1));
                         obj.PicPlane3 = zeros(size(obj.PicPlane1));
@@ -617,7 +636,21 @@ classdef modelEdit < handle
                     obj.InfoMessage = '      - convert all images to 8-bit unsigned integers';
                     try
                         %get bit per pixel from OME Meta Data
-                        bpp= str2num(obj.MetaData(2).GlobalAcquisitionBitDepth);
+                        try
+                            bpp= str2num(obj.MetaData(2).GlobalAcquisitionBitDepth);
+                            obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
+                        catch
+                            obj.InfoMessage = ['         - No Pixel Depth MetaData found'];
+                            obj.InfoMessage = ['            - assume Pixel Depth...'];
+                            bpp = assumePixelDepth(obj);
+                            
+                            if isempty(bpp)
+                                obj.InfoMessage = ['               - failed'];
+                            else
+                                obj.InfoMessage = ['            - Pixel Depth :' num2str(bpp)];
+                            end
+                                
+                        end
                         
                         obj.PicPlane1 = uint8(double(obj.PicPlane1)./(2^bpp-1)*255);
                         obj.PicPlane2 = uint8(double(obj.PicPlane2)./(2^bpp-1)*255);
@@ -628,8 +661,8 @@ classdef modelEdit < handle
                         obj.PicPlaneGreen = uint8(double(obj.PicPlaneGreen)./(2^bpp-1)*255);
                         obj.PicPlaneRed = uint8(double(obj.PicPlaneRed)./(2^bpp-1)*255);
                         obj.PicPlaneFarRed = uint8(double(obj.PicPlaneFarRed)./(2^bpp-1)*255);
+                        obj.InfoMessage = '      - converting to 8-bit unsigned integers completed';
                         
-                        obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
                     catch
                         %No information about the bit per pixel found.
                         %Using MATLAB standart function. Can produce very
@@ -645,6 +678,7 @@ classdef modelEdit < handle
                         obj.PicPlaneBlue = im2uint8(obj.PicPlaneBlue);
                         obj.PicPlaneRed = im2uint8(obj.PicPlaneRed);
                         obj.PicPlaneFarRed = im2uint8(obj.PicPlaneFarRed);
+                        obj.InfoMessage = '      - converting to 8-bit unsigned integers completed';
                         
                     end
                     
@@ -807,6 +841,20 @@ classdef modelEdit < handle
                     obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
                     
                 end
+        end
+        
+        function pixelDepth = assumePixelDepth(obj)
+            maxValue = max([max(max(obj.PicPlane1)) max(max(obj.PicPlane2)) max(max(obj.PicPlane3)) max(max(obj.PicPlane4))]);
+            if maxValue <=255
+                pixelDepth = 8;
+            elseif maxValue <=4095
+                pixelDepth = 12;
+            elseif maxValue <=65535
+                pixelDepth = 12;
+            else
+                pixelDepth = [];
+            end
+                
         end
         
         function status = openImage(obj)

@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\FiberClassificationTool" name="MuscleFiberClassificationTool" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="1016483922" file="C:\Users\sfriedrich\CloudStation\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\CloudStation\Developer\Matlab\FiberClassificationTool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>MuscleFiberClassificationTool</param.appname>
     <param.icon>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon.ico</param.icon>
     <param.icons>
@@ -8,18 +8,48 @@
       <file>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon_16.png</file>
     </param.icons>
-    <param.version>1.2</param.version>
+    <param.version>1.3</param.version>
     <param.authnamewatermark>Sebastian Friedrich</param.authnamewatermark>
     <param.email>sebastian.friedrich89@gmail.com</param.email>
-    <param.company>Trier University of Applied Sciences, GER</param.company>
+    <param.company>Trier University of Applied Sciences</param.company>
     <param.summary />
-    <param.description>18-Oct-2017</param.description>
+    <param.description>Version 1.3 6-March-2020
+
+Application created with MATLAB 2016b.
+
+If the connection to the MathWorks Server fails:
+
+1.: Go to https://de.mathworks.com/products/compiler/matlab-runtime.html and download
+      the MATLAB Runtime Package R2016b (9.1).
+
+2.: Install the the MATLAB Runtime Package R2016b (9.1).
+
+3.: After installing the the correct Runtime Package run the
+      MuscleFiberClassificationTool_Installer again.
+
+Thanks
+
+Sebastian</param.description>
     <param.screenshot>${PROJECT_ROOT}\Icons\Splash.bmp</param.screenshot>
     <param.guid />
-    <param.installpath.string>\Trier University of Applied Sciences, GER\MuscleFiberClassificationTool\</param.installpath.string>
+    <param.installpath.string>\TrierUniversityOfAppliedSciences\MuscleFiberClassificationTool\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
-    <param.logo />
-    <param.install.notes />
+    <param.logo>${PROJECT_ROOT}\Icons\icon.bmp</param.logo>
+    <param.install.notes>Application created with MATLAB 2016b.
+
+If the connection to the MathWorks Server fails:
+
+1.: Go to https://de.mathworks.com/products/compiler/matlab-runtime.html and download
+      the MATLAB Runtime Package R2016b (9.1).
+
+2.: Install the the MATLAB Runtime Package R2016b (9.1).
+
+3.: After installing the the correct Runtime Package run the
+      MuscleFiberClassificationTool_Installer again.
+
+Thanks
+
+Sebastian</param.install.notes>
     <param.target.install.notes />
     <param.intermediate>${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing</param.intermediate>
     <param.files.only>${PROJECT_ROOT}\MuscleFiberClassificationTool\for_redistribution_files_only</param.files.only>
@@ -33,7 +63,7 @@
     <param.web.mcr>true</param.web.mcr>
     <param.package.mcr>false</param.package.mcr>
     <param.no.mcr>false</param.no.mcr>
-    <param.web.mcr.name>MuscleFiberClassificationTool_Installer_web</param.web.mcr.name>
+    <param.web.mcr.name>MuscleFiberClassificationTool_Installer_Version_1_3</param.web.mcr.name>
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
     <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
     <param.windows.command.prompt>true</param.windows.command.prompt>
@@ -42,9 +72,7 @@
     <unset>
       <param.summary />
       <param.guid />
-      <param.installpath.string />
       <param.installpath.combo />
-      <param.logo />
       <param.target.install.notes />
       <param.intermediate />
       <param.files.only />
@@ -75,9 +103,9 @@
     <fileset.package />
     <fileset.depfun />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="splash.png" optional="false">C:\Users\sfriedrich\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_testing\splash.png</file>
-      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="readme.txt" optional="true">C:\Users\sfriedrich\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_testing\readme.txt</file>
-      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="MuscleFiberClassificationTool.exe" optional="false">C:\Users\sfriedrich\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_testing\MuscleFiberClassificationTool.exe</file>
+      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="readme.txt" optional="true">C:\Users\sfriedrich\CloudStation\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="MuscleFiberClassificationTool.exe" optional="false">C:\Users\sfriedrich\CloudStation\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_testing\MuscleFiberClassificationTool.exe</file>
+      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="splash.png" optional="false">C:\Users\sfriedrich\CloudStation\CloudStation\Developer\Matlab\FiberClassificationTool\MuscleFiberClassificationTool\for_testing\splash.png</file>
     </build-deliverables>
     <workflow />
     <matlab>
