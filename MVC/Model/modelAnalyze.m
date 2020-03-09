@@ -390,14 +390,24 @@ classdef modelAnalyze < handle
                 stats = regionprops(maskRot,'BoundingBox');
 %                 figure()
 %                 imshow(maskRot)
-                
-                for i=1:1:noObjects
-                    
-                    b = stats(i).BoundingBox;
-                    minDia(i,j+1)= min([b(3)*obj.XScale b(4)*obj.YScale ]);
-                    maxDia(i,j+1)= max([b(3)*obj.XScale b(4)*obj.YScale ]);
+                if noObjects == size(stats,1)
+                    for i=1:1:noObjects
+                        
+                        b = stats(i).BoundingBox;
+                        minDia(i,j+1)= min([b(3)*obj.XScale b(4)*obj.YScale ]);
+                        maxDia(i,j+1)= max([b(3)*obj.XScale b(4)*obj.YScale ]);
 %                     hold on 
 %                     rectLine = rectangle('Position',stats(i).BoundingBox,'EdgeColor','r','LineWidth',2);
+                    end
+                else
+                    for i=1:1:noObjects
+                        % To fill up the min max vectors
+                        
+                        minDia(i,j+1)= Inf;
+                        maxDia(i,j+1)= -Inf;
+%                     hold on 
+%                     rectLine = rectangle('Position',stats(i).BoundingBox,'EdgeColor','r','LineWidth',2);
+                    end
                 end
                 
                 
