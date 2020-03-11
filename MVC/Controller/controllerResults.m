@@ -173,6 +173,7 @@ classdef controllerResults < handle
             %           InfoText:   Info text log.
             %
             
+            try
             % Set PicData Properties in the Results Model
             obj.modelResultsHandle.FileName = Data{1};
             obj.modelResultsHandle.PathName = Data{2};
@@ -269,6 +270,10 @@ classdef controllerResults < handle
 
             end
             
+            catch
+                obj.errorMessage(lasterror);
+            end
+            
         end
         
         function backAnalyzeModeEvent(obj,~,~)
@@ -311,7 +316,7 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResults object.
             %
-            
+            try
             obj.modelResultsHandle.SaveFiberTable = obj.viewResultsHandle.B_SaveFiberTable.Value;
             obj.modelResultsHandle.SaveScatterAll = obj.viewResultsHandle.B_SaveScatterAll.Value;
             obj.modelResultsHandle.SavePlots = obj.viewResultsHandle.B_SavePlots.Value;
@@ -346,6 +351,12 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.InfoMessage = '- no data has been saved';
             end
             obj.busyIndicator(0);
+            
+            [y,Fs] = audioread('filling-your-inbox.mp3');
+            sound(y*0.4,Fs);
+            catch
+                obj.errorMessage(lasterror);
+            end
         end
         
         function showInfoInTableGUI(obj)
@@ -359,6 +370,8 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResults object.
             %
+            try
+                
             obj.viewResultsHandle.B_TableMain.RowName = [];
             obj.viewResultsHandle.B_TableMain.ColumnName = {'Label'  sprintf('XPos |(\x3BCm)') sprintf('YPos |(\x3BCm)')...
                 sprintf('Area |(\x3BCm^2)') sprintf('min Area Cross|Section (\x3BCm^2)'), sprintf('max Area Cross|Section (\x3BCm^2)')...
@@ -370,9 +383,13 @@ classdef controllerResults < handle
             obj.viewResultsHandle.B_TableMain.ColumnWidth={'auto'};
             
             obj.viewResultsHandle.B_TableStatistic.RowName = [];
-            obj.viewResultsHandle.B_TableStatistic.ColumnName = {'Name of parameter           ','Value of parameter           '};
+            obj.viewResultsHandle.B_TableStatistic.ColumnName = {'Name of parameter            ','Value of parameter             '};
             obj.viewResultsHandle.B_TableStatistic.Data = obj.modelResultsHandle.StatisticMat;
             obj.viewResultsHandle.B_TableStatistic.ColumnWidth={'auto'};
+            
+            catch
+                obj.errorMessage(lasterror);
+            end
         end
         
         function showAxesDataInGUI(obj)
@@ -388,7 +405,7 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResults object.
             %
-            
+                
             obj.modelResultsHandle.InfoMessage = '   - plot data into GUI axes...';
             
             AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
@@ -558,7 +575,7 @@ classdef controllerResults < handle
                 
                 StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
                 StringLegend(z==0)=[];
-                title('Area of all fiber types','FontUnits','normalized','Fontsize',0.06)
+                title('Area of fiber in relation to the image','FontUnits','normalized','Fontsize',0.06)
                 
                 if ~isempty(StringLegend)
                 l2_1 = legend(StringLegend,'Location','Best');
@@ -697,7 +714,7 @@ classdef controllerResults < handle
             elseif obj.modelResultsHandle.AnalyzeMode == 3
                 title('Cluster-Based Triple Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 4
-                title('luster-Based Quad Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
+                title('Cluster-Based Quad Labeling (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 5 || obj.modelResultsHandle.AnalyzeMode == 6
                 title('Manual Classification (Main Groups)','FontUnits','normalized','Fontsize',0.06);
             elseif obj.modelResultsHandle.AnalyzeMode == 7   
@@ -1260,7 +1277,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hAAreaHist,'FontUnits','normalized','Fontsize',0.03);
             title('Area Histogram','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Area in \mum^2 ( Stepsize bins: ' num2str(h.BinWidth) ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             grid on
             
             %%%%%%%%% Aspect Ratio Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1274,7 +1291,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hAAspectHist,'FontUnits','normalized','Fontsize',0.03);
             title('Aspect Ratio Histogram','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Aspect Ratio ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             
             grid on
             
@@ -1293,7 +1310,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hADiaHist,'FontUnits','normalized','Fontsize',0.03);
             title('Diameter Histogram, minimum Fertet-Diameter (Breadth) ','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Diameters in \mum ( Stepsize bins: ' num2str(h.BinWidth) ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             grid on
             
             %%%%%%%%% Roundness Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1307,7 +1324,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hARoundHist,'FontUnits','normalized','Fontsize',0.03);
             title('Roundness Histogram','FontUnits','normalized','Fontsize',0.06)
             xlabel(['Roundness ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel('Numbers','FontUnits','normalized','Fontsize',0.045)
+            ylabel('Frequency','FontUnits','normalized','Fontsize',0.045)
             grid on
             
             else
@@ -1558,27 +1575,32 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResult object
             %
-
-            if exist(obj.modelResultsHandle.SavePath,'dir') == 7
+            try
                 
-                if ismac
-                    obj.modelResultsHandle.InfoMessage = '   - open save directory';
-                    path = obj.modelResultsHandle.SavePath;
+                if exist(obj.modelResultsHandle.SavePath,'dir') == 7
                     
-                    % transforl space char into mac compatible '/ ' char
-                    path = strrep(path,' ','\ ');
-                    unix(['open ' path]);
-                    
-                elseif ispc
-                    obj.modelResultsHandle.InfoMessage = '   - open save directory';
-                    winopen(obj.modelResultsHandle.SavePath);
+                    if ismac
+                        obj.modelResultsHandle.InfoMessage = '   - open save directory';
+                        path = obj.modelResultsHandle.SavePath;
+                        
+                        % transforl space char into mac compatible '/ ' char
+                        path = strrep(path,' ','\ ');
+                        unix(['open ' path]);
+                        
+                    elseif ispc
+                        obj.modelResultsHandle.InfoMessage = '   - open save directory';
+                        winopen(obj.modelResultsHandle.SavePath);
+                    else
+                        obj.modelResultsHandle.InfoMessage = '   - Error while opening save directory';
+                    end
                 else
-                    obj.modelResultsHandle.InfoMessage = '   - Error while opening save directory';
+                    obj.modelResultsHandle.InfoMessage = '   - save directory dont exist';
+                    obj.modelResultsHandle.InfoMessage = '      - no data has been saved';
+                    obj.modelResultsHandle.InfoMessage = '      - press Save button to saving data and creating directory';
                 end
-            else
-                obj.modelResultsHandle.InfoMessage = '   - save directory dont exist';
-                obj.modelResultsHandle.InfoMessage = '      - no data has been saved';
-                obj.modelResultsHandle.InfoMessage = '      - press Save button to saving data and creating directory';
+                
+            catch
+                obj.errorMessage(lasterror);
             end
             
         end
@@ -1634,6 +1656,31 @@ classdef controllerResults < handle
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
                 end
             end
+        end
+        
+        function errorMessage(obj,ErrorInfo)
+            Text = [];
+            Text{1,1} = ErrorInfo.message;
+            Text{2,1} = '';
+            
+            if any(strcmp('stack',fieldnames(ErrorInfo)))
+                
+                for i=1:size(ErrorInfo.stack,1)
+                    
+                    Text{end+1,1} = [ErrorInfo.stack(i).file];
+                    Text{end+1,1} = [ErrorInfo.stack(i).name];
+                    Text{end+1,1} = ['Line: ' num2str(ErrorInfo.stack(i).line)];
+                    Text{end+1,1} = '------------------------------------------';
+                    
+                end
+                
+            end
+            
+            mode = struct('WindowStyle','modal','Interpreter','tex');
+            beep
+            uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
+            
+            obj.busyIndicator(0);
         end
         
         function closeProgramEvent(obj,~,~)

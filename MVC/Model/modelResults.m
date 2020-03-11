@@ -833,15 +833,26 @@ classdef modelResults < handle
             
             obj.InfoMessage = '      - create convex hull';
             BW_C = zeros(size(obj.LabelMat));
+            [m n] = size(obj.LabelMat);
+            
             for i=1:1:size(obj.Stats,1)
                 % seperate centroid in X and Y values
-                FCPX = round(obj.Stats(i).Centroid(1));
-                FCPY = round(obj.Stats(i).Centroid(2));
+                FCPX = round(obj.Stats(i).Centroid(1)/obj.XScale);
+                FCPY = round(obj.Stats(i).Centroid(2)/obj.YScale);
+                if FCPX > n
+                    FCPX = n;
+                end
+                
+                if FCPY > m
+                    FCPY = m;
+                end
+                
                 BW_C(FCPY,FCPX)=1;
             end
-            BW_C=bwconvhull(BW_C);
             
+            BW_C = bwconvhull(BW_C);
             
+
             BW = zeros(size(obj.LabelMat));
             BW(obj.LabelMat>0)=1;
             Hull = BW_C | BW;
@@ -1440,7 +1451,7 @@ classdef modelResults < handle
                     end
                 end
                 options.Resize='off';
-                options.WindowStyle='normal';
+                options.WindowStyle='modal';
                 answer = inputdlg(prompt,dlg_title,num_lines,defaultans,options)';
                 
                 if isempty(answer)
