@@ -14,6 +14,10 @@
 
 #Gui Toolbox help
 
+*.exe
+*.app
+*.zip
+
 *.html
 *.jar
 
