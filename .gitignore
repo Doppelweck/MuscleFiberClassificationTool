@@ -19,7 +19,6 @@
 *.zip
 
 *.html
-*.jar
 
 # Simulink Code Generation
 slprj/
