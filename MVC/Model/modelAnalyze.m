@@ -33,7 +33,6 @@ classdef modelAnalyze < handle
     properties
         
         controllerAnalyzeHandle; %hande to controllerAnalyze instance.
-        
         FileName; %Filename of the selected file.
         PathName; %Directory path of the selected file.
         PicPRGBFRPlanes; %RGB image created from the red blue green and far red color plane images.
@@ -2233,7 +2232,7 @@ classdef modelAnalyze < handle
         function delete(obj)
             %deconstructor
         end
-        
+
     end
     
 end
