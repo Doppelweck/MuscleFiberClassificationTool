@@ -579,26 +579,30 @@ classdef modelEdit < handle
                 if size(ch_wave_name,2) == NumberOfPlanes
                     
                     for i=1:1:NumberOfPlanes
-                        if ( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
-                                ~isempty(strfind(ch_wave_name{1,i},'A4')) ) && ~foundBlue
-                            obj.PicPlaneBlue = bfGetPlane(reader,i);
+                        if ~foundBlue &&( ~isempty(strfind(ch_wave_name{1,i},'Blue')) || ...
+                                          ~isempty(strfind(ch_wave_name{1,i},'A4')) || ...
+                                          ~isempty(strfind(ch_wave_name{1,i},'DAPI')))
+                            obj.PicPlaneBlue = bfGetPlane(reader,ch_order(i));
                             obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                             foundBlue = 1;
-                        elseif ( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
-                                ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
-                                ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
-                                ~isempty(strfind(ch_wave_name{1,i},'Y5')) ) && ~foundFarRed
-                            obj.PicPlaneFarRed = bfGetPlane(reader,i);
+                        elseif ~foundFarRed &&( ~isempty(strfind(ch_wave_name{1,i},'Far Red')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'FarRed')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'Farred')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'Y5')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'CY5')))
+                            obj.PicPlaneFarRed = bfGetPlane(reader,ch_order(i));
                             obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                             foundFarRed = 1;
-                        elseif ( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
-                                ~isempty(strfind(ch_wave_name{1,i},'TX2')) ) && ~foundRed
-                            obj.PicPlaneRed = bfGetPlane(reader,i);
+                        elseif ~foundRed &&( ~isempty(strfind(ch_wave_name{1,i},'Red')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'TX2')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'TRITC')))
+                            obj.PicPlaneRed = bfGetPlane(reader,ch_order(i));
                             obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                             foundRed = 1;
-                        elseif ( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
-                                ~isempty(strfind(ch_wave_name{1,i},'L5')) ) && ~foundGreen
-                            obj.PicPlaneGreen = bfGetPlane(reader,i);
+                        elseif ~foundGreen &&( ~isempty(strfind(ch_wave_name{1,i},'Green')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'L5')) || ...
+                                              ~isempty(strfind(ch_wave_name{1,i},'GFP')))
+                            obj.PicPlaneGreen = bfGetPlane(reader,ch_order(i));
                             obj.InfoMessage = ['      - plane ' num2str(i) ' identified as ' ch_wave_name{1,i}];
                             foundGreen = 1;
                         else
@@ -850,7 +854,7 @@ classdef modelEdit < handle
             elseif maxValue <=4095
                 pixelDepth = 12;
             elseif maxValue <=65535
-                pixelDepth = 12;
+                pixelDepth = 16;
             else
                 pixelDepth = [];
             end
