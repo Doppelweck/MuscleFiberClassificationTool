@@ -1073,8 +1073,8 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.InfoMessage = '*** Start analyzing mode ***';
             
             
-            oldScaleX = obj.viewAnalyzeHandle.B_XScale;
-            oldScaleY = obj.viewAnalyzeHandle.B_YScale;
+            oldScaleX = get(obj.viewAnalyzeHandle.B_XScale, 'String');
+            oldScaleY = get(obj.viewAnalyzeHandle.B_YScale, 'String');
             
             try
                 MetaData = PicData{1,19};
