@@ -6,7 +6,7 @@ try
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
     addpath(genpath('NotifySounds'));
-%     javaaddpath(genpath('bioformats_package.jar'),'-end')
+    %     javaaddpath(genpath('bioformats_package.jar'),'-end')
     
     cl;
     pause(0.1);
@@ -31,13 +31,24 @@ try
         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
     TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
-    VersionText=text(hf.Children,0.45,0.75,'Version 1.3 6-March-2020','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+    VersionText=text(hf.Children,0.45,0.75,'Version 1.4 30-November-2023','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
     text(hf.Children,0.05,0.3,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     text(hf.Children,0.05,0.15,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
     % setAlwaysOnTop(hf,true);
     drawnow;
+    
+    % R2010a and newer
+    iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
+    iconsSizeEnums = javaMethod('values',iconsClassName);
+    SIZE_32x32 = iconsSizeEnums(1);  % (1) = 16x16,  (2) = 32x32
+    busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32);  % icon, label
+    busyIndicator.setPaintsWhenStopped(false);  % default = false
+    busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
+    javacomponent(busyIndicator.getComponent, [hf.Position(3)*0.74,hf.Position(4)*0.72,40,40], hf);
+    busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
+    busyIndicator.start;
     
     % create main figure
     mainFig = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85],...
@@ -114,6 +125,7 @@ try
     pause(0.5);
     drawnow;
     % delete starting screen
+    busyIndicator.stop;
     delete(hf);
     delete(InfoText);
     delete(VersionText);
@@ -146,7 +158,7 @@ catch
     
     uiwait(errordlg(Text,'ERROR: Initalize Program failed:',mode));
     
-                    
+    
     %find all objects
     object_handles = findall(mainFig);
     %delete objects
