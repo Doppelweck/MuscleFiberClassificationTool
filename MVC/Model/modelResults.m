@@ -197,29 +197,31 @@ classdef modelResults < handle
                 obj.InfoMessage = '- updating GUI is not necessary';
             else
             obj.InfoMessage = '- updating GUI...';
-            
+            workbar(0.01,'Transform Data','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.transformDataStructToMatrix();
-            
+            workbar(0.1,'calculate Fiber Numbers','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.calculateFiberNubers();
-            
+            workbar(0.2,'calculate Area Features','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.calculateAreaFeatures();
-            
+            workbar(0.3,'create Statistic Table','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.createMatStatisticTable();
-            
+            workbar(0.4,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.findFiberGroups();
-            
+            workbar(0.5,'show Axes Data in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showAxesDataInGUI();
-            
+            workbar(0.6,'show Info Table in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showInfoInTableGUI();
-            
+            workbar(0.7,'show Histogram in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showHistogramGUI();
-            
+            workbar(0.8,'show Imaged Processed in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicProcessedGUI();
-            
+            workbar(0.9,'show Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicGroupsGUI();
-            
+            drawnow;
+            pause(0.5);
+            drawnow;
             obj.InfoMessage = '- updating GUI complete';
-            
+            workbar(1,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.ResultUpdateStaus = true;
             end
         end
@@ -1183,7 +1185,7 @@ classdef modelResults < handle
             
             obj.InfoMessage = ' ';
             obj.InfoMessage = '   - saving data in the same dir than the file was selected';
-            
+            workbar(0.01,'Transform Data','Saving Results',obj.controllerResultsHandle.mainFigure);
             %Cell arrays for saving data in excel sheet
             CellStatisticTable = {};
             CellFiberTable = {};
@@ -1219,6 +1221,7 @@ classdef modelResults < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save image processed
+            workbar(0.1,'saving Image processed','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SavePicProcessed
                 obj.InfoMessage = '      - saving image processed...';
                 
@@ -1260,6 +1263,7 @@ classdef modelResults < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save image with fiber type groups
+            workbar(0.3,'saving Image with fiber type groups','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SavePicGroups
                 obj.InfoMessage = '      - saving image with fiber groups...';
                 
@@ -1301,6 +1305,7 @@ classdef modelResults < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save axes StatisticsTab
+            workbar(0.4,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SavePlots
                 obj.InfoMessage = '      - saving axes with statistics plots...';
                 
@@ -1317,6 +1322,7 @@ classdef modelResults < handle
                 picName ='';
                 delete(fTemp)
                 
+                workbar(0.42,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '         - saving number of Fiber-Types as .pdf';
                 picName = [fileName '_processed_NumberPlot' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
@@ -1330,6 +1336,7 @@ classdef modelResults < handle
                 picName ='';
                 delete(fTemp)
                 
+                workbar(0.46,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '         - saving Scatter plot Blue over Red as .pdf';
                 picName = [fileName '_processed_ScatterPlotBlueRed' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
@@ -1343,6 +1350,7 @@ classdef modelResults < handle
                 picName ='';
                 delete(fTemp)
                 
+                workbar(0.48,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
                 picName = [fileName '_processed_ScatterPlotFarredRed' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
@@ -1362,7 +1370,7 @@ classdef modelResults < handle
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save Histograms
             if obj.SaveHisto
-                
+                workbar(0.5,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '      - saving Histograms plots...';
                 
                 obj.InfoMessage = '         - saving Area histogram as .pdf';
@@ -1374,6 +1382,7 @@ classdef modelResults < handle
                 picName ='';
                 delete(fTemp)
                 
+                workbar(0.52,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '         - saving AspectRatio histogram as .pdf';
                 picName = [fileName '_processed_AspectRatioHisto' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
@@ -1383,6 +1392,7 @@ classdef modelResults < handle
                 picName ='';
                 delete(fTemp)
                 
+                workbar(0.56,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '         - saving Diameter histogram as .pdf';
                 picName = [fileName '_processed_DiameterHisto' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
@@ -1392,6 +1402,7 @@ classdef modelResults < handle
                 picName ='';
                 delete(fTemp)
                 
+                workbar(0.58,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
                 obj.InfoMessage = '         - saving Roundness histogram as .pdf';
                 picName = [fileName '_processed_RoundnessHisto' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
@@ -1407,6 +1418,7 @@ classdef modelResults < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save Scatter all
+            workbar(0.6,'saving Scatter Plots','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SaveScatterAll
                 obj.InfoMessage = '      - saving Scatter all Fibers...';
                 obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
@@ -1429,6 +1441,7 @@ classdef modelResults < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % create Cell Array with Fiber-Type Table
+            workbar(0.7,'saving Cell Array with Fiber-Type Table','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SaveFiberTable
                 obj.InfoMessage = '      - creating Fiber-Type struct';
                 
@@ -1439,6 +1452,7 @@ classdef modelResults < handle
                 strComp = strsplit(name,{' ','-','_'});
                 
                 %dialog input box parameter
+                workbar(1,'saving Cell Array with Fiber-Type Table','Saving Results',obj.controllerResultsHandle.mainFigure);
                 prompt = {'Date','Animal code','Muscle code','Image number','Microscope magnification','treated/control'};
                 dlg_title = 'Completion of the Excel table';
                 num_lines = [1,50];
@@ -1453,7 +1467,7 @@ classdef modelResults < handle
                 options.Resize='off';
                 options.WindowStyle='modal';
                 answer = inputdlg(prompt,dlg_title,num_lines,defaultans,options)';
-                
+                workbar(0.7,'saving Cell Array with Fiber-Type Table','Saving Results',obj.controllerResultsHandle.mainFigure);
                 if isempty(answer)
                     answer = cell(1,size(prompt,2));
                 end
@@ -1475,6 +1489,7 @@ classdef modelResults < handle
                     [InfoAnimalT2x{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2a{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2ax{:,i}] = deal(answer{1,i});
+                    workbar(0.7+(i/size(prompt,2)/10),'create .xlsx file','Saving Results',obj.controllerResultsHandle.mainFigure);
                 end
                 
                 Header = {'Label' sprintf('XPos (\x3BCm)') sprintf('YPos (\x3BCm)')... 
@@ -1500,6 +1515,7 @@ classdef modelResults < handle
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Save DataFile as xls file
+            workbar(0.8,'create .xlsx file','Saving Results',obj.controllerResultsHandle.mainFigure);
             
             if ~isempty(CellFiberTable)
                 obj.InfoMessage = '      - creating .xlsx file';
@@ -1525,75 +1541,7 @@ classdef modelResults < handle
                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
                     javaaddpath(path);
                     
-                    xlsfileName = [fileName '_processed' time '.xlsx'];
-                    
-                    fullFileName = fullfile(SaveDir,xlsfileName);
-%                     oldPath = pwd;
-%                     cd(SaveDir);
-                    
-                    obj.InfoMessage = '            - write all fiber types ';
-                    sheetName = 'Fyber Types';
-                    startRange = 'B2';
-                    % undocumented function from the file exchange Matlab Forum
-                    % for creating .xlsx files on a macintosh OS
-                    status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
-                    
-                    sheetName = 'Statistics';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write statistic table ';
-                    status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
-                    
-                    
-                    sheetName = 'Type 1';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 1 fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
-                    
-                    sheetName = 'Type 12h';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 12h fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
-                    
-                    sheetName = 'Type 2';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 2 fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
-                    
-                    sheetName = 'Type 2x';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 2x fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
-                    
-                    sheetName = 'Type 2a';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 2a fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
-                    
-                    sheetName = 'Type 2ax';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 2ax fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
-                    
-%                     cd(oldPath);
-                    
-                    if status
-                        obj.InfoMessage = '         - .xlxs file has been created';
-                    else
-                        obj.InfoMessage = '         - .xlxs file could not be created';
-                        obj.InfoMessage = '         - creating .txt file instead...';
-                        txtfileName = [fileName '_processed' time '.txt'];
-                        oldPath = pwd;
-                        cd(SaveDir)
-                        fid=fopen(txtfileName,'a+');
-                        % undocumented function from the file exchange Matlab Forum
-                        % for creating .txt files.
-                        cell2file(fid,DataFile,'EndOfLine','\r\n');
-                        fclose(fid);
-                        cd(oldPath)
-                        obj.InfoMessage = '         - .txt file has been created';
-                    end
-                    
-                elseif ispc
+                    elseif ispc
 
                     obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
                     
@@ -1609,13 +1557,14 @@ classdef modelResults < handle
                     javaaddpath(path);
                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
                     javaaddpath(path);
+                end
                     
                     xlsfileName = [fileName '_processed' time '.xlsx'];
-
+                    
+                    fullFileName = fullfile(SaveDir,xlsfileName);
 %                     oldPath = pwd;
 %                     cd(SaveDir);
-                    fullFileName = fullfile(SaveDir,xlsfileName);
-                    
+                    workbar(0.82,'write all fiber types','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write all fiber types ';
                     sheetName = 'Fyber Types';
                     startRange = 'B2';
@@ -1625,37 +1574,44 @@ classdef modelResults < handle
                     
                     sheetName = 'Statistics';
                     startRange = 'B2';
+                    workbar(0.84,'write statistic table','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write statistic table ';
                     status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
                     
                     
                     sheetName = 'Type 1';
                     startRange = 'B2';
+                    workbar(0.86,'write Type 1 fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write Type 1 fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
                     
                     sheetName = 'Type 12h';
                     startRange = 'B2';
+                    workbar(0.88,'write Type 12h fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write Type 12h fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
                     
                     sheetName = 'Type 2';
                     startRange = 'B2';
+                    workbar(0.90,'write Type 2 fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write Type 2 fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
                     
                     sheetName = 'Type 2x';
                     startRange = 'B2';
+                    workbar(0.92,'write Type 2x fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write Type 2x fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
                     
                     sheetName = 'Type 2a';
                     startRange = 'B2';
                     obj.InfoMessage = '            - write Type 2a fibers ';
+                    workbar(0.94,'write Type 2a fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
                     status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
                     
                     sheetName = 'Type 2ax';
                     startRange = 'B2';
+                    workbar(0.96,'write Type 2ax fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
                     obj.InfoMessage = '            - write Type 2ax fibers ';
                     status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
                     
@@ -1677,10 +1633,97 @@ classdef modelResults < handle
                         cd(oldPath)
                         obj.InfoMessage = '         - .txt file has been created';
                     end
-                end
+                    workbar(0.98,'file has been created','Saving Results',obj.controllerResultsHandle.mainFigure);
+                    
+%                 elseif ispc
+% 
+%                     obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
+%                     
+%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
+%                     javaaddpath(path);
+%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-3.8-20120326.jar'];
+%                     javaaddpath(path);
+%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-schemas-3.8-20120326.jar'];
+%                     javaaddpath(path);
+%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/xmlbeans-2.3.0.jar'];
+%                     javaaddpath(path);
+%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/dom4j-1.6.1.jar'];
+%                     javaaddpath(path);
+%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
+%                     javaaddpath(path);
+%                     
+%                     xlsfileName = [fileName '_processed' time '.xlsx'];
+% 
+% %                     oldPath = pwd;
+% %                     cd(SaveDir);
+%                     fullFileName = fullfile(SaveDir,xlsfileName);
+%                     
+%                     obj.InfoMessage = '            - write all fiber types ';
+%                     sheetName = 'Fyber Types';
+%                     startRange = 'B2';
+%                     % undocumented function from the file exchange Matlab Forum
+%                     % for creating .xlsx files on a macintosh OS
+%                     status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
+%                     
+%                     sheetName = 'Statistics';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write statistic table ';
+%                     status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
+%                     
+%                     
+%                     sheetName = 'Type 1';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write Type 1 fibers ';
+%                     status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
+%                     
+%                     sheetName = 'Type 12h';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write Type 12h fibers ';
+%                     status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
+%                     
+%                     sheetName = 'Type 2';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write Type 2 fibers ';
+%                     status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
+%                     
+%                     sheetName = 'Type 2x';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write Type 2x fibers ';
+%                     status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
+%                     
+%                     sheetName = 'Type 2a';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write Type 2a fibers ';
+%                     status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
+%                     
+%                     sheetName = 'Type 2ax';
+%                     startRange = 'B2';
+%                     obj.InfoMessage = '            - write Type 2ax fibers ';
+%                     status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
+%                     
+% %                     cd(oldPath);
+%                     
+%                     if status
+%                         obj.InfoMessage = '         - .xlxs file has been created';
+%                     else
+%                         obj.InfoMessage = '         - .xlxs file could not be created';
+%                         obj.InfoMessage = '         - creating .txt file instead...';
+%                         txtfileName = [fileName '_processed' time '.txt'];
+%                         oldPath = pwd;
+%                         cd(SaveDir)
+%                         fid=fopen(txtfileName,'a+');
+%                         % undocumented function from the file exchange Matlab Forum
+%                         % for creating .txt files.
+%                         cell2file(fid,DataFile,'EndOfLine','\r\n');
+%                         fclose(fid);
+%                         cd(oldPath)
+%                         obj.InfoMessage = '         - .txt file has been created';
+%                     end
+%                 end
                 
             end
             obj.InfoMessage = '   - Saving data complete';
+            workbar(1,'completed','Saving Results',obj.controllerResultsHandle.mainFigure);
         end
 
         function delete(obj)
