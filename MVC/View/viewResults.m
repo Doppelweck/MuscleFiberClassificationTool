@@ -82,7 +82,7 @@ classdef viewResults < handle
             mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',5,'Padding',5 );
             
             obj.panelResults = uix.Panel( 'Title', 'Results', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
-            obj.panelControl = uix.Panel( 'Title', 'Control Panel - RESULTS-MODE', 'Parent', mainPanelBox,'FontSize',fontSizeB );
+            obj.panelControl = uix.Panel( 'Title', 'RESULTS', 'Parent', mainPanelBox,'FontSize',fontSizeB,'TitlePosition','centertop');
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             
@@ -93,18 +93,18 @@ classdef viewResults < handle
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelSave = uix.Panel('Parent',PanelVBox,'Title','Save options','FontSize',fontSizeB,'Padding',2);
-            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
+            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',2);
             
             set( PanelVBox, 'Heights', [-3 -7 -14], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%% Panel control %%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 );
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 3 ,'Padding',3 );
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
-            obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', sprintf('\x25C4 Analyze-Mode'),'FontUnits','normalized','Fontsize',0.4 );
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',3);
+            obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', sprintf('\x25C4 Classification'),'FontUnits','normalized','Fontsize',0.4 );
             obj.B_CloseProgramm = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Close program \x2612') );
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 600], 'Spacing',0);
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',3);
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
             obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', sprintf('Save data \x2611'),'FontUnits','normalized','Fontsize',0.4 );
             
@@ -115,7 +115,7 @@ classdef viewResults < handle
             HBoxSave1 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave11 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', '  Save Overview plots as .pdf: ' );
+            uicontrol( 'Parent', HButtonBoxSave11,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Overview plots as .pdf: ' );
             
             HButtonBoxSave12 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SavePlots = uicontrol( 'Parent', HButtonBoxSave12,'Style','checkbox','Value',1,'Tag','SaveOverview');
@@ -126,7 +126,7 @@ classdef viewResults < handle
             HBoxSave2 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave21 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', '  Save Histogram plots as .pdf: ' );
+            uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Histogram plots as .pdf: ' );
             
             HButtonBoxSave22 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SaveHisto = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','SaveHistogram');
@@ -137,7 +137,7 @@ classdef viewResults < handle
             HBoxSave3 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave31 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave31,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', '  Save Processed Image as .pdf: ' );
+            uicontrol( 'Parent', HButtonBoxSave31,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Processed Image as .pdf: ' );
             
             HButtonBoxSave32 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SavePicProc = uicontrol( 'Parent', HButtonBoxSave32,'Style','checkbox','Value',1,'Tag','SavePicProcessed');
@@ -148,7 +148,7 @@ classdef viewResults < handle
             HBoxSave4 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave41 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', '  Save Fiber-Grouping Image as .pdf: ' );
+            uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Fiber-Grouping Image as .pdf: ' );
             
             HButtonBoxSave42 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SavePicGroups = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SavePicGroups');
@@ -159,7 +159,7 @@ classdef viewResults < handle
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', '  Save Fiber-Table as Excel spreadsheet: ' );
+            uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Fiber-Table as Excel spreadsheet: ' );
             
             HButtonBoxSave52 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SaveFiberTable = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SaveFiberTable'); 
@@ -170,7 +170,7 @@ classdef viewResults < handle
             HBoxSave6 = uix.HBox('Parent', mainVBBoxSave);
             
             HButtonBoxSave61 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left','String', '  Save Scatterplot all Fibers as .pdf: ' );
+            uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Scatterplot all Fibers as .pdf: ' );
             
             HButtonBoxSave62 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 1 );
             obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','SaveScatterAll');
@@ -180,8 +180,8 @@ classdef viewResults < handle
             %%%%%%%%%%%%%%%% 7. Row Save dir
             HBoxSave7 = uix.HBox('Parent', mainVBBoxSave);
             
-            HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[600 30],'Padding', 1 );
-            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave71,'FontUnits','normalized','Fontsize',0.4, 'String', 'Open results folder' );
+            HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[600 30],'Padding', 3 );
+            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave71,'FontUnits','normalized','Fontsize',0.5, 'String', 'Open results folder' );
             
             %%%%%%%%
             set( mainVBBoxSave, 'Heights', [-1 -1 -1 -1 -1 -1 -2] );

@@ -122,7 +122,7 @@ classdef viewAnalyze < handle
             mainPanelBox = uix.HBox( 'Parent', mainCard ,'Spacing',5,'Padding',5);
             
             obj.panelPicture = uix.Panel( 'Title', 'Picture', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
-            obj.panelControl = uix.Panel( 'Title', 'Control Panel - ANALYZE-MODE', 'Parent', mainPanelBox,'FontSize',fontSizeB );
+            obj.panelControl = uix.Panel( 'Title', 'CLASSIFICATION', 'Parent', mainPanelBox,'FontSize',fontSizeB,'TitlePosition','centertop');
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-80 -20] );
             
@@ -135,20 +135,20 @@ classdef viewAnalyze < handle
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelPara = uix.Panel('Parent',PanelVBox,'Title','Parameter','FontSize',fontSizeB,'Padding',2);
             PanelFiberInformation = uix.Panel('Parent',PanelVBox,'Title','Fiber informations','FontSize',fontSizeB,'Padding',2);
-            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info text log','FontSize',fontSizeB,'Padding',2);
+            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',2);
             
             
             set( PanelVBox, 'Heights', [-3 -7 -10 -4], 'Spacing', 1 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%
-            VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 );
+            VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 3 ,'Padding',3);
             
-            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 600],'Spacing', 0 );
-            obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('\x25C4 Edit-Mode'),'FontUnits','normalized','Fontsize',0.4 );
-            obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('Result-Mode \x25BA'),'FontUnits','normalized','Fontsize',0.4 );
+            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 3 );
+            obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('\x25C4 Segmentation'),'FontUnits','normalized','Fontsize',0.4 );
+            obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('Results \x25BA'),'FontUnits','normalized','Fontsize',0.4 );
             
-            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 600],'Spacing', 0 );
+            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 3 );
             obj.B_StartAnalyze = uicontrol( 'Parent', HBBoxControl2, 'String', sprintf('\x21DB Start analyzing'),'FontUnits','normalized','Fontsize',0.4 );
             obj.B_PreResults = uicontrol( 'Parent', HBBoxControl2, 'String', sprintf('Preview results \x2750'),'FontUnits','normalized','Fontsize',0.4 );
             
@@ -159,32 +159,31 @@ classdef viewAnalyze < handle
             %%%%%%%%%%%%%%%% 1. Row Analyze Mode
             HBoxPara1 = uix.HBox('Parent', mainVBoxPara);
             
-            HButtonBoxPara11 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', ' Analyze Mode :' );
+%             HButtonBoxPara11 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
+%             uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', ' Analyze Mode :' );
             
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
             String= {sprintf('Color-Ratio-Based triple labeling') ; sprintf('Color-Ratio-Based quad labeling');...
             'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'; 'Collagen / Dystrophin'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Value',2);
             
-            set( HBoxPara1, 'Widths', [-2 -5] );
+%             set( HBoxPara1, 'Widths', [-2 -5] );
             
             %%%%%%%%%%%%%%%% 2. Row: Area
             HBoxPara2 = uix.HBox('Parent', mainVBoxPara);
             
-            HButtonBoxPara21 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
+            HButtonBoxPara21 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 0 );
             obj.B_AreaActive = uicontrol( 'Parent', HButtonBoxPara21,'Style','checkbox','FontUnits','normalized','Fontsize',0.6,'Value',1,'Tag','AreaActive');
-            
-            HButtonBoxPara22 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara22,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', ['Area (' sprintf(' \x3BCm^2') ') from:'] );
-            
-            HButtonBoxPara23 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
+            HButtonBoxPara22 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20*0.7],'Padding', 0 );
+            uicontrol( 'Parent', HButtonBoxPara22,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', ['Area (' sprintf('\x3BCm^2') ') from:']);
+
+            HButtonBoxPara23 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 0 );
             obj.B_MinArea = uicontrol( 'Parent', HButtonBoxPara23,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','MinAreaValue', 'String', '100' );
             
-            HButtonBoxPara24 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara24,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'to' );
-            
-            HButtonBoxPara25 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 1 );
+            HButtonBoxPara24 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20*0.7],'Padding', 0 );
+            uicontrol( 'Parent', HButtonBoxPara24,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String', 'to' );
+
+            HButtonBoxPara25 = uix.HButtonBox('Parent', HBoxPara2,'ButtonSize',[600 20],'Padding', 0 );
             obj.B_MaxArea = uicontrol( 'Parent', HButtonBoxPara25,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','MaxAreaValue', 'String', '10000' );
             
             set( HBoxPara2, 'Widths', [-8 -34 -22 -12 -22] );
@@ -195,14 +194,14 @@ classdef viewAnalyze < handle
             HButtonBoxPara31 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_AspectRatioActive = uicontrol( 'Parent', HButtonBoxPara31,'Style','checkbox','Value',1,'Tag','AspectRatioActive');
             
-            HButtonBoxPara32 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara32,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Aspect Ratio from:' );
+            HButtonBoxPara32 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara32,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'Aspect Ratio from:' );
             
             HButtonBoxPara33 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_MinAspectRatio = uicontrol( 'Parent', HButtonBoxPara33,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','MinAspectRatioValue', 'String', '1' );
             
-            HButtonBoxPara34 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara34,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'to' );
+            HButtonBoxPara34 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara34,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String', 'to' );
             
             HButtonBoxPara35 = uix.HButtonBox('Parent', HBoxPara3,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_MaxAspectRatio= uicontrol( 'Parent', HButtonBoxPara35,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','MaxAspectRatioValue', 'String', '4' );
@@ -215,8 +214,8 @@ classdef viewAnalyze < handle
             HButtonBoxPara41 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_ColorValueActive = uicontrol( 'Parent', HButtonBoxPara41,'Style','checkbox','Value',1,'Tag','ColorValueActive');
             
-            HButtonBoxPara42 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara42,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Minimal Color Value:' );
+            HButtonBoxPara42 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara42,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'Minimal Color Value:' );
             
             HButtonBoxPara43 = uix.HButtonBox('Parent', HBoxPara4,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_ColorValue = uicontrol( 'Parent', HButtonBoxPara43,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','ColorValue', 'String', '0.1' );
@@ -229,8 +228,8 @@ classdef viewAnalyze < handle
             HButtonBoxPara51 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_RoundnessActive = uicontrol( 'Parent', HButtonBoxPara51,'Style','checkbox','Value',1,'Tag','RoundnessActive');
             
-            HButtonBoxPara52 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara52,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Minimal Roundness:' );
+            HButtonBoxPara52 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara52,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'Minimal Roundness:' );
             
             HButtonBoxPara53 = uix.HButtonBox('Parent', HBoxPara5,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_MinRoundness = uicontrol( 'Parent', HButtonBoxPara53,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','MinRoundValue', 'String', '0.15' );
@@ -248,20 +247,20 @@ classdef viewAnalyze < handle
             HButtonBoxPara61 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_BlueRedThreshActive = uicontrol( 'Parent', HButtonBoxPara61,'style','checkbox','Value',1,'Tag','BlueRedThreshActive');
             
-            HButtonBoxPara62 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara62,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'B/R thresh:' );
+            HButtonBoxPara62 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara62,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'B/R thresh:' );
             
             HButtonBoxPara63 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_BlueRedThresh = uicontrol( 'Parent', HButtonBoxPara63,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','BlueRedThresh', 'String', '1' );
             
-            HButtonBoxPara64 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara64,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Blue dist:' );
+            HButtonBoxPara64 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara64,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String', 'Blue dist:' );
             
             HButtonBoxPara65 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_BlueRedDistBlue = uicontrol( 'Parent', HButtonBoxPara65,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','BlueRedDistBlue', 'String', '0.1' );
             
-            HButtonBoxPara66 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara66,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Red dist:' );
+            HButtonBoxPara66 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara66,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String', 'Red dist:' );
             
             HButtonBoxPara67 = uix.HButtonBox('Parent', HBoxPara6,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_BlueRedDistRed = uicontrol( 'Parent', HButtonBoxPara67,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','BlueRedDistRed', 'String', '0.1' );
@@ -275,20 +274,20 @@ classdef viewAnalyze < handle
             HButtonBoxPara71 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_FarredRedThreshActive = uicontrol( 'Parent', HButtonBoxPara71,'style','checkbox','Value',1,'Tag','FarredRedThreshActive');
             
-            HButtonBoxPara72 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara72,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'FR/R thresh:' );
+            HButtonBoxPara72 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara72,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'FR/R thresh:' );
             
             HButtonBoxPara73 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_FarredRedThresh = uicontrol( 'Parent', HButtonBoxPara73,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','FarredRedThresh', 'String', '1' );
             
-            HButtonBoxPara74 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara74,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Farred dist:' );
+            HButtonBoxPara74 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara74,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String', 'Farred dist:' );
             
             HButtonBoxPara75 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_FarredRedDistFarred = uicontrol( 'Parent', HButtonBoxPara75,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','FarredRedDistFarred', 'String', '0.1' );
             
-            HButtonBoxPara76 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara76,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String', 'Red dist:' );
+            HButtonBoxPara76 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara76,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String', 'Red dist:' );
             
             HButtonBoxPara77 = uix.HButtonBox('Parent', HBoxPara7,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_FarredRedDistRed = uicontrol( 'Parent', HButtonBoxPara77,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','FarredRedDistRed', 'String', '0.1' );
@@ -302,8 +301,8 @@ classdef viewAnalyze < handle
             HButtonBoxPara711 = uix.HButtonBox('Parent', HBoxPara71,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_12HybridFiberActive = uicontrol( 'Parent', HButtonBoxPara711,'style','checkbox','Value',1,'Tag','Hybrid12FiberActive');
             
-            HButtonBoxPara712 = uix.HButtonBox('Parent', HBoxPara71,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara712,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Searching for 1/2-Hybrid Fibers allowed?' );
+            HButtonBoxPara712 = uix.HButtonBox('Parent', HBoxPara71,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara712,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'Searching for 1/2-Hybrid Fibers allowed?' );
             
             set( HBoxPara71, 'Widths', [-8 -92] );
             
@@ -312,8 +311,8 @@ classdef viewAnalyze < handle
             HButtonBoxPara721 = uix.HButtonBox('Parent', HBoxPara72,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_2axHybridFiberActive = uicontrol( 'Parent', HButtonBoxPara721,'style','checkbox','Value',1,'Tag','Hybrid2axFiberActive');
             
-            HButtonBoxPara722 = uix.HButtonBox('Parent', HBoxPara72,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara722,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', 'Searching for 2ax-Hybrid Fibers allowed?' );
+            HButtonBoxPara722 = uix.HButtonBox('Parent', HBoxPara72,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara722,'Style','text','FontUnits','normalized','Fontsize',0.85, 'HorizontalAlignment','left', 'String', 'Searching for 2ax-Hybrid Fibers allowed?' );
             
             set( HBoxPara72, 'Widths', [-8 -92] );
             
@@ -321,16 +320,16 @@ classdef viewAnalyze < handle
             %%%%%%%%%%%%%%%% 8. Pixel Scale
             HBoxPara8 = uix.HBox('Parent', mainVBoxPara);
             
-            HButtonBoxPara81 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
+            HButtonBoxPara81 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20*0.7],'Padding', 1 );
 %             ui = uibuttongroup('Parent', HButtonBoxPara81);
 %             t = text('Parent', ui,'Interpreter','LaTex','string','$\alpha_{0}$','FontSize',13)
-            uicontrol( 'Parent', HButtonBoxPara81,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String',sprintf('Xs: \x3BCm/pixel'));
+            uicontrol( 'Parent', HButtonBoxPara81,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String',sprintf('Xs: \x3BCm/pixel'));
             
             HButtonBoxPara82 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_XScale = uicontrol( 'Parent', HButtonBoxPara82,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','XScale', 'String', '1' );
             
-            HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
-            uicontrol( 'Parent', HButtonBoxPara83,'Style','text','FontUnits','normalized','Fontsize',0.6, 'String',sprintf('Ys: \x3BCm/pixel') );
+            HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20*0.7],'Padding', 1 );
+            uicontrol( 'Parent', HButtonBoxPara83,'Style','text','FontUnits','normalized','Fontsize',0.85, 'String',sprintf('Ys: \x3BCm/pixel') );
             
             HButtonBoxPara83 = uix.HButtonBox('Parent', HBoxPara8,'ButtonSize',[600 20],'Padding', 1 );
             obj.B_YScale = uicontrol( 'Parent', HButtonBoxPara83,'Style','edit','FontUnits','normalized','Fontsize',0.6,'Tag','YScale', 'String', '1' );
