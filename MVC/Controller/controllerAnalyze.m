@@ -2165,7 +2165,7 @@ classdef controllerAnalyze < handle
             Text = [];
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';
-            
+            workbar(1,'delete workbar','delete workbar',obj.mainFigure);
             if any(strcmp('stack',fieldnames(ErrorInfo)))
                 
                 for i=1:size(ErrorInfo.stack,1)
