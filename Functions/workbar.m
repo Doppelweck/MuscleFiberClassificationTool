@@ -88,7 +88,6 @@ percentdone = floor(100*fractiondone);
 if percentdone == 100 % Task completed
     if ~isempty(progfig)
         setAlwaysOnTop(progfig,false);
-        busyIndicator.stop;
     end
     delete(progfig) % Close progress bar
     clear progfig progpatch starttime lastupdate % Clear persistent vars
