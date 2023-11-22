@@ -67,6 +67,7 @@ try
     
     % If progress bar needs to be reset, close figure and set handle to empty
     if fractiondone == 0
+        setAlwaysOnTop(progfig,false);
         delete(progfig) % Close progress bar
         progfig = []; % Set to empty so a new progress bar is created
     end
@@ -85,7 +86,7 @@ end
 % If task completed, close figure and clear vars, then exit
 percentdone = floor(100*fractiondone);
 if percentdone == 100 % Task completed
-   
+    setAlwaysOnTop(progfig,false);
     delete(progfig) % Close progress bar
     clear progfig progpatch starttime lastupdate % Clear persistent vars
     return
@@ -136,12 +137,13 @@ if isempty(progfig)
          'color',wincolor,...                               % Set the figure color
          'resize','off',...                                 % Turn of figure resizing
          'tag','timebar',...                                % Tag the figure for later checking
-         'WindowStyle','modal',...                            % Stay figure in forground                          
+         'WindowStyle','normal',...                            % Stay figure in forground                          
          'Visible','off');
-     
-    movegui(progfig,'center');
-    set(progfig,'Visible','on') 
     
+    movegui(progfig,'center');
+    set(progfig,'Visible','on')
+    setAlwaysOnTop(progfig,true);
+    set(progfig,'CloseRequestFcn','');
     work.progtitle = progtitle;                             % Store initial values for title
     work.message = message;                                 % Store initial value for message
     set(progfig,'userdata',work);                           % Save text in figure's userdata
