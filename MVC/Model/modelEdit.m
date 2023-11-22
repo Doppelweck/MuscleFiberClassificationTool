@@ -842,7 +842,7 @@ classdef modelEdit < handle
                         'See MANUAL for more details.',...
                         };
                     %show info message on gui
-                    obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
+%                     obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
                     
                 end
         end
