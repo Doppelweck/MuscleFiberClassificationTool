@@ -841,6 +841,8 @@ classdef modelEdit < handle
                         '',...
                         'See MANUAL for more details.',...
                         };
+                    obj.InfoMessage = ['<HTML><FONT color="orange">- Not all brightness adjustment images was found.</FONT></HTML>'];
+                    obj.InfoMessage = ['      - Go to the "Check planes" for more options.'];
                     %show info message on gui
 %                     obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
                     
