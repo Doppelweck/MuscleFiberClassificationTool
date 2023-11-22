@@ -79,7 +79,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.InfoMessage = 'In cooperation with:';
             obj.modelEditHandle.InfoMessage = 'The Royal Veterinary College, UK';
             obj.modelEditHandle.InfoMessage = ' ';
-            obj.modelEditHandle.InfoMessage = 'Version 1.3 2020';
+            obj.modelEditHandle.InfoMessage = 'Version 1.4 2023';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Press "New file" to start';
             
