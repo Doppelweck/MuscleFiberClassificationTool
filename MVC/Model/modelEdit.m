@@ -486,6 +486,7 @@ classdef modelEdit < handle
             % See: http://www.openmicroscopy.org/site/support/bio-formats5.3/developers/matlab-dev.html
             
             %Open bioformat file
+            workbar(0.1,'open file','Open Bioformat File',obj.controllerEditHandle.mainFigure);
             data = bfopen([obj.PathName obj.FileName]);
             reader = bfGetReader([obj.PathName obj.FileName]);
             
@@ -509,6 +510,7 @@ classdef modelEdit < handle
                 value = metadata.get(key);
                 MetaData{i,1}=sprintf('%s', key);
                 MetaData{i,2}=sprintf('%s', value);
+                workbar(0.1+(0.3*i/metadata.size()),'get meta data','Open Bioformat File',obj.controllerEditHandle.mainFigure);
             end
             
             Parameters = {MetaData{:,1}};
@@ -521,6 +523,7 @@ classdef modelEdit < handle
                 obj.InfoMessage = '     - Read Meta Data From Image';
             catch
                 try
+                    workbar(0.4,'get meta data','Open Bioformat File',obj.controllerEditHandle.mainFigure);
                     ParametersNewValid = matlab.lang.makeValidName(Parameters);
                     ParametersNewValidUnique =  matlab.lang.makeUniqueStrings(ParametersNewValid,namelengthmax);
                     ParametersNewValidUnique = matlab.lang.makeUniqueStrings(ParametersNewValidUnique);
@@ -538,7 +541,7 @@ classdef modelEdit < handle
             NumberOfPlanes = size(data{1,1},1);
             
             if (NumberOfPlanes <= 4) && seriesCount == 1
-                
+                workbar(0.6,'get plane images','Open Bioformat File',obj.controllerEditHandle.mainFigure);
                 switch NumberOfPlanes %check numer of images within the file
                     case 1
                         obj.InfoMessage = '   - 1 plane image within the file';
@@ -566,7 +569,7 @@ classdef modelEdit < handle
                         obj.PicPlane4 = bfGetPlane(reader,4);
                 end
                 
-                
+                workbar(0.75,'indentifing planes','Open Bioformat File',obj.controllerEditHandle.mainFigure);
                 obj.InfoMessage = '   - indentifing planes';
                 %get ColorPlane Info from metaData
                 [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
@@ -635,7 +638,7 @@ classdef modelEdit < handle
                         obj.PicPlaneBlue = obj.PicPlane3;
                         obj.PicPlaneFarRed = obj.PicPlane4;
                     end
-                    
+                    workbar(0.9,'convert all images to 8-bit','Open Bioformat File',obj.controllerEditHandle.mainFigure);
                     %Convert every image into 8 bit per pixel
                     obj.InfoMessage = '      - convert all images to 8-bit unsigned integers';
                     try
@@ -703,7 +706,7 @@ classdef modelEdit < handle
                 obj.InfoMessage = 'ERROR opening planes';
                 status = 'false';
             end
-            
+            workbar(1,'convert all images to 8-bit','Open Bioformat File',obj.controllerEditHandle.mainFigure);
         end
         
         function searchForBrighntessImages(obj)
@@ -1368,19 +1371,18 @@ classdef modelEdit < handle
             else
                 %brightness adjustment PicPlaneGreen
                 if ~isempty(obj.PicBCGreen)
+                    workbar(0.1,'Brightness adjustment Green Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     obj.InfoMessage = '      - adjust green plane';
                     PicMF = medfilt2(obj.PicBCGreen,[5 5],'symmetric');
+                    workbar(0.3,'Brightness adjustment Green Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicMFnorm = double(PicMF)./double(max(max(PicMF)));
+                    workbar(0.5,'Brightness adjustment Green Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicBC = double(obj.PicPlaneGreen)./double(PicMFnorm);
+                    workbar(0.7,'Brightness adjustment Green Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneGreen)));
+                    workbar(0.9,'Brightness adjustment Green Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     obj.PicPlaneGreen_adj = uint8(PicBC);
-                    
-%                     figure('name','green BC')
-%                     surf(div,'EdgeColor','none')
-%                     figure('name','green Plane')
-%                     surf(obj.PicPlaneGreen,'EdgeColor','none')
-%                     figure('name','green Plane adj')
-%                     surf(obj.PicPlaneGreen_adj,'EdgeColor','none')
+                    workbar(1,'Brightness adjustment Green Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicBCGreen not found';
@@ -1389,19 +1391,18 @@ classdef modelEdit < handle
                 
                 %brightness adjustment PicPlaneRed
                 if ~isempty(obj.PicBCRed)
+                    workbar(0.1,'Brightness adjustment Red Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     obj.InfoMessage = '      - adjust red plane';
                     PicMF = medfilt2(obj.PicBCRed,[5 5],'symmetric');
+                    workbar(0.3,'Brightness adjustment Red Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicMFnorm = double(PicMF)/double(max(max(PicMF)));
+                    workbar(0.5,'Brightness adjustment Red Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicBC = double(obj.PicPlaneRed)./double(PicMFnorm);
+                    workbar(0.7,'Brightness adjustment Red Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneRed)));
+                    workbar(0.9,'Brightness adjustment Red Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     obj.PicPlaneRed_adj = uint8(PicBC);
-                    
-%                     figure('name','red BC')
-%                     surf(div,'EdgeColor','none')
-%                     figure('name','red Plane')
-%                     surf(obj.PicPlaneRed,'EdgeColor','none')
-%                     figure('name','red Plane adj')
-%                     surf(obj.PicPlaneRed_adj,'EdgeColor','none')
+                    workbar(1,'Brightness adjustment Red Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                 else
                     obj.InfoMessage = '      - PicBCRed not found';
                     obj.PicPlaneRed_adj = obj.PicPlaneRed;
@@ -1409,24 +1410,21 @@ classdef modelEdit < handle
                 
                 %brightness adjustment PicPlaneBlue
                 if ~isempty(obj.PicBCBlue)
+                    workbar(0.1,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '      - adjust blue plane';
                     PicMF = medfilt2(obj.PicBCBlue,[5 5],'symmetric');
+                    workbar(0.2,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicMFnorm = double(PicMF)/double(max(max(PicMF)));
-%                     minP = min(obj.PicPlaneBlue(:)); %min Plane Original
+                    workbar(0.3,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     maxP = double( max(obj.PicPlaneBlue(:)) ); %max Plane Original
+                    workbar(0.5,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     PicBC = double(obj.PicPlaneBlue)./double(PicMFnorm);
+                    workbar(0.7,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     minPBC = double(min(PicBC(:))); %min Plane afer BC
-%                     maxPBC = max(PicBC(:)); %max Plane after BC
                     PicBC = ((PicBC-minPBC)/max(max((PicBC-minPBC)))*(maxP-minPBC))+minPBC;
-%                     PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneBlue)));
+                    workbar(0.9,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                     obj.PicPlaneBlue_adj = uint8(PicBC);
-                    
-%                     figure('name','blue BC')
-%                     surf(div,'EdgeColor','none')
-%                     figure('name','blue Plane')
-%                     surf(obj.PicPlaneBlue,'EdgeColor','none')
-%                     figure('name','blue Plane adj')
-%                     surf(obj.PicPlaneBlue_adj,'EdgeColor','none')
+                    workbar(1,'Brightness adjustment Blue Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure);
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicBCBlue not found';
@@ -1435,15 +1433,21 @@ classdef modelEdit < handle
                 
                 %brightness adjustment PicPlaneFarRed
                 if ~isempty(obj.PicBCFarRed)
+                    workbar(0.1,'Brightness adjustment Farred Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     obj.InfoMessage = '      - adjust farred plane';
                     PicMF = medfilt2(obj.PicBCFarRed,[5 5],'symmetric');
+                    workbar(0.3,'Brightness adjustment Farred Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     PicMFnorm = double(PicMF)/double(max(max(PicMF)));
+                    workbar(0.5,'Brightness adjustment Farred Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     PicBC = double(obj.PicPlaneFarRed)./double(PicMFnorm);
+                    workbar(0.7,'Brightness adjustment Farred Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     maxP = double( max(obj.PicPlaneFarRed(:)) ); %max Plane Original
                     minPBC = double(min(PicBC(:))); %min Plane afer BC
+                    workbar(0.9,'Brightness adjustment Farred Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                     PicBC = ((PicBC-minPBC)/max(max((PicBC-minPBC)))*(maxP-minPBC))+minPBC;
                     PicBC = PicBC./max(max(PicBC))*double(max(max(obj.PicPlaneFarRed)));
                     obj.PicPlaneFarRed_adj = uint8(PicBC);
+                    workbar(1,'Brightness adjustment Farred Plane','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
                 else
                     %no adjustment image were found
                     obj.InfoMessage = '      - PicY4 not found';
@@ -1451,6 +1455,7 @@ classdef modelEdit < handle
                 end
                 
             end
+            workbar(1,'Brightness adjustment Green Plabe','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
             obj.InfoMessage = '   - brightness adjustment finished';
             
             
@@ -1462,7 +1467,7 @@ classdef modelEdit < handle
             switch plane
                 
                 case 'Green'
-                    
+                    workbar(0.1,'create image for Green Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure); 
                     obj.InfoMessage = '      - create image for Green Plane adjustment';
                     obj.InfoMessage = '         - try to calculate the background illumination';
                     obj.InfoMessage = '            - determine mean area of fibers';
@@ -1477,24 +1482,29 @@ classdef modelEdit < handle
                     %mean area  value of the biggest fibers
                     AreaBig = Area(round(length(Area)*(2/3)):end);
                     MeanArea = mean(AreaBig);
+                    workbar(0.3,'determine fiber radius','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - determine fiber radius';
                     %radius of mean area
                     radius = sqrt(MeanArea/pi);
                     %double radius to be sure that the structering element
                     %is bigger than the fibers
                     radius=ceil(radius)*3;
+                    workbar(0.5,'calculate background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - calculate background profile';
                     background = imopen(obj.PicPlaneGreen,strel('disk',radius));
                     h = fspecial('disk', radius);
+                    workbar(0.7,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
+                    workbar(0.9,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCGreen = smoothedBackground;
                     obj.FilenameBCGreen = 'calculated from Green plane background';
+                    workbar(1,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Blue'
-                    
+                    workbar(0.1,'create image for Blue Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '      - create image for Blue Plane adjustment';
                     obj.InfoMessage = '         - try to calculate the background illumination';
                     obj.InfoMessage = '            - determine mean area of fibers';
@@ -1509,24 +1519,29 @@ classdef modelEdit < handle
                     %mean area  value of the biggest fibers
                     AreaBig = Area(round(length(Area)*(2/3)):end);
                     MeanArea = mean(AreaBig);
+                    workbar(0.3,'determine fiber radius','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - determine fiber radius';
                     %radius of mean area
                     radius = sqrt(MeanArea/pi);
                     %double radius to be sure that the structering element
                     %is bigger than the fibers
                     radius=ceil(radius)*3;
+                    workbar(0.5,'calculate background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - calculate background profile';
                     background = imopen(obj.PicPlaneBlue,strel('disk',radius));
                     h = fspecial('disk', radius);
+                    workbar(0.7,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
+                    workbar(0.9,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCBlue = smoothedBackground;
                     obj.FilenameBCBlue = 'calculated from Blue plane background';
+                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Red'
-                    
+                    workbar(0.1,'create image for Red Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '      - create image for Red Plane adjustment';
                     obj.InfoMessage = '         - try to calculate the background illumination';
                     obj.InfoMessage = '            - determine mean area of fibers';
@@ -1541,24 +1556,29 @@ classdef modelEdit < handle
                     %mean area  value of the biggest fibers
                     AreaBig = Area(round(length(Area)*(2/3)):end);
                     MeanArea = mean(AreaBig);
+                    workbar(0.3,'determine fiber radius','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - determine fiber radius';
                     %radius of mean area
                     radius = sqrt(MeanArea/pi);
                     %double radius to be sure that the structering element
                     %is bigger than the fibers
                     radius=ceil(radius)*3;
+                    workbar(0.5,'calculate background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - calculate background profile';
                     background = imopen(obj.PicPlaneRed,strel('disk',radius));
                     h = fspecial('disk', radius);
+                    workbar(0.7,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
+                    workbar(0.9,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCRed = smoothedBackground;
                     obj.FilenameBCRed = 'calculated from Red plane background';
+                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Farred'
-                    
+                    workbar(0.1,'create image for Farred Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '      - create image for Farred Plane adjustment';
                     obj.InfoMessage = '         - try to calculate the background illumination';
                     obj.InfoMessage = '            - determine mean area of fibers';
@@ -1573,21 +1593,26 @@ classdef modelEdit < handle
                     %mean area  value of the biggest fibers
                     AreaBig = Area(round(length(Area)*(2/3)):end);
                     MeanArea = mean(AreaBig);
+                    workbar(0.3,'determine fiber radius','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - determine fiber radius';
                     %radius of mean area
                     radius = sqrt(MeanArea/pi);
                     %double radius to be sure that the structering element
                     %is bigger than the fibers
                     radius=ceil(radius)*3;
+                    workbar(0.5,'calculate background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - calculate background profile';
                     background = imopen(obj.PicPlaneFarRed,strel('disk',radius));
                     h = fspecial('disk', radius);
+                    workbar(0.7,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     obj.InfoMessage = '            - smoothing background profile';
                     smoothedBackground = imfilter(single(background), h, 'replicate');
                     %Normalized Background to 1
+                    workbar(0.9,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCFarRed = smoothedBackground;
                     obj.FilenameBCFarRed = 'calculated from Farred plane background';
+                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 otherwise %calculate all missing images
                     disp('all missing');
@@ -2184,7 +2209,7 @@ classdef modelEdit < handle
         
         function autoSetupBinarization(obj)
             obj.InfoMessage = '   - running auto setup binarization';
-            
+            workbar(0.1,'running auto setup binarization','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
             %green Plane
             switch obj.FiberForeBackGround
@@ -2193,95 +2218,30 @@ classdef modelEdit < handle
                 case 2 %Foreground. Fibers are shown as white Pixels.
                     tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
             end
-            
+             
             obj.PicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',0.9);
             obj.PicBWisInvert = 'false';
             
             %create Gradient Magnitude image
+            workbar(0.2,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             obj.InfoMessage = '      - compute Gradient-Magnitude image';
             hy = fspecial('sobel');
             hx = hy';
+            workbar(0.3,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             Iy = imfilter(double(tempGreenPlane), hy, 'replicate');
             Ix = imfilter(double(tempGreenPlane), hx, 'replicate');
+            workbar(0.4,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             gradmag = sqrt(Ix.^2 + Iy.^2); %image of Gradient Magnitude
             gradmag = medfilt2(gradmag,[5 5],'symmetric');
-%             test = gradmag;
-%             test(test>255)=255;
-%             x = imbinarize(uint8(test),'adaptive','ForegroundPolarity','bright');
-%             figure()
-%             imshow(x,[])
-% %           
-%               grandmagVec = gradmag(:,500);
-%               grandmagPlus = gradmag+round(MeanMinGradMag/3);
-                
-%             x = imregionalmin(gradmag);
-            
-%             Hmin = imhmin(gradmag,round(MeanMinGradMag/3));
-%             HminVec = imhmin(grandmagVec,round(MeanMinGradMag/3));
-%             HminVec = Hmin(:,500);
-%             grandmagVec = gradmag(:,500);
-%             grandmagPlus = gradmag+round(MeanMinGradMag/3);
-%             grandmagPlusVec = grandmagPlus(:,500);
-%             figure
-%             plot(grandmagVec,'k','LineWidth',2)
-%             hold on
-%             plot(grandmagPlusVec,'r','LineWidth',2)
-%             hold on
-%             plot(HminVec,'b','LineWidth',1)
-%             grid on
-%             obj.InfoMessage = '      - compute fiber type markes';
-%             LEG=legend('G`','G`+h','HMIN(G`)');
-%             set(LEG,'FontSize',36)
-%             set(gca,'FontSize',36)
-%             %find mean value of all regional minima
+            workbar(0.5,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             MeanMinGradMag=mean(gradmag(imregionalmin(gradmag)));
             MeanMinGradMag = round(MeanMinGradMag/3);
             if MeanMinGradMag < 3
                 MeanMinGradMag = 3;
             end
             
-%             
-%             grandmagVec = gradmag(:,500);
-%             grandmagVecPlus = gradmag+round(MeanMinGradMag/3);
-%             grandmagPlusVec = grandmagVecPlus(:,500);
-%             HminVec = imhmin(grandmagVec,round(MeanMinGradMag/3));
-%             figure('position',[100 100 350 300])
-%             plot(grandmagVec,'k','LineWidth',1);
-%             hold on
-%             plot(grandmagPlusVec,'r','LineWidth',1);
-%             hold on
-%             plot(HminVec,'b','LineWidth',1);
-%             LEG = legend('G','G+h','HMIN(G)');
-%             set(LEG,'FontSize',12)
-%             grid on
-%             xlim([318 402])
-%             ylim([1 14])
-%             
-            
-%              MeanMinGradMag=mean(gradmag(imregionalmin(gradmag)));
-%             MeanMinGradMag = round(MeanMinGradMag/3);
-%             if MeanMinGradMag < 3
-%                 MeanMinGradMag = 3;
-%             end
-%             
-%             grandmagVec1 = gradmag(:,500);
-%             grandmagVecPlus = gradmag+round(MeanMinGradMag/3);
-%             grandmagPlusVec = grandmagVecPlus(:,500);
-%             HminVec = imhmin(grandmagVec1,round(MeanMinGradMag/3));
-%             figure('position',[100 100 350 300])
-%             plot(grandmagVec1,'k','LineWidth',1);
-%             hold on
-%             plot(grandmagPlusVec,'r','LineWidth',1);
-%             hold on
-%             plot(HminVec,'b','LineWidth',1);
-%             LEG = legend('G_{median}','G_{median}+h','HMIN(G_{median})');
-%             set(LEG,'FontSize',12)
-%              grid on
-%             xlim([318 402])
-%             ylim([1 14])
-            
-           
             %extend regional minima using h-min transform
+            workbar(0.6,'extend regional minima','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             MinMarker = imextendedmin(gradmag,round(MeanMinGradMag));
 %             MaxMarker = imextendedmax(gradmag,200);
             %
@@ -2296,7 +2256,7 @@ classdef modelEdit < handle
 
 %             figure()
 %             imshow(MinMarker,[])
-%             
+            workbar(0.7,'remove small fibers','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             stats = regionprops('struct',MinMarker,'Area');
             MeanArea = mean([stats(:).Area]);
             obj.InfoMessage = '      - remove small fiber type markes';
@@ -2304,7 +2264,7 @@ classdef modelEdit < handle
 
 %             figure()
 %             imshow(MinMarker)
-            
+            workbar(0.8,'remove small fibers','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             %Background Markers (currently not used)
             D = bwdist(MinMarker);
             DL = watershed(D);
@@ -2313,7 +2273,7 @@ classdef modelEdit < handle
 %             imshow(bgm)
 %             gradmag2 = imimposemin(gradmag, bgm | MinMarker);
             gradmag2 = imimposemin(gradmag, MinMarker);
-
+            workbar(0.9,'perform watershed transformation','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
             obj.InfoMessage = '      - perform watershed transformation';
             L = watershed(gradmag2);
             
@@ -2326,6 +2286,7 @@ classdef modelEdit < handle
             obj.handlePicBW.CData = obj.PicBW | f2;
             
             obj.InfoMessage = '   - auto setup binarization completed';
+            workbar(1,'perform watershed transformation','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
         end
         
         function [xOut yOut isInAxes] = checkPosition(obj,PosX,PosY)
