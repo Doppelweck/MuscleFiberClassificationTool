@@ -373,20 +373,23 @@ classdef controllerResults < handle
             try
                 
             obj.viewResultsHandle.B_TableMain.RowName = [];
-            obj.viewResultsHandle.B_TableMain.ColumnName = {'Label'  sprintf('XPos |(\x3BCm)') sprintf('YPos |(\x3BCm)')...
-                sprintf('Area |(\x3BCm^2)') sprintf('min Area Cross|Section (\x3BCm^2)'), sprintf('max Area Cross|Section (\x3BCm^2)')...
-                sprintf('Perimeter |(\x3BCm)') sprintf('min Diameter |(\x3BCm)') sprintf('max Diameter |(\x3BCm)') 'Roundness' ...
-                sprintf('Aspect|Ratio') sprintf('Color|Value') sprintf('mean|Red') sprintf('mean|Green') ...
-                sprintf('mean|Blue') sprintf('mean|Farred') 'Blue/Red' 'Farred/Red'...
-                'Fiber Type|Main Group' 'Fiber Type'};
+            obj.viewResultsHandle.B_TableMain.ColumnName = {'No.',  sprintf('XPos |(\x3BCm)'), sprintf('YPos |(\x3BCm)'),...
+                sprintf('Area |(\x3BCm^2)'), sprintf('min Area Cross|Section (\x3BCm^2)'), sprintf('max Area Cross|Section (\x3BCm^2)')...
+                sprintf('Perimeter |(\x3BCm)'), sprintf('Diameter|min (\x3BCm)'), sprintf('Diameter|max (\x3BCm)'), 'Roundness' ...
+                sprintf('Aspect|Ratio'), sprintf('Color|Value'), sprintf('mean|Red'), sprintf('mean|Green'), ...
+                sprintf('mean|Blue'), sprintf('mean|Farred'), 'Blue/Red', 'Farred/Red',...
+                'Main|Group', 'Fiber|Type'};
+
             obj.viewResultsHandle.B_TableMain.Data = obj.modelResultsHandle.StatsMatData;
-            obj.viewResultsHandle.B_TableMain.ColumnWidth={'auto'};
+            pos = round((obj.viewResultsHandle.B_TableMain.Position(3)-20-35-40-40)/17);
+            obj.viewResultsHandle.B_TableMain.ColumnWidth={45 45 45 60 100 100 'auto'};
             
             obj.viewResultsHandle.B_TableStatistic.RowName = [];
-            obj.viewResultsHandle.B_TableStatistic.ColumnName = {'Name of parameter            ','Value of parameter             '};
+%             obj.viewResultsHandle.B_TableStatistic.ColumnWidth={180 'auto'};
+            obj.viewResultsHandle.B_TableStatistic.ColumnName = {'Name of parameter','Value of parameter'};
             obj.viewResultsHandle.B_TableStatistic.Data = obj.modelResultsHandle.StatisticMat;
-            obj.viewResultsHandle.B_TableStatistic.ColumnWidth={'auto'};
-            
+            pos = obj.viewResultsHandle.B_TableStatistic.Position(3);
+            obj.viewResultsHandle.B_TableStatistic.ColumnWidth={pos/2 pos/2-20};
             catch
                 obj.errorMessage(lasterror);
             end
