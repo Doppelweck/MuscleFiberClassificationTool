@@ -97,7 +97,7 @@ classdef viewAnalyze < handle
         B_ManualClassBack; %Button, manual classification, go back to choose main fiber types.
         B_ManualClassEnd; %Button, quit manual classification.
         B_ManualClassForward; %Button, manual classification, go forward to specify type 2 fiber types.
-        
+        PanelFiberInformation;
     end
     
     methods
@@ -134,7 +134,7 @@ classdef viewAnalyze < handle
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelPara = uix.Panel('Parent',PanelVBox,'Title','Parameter','FontSize',fontSizeB,'Padding',2);
-            PanelFiberInformation = uix.Panel('Parent',PanelVBox,'Title','Fiber informations','FontSize',fontSizeB,'Padding',2);
+            obj.PanelFiberInformation = uix.Panel('Parent',PanelVBox,'Title','Fiber informations','FontSize',fontSizeB,'Padding',2);
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',2);
             
             
@@ -339,7 +339,7 @@ classdef viewAnalyze < handle
             set( mainVBoxPara, 'Heights', [-1 -1 -1 -1 -1 -2 -1], 'Spacing', 0 );
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%% Panel FiberInformation %%%%%%%%%%%%%%%%%%%%%
-            VBoxMainInfoFiber = uix.VBox('Parent', PanelFiberInformation);
+            VBoxMainInfoFiber = uix.VBox('Parent', obj.PanelFiberInformation);
             
             HBoxInfo1 = uix.HBox('Parent', VBoxMainInfoFiber);
             

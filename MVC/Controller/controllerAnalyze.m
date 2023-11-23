@@ -950,6 +950,7 @@ classdef controllerAnalyze < handle
             %           InfoText:   Info text log.
             %
             
+            obj.viewAnalyzeHandle.PanelFiberInformation.Title = 'Fiber informations';
             
             % Set PicData Properties in the Analyze Model
             obj.modelAnalyzeHandle.FileName = PicData{1};
@@ -1211,7 +1212,7 @@ classdef controllerAnalyze < handle
             %           obj:    Handle to modelAnalyze object
             %
             
-            obj.modelAnalyzeHandle.InfoMessage = '   - plot boundaries...';
+            
             
             %Make axes with rgb image the current axes
             axesh = obj.modelAnalyzeHandle.handlePicRGB.Parent;
@@ -1226,6 +1227,11 @@ classdef controllerAnalyze < handle
             delete(hLines);
             
             nObjects = size(obj.modelAnalyzeHandle.Stats,1);
+            
+            if nObjects > 0
+                obj.modelAnalyzeHandle.InfoMessage = '   - plot boundaries...';
+            end
+            
             hold on
             for i=1:1:nObjects
                 %select boundarie color for diffrent fiber types
