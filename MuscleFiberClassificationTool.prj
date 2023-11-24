@@ -75,24 +75,7 @@ Sebastian</param.install.notes>
 	 
  Input Arguments 
 	 -?  print help on how to use the application 
-	 input arguments 
- Description 
- 	 Version 1.4 6-November-2023
-
-Application created with MATLAB 2021a.
-If the connection to the MathWorks Server fails:
-
-1.: Go to https://de.mathworks.com/products/compiler/matlab-runtime.html and download
-      the MATLAB Runtime Package R2021a.
-
-2.: Install the the MATLAB Runtime Package R2018a.
-
-3.: After installing the the correct Runtime Package run the
-      MuscleFiberClassificationTool_Installer again.
-
-Thanks
-
-Sebastian</param.help.text>
+	 input arguments</param.help.text>
     <unset>
       <param.summary />
       <param.guid />
