@@ -1654,8 +1654,7 @@ classdef modelEdit < handle
                             
                             obj.PicBW = im2bw(tempGreenPlane,thresh);
                             obj.handlePicBW.CData = obj.PicBW;
-%                             figure
-% imhist(obj.PicPlaneGreen_adj)
+
                         case 2 % Use automatic adaptive threshold for binarization
                             
                             obj.PicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',abs(1-thresh));
@@ -1668,8 +1667,11 @@ classdef modelEdit < handle
                             obj.PicBW = PicBW1 | PicBW2;
                             obj.handlePicBW.CData = obj.PicBW;
                             
-                        case 4 % Use automatic setup for binarization
-                            obj.autoSetupBinarization();
+                        case 4 % Use automatic setup for binarization (Watershed I)
+                            obj.autoBinarizationWatershed_1();
+                            
+                        case 5 % Use automatic setup for binarization (Watershed II)
+                            obj.autoBinarizationWatershed_2();
                             
                     end
                 else
@@ -1695,9 +1697,11 @@ classdef modelEdit < handle
                             obj.PicBW = ~(temp1 | temp2);
                             obj.handlePicBW.CData = obj.PicBW;
                             
-                        case 4 % Use automatic setup for binarization
-                            obj.autoSetupBinarization();
-%                             obj.addToBuffer();
+                        case 4 % Use automatic setup for binarization (Watershed I)
+                            obj.autoBinarizationWatershed_1();
+
+                        case 5 % Use automatic setup for binarization (Watershed II)
+                            obj.autoBinarizationWatershed_2();
                     end
                     
                 end
@@ -2207,9 +2211,9 @@ classdef modelEdit < handle
             obj.addToBuffer();
         end
         
-        function autoSetupBinarization(obj)
-            obj.InfoMessage = '   - running auto setup binarization';
-            workbar(0.1,'running auto setup binarization','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+        function autoBinarizationWatershed_1(obj)
+            obj.InfoMessage = '   - running Auto Watershed I Binarization';
+            workbar(0.1,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
             %green Plane
             switch obj.FiberForeBackGround
@@ -2223,17 +2227,17 @@ classdef modelEdit < handle
             obj.PicBWisInvert = 'false';
             
             %create Gradient Magnitude image
-            workbar(0.2,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.2,'compute Gradient-Magnitude image','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             obj.InfoMessage = '      - compute Gradient-Magnitude image';
             hy = fspecial('sobel');
             hx = hy';
-            workbar(0.3,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.3,'compute Gradient-Magnitude image','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             Iy = imfilter(double(tempGreenPlane), hy, 'replicate');
             Ix = imfilter(double(tempGreenPlane), hx, 'replicate');
-            workbar(0.4,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.4,'compute Gradient-Magnitude image','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             gradmag = sqrt(Ix.^2 + Iy.^2); %image of Gradient Magnitude
             gradmag = medfilt2(gradmag,[5 5],'symmetric');
-            workbar(0.5,'compute Gradient-Magnitude image','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.5,'compute Gradient-Magnitude image','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             MeanMinGradMag=mean(gradmag(imregionalmin(gradmag)));
             MeanMinGradMag = round(MeanMinGradMag/3);
             if MeanMinGradMag < 3
@@ -2241,7 +2245,7 @@ classdef modelEdit < handle
             end
             
             %extend regional minima using h-min transform
-            workbar(0.6,'extend regional minima','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.6,'extend regional minima','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             MinMarker = imextendedmin(gradmag,round(MeanMinGradMag));
 %             MaxMarker = imextendedmax(gradmag,200);
             %
@@ -2256,7 +2260,7 @@ classdef modelEdit < handle
 
 %             figure()
 %             imshow(MinMarker,[])
-            workbar(0.7,'remove small fibers','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.7,'remove small fibers','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             stats = regionprops('struct',MinMarker,'Area');
             MeanArea = mean([stats(:).Area]);
             obj.InfoMessage = '      - remove small fiber type markes';
@@ -2264,7 +2268,7 @@ classdef modelEdit < handle
 
 %             figure()
 %             imshow(MinMarker)
-            workbar(0.8,'remove small fibers','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.8,'remove small fibers','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Background Markers (currently not used)
             D = bwdist(MinMarker);
             DL = watershed(D);
@@ -2273,7 +2277,7 @@ classdef modelEdit < handle
 %             imshow(bgm)
 %             gradmag2 = imimposemin(gradmag, bgm | MinMarker);
             gradmag2 = imimposemin(gradmag, MinMarker);
-            workbar(0.9,'perform watershed transformation','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.9,'perform watershed transformation','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             obj.InfoMessage = '      - perform watershed transformation';
             L = watershed(gradmag2);
             
@@ -2285,8 +2289,58 @@ classdef modelEdit < handle
             obj.PicBW = obj.PicBW | f2;
             obj.handlePicBW.CData = obj.PicBW | f2;
             
-            obj.InfoMessage = '   - auto setup binarization completed';
-            workbar(1,'perform watershed transformation','Auto Setup Binarization',obj.controllerEditHandle.mainFigure);
+            obj.InfoMessage = '   - Auto Watershed I Binarization completed';
+            workbar(1,'perform watershed transformation','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
+        end
+        
+        function autoBinarizationWatershed_2(obj)
+            obj.InfoMessage = '   - running Auto Watershed II Binarization';
+%             workbar(0.1,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
+            %Check if Fibers are shown as Black or White Pixel within the
+            %green Plane
+            switch obj.FiberForeBackGround
+                case 1 %Background. Fibers are shown as black Pixels.
+                    tempGreenPlane = obj.PicPlaneGreen_adj;
+                case 2 %Foreground. Fibers are shown as white Pixels.
+                    tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
+            end
+            
+            BW_R = imbinarize(obj.PicPlaneRed_adj,adaptthresh(obj.PicPlaneRed_adj,0.9));
+            BW_B = imbinarize(obj.PicPlaneBlue_adj,adaptthresh(obj.PicPlaneBlue_adj,0.9));
+            BW_G = imbinarize(obj.PicPlaneGreen_adj,adaptthresh(obj.PicPlaneGreen_adj,0.9));
+            BW_R(BW_G==1)=0;
+            BW_B(BW_G==1)=0;
+            
+            se = strel('disk', 5);
+            BW_R = imdilate(BW_R,se);
+            BW_B = imdilate(BW_B,se);
+            BW_R(BW_G==1)=0;
+            BW_B(BW_G==1)=0;
+            
+            se = strel('disk', 3);
+            BW_R = imerode(BW_R,se);
+            BW_B = imerode(BW_B,se);
+            BW_Fibers = BW_B | BW_R;
+            BW_Fibers(BW_G==1)=0;
+
+%             BW_Fibers = ~bwareaopen(~BW_Fibers, 100,8);
+%             BW_Fibers = bwareaopen(BW_Fibers, 100,8);
+
+            D = -bwdist(~BW_Fibers);
+
+            mask = imextendedmin(D,5);
+            D2 = imimposemin(D,mask);
+            D3 = D2;
+            D3(BW_G==1)=-Inf;
+            Ld2 = watershed(D2);
+            bw3 = BW_Fibers;
+            bw3(Ld2 == 0) = 0;
+
+            Ld2(Ld2>0)=1;
+            Ld2 = imdilate(~Ld2,strel('disk', 1));
+
+            obj.PicBW = Ld2|BW_G;
+            obj.handlePicBW.CData = Ld2|BW_G;
         end
         
         function [xOut yOut isInAxes] = checkPosition(obj,PosX,PosY)

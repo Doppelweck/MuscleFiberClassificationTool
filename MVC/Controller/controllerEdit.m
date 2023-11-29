@@ -1657,7 +1657,8 @@ classdef controllerEdit < handle
             
             obj.modelEditHandle.InfoMessage = '   - Binarization operation';
             
-            if Mode == 1
+            switch Mode
+                case 1
                 % Use manual global threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -1672,7 +1673,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.createBinary();
                 obj.busyIndicator(0);
                 
-            elseif Mode == 2
+                case 2
                 % Use automatic adaptive threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -1686,7 +1687,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.createBinary();
                 obj.busyIndicator(0);
                 
-            elseif Mode == 3
+                case 3
                 % Use automatic adaptive and manual global threshold for binarization
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','on');
                 set(obj.viewEditHandle.B_Threshold,'Enable','on');
@@ -1701,45 +1702,36 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.createBinary();
                 obj.busyIndicator(0);
                 
-            elseif Mode == 4
-                % Use Automatic setup for binarization
+                case 4
+                % Use Automatic setup for binarization (Watershed I)
                 set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
                 set(obj.viewEditHandle.B_Threshold,'Enable','off');
-%                 
-%                 set(obj.viewEditHandle.B_NewPic,'Enable','off');
-%                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
-%                 set(obj.viewEditHandle.B_CheckMask,'Enable','off');
-%                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
-%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
-%                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','off');
-%                 set(obj.viewEditHandle.B_Color,'Enable','off');
-%                 set(obj.viewEditHandle.B_Invert,'Enable','off');
-%                 set(obj.viewEditHandle.B_Alpha,'Enable','off');
-%                 set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
-%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 
                 obj.busyIndicator(1);
                 
                 obj.modelEditHandle.ThresholdMode = Mode;
-                obj.modelEditHandle.InfoMessage = '      - Automatic setup has been selected';
+                obj.modelEditHandle.InfoMessage = '      - Automatic Watershed I has been selected';
                 
                 %Create binary image 
                 obj.modelEditHandle.createBinary();
                 obj.busyIndicator(0);
                 
-%                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
-%                 set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
-%                 set(obj.viewEditHandle.B_CheckMask,'Enable','on');
-%                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
-%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
-%                 set(obj.viewEditHandle.B_ThresholdMode,'Enable','on');
-%                 set(obj.viewEditHandle.B_Color,'Enable','on');
-%                 set(obj.viewEditHandle.B_Invert,'Enable','on');
-%                 set(obj.viewEditHandle.B_Alpha,'Enable','on');
-%                 set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
-%                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                case 5
+                    
+                    % Use Automatic setup for binarization (Watershed II)
+                set(obj.viewEditHandle.B_ThresholdValue,'Enable','off');
+                set(obj.viewEditHandle.B_Threshold,'Enable','off');
                 
-            else
+                obj.busyIndicator(1);
+                
+                obj.modelEditHandle.ThresholdMode = Mode;
+                obj.modelEditHandle.InfoMessage = '      - Automatic Watershed II has been selected';
+                
+                %Create binary image 
+                obj.modelEditHandle.createBinary();
+                obj.busyIndicator(0);
+                              
+                otherwise   
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in thresholdModeEvent() FUNCTION !';
             end
