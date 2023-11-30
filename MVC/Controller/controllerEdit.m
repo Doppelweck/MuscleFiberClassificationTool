@@ -135,6 +135,8 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_Invert,'Callback',@obj.invertEvent);
             set(obj.viewEditHandle.B_ThresholdValue,'Callback',@obj.thresholdEvent);
             set(obj.viewEditHandle.B_AlphaValue,'Callback',@obj.alphaMapEvent);
+            set(obj.viewEditHandle.B_AlphaActive,'Callback',@obj.alphaMapEvent);
+            set(obj.viewEditHandle.B_ImageOverlaySelection,'Callback',@obj.alphaImageEvent);
             set(obj.viewEditHandle.B_LineWidthValue,'Callback',@obj.lineWidthEvent);
             set(obj.viewEditHandle.B_Color,'Callback',@obj.colorEvent);
             set(obj.viewEditHandle.B_MorphOP,'Callback',@obj.morphOpEvent);
@@ -1837,8 +1839,8 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if strcmp(evnt.Source.Tag,'textAlpha')
-                % Text Value has changed
+            switch evnt.Source.Tag
+                case 'textAlpha' % Text Value has changed
                 
                 Value = str2double( src.String );
                 
@@ -1903,8 +1905,7 @@ classdef controllerEdit < handle
                     
                 end
                 
-            elseif strcmp(evnt.Source.Tag,'sliderAlpha')
-                % slider Value has changed
+            case 'sliderAlpha'% slider Value has changed
                 
                 %Copy the slider value into the text edit box in the GUI
                 set(obj.viewEditHandle.B_AlphaValue,'String',num2str(evnt.Source.Value));
@@ -1914,11 +1915,30 @@ classdef controllerEdit < handle
                 
                 %Change alphamp (transparency) of binary image
                 obj.modelEditHandle.alphaMapEvent();
-            else
+                
+            case 'activeAlpha' % active Checkbox has changed
+                    obj.modelEditHandle.AlphaMapActive = evnt.Source.Value;
+                    %Change alphamp (transparency) of binary image
+                    obj.modelEditHandle.alphaMapEvent();
+            otherwise
                 % Error Code
                 obj.modelEditHandle.InfoMessage = '! ERROR in alphaMapEvent() FUNCTION !';
             end
             
+        end
+                
+        function alphaImageEvent(obj,src,evnt)
+            % Callback function of the alpha Image dropdown menu. 
+            %
+            %   alphaImageEvent(obj,src,evnt);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerEdit object
+            %           src:    source of the callback
+            %           evnt:   callback event data
+            %
         end
         
         function lineWidthEvent(obj,src,evnt)

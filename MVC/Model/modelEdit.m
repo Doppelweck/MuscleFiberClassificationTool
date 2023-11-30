@@ -76,6 +76,7 @@ classdef modelEdit < handle
         FiberForeBackGround; 
         
         AlphaMapValue; %Selected alphamap value (transparency).
+        AlphaMapActive;
         
         LineWidthValue = 1; %Selected linewidth value.
         ColorValue = 1; %Selected color value. 1 for white, 0 for black
@@ -1721,9 +1722,11 @@ classdef modelEdit < handle
             %
             
             if ~isempty(obj.handlePicBW)
-                
+                if obj.AlphaMapActive
                 set(obj.handlePicBW,'AlphaData',obj.AlphaMapValue);
-                
+                else
+                    set(obj.handlePicBW,'AlphaData',1);
+                end
             end
             
         end
