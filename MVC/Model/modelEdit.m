@@ -2007,7 +2007,7 @@ classdef modelEdit < handle
                     % Remove single pixels
                     temp = bwareaopen(temp,1,4);
                     L = bwlabel(temp,4);
-                    obj.InfoMessage = ['      - ' num2str(max(max(L))) ' objects was found'];
+                    obj.InfoMessage = ['      - ' num2str(max(max(L))) ' objects were found'];
                     
                     temp = label2rgb(L, 'jet', 'w', 'shuffle');
                     obj.InfoMessage = ['      - objects will be highlighted in RGB colors'];
@@ -2022,7 +2022,7 @@ classdef modelEdit < handle
                     % Remove single pixels
                     temp = bwareaopen(temp,1,4);
                     L = bwlabel(temp,4);
-                    obj.InfoMessage = ['      - ' num2str(max(max(L))) ' objects was found'];
+                    obj.InfoMessage = ['      - ' num2str(max(max(L))) ' objects were found'];
 
                     temp = label2rgb(L, 'jet', 'w', 'shuffle');
                     obj.InfoMessage = ['      - objects will be highlighted in RGB colors'];
@@ -2213,7 +2213,7 @@ classdef modelEdit < handle
         
         function autoBinarizationWatershed_1(obj)
             obj.InfoMessage = '   - running Auto Watershed I Binarization';
-            workbar(0.1,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
             %green Plane
             switch obj.FiberForeBackGround
@@ -2295,7 +2295,7 @@ classdef modelEdit < handle
         
         function autoBinarizationWatershed_2(obj)
             obj.InfoMessage = '   - running Auto Watershed II Binarization';
-%             workbar(0.1,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.1,'running Auto Watershed II Binarization','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
             %green Plane
             switch obj.FiberForeBackGround
@@ -2304,43 +2304,87 @@ classdef modelEdit < handle
                 case 2 %Foreground. Fibers are shown as white Pixels.
                     tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
             end
-            
+            obj.InfoMessage = '     - create masks for all Planes';
+            workbar(0.2,'create masks for all Planes','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             BW_R = imbinarize(obj.PicPlaneRed_adj,adaptthresh(obj.PicPlaneRed_adj,0.9));
             BW_B = imbinarize(obj.PicPlaneBlue_adj,adaptthresh(obj.PicPlaneBlue_adj,0.9));
             BW_G = imbinarize(obj.PicPlaneGreen_adj,adaptthresh(obj.PicPlaneGreen_adj,0.9));
+            BW_FR = imbinarize(obj.PicPlaneFarRed_adj,adaptthresh(obj.PicPlaneGreen_adj,0.9));
             BW_R(BW_G==1)=0;
             BW_B(BW_G==1)=0;
+            BW_FR(BW_G==1)=0;
             
-            se = strel('disk', 5);
-            BW_R = imdilate(BW_R,se);
-            BW_B = imdilate(BW_B,se);
-            BW_R(BW_G==1)=0;
-            BW_B(BW_G==1)=0;
-            
-            se = strel('disk', 3);
+            obj.InfoMessage = '     - perform erosion';
+            workbar(0.3,'perform erosion','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            se = strel('disk', 1);
             BW_R = imerode(BW_R,se);
             BW_B = imerode(BW_B,se);
-            BW_Fibers = BW_B | BW_R;
+            BW_FR = imerode(BW_FR,se);
+            
+            obj.InfoMessage = '     - overlay masks';
+            workbar(0.35,'overlay masks','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            BW_Fibers = BW_B | BW_R | BW_FR;
             BW_Fibers(BW_G==1)=0;
+            
+            obj.InfoMessage = '     - close holes';
+            workbar(0.4,'close holes','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            BW_Fibers = bwareaopen(BW_Fibers,round(100));
+            BW_Fibers = imfill(BW_Fibers,'holes');
 
 %             BW_Fibers = ~bwareaopen(~BW_Fibers, 100,8);
 %             BW_Fibers = bwareaopen(BW_Fibers, 100,8);
-
+            obj.InfoMessage = '     - create distance transformation';
+            workbar(0.45,'create distance transformation','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             D = -bwdist(~BW_Fibers);
 
             mask = imextendedmin(D,5);
             D2 = imimposemin(D,mask);
             D3 = D2;
-            D3(BW_G==1)=-Inf;
+            obj.InfoMessage = '     - perform Watershed Transformation';
+            workbar(0.5,'perform Watershed Transformation','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             Ld2 = watershed(D2);
             bw3 = BW_Fibers;
-            bw3(Ld2 == 0) = 0;
 
             Ld2(Ld2>0)=1;
             Ld2 = imdilate(~Ld2,strel('disk', 1));
-
-            obj.PicBW = Ld2|BW_G;
-            obj.handlePicBW.CData = Ld2|BW_G;
+            
+            obj.InfoMessage = '     - close small gaps';
+            workbar(0.65,'close small gaps','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            Mask = Ld2|BW_G;
+            %skel the temp binary image
+            tempPic = bwmorph(Mask,'skel',Inf);
+            
+            %create small structering element
+            se = strel('disk',1);
+            
+            %perform n times a dilate with small SE
+            NoClose = 4;
+            for i = 1:1:NoClose
+                tempPic = imdilate(tempPic , se);
+                if mod(i,1)==0
+                    tempPic = bwmorph(tempPic,'majority',1);
+                end
+                workbar(0.65+(i/NoClose)*0.2,'close small gaps','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            end
+            
+            %skel the temp binary image again
+            tempPic = bwmorph(tempPic,'skel',Inf);
+            %perform one times a dilate with small SE to make the
+            %skeleton thicker
+            tempPic = imdilate(tempPic , se);
+            %remove pixels with a small neighborhood
+            tempPic = bwmorph(tempPic,'majority',1);
+            
+            obj.InfoMessage = '     - smooth edges';
+            workbar(0.85,'smooth edges','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            Mask = tempPic | Mask;
+            %smoothing
+            Mask = bwmorph(Mask,'majority',500);
+            workbar(0.95,'create final mask','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
+            obj.PicBW = Mask;
+            obj.handlePicBW.CData = Mask;
+            obj.InfoMessage = '   - Auto Watershed II Binarization completed';
+            workbar(1,'finished','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
         end
         
         function [xOut yOut isInAxes] = checkPosition(obj,PosX,PosY)
