@@ -43,7 +43,7 @@ classdef viewEdit < handle
         B_Alpha; %Slider, to change the transperancy between the binary and the RGB picture.
         B_AlphaValue; % TextEditBox, to change the transperancy between the binary and the RGB picture.
         B_AlphaActive; %Checkbox, Switch Overlay on and off
-        B_ImageOverlaySelection
+        B_ImageOverlaySelection;
 
         B_Color; %Popupmenu, to select the color to draw into the binary image.
         B_Invert; %Butto, invert the binary pic.
@@ -123,7 +123,7 @@ classdef viewEdit < handle
                 fontSizeM = 12; % Font size medium
                 fontSizeB = 16; % Font size big
             end
-            mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
+%             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
             
             obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
@@ -187,7 +187,7 @@ classdef viewEdit < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER)
             
             HButtonBoxAlpha2_4 = uix.HButtonBox('Parent', HBoxAlpha2,'ButtonSize',[20 20],'Padding', 1 );
-            obj.B_AlphaActive = uicontrol( 'Parent', HButtonBoxAlpha2_4,'Style','checkbox','Value',1,'Tag','SaveScatterAll');
+            obj.B_AlphaActive = uicontrol( 'Parent', HButtonBoxAlpha2_4,'Style','checkbox','Value',1,'Tag','activeAlpha');
             
             HButtonBoxAlpha2_2 = uix.HButtonBox('Parent', HBoxAlpha2,'ButtonSize',[6000 18],'Padding', 3 );
             obj.B_Alpha = uicontrol( 'Parent', HButtonBoxAlpha2_2,'Style','slider','FontUnits','normalized','Fontsize',0.6, 'String', 'Alpha' ,'Tag','sliderAlpha','Enable','off');
