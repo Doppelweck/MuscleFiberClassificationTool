@@ -159,7 +159,7 @@ if isempty(progfig)
      
     axes('parent',progfig,...                               % Set the progress bar parent to the figure
         'units','pixels',...                                % Provide axes units in pixels
-        'pos',[10 winheight-45 winwidth-50 15],...          % Set the progress bar position and size
+        'pos',[10 winheight-45 winwidth-75 15],...          % Set the progress bar position and size
         'xlim',[0 1],...                                    % Set the range from 0 to 1
         'visible','off');                                 % Turn off axes
  
@@ -168,7 +168,7 @@ if isempty(progfig)
     
     progaxes = axes('parent',progfig,...                    % Set the progress bar parent to the figure
         'units','pixels',...                                % Provide axes units in pixels
-        'pos',[14-pgx(m) winheight-pgy(m) winwidth-pgw(m) 7-pgh(m)],...   % Set the progress bar position and size
+        'pos',[12-pgx(m) winheight-pgy(m) winwidth-pgw(m)-22 7-pgh(m)],...   % Set the progress bar position and size
         'xlim',[0 1],...                                    % Set the range from 0 to 1
         'visible','off');                                   % Turn off axes
 
@@ -212,7 +212,7 @@ if isempty(progfig)
     busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32);  % icon, label
     busyIndicator.setPaintsWhenStopped(false);  % default = false
     busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
-    javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.93,progfig.Position(4)*0.1,20,20], progfig);
+    javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.86,progfig.Position(4)*0.35,20,20], progfig);
     busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
     busyIndicator.start;
         
@@ -232,8 +232,8 @@ if etime(clock,lastupdate) < 0.01
 end
 
 % Update progress patch
-n = [.02857 ];
-set(progpatch,'XData',[1 n(1)*round(fractiondone/n(1)) n(1)*round(fractiondone/n(1)) 1])
+n = [.03857 ];
+set(progpatch,'XData',[1 fractiondone fractiondone 1])
 
 % Set all dynamic text
 runtime = etime(clock,starttime);
