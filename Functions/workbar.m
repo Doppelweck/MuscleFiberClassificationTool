@@ -102,7 +102,7 @@ if isempty(progfig)
     
     
     %%%%%%%%%% SET WINDOW SIZE AND POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    winwidth = 300;                                         % Width of timebar window
+    winwidth = 400;                                         % Width of timebar window
     winheight = 75;                                         % Height of timebar window
     
     if ~isempty(mainFig)
@@ -212,7 +212,7 @@ if isempty(progfig)
     busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32);  % icon, label
     busyIndicator.setPaintsWhenStopped(false);  % default = false
     busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
-    javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.91,progfig.Position(4)*0.1,20,20], progfig);
+    javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.93,progfig.Position(4)*0.1,20,20], progfig);
     busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
     busyIndicator.start;
         
@@ -294,16 +294,16 @@ function a=progimage(m)
 
 if m == 1
     
-    a=ones(13,285,3);
-    a(:,:,1)=ones([13,285])*0;
-    a(:,:,2)=ones([13,285])*0.4470*255;
-    a(:,:,3)=ones([13,285])*0.7410*255;
+    a=ones(13,385,3);
+    a(:,:,1)=ones([13,385])*0;
+    a(:,:,2)=ones([13,385])*0.4470*255;
+    a(:,:,3)=ones([13,385])*0.7410*255;
       
 else
-    a=ones(13,285,3);
-    a(:,:,1)=ones([13,285]);
-    a(:,:,2)=ones([13,285]);
-    a(:,:,3)=ones([13,285]);
+    a=ones(13,385,3);
+    a(:,:,1)=ones([13,385]);
+    a(:,:,2)=ones([13,385]);
+    a(:,:,3)=ones([13,385]);
    
 end
 
