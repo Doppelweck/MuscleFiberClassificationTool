@@ -45,7 +45,7 @@ if ~islogical(bool) || length(bool)~=1
 end
 
 % Flush the Event Queue of Graphic Objects and Update the Figure Window.
-drawnow expose
+drawnow nocallbacks 
 
 % Get JavaFrame of Figure.
 fJFrame = get(hFig,'JavaFrame');
