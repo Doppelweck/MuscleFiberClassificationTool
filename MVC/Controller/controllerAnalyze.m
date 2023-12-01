@@ -1233,47 +1233,72 @@ classdef controllerAnalyze < handle
             end
             
             hold on
+            
+            B = bwboundaries(obj.modelAnalyzeHandle.PicInvertBW,4,'noholes');
+            Bound0={};
+            Bound1={};
+            Bound2={};
+            Bound2x={};
+            Bound2a={};
+            Bound2ax={};
+            Bound12h={};
+            BoundE={};
             for i=1:1:nObjects
                 %select boundarie color for diffrent fiber types
                 switch obj.modelAnalyzeHandle.Stats(i).FiberType
                     case 'undefined'
                         % Type 0
-                        Color = 'w';
+                        %                         Color0(end+1,:) = [1 1 1]';
+                        Bound0{end+1,1} =  B{i,1};
                     case 'Type 1'
-                        Color = 'b';
+                        Bound1{end+1,1} =  B{i,1};
                     case 'Type 2'
-                        Color = 'r';
+                        Bound2{end+1,1} =  B{i,1};
                     case 'Type 2x'
-                        Color = 'r';
+                        Bound2x{end+1,1} =  B{i,1};
                     case 'Type 2a'
-                        Color = 'y';
+                        Bound2a{end+1,1} =  B{i,1};
                     case 'Type 2ax'
-                        Color = [255/255 100/255 0]; %orange
+                        Bound2ax{end+1,1} =  B{i,1};
                     case 'Type 12h'
                         % Type 3
-                        Color = 'm';
+                        Bound12h{end+1,1} =  B{i,1};
                     otherwise
                         % error
-                        Color = 'k';
+                        BoundE{end+1,1} =  B{i,1};
                 end
-                
-                
-                drawnow limitrate
-                htemp = line(axesh,obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,2),obj.modelAnalyzeHandle.Stats(i).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
-                %                 htemp = visboundaries(axesh,obj.Stats(i).Boundarie,'Color',Color,'LineWidth',2);
-                % Tag every Boundarie Line Object with his own Label number
-                % to find them later for manipualtion
-                set(htemp,'Tag',['boundLabel ' num2str(i)]);
-                set(htemp,'HitTest','off');
-                
-                percent = (i-0.1)/nObjects;
-                %                 if i == 1
-                %                     % get workbar in foreground
-                %                     pause(0.1)
-                %                 end
+                percent = (i-0.5)/nObjects;
+
                 workbar(percent,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
             end
+            
+            if ~isempty(Bound0)
+                visboundaries(axesh,Bound0,'Color','w','LineWidth',2);
+            end
+            if ~isempty(Bound1)
+                visboundaries(axesh,Bound1,'Color','b','LineWidth',2);
+            end
+            if ~isempty(Bound2)
+                visboundaries(axesh,Bound2,'Color','r','LineWidth',2);
+            end
+            
+            if ~isempty(Bound2x)
+                visboundaries(axesh,Bound2x,'Color','r','LineWidth',2);
+            end
+            if ~isempty(Bound2a)
+                visboundaries(axesh,Bound2a,'Color','y','LineWidth',2);
+            end
+            if ~isempty(Bound2ax)
+                visboundaries(axesh,Bound2ax,'Color',[1 100/255 0],'LineWidth',2);
+            end
+            if ~isempty(Bound12h)
+                visboundaries(axesh,Bound12h,'Color','m','LineWidth',2);
+            end
+            if ~isempty(BoundE)
+                visboundaries(axesh,BoundE,'Color','r','LineWidth',2);
+            end
             hold off
+            workbar(1,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
         end
         
         function backEditModeEvent(obj,~,~)
@@ -1659,396 +1684,396 @@ classdef controllerAnalyze < handle
         
         function showPreResultsEvent(obj,src,evnt)
             try
-            %refresh main figure callbacks
-            addWindowCallbacks(obj);
-            % If a window already exists, delete it
-            OldFig = findobj('Tag','FigureManipulate');
-            if ~isempty(OldFig) && isvalid(OldFig)
-                delete(OldFig);
-            end
-            
-            % If a highlight BoundarieBox already exists, delete it
-            OldBox = findobj('Tag','highlightBox');
-            if ~isempty(OldBox) && isvalid(OldBox)
-                delete(OldBox);
-            end
-            
-            if ~isempty(obj.modelAnalyzeHandle.Stats)
-                
-                %Find Pre Figure for results
-                preFig = findobj('Tag','FigurePreResults');
-                if ~isempty(preFig) && isvalid(preFig)
-                    % If figure already exist make it the current figure
-                    figure(preFig)
-                else
-                    % If figure dont exist create a new figure
-                    obj.viewAnalyzeHandle.showFigurePreResults(obj.mainFigure);
+                %refresh main figure callbacks
+                addWindowCallbacks(obj);
+                % If a window already exists, delete it
+                OldFig = findobj('Tag','FigureManipulate');
+                if ~isempty(OldFig) && isvalid(OldFig)
+                    delete(OldFig);
                 end
                 
-                %Color Map for FIber Types
-                ColorMap(1,:) = [51 51 255]; % Blue Fiber Type 1
-                ColorMap(2,:) = [255 51 255]; % Magenta Fiber Type 12h
-                ColorMap(3,:) = [255 51 51]; % Red Fiber Type 2x
-                ColorMap(4,:) = [255 255 51]; % Yellow Fiber Type 2a
-                ColorMap(5,:) = [255 153 51]; % orange Fiber Type 2ax
-                ColorMap(6,:) = [224 224 224]; % Grey Fiber Type undifiend
-                ColorMap = ColorMap/255;
+                % If a highlight BoundarieBox already exists, delete it
+                OldBox = findobj('Tag','highlightBox');
+                if ~isempty(OldBox) && isvalid(OldBox)
+                    delete(OldBox);
+                end
                 
-                %find all Type 1 Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 1');
-                T1 = obj.modelAnalyzeHandle.Stats(Index);
-                
-                %find all Type 12h Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 12h');
-                T12h = obj.modelAnalyzeHandle.Stats(Index);
-                
-                %find all Type 2 Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2');
-                T2 = obj.modelAnalyzeHandle.Stats(Index);
-                
-                %find all Type 2x Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2x');
-                T2x = obj.modelAnalyzeHandle.Stats(Index);
-                
-                %find all Type 2a Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2a');
-                T2a = obj.modelAnalyzeHandle.Stats(Index);
-                
-                %find all Type 2ax Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2ax');
-                T2ax = obj.modelAnalyzeHandle.Stats(Index);
-                
-                %find all Type 0 Fibers
-                Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'undefined');
-                T0 = obj.modelAnalyzeHandle.Stats(Index);
-                
-                
-                
-                switch obj.modelAnalyzeHandle.AnalyzeMode
+                if ~isempty(obj.modelAnalyzeHandle.Stats)
                     
-                    case {3,4} %Cluster Based. Need two plots instead of the other ones
-                        %Handle to axes Pre-Results Blue over Red
-                        ax = obj.viewAnalyzeHandle.hAPRBR;
-                        axes(ax)
+                    %Find Pre Figure for results
+                    preFig = findobj('Tag','FigurePreResults');
+                    if ~isempty(preFig) && isvalid(preFig)
+                        % If figure already exist make it the current figure
+                        figure(preFig)
+                    else
+                        % If figure dont exist create a new figure
+                        obj.viewAnalyzeHandle.showFigurePreResults(obj.mainFigure);
+                    end
+                    
+                    %Color Map for FIber Types
+                    ColorMap(1,:) = [51 51 255]; % Blue Fiber Type 1
+                    ColorMap(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+                    ColorMap(3,:) = [255 51 51]; % Red Fiber Type 2x
+                    ColorMap(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+                    ColorMap(5,:) = [255 153 51]; % orange Fiber Type 2ax
+                    ColorMap(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+                    ColorMap = ColorMap/255;
+                    
+                    %find all Type 1 Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 1');
+                    T1 = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 12h Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 12h');
+                    T12h = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2 Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2');
+                    T2 = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2x Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2x');
+                    T2x = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2a Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2a');
+                    T2a = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 2ax Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'Type 2ax');
+                    T2ax = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    %find all Type 0 Fibers
+                    Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'undefined');
+                    T0 = obj.modelAnalyzeHandle.Stats(Index);
+                    
+                    
+                    
+                    switch obj.modelAnalyzeHandle.AnalyzeMode
                         
-                        subplot(2,1,1) %Plot for main Fibers
-                        LegendString = {};
-                        
-                        hold on
-                        if ~isempty(T1)
-                            h=scatter([T1.ColorRed],[T1.ColorBlue],20,ColorMap(1,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 1';
-                        end
-                        hold on
-                        if ~isempty(T12h)
-                            h=scatter([T12h.ColorRed],[T12h.ColorBlue],20,ColorMap(2,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 12h';
-                        end
-                        hold on
-                        if ~isempty(T2)
-                            h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2';
-                        end
-                        hold on
-                        if ~isempty(T2x)
-                            h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2x';
-                        end
-                        hold on
-                        if ~isempty(T2a)
-                            h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
-                        end
-                        hold on
-                        if ~isempty(T2ax)
-                            h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2ax';
-                        end
-                        hold on
-                        if ~isempty(T0)
-                            h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type-0 (undefined)';
-                        end
-                        
-                        Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
-                        Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
-                        R = [0 10*Rmax]; %Red value vector
-                        grid on
-                        legend(LegendString,'Location','best')
-                        title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
-                        maxLim = max([Rmax Bmax]);
-                        xlabel('x: mean Red','FontSize',12);
-                        ylabel('y: mean Blue','FontSize',12);
-                        ylim([ 0 maxLim+10 ] );
-                        xlim([ 0 maxLim+10 ] );
-                        %                         saveTightFigureOrAxes(gca,'ScatMainTest.pdf');
-                        
-                        subplot(2,1,2) %Plot Reachability Plot for main Fibers
-                        if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)
-                            bar(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain);
-                            set(gca,'xlim',[0 length(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)])
-                            hold on
-                            epsilon = obj.modelAnalyzeHandle.ClusterData.EpsilonMain;
-                            plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
-                            grid on
-                        end
-                        title('OPTICS-Clustering: Reachability Plot for Fiber Type Maingroups','FontSize',14)
-                        xlabel('x: Order','FontSize',12);
-                        ylabel('y: Reachability distance R_D','FontSize',12);
-                        %                         saveTightFigureOrAxes(gca,'ReachMainTest.pdf');
-                        
-                        
-                        %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        ax = obj.viewAnalyzeHandle.hAPRFRR;
-                        axes(ax)
-                        LegendString = {};
-                        subplot(2,1,1) %Plot for Type-2 sub Fibers
-                        
-                        hold on
-                        if ~isempty(T2)
-                            h=scatter([T2.ColorRed],[T2.ColorFarRed],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2';
-                        end
-                        if ~isempty(T2x)
-                            h=scatter([T2x.ColorRed],[T2x.ColorFarRed],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2x';
-                        end
-                        hold on
-                        if ~isempty(T2a)
-                            h=scatter([T2a.ColorRed],[T2a.ColorFarRed],20,ColorMap(4,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
-                        end
-                        hold on
-                        if ~isempty(T2ax)
-                            h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2ax';
-                        end
-                        
-                        Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
-                        FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
-                        R = [0 10*Rmax]; %Red value vector
-                        grid on
-                        legend(LegendString,'Location','best')
-                        if obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 3 || ...
-                                obj.modelAnalyzeHandle.AnalyzeMode == 5 || obj.modelAnalyzeHandle.AnalyzeMode == 7
-                            title({'Trible labeling: Type-2 specification classification' ;'(Type-2)'},'FontSize',14)
-                        else
-                            title({'Quad labeling: Fiber Type-2 specification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
-                        end
-                        maxLim = max([Rmax FRmax]);
-                        xlabel('x: mean Red','FontSize',12);
-                        ylabel('y: mean Farred','FontSize',12);
-                        ylim([ 0 maxLim+10 ] );
-                        xlim([ 0 maxLim+10 ] );
-                        
-                        subplot(2,1,2) %Plot Reachability Plot for sub Type-2 Fibers
-                        if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub)
-                            bar(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub);
-                            set(gca,'xlim',[0 length(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub)])
-                            hold on
-                            epsilon = obj.modelAnalyzeHandle.ClusterData.EpsilonSub;
-                            plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
-                            grid on
-                        end
-                        title('OPTICS-Clustering: Reachability Plot for Fiber Type-2 Subgroups','FontSize',14)
-                        xlabel('x: Order','FontSize',12);
-                        ylabel('y: Reachability distance R_D','FontSize',12);
-                        
-                    otherwise
-                        
-                        %Handle to axes Pre-Results Blue over Red
-                        ax = obj.viewAnalyzeHandle.hAPRBR;
-                        
-                        LegendString = {};
-                        
-                        axes(ax)
-                        hold on
-                        if ~isempty(T1)
-                            h=scatter([T1.ColorRed],[T1.ColorBlue],20,ColorMap(1,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 1';
-                        end
-                        hold on
-                        if ~isempty(T12h)
-                            h=scatter([T12h.ColorRed],[T12h.ColorBlue],20,ColorMap(2,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 12h';
-                        end
-                        hold on
-                        if ~isempty(T2)
-                            h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2';
-                        end
-                        hold on
-                        if ~isempty(T2x)
-                            h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2x';
-                        end
-                        hold on
-                        if ~isempty(T2a)
-                            h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
-                        end
-                        hold on
-                        if ~isempty(T2ax)
-                            h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2ax';
-                        end
-                        if ~isempty(T0)
-                            h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type-0 (undefined)';
-                        end
-                        
-                        Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
-                        Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
-                        R = [0 10*Rmax]; %Red value vector
-                        
-                        if obj.modelAnalyzeHandle.BlueRedThreshActive
-                            % BlueRedThreshActive Parameter is active, plot
-                            % classification functions
+                        case {3,4} %Cluster Based. Need two plots instead of the other ones
+                            %Handle to axes Pre-Results Blue over Red
+                            ax = obj.viewAnalyzeHandle.hAPRBR;
+                            axes(ax)
                             
-                            BlueRedTh = obj.modelAnalyzeHandle.BlueRedThresh;
-                            BlueRedDistB = obj.modelAnalyzeHandle.BlueRedDistBlue;
-                            BlueRedDistR = obj.modelAnalyzeHandle.BlueRedDistRed;
+                            subplot(2,1,1) %Plot for main Fibers
+                            LegendString = {};
                             
-                            if BlueRedDistB == 1
-                                BlueRedDistB = 0.999999999;
+                            hold on
+                            if ~isempty(T1)
+                                h=scatter([T1.ColorRed],[T1.ColorBlue],20,ColorMap(1,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 1';
+                            end
+                            hold on
+                            if ~isempty(T12h)
+                                h=scatter([T12h.ColorRed],[T12h.ColorBlue],20,ColorMap(2,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 12h';
+                            end
+                            hold on
+                            if ~isempty(T2)
+                                h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2';
+                            end
+                            hold on
+                            if ~isempty(T2x)
+                                h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2x';
+                            end
+                            hold on
+                            if ~isempty(T2a)
+                                h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2a';
+                            end
+                            hold on
+                            if ~isempty(T2ax)
+                                h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2ax';
+                            end
+                            hold on
+                            if ~isempty(T0)
+                                h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type-0 (undefined)';
                             end
                             
-                            % creat classification function line obj
-                            f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
-                            f_Bdist = BlueRedTh * R / (1-BlueRedDistB); %blue dist fcn
-                            f_Rdist = BlueRedTh * R * (1-BlueRedDistR); %red dist fcn
-                            hold on
-                            plot(R,f_Bdist,'b','LineWidth',1.5);
-                            LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(BlueRedTh) ' * R / (1-' num2str(BlueRedDistB) ')'];
-                            hold on
-                            plot(R,f_Rdist,'r','LineWidth',1.5);
-                            LegendString{end+1}= ['f_{Rdist}(R) = ' num2str(BlueRedTh) ' * R * (1-' num2str(BlueRedDistR) ')'];
-                            hold on
-                            plot(R,f_BRthresh,'k','LineWidth',1.5);
-                            LegendString{end+1}= ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
-                        elseif obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 2
-                            BlueRedTh = 1;
-                            BlueRedDistB = 0;
-                            BlueRedDistR = 0;
-                            f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
-                            LegendString{end+1}= ['f_{BRthresh}(R) = R (not active)'];
-                            hold on
-                            plot(R,f_BRthresh,'k');
+                            Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
+                            Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
+                            R = [0 10*Rmax]; %Red value vector
+                            grid on
+                            legend(LegendString,'Location','best')
+                            title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
+                            maxLim = max([Rmax Bmax]);
+                            xlabel('x: mean Red','FontSize',12);
+                            ylabel('y: mean Blue','FontSize',12);
+                            ylim([ 0 maxLim+10 ] );
+                            xlim([ 0 maxLim+10 ] );
+                            %                         saveTightFigureOrAxes(gca,'ScatMainTest.pdf');
                             
-                        end
-                        
-                        maxLim =  max([Rmax Bmax]);
-                        ylabel('y: mean Blue (B)','FontSize',12);
-                        xlabel('x: mean Red (R)','FontSize',12);
-                        ylim([ 0 maxLim+10 ] );
-                        xlim([ 0 maxLim+10 ] );
-                        grid on
-                        title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
-                        legend(LegendString,'Location','best')
-                        
-                        %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                        ax = obj.viewAnalyzeHandle.hAPRFRR;
-                        axes(ax)
-                        LegendString = {};
-                        
-                        hold on
-                        if ~isempty(T2)
-                            h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2';
-                        end
-                        if ~isempty(T2x)
-                            h=scatter([T2x.ColorRed],[T2x.ColorFarRed],20,ColorMap(3,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2x';
-                        end
-                        hold on
-                        if ~isempty(T2a)
-                            h=scatter([T2a.ColorRed],[T2a.ColorFarRed],20,ColorMap(4,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2a';
-                        end
-                        hold on
-                        if ~isempty(T2ax)
-                            h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
-                            set(h,'MarkerEdgeColor','k');
-                            LegendString{end+1} = 'Type 2ax';
-                        end
-                        
-                        Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
-                        FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
-                        R = [0 10*Rmax]; %Red value vector
-                        
-                        if obj.modelAnalyzeHandle.FarredRedThreshActive
-                            % Color-Based Classification
-                            % FarredRedThreshActive Parameter is active, plot
-                            % classification functions
-                            FarredRedTh = obj.modelAnalyzeHandle.FarredRedThresh;
-                            FarredRedDistFR = obj.modelAnalyzeHandle.FarredRedDistFarred;
-                            FarredRedDistR = obj.modelAnalyzeHandle.FarredRedDistRed;
+                            subplot(2,1,2) %Plot Reachability Plot for main Fibers
+                            if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)
+                                bar(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain);
+                                set(gca,'xlim',[0 length(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)])
+                                hold on
+                                epsilon = obj.modelAnalyzeHandle.ClusterData.EpsilonMain;
+                                plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+                                grid on
+                            end
+                            title('OPTICS-Clustering: Reachability Plot for Fiber Type Maingroups','FontSize',14)
+                            xlabel('x: Order','FontSize',12);
+                            ylabel('y: Reachability distance R_D','FontSize',12);
+                            %                         saveTightFigureOrAxes(gca,'ReachMainTest.pdf');
                             
-                            if FarredRedDistFR == 1
-                                FarredRedDistFR = 0.999999999;
+                            
+                            %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                            ax = obj.viewAnalyzeHandle.hAPRFRR;
+                            axes(ax)
+                            LegendString = {};
+                            subplot(2,1,1) %Plot for Type-2 sub Fibers
+                            
+                            hold on
+                            if ~isempty(T2)
+                                h=scatter([T2.ColorRed],[T2.ColorFarRed],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2';
+                            end
+                            if ~isempty(T2x)
+                                h=scatter([T2x.ColorRed],[T2x.ColorFarRed],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2x';
+                            end
+                            hold on
+                            if ~isempty(T2a)
+                                h=scatter([T2a.ColorRed],[T2a.ColorFarRed],20,ColorMap(4,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2a';
+                            end
+                            hold on
+                            if ~isempty(T2ax)
+                                h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2ax';
                             end
                             
-                            % creat classification function line obj
-                            f_FRRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
-                            f_FRdist = FarredRedTh * R / (1-FarredRedDistFR); %farred dist fcn
-                            f_Rdist = FarredRedTh * R * (1-FarredRedDistR); %red dist fcn
+                            Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
+                            FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
+                            R = [0 10*Rmax]; %Red value vector
+                            grid on
+                            legend(LegendString,'Location','best')
+                            if obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 3 || ...
+                                    obj.modelAnalyzeHandle.AnalyzeMode == 5 || obj.modelAnalyzeHandle.AnalyzeMode == 7
+                                title({'Trible labeling: Type-2 specification classification' ;'(Type-2)'},'FontSize',14)
+                            else
+                                title({'Quad labeling: Fiber Type-2 specification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
+                            end
+                            maxLim = max([Rmax FRmax]);
+                            xlabel('x: mean Red','FontSize',12);
+                            ylabel('y: mean Farred','FontSize',12);
+                            ylim([ 0 maxLim+10 ] );
+                            xlim([ 0 maxLim+10 ] );
                             
-                            plot(R,f_FRdist,'y','LineWidth',1.5);
-                            LegendString{end+1} = ['f_{FRdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
+                            subplot(2,1,2) %Plot Reachability Plot for sub Type-2 Fibers
+                            if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub)
+                                bar(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub);
+                                set(gca,'xlim',[0 length(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub)])
+                                hold on
+                                epsilon = obj.modelAnalyzeHandle.ClusterData.EpsilonSub;
+                                plot(get(gca,'xlim'), [epsilon epsilon],'Color','g','LineWidth',2);
+                                grid on
+                            end
+                            title('OPTICS-Clustering: Reachability Plot for Fiber Type-2 Subgroups','FontSize',14)
+                            xlabel('x: Order','FontSize',12);
+                            ylabel('y: Reachability distance R_D','FontSize',12);
                             
-                            plot(R,f_Rdist,'r','LineWidth',1.5);
-                            LegendString{end+1} = ['f_{Rdist}(R) = ' num2str(FarredRedTh) ' * R * (1-' num2str(FarredRedDistR) ')'];
+                        otherwise
                             
-                            plot(R,f_FRRthresh,'k','LineWidth',1.5);
-                            LegendString{end+1} = ['f_{FRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
-                        elseif obj.modelAnalyzeHandle.AnalyzeMode == 2
-                            FarredRedTh = 1;
-                            FarredRedDistFR = 0;
-                            FarredRedDistR = 0;
-                            f_BRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
-                            LegendString{end+1} = ['f_{FRthresh}(R) = R (not active)'];
+                            %Handle to axes Pre-Results Blue over Red
+                            ax = obj.viewAnalyzeHandle.hAPRBR;
+                            
+                            LegendString = {};
+                            
+                            axes(ax)
                             hold on
-                            plot(R,f_BRthresh,'k');
-                        end
-                        
-                        maxLim =  max([Rmax FRmax]);
-                        ylabel('y: mean Farred (FR)','FontSize',12);
-                        xlabel('x: mean Red (R)','FontSize',12);
-                        ylim([ 0 maxLim+10 ] );
-                        xlim([ 0 maxLim+10 ] );
-                        grid on
-                        if obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 3 || ...
-                                obj.modelAnalyzeHandle.AnalyzeMode == 5 || obj.modelAnalyzeHandle.AnalyzeMode == 7
-                            title({'Trible labeling: Type-2 specification classification' ;'(Type-2)'},'FontSize',14)
-                        else
-                            title({'Quad labeling: Fiber Type-2 specification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
-                        end
-                        legend(LegendString,'Location','Best')
+                            if ~isempty(T1)
+                                h=scatter([T1.ColorRed],[T1.ColorBlue],20,ColorMap(1,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 1';
+                            end
+                            hold on
+                            if ~isempty(T12h)
+                                h=scatter([T12h.ColorRed],[T12h.ColorBlue],20,ColorMap(2,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 12h';
+                            end
+                            hold on
+                            if ~isempty(T2)
+                                h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2';
+                            end
+                            hold on
+                            if ~isempty(T2x)
+                                h=scatter([T2x.ColorRed],[T2x.ColorBlue],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2x';
+                            end
+                            hold on
+                            if ~isempty(T2a)
+                                h=scatter([T2a.ColorRed],[T2a.ColorBlue],20,ColorMap(4,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2a';
+                            end
+                            hold on
+                            if ~isempty(T2ax)
+                                h=scatter([T2ax.ColorRed],[T2ax.ColorBlue],20,ColorMap(5,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2ax';
+                            end
+                            if ~isempty(T0)
+                                h=scatter([T0.ColorRed],[T0.ColorBlue],20,ColorMap(6,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type-0 (undefined)';
+                            end
+                            
+                            Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
+                            Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
+                            R = [0 10*Rmax]; %Red value vector
+                            
+                            if obj.modelAnalyzeHandle.BlueRedThreshActive
+                                % BlueRedThreshActive Parameter is active, plot
+                                % classification functions
+                                
+                                BlueRedTh = obj.modelAnalyzeHandle.BlueRedThresh;
+                                BlueRedDistB = obj.modelAnalyzeHandle.BlueRedDistBlue;
+                                BlueRedDistR = obj.modelAnalyzeHandle.BlueRedDistRed;
+                                
+                                if BlueRedDistB == 1
+                                    BlueRedDistB = 0.999999999;
+                                end
+                                
+                                % creat classification function line obj
+                                f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
+                                f_Bdist = BlueRedTh * R / (1-BlueRedDistB); %blue dist fcn
+                                f_Rdist = BlueRedTh * R * (1-BlueRedDistR); %red dist fcn
+                                hold on
+                                plot(R,f_Bdist,'b','LineWidth',1.5);
+                                LegendString{end+1} = ['f_{Bdist}(R) = ' num2str(BlueRedTh) ' * R / (1-' num2str(BlueRedDistB) ')'];
+                                hold on
+                                plot(R,f_Rdist,'r','LineWidth',1.5);
+                                LegendString{end+1}= ['f_{Rdist}(R) = ' num2str(BlueRedTh) ' * R * (1-' num2str(BlueRedDistR) ')'];
+                                hold on
+                                plot(R,f_BRthresh,'k','LineWidth',1.5);
+                                LegendString{end+1}= ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
+                            elseif obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 2
+                                BlueRedTh = 1;
+                                BlueRedDistB = 0;
+                                BlueRedDistR = 0;
+                                f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
+                                LegendString{end+1}= ['f_{BRthresh}(R) = R (not active)'];
+                                hold on
+                                plot(R,f_BRthresh,'k');
+                                
+                            end
+                            
+                            maxLim =  max([Rmax Bmax]);
+                            ylabel('y: mean Blue (B)','FontSize',12);
+                            xlabel('x: mean Red (R)','FontSize',12);
+                            ylim([ 0 maxLim+10 ] );
+                            xlim([ 0 maxLim+10 ] );
+                            grid on
+                            title({'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
+                            legend(LegendString,'Location','best')
+                            
+                            %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                            ax = obj.viewAnalyzeHandle.hAPRFRR;
+                            axes(ax)
+                            LegendString = {};
+                            
+                            hold on
+                            if ~isempty(T2)
+                                h=scatter([T2.ColorRed],[T2.ColorBlue],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2';
+                            end
+                            if ~isempty(T2x)
+                                h=scatter([T2x.ColorRed],[T2x.ColorFarRed],20,ColorMap(3,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2x';
+                            end
+                            hold on
+                            if ~isempty(T2a)
+                                h=scatter([T2a.ColorRed],[T2a.ColorFarRed],20,ColorMap(4,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2a';
+                            end
+                            hold on
+                            if ~isempty(T2ax)
+                                h=scatter([T2ax.ColorRed],[T2ax.ColorFarRed],20,ColorMap(5,:),'filled');
+                                set(h,'MarkerEdgeColor','k');
+                                LegendString{end+1} = 'Type 2ax';
+                            end
+                            
+                            Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
+                            FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
+                            R = [0 10*Rmax]; %Red value vector
+                            
+                            if obj.modelAnalyzeHandle.FarredRedThreshActive
+                                % Color-Based Classification
+                                % FarredRedThreshActive Parameter is active, plot
+                                % classification functions
+                                FarredRedTh = obj.modelAnalyzeHandle.FarredRedThresh;
+                                FarredRedDistFR = obj.modelAnalyzeHandle.FarredRedDistFarred;
+                                FarredRedDistR = obj.modelAnalyzeHandle.FarredRedDistRed;
+                                
+                                if FarredRedDistFR == 1
+                                    FarredRedDistFR = 0.999999999;
+                                end
+                                
+                                % creat classification function line obj
+                                f_FRRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
+                                f_FRdist = FarredRedTh * R / (1-FarredRedDistFR); %farred dist fcn
+                                f_Rdist = FarredRedTh * R * (1-FarredRedDistR); %red dist fcn
+                                
+                                plot(R,f_FRdist,'y','LineWidth',1.5);
+                                LegendString{end+1} = ['f_{FRdist}(R) = ' num2str(FarredRedTh) ' * R / (1-' num2str(FarredRedDistFR) ')'];
+                                
+                                plot(R,f_Rdist,'r','LineWidth',1.5);
+                                LegendString{end+1} = ['f_{Rdist}(R) = ' num2str(FarredRedTh) ' * R * (1-' num2str(FarredRedDistR) ')'];
+                                
+                                plot(R,f_FRRthresh,'k','LineWidth',1.5);
+                                LegendString{end+1} = ['f_{FRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
+                            elseif obj.modelAnalyzeHandle.AnalyzeMode == 2
+                                FarredRedTh = 1;
+                                FarredRedDistFR = 0;
+                                FarredRedDistR = 0;
+                                f_BRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
+                                LegendString{end+1} = ['f_{FRthresh}(R) = R (not active)'];
+                                hold on
+                                plot(R,f_BRthresh,'k');
+                            end
+                            
+                            maxLim =  max([Rmax FRmax]);
+                            ylabel('y: mean Farred (FR)','FontSize',12);
+                            xlabel('x: mean Red (R)','FontSize',12);
+                            ylim([ 0 maxLim+10 ] );
+                            xlim([ 0 maxLim+10 ] );
+                            grid on
+                            if obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 3 || ...
+                                    obj.modelAnalyzeHandle.AnalyzeMode == 5 || obj.modelAnalyzeHandle.AnalyzeMode == 7
+                                title({'Trible labeling: Type-2 specification classification' ;'(Type-2)'},'FontSize',14)
+                            else
+                                title({'Quad labeling: Fiber Type-2 specification' ;'(Type-2x, Type-2a, Type-2ax)'},'FontSize',14)
+                            end
+                            legend(LegendString,'Location','Best')
+                    end
+                else
+                    %Stats Struct is empty
                 end
-            else
-                %Stats Struct is empty
-            end
             catch
                 obj.errorMessage(lasterror);
             end
