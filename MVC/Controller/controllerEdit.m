@@ -233,7 +233,7 @@ classdef controllerEdit < handle
             hold off
             lhx=xlabel(obj.viewEditHandle.hAP, 'x/pixel','Fontsize',14);
             lhy=ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',14);
-            set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
+            set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             maxPixelX = size(PicBW,2);
             obj.viewEditHandle.hAP.XTick = [0:100:maxPixelX];
             maxPixelY = size(PicBW,1);
