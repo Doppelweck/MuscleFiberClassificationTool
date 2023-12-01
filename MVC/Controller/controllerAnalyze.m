@@ -1018,7 +1018,7 @@ classdef controllerAnalyze < handle
             
             lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',14);
             lhy=ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',14);
-            set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
+            set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);
             maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
             obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
