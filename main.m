@@ -58,7 +58,7 @@ try
         'PaperPositionMode','auto',...
         'InvertHardcopy','off',...
         'WindowState','maximized');
-    
+    set(mainFig,'color','w');
     figure(hf);
     set(hf,'WindowStyle','modal');
     
