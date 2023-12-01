@@ -39,6 +39,10 @@ classdef modelEdit < handle
         PicRGBFRPlanes;  %RGB image created from the color plane images red green blue and FarRed after brightness correction.
         PicRGBPlanes; %RGB image created from the color plane images red green and blue after brightness correction.
         PicRGBFRPlanesNoBC; %RGB image created from the color plane images red green blue and FarRed without brightness correction.
+        PicPlaneRed_RGB;
+        PicPlaneBlue_RGB;
+        PicPlaneGreen_RGB;
+        PicPlaneFarRed_RGB;
         PicBW; %Binary image.
         handlePicRGB; %handle to RGB image.
         handlePicBW; %handle to binary image.
@@ -1167,6 +1171,10 @@ classdef modelEdit < handle
             tempY3D(:,:,3) = double(0*ones(size(tempFR))).*(double(tempFR)/255);
             
             obj.PicRGBFRPlanes = uint8(tempR3D + tempG3D + tempB3D + tempY3D);
+            obj.PicPlaneRed_RGB = uint8(tempR3D);
+            obj.PicPlaneBlue_RGB = uint8(tempB3D);
+            obj.PicPlaneGreen_RGB = uint8(tempG3D);
+            obj.PicPlaneFarRed_RGB = uint8(tempY3D);
             
             obj.PicRGBPlanes = uint8(tempR3D + tempG3D + tempB3D );
             

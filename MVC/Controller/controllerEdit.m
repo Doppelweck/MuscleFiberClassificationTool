@@ -198,7 +198,20 @@ classdef controllerEdit < handle
             %
             
             % get Pics from the model
-            PicRGB = obj.modelEditHandle.PicRGBFRPlanes;
+            switch obj.viewEditHandle.B_ImageOverlaySelection.Value
+                case 1 %RGB
+                    Pic = obj.modelEditHandle.PicRGBFRPlanes;
+                case 2
+                    Pic = obj.modelEditHandle.PicPlaneGreen_RGB;
+                case 3
+                    Pic = obj.modelEditHandle.PicPlaneBlue_RGB;
+                case 4
+                    Pic = obj.modelEditHandle.PicPlaneRed_RGB;
+                case 5
+                    Pic = obj.modelEditHandle.PicPlaneFarRed_RGB;
+                otherwise
+                    Pic = obj.modelEditHandle.PicRGBFRPlanes;
+            end
             PicBW = obj.modelEditHandle.PicBW;
             
             % set axes in the GUI as the current axes
@@ -207,10 +220,10 @@ classdef controllerEdit < handle
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
                 % first start of the programm. No image handle exist.
                 % create image handle for Pic RGB
-                obj.modelEditHandle.handlePicRGB = imshow(PicRGB);
+                obj.modelEditHandle.handlePicRGB = imshow(Pic);
             else
                 % New image was selected. Change data in existing handle
-                obj.modelEditHandle.handlePicRGB.CData = PicRGB;
+                obj.modelEditHandle.handlePicRGB.CData = Pic;
             end
             
             hold on
@@ -277,6 +290,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_Invert,'Enable','off');
                 set(obj.viewEditHandle.B_Alpha,'Enable','off');
                 set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','off');
+                set(obj.viewEditHandle.B_AlphaActive,'Enable','off');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
@@ -336,6 +351,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_Color,'Enable','on');
                                 set(obj.viewEditHandle.B_Alpha,'Enable','on');
                                 set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                                set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');                     
+                                set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
@@ -393,6 +410,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_Color,'Enable','on');
                                 set(obj.viewEditHandle.B_Alpha,'Enable','on');
                                 set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                                set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                                set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
@@ -430,6 +449,8 @@ classdef controllerEdit < handle
                                     set(obj.viewEditHandle.B_Color,'Enable','on');
                                     set(obj.viewEditHandle.B_Alpha,'Enable','on');
                                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                                    set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                     % check wich morphOp buttons must be enabled
@@ -495,6 +516,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_Color,'Enable','on');
                                 set(obj.viewEditHandle.B_Alpha,'Enable','on');
                                 set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                                set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                                set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
@@ -556,6 +579,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_Color,'Enable','on');
                                 set(obj.viewEditHandle.B_Alpha,'Enable','on');
                                 set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                                set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                                set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
@@ -593,6 +618,8 @@ classdef controllerEdit < handle
                                     set(obj.viewEditHandle.B_Color,'Enable','on');
                                     set(obj.viewEditHandle.B_Alpha,'Enable','on');
                                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                                    set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                     % check wich morphOp buttons must be enabled
@@ -635,6 +662,8 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_Color,'Enable','on');
                             set(obj.viewEditHandle.B_Alpha,'Enable','on');
                             set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                            set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                            set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                             set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             % check wich morphOp buttons must be enabled
@@ -689,6 +718,8 @@ classdef controllerEdit < handle
                             set(obj.viewEditHandle.B_Color,'Enable','on');
                             set(obj.viewEditHandle.B_Alpha,'Enable','on');
                             set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                            set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                            set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                             set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                             set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                             % check wich morphOp buttons must be enabled
@@ -734,6 +765,8 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_Invert,'Enable','off');
             set(obj.viewEditHandle.B_Alpha,'Enable','off');
             set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+            set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','off');
+            set(obj.viewEditHandle.B_AlphaActive,'Enable','off');
             set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
             set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
             set(obj.viewEditHandle.B_SizeSE,'Enable','off');
@@ -789,6 +822,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_Invert,'Enable','off');
                     set(obj.viewEditHandle.B_Alpha,'Enable','off');
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaActive,'Enable','off');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
@@ -847,6 +882,8 @@ classdef controllerEdit < handle
                         set(obj.viewEditHandle.B_Invert,'Enable','on');
                         set(obj.viewEditHandle.B_Alpha,'Enable','on');
                         set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                        set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                        set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                         set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                         set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                         
@@ -870,6 +907,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_Invert,'Enable','off');
                     set(obj.viewEditHandle.B_Alpha,'Enable','off');
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaActive,'Enable','off');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
@@ -900,6 +939,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_Invert,'Enable','off');
                     set(obj.viewEditHandle.B_Alpha,'Enable','off');
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaActive,'Enable','off');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
@@ -958,6 +999,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_Invert,'Enable','on');
                     set(obj.viewEditHandle.B_Alpha,'Enable','on');
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                    set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     
@@ -988,6 +1031,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_Color,'Enable','off');
                     set(obj.viewEditHandle.B_Alpha,'Enable','off');
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','off');
+                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','off');
+                    set(obj.viewEditHandle.B_AlphaActive,'Enable','off');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                     set(obj.viewEditHandle.B_ShapeSE,'Enable','off');
@@ -1014,6 +1059,8 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_Color,'Enable','on');
                     set(obj.viewEditHandle.B_Alpha,'Enable','on');
                     set(obj.viewEditHandle.B_AlphaValue,'Enable','on');
+                    set(obj.viewEditHandle.B_ImageOverlaySelection,'Enable','on');
+                    set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                     
@@ -1939,6 +1986,31 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
+            
+            obj.modelEditHandle.handlePicRGB
+            switch obj.viewEditHandle.B_ImageOverlaySelection.Value
+                case 1 %RGB
+                    Pic = obj.modelEditHandle.PicRGBFRPlanes;
+                case 2
+                    Pic = obj.modelEditHandle.PicPlaneGreen_RGB;
+                case 3
+                    Pic = obj.modelEditHandle.PicPlaneBlue_RGB;
+                case 4
+                    Pic = obj.modelEditHandle.PicPlaneRed_RGB;
+                case 5
+                    Pic = obj.modelEditHandle.PicPlaneFarRed_RGB;
+                otherwise
+                    Pic = obj.modelEditHandle.PicRGBFRPlanes;
+            end
+            if isa(obj.modelEditHandle.handlePicRGB,'struct')
+                % first start of the programm. No image handle exist.
+                % create image handle for Pic RGB
+                obj.modelEditHandle.handlePicRGB = imshow(Pic);
+            else
+                % New image was selected. Change data in existing handle
+                obj.modelEditHandle.handlePicRGB.CData = Pic;
+            end
+%             setInitPicsGUI(obj);
         end
         
         function lineWidthEvent(obj,src,evnt)
