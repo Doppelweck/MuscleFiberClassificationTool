@@ -57,7 +57,7 @@ function workbar(fractiondone, message, progtitle, mainFig)
 persistent progfig progpatch starttime lastupdate text 
 
 % Set defaults for variables not passed in
-if nargin < 1,
+if nargin < 1
     fractiondone = 0;
 end
 
@@ -75,10 +75,10 @@ catch
     progfig = []; % Set to empty so a new progress bar is created
 end
 
-if nargin < 2 & isempty(progfig),
+if nargin < 2 && isempty(progfig)
     message = '';
 end
-if nargin < 3 & isempty(progfig),
+if nargin < 3 && isempty(progfig)
     progtitle = '';
     mainFig =[];
 end
@@ -90,7 +90,12 @@ if percentdone == 100 % Task completed
         setAlwaysOnTop(progfig,false);
     end
     delete(progfig) % Close progress bar
+    set(mainFig,'WindowState','maximized');
     clear progfig progpatch starttime lastupdate % Clear persistent vars
+    
+    if strcmp(get(mainFig,'WindowState'),'maximized')
+        set(mainFig,'WindowState','maximized');
+    end
     return
 end
 
