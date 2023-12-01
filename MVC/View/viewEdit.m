@@ -124,10 +124,11 @@ classdef viewEdit < handle
                 fontSizeB = 16; % Font size big
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
-            mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',5,'Padding',5);
+            set(mainCard,'Visible','off');
+            mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',2,'Padding',2);
             
-            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',5);
-            obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop');
+            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',2);
+            obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',2);
             set( mainPanelBox, 'MinimumWidths', [1 320] );
             set( mainPanelBox, 'Widths', [-4 -1] );
             set(obj.panelPicture,'Title','Picture');
@@ -136,7 +137,7 @@ classdef viewEdit < handle
             axis image
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
-            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 1,'Padding',1);
+            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 0,'Padding',0);
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelAlpha = uix.Panel('Parent',PanelVBox,'Title','Image Overlay','FontSize',fontSizeB,'Padding',2);
@@ -144,11 +145,11 @@ classdef viewEdit < handle
             PanelMorphOp = uix.Panel('Parent',PanelVBox,'Title','Morphological operations','FontSize',fontSizeB,'Padding',2);
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',2);
             
-            set( PanelVBox, 'Heights', [-4.5 -2.5 -5 -5.5 -6], 'Spacing', 1 );
+            set( PanelVBox, 'Heights', [-4.5 -2.5 -5 -5.5 -6], 'Spacing', 5 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 3 ,'Padding',3);
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 3 ,'Padding',5);
             
             HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',3);
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
@@ -329,6 +330,25 @@ classdef viewEdit < handle
             set(obj.B_ThresholdMode,'Value',4);
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
+            
+            h = findobj('-property','BackgroundColor','-and', ...
+            '-not',{'Style','pushbutton','-or','Style','togglebutton'});
+            for i=1:1:length(h)
+                try
+                    set(h(i),'BackgroundColor','w');
+                catch
+                end
+            end
+            h = findobj('Type','uipanel');
+            for i=1:1:length(h)
+                try
+                    set(h(i),'BorderWidth',2);
+                    set(h(i),'BorderType','line');
+                    set(h(i),'HighlightColor',[0.64 0.64 0.64]);
+                catch
+                end
+            end
+            set(mainCard,'Visible','on');
 
         end % end constructor
         
@@ -644,6 +664,8 @@ classdef viewEdit < handle
             set(obj.B_SizeSE,'tooltipstring',StructuringSizeToolTip);
             set(obj.B_NoIteration,'tooltipstring',NoOfIterationsToolTip);
             set(obj.B_StartMorphOP,'tooltipstring',RunMorphToolTip);
+            
+           
         end
         
         function delete(obj)
