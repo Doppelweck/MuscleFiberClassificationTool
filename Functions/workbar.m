@@ -57,7 +57,7 @@ function workbar(fractiondone, message, progtitle, mainFig)
 persistent progfig progpatch starttime lastupdate text 
 
 % Set defaults for variables not passed in
-if nargin < 1,
+if nargin < 1
     fractiondone = 0;
 end
 
@@ -75,10 +75,10 @@ catch
     progfig = []; % Set to empty so a new progress bar is created
 end
 
-if nargin < 2 & isempty(progfig),
+if nargin < 2 && isempty(progfig)
     message = '';
 end
-if nargin < 3 & isempty(progfig),
+if nargin < 3 && isempty(progfig)
     progtitle = '';
     mainFig =[];
 end
@@ -90,7 +90,12 @@ if percentdone == 100 % Task completed
         setAlwaysOnTop(progfig,false);
     end
     delete(progfig) % Close progress bar
+    set(mainFig,'WindowState','maximized');
     clear progfig progpatch starttime lastupdate % Clear persistent vars
+    
+    if strcmp(get(mainFig,'WindowState'),'maximized')
+        set(mainFig,'WindowState','maximized');
+    end
     return
 end
 
@@ -102,7 +107,7 @@ if isempty(progfig)
     
     
     %%%%%%%%%% SET WINDOW SIZE AND POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    winwidth = 300;                                         % Width of timebar window
+    winwidth = 400;                                         % Width of timebar window
     winheight = 75;                                         % Height of timebar window
     
     if ~isempty(mainFig)
@@ -159,7 +164,7 @@ if isempty(progfig)
      
     axes('parent',progfig,...                               % Set the progress bar parent to the figure
         'units','pixels',...                                % Provide axes units in pixels
-        'pos',[10 winheight-45 winwidth-50 15],...          % Set the progress bar position and size
+        'pos',[10 winheight-45 winwidth-75 15],...          % Set the progress bar position and size
         'xlim',[0 1],...                                    % Set the range from 0 to 1
         'visible','off');                                 % Turn off axes
  
@@ -168,7 +173,7 @@ if isempty(progfig)
     
     progaxes = axes('parent',progfig,...                    % Set the progress bar parent to the figure
         'units','pixels',...                                % Provide axes units in pixels
-        'pos',[14-pgx(m) winheight-pgy(m) winwidth-pgw(m) 7-pgh(m)],...   % Set the progress bar position and size
+        'pos',[12-pgx(m) winheight-pgy(m) winwidth-pgw(m)-22 7-pgh(m)],...   % Set the progress bar position and size
         'xlim',[0 1],...                                    % Set the range from 0 to 1
         'visible','off');                                   % Turn off axes
 
@@ -212,7 +217,7 @@ if isempty(progfig)
     busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32);  % icon, label
     busyIndicator.setPaintsWhenStopped(false);  % default = false
     busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
-    javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.91,progfig.Position(4)*0.1,20,20], progfig);
+    javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.86,progfig.Position(4)*0.35,20,20], progfig);
     busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
     busyIndicator.start;
         
@@ -232,8 +237,8 @@ if etime(clock,lastupdate) < 0.01
 end
 
 % Update progress patch
-n = [.02857 ];
-set(progpatch,'XData',[1 n(1)*round(fractiondone/n(1)) n(1)*round(fractiondone/n(1)) 1])
+n = [.03857 ];
+set(progpatch,'XData',[1 fractiondone fractiondone 1])
 
 % Set all dynamic text
 runtime = etime(clock,starttime);
@@ -294,16 +299,16 @@ function a=progimage(m)
 
 if m == 1
     
-    a=ones(13,285,3);
-    a(:,:,1)=ones([13,285])*0;
-    a(:,:,2)=ones([13,285])*0.4470*255;
-    a(:,:,3)=ones([13,285])*0.7410*255;
+    a=ones(13,385,3);
+    a(:,:,1)=ones([13,385])*0;
+    a(:,:,2)=ones([13,385])*0.4470*255;
+    a(:,:,3)=ones([13,385])*0.7410*255;
       
 else
-    a=ones(13,285,3);
-    a(:,:,1)=ones([13,285]);
-    a(:,:,2)=ones([13,285]);
-    a(:,:,3)=ones([13,285]);
+    a=ones(13,385,3);
+    a(:,:,1)=ones([13,385]);
+    a(:,:,2)=ones([13,385]);
+    a(:,:,3)=ones([13,385]);
    
 end
 

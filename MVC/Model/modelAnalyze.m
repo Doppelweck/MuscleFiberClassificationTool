@@ -427,7 +427,6 @@ classdef modelAnalyze < handle
                 
                 percent = (abs(j-0.1))/(angle/angleStep);
                 workbar(percent,'Please Wait...calculating diameters','Diameters',obj.controllerAnalyzeHandle.mainFigure);
-                %                 pause(0.00001)
             end
             
             obj.InfoMessage = '      - find min and max diameters...';
@@ -436,7 +435,6 @@ classdef modelAnalyze < handle
                 obj.Stats(k).maxDiameter = max(maxDia(k,:));
                 percent = (k-0.1)/noObjects;
                 workbar(percent,'Please Wait...saving diameters','Find min and max Diameters',obj.controllerAnalyzeHandle.mainFigure);
-                %                 pause(0.00001)
             end
             
         end
@@ -466,7 +464,6 @@ classdef modelAnalyze < handle
                 obj.Stats(i).AspectRatio = obj.Stats(i).maxDiameter/obj.Stats(i).minDiameter;
                 percent = (i-0.1)/nObjects;
                 workbar(percent,'Please Wait...calculating aspect ratio','Aspect Ratio',obj.controllerAnalyzeHandle.mainFigure);
-                %                 pause(0.00001)
             end
             
         end
