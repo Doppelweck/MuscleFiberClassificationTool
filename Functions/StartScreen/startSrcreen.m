@@ -4,7 +4,7 @@ function hf = startSrcreen()
 Pic = imread('StartScreen3.jpg');
 [m n]= size(Pic);
 hf  = figure('Visible','off','MenuBar','none','NumberTitle','off',...
-    'WindowStyle','normal','Units','pixels');
+    'WindowStyle','normal','Units','pixels','ToolBar','none');
 ha = axes('Parent',hf,'Visible','on','Units','pixels');
 axis image
 % Pic = imread('StartScreen.png');
