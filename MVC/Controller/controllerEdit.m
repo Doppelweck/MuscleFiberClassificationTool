@@ -182,6 +182,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.ThresholdMode = obj.viewEditHandle.B_ThresholdMode.Value;
             obj.modelEditHandle.ThresholdValue = obj.viewEditHandle.B_Threshold.Value;
             obj.modelEditHandle.AlphaMapValue = obj.viewEditHandle.B_Alpha.Value;
+            obj.modelEditHandle.AlphaMapActive = obj.viewEditHandle.B_AlphaActive.Value;
             obj.modelEditHandle.FiberForeBackGround = obj.viewEditHandle.B_FiberForeBackGround.Value;
         end
         
@@ -216,6 +217,7 @@ classdef controllerEdit < handle
             
             % set axes in the GUI as the current axes
             axes(obj.viewEditHandle.hAP);
+%             axtoolbar(obj.viewEditHandle.hAP,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
                 % first start of the programm. No image handle exist.
@@ -244,8 +246,10 @@ classdef controllerEdit < handle
             axis on
             axis image
             hold off
-            lhx=xlabel(obj.viewEditHandle.hAP, 'x/pixel','Fontsize',14);
-            lhy=ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',14);
+            title(obj.viewEditHandle.hAP,'Create Binary Mask')
+            lhx=xlabel(obj.viewEditHandle.hAP, 'x/pixel','Fontsize',12);
+            lhy=ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',12);
+            axtoolbar(gca,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             maxPixelX = size(PicBW,2);
             obj.viewEditHandle.hAP.XTick = [0:100:maxPixelX];
