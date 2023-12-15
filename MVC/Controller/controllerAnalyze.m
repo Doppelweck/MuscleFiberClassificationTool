@@ -1016,8 +1016,10 @@ classdef controllerAnalyze < handle
                 axis image
             end
             
-            lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',14);
-            lhy=ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',14);
+            lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',12);
+            lhy=ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',12);
+            title(obj.viewAnalyzeHandle.hAP,'Analyzing Fibers')
+            axtoolbar(gca,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);
             maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
