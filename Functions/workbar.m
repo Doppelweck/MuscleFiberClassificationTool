@@ -54,7 +54,7 @@ function workbar(fractiondone, message, progtitle, mainFig)
 % Last Modified: 3-17-05
 
 
-persistent progfig progpatch starttime lastupdate text 
+persistent progfig progpatch starttime lastupdate text winState
 
 % Set defaults for variables not passed in
 if nargin < 1
@@ -92,8 +92,7 @@ if percentdone == 100 % Task completed
     delete(progfig) % Close progress bar
 
     clear progfig progpatch starttime lastupdate % Clear persistent vars
-    
-    if strcmp(get(mainFig,'WindowState'),'maximized')
+    if strcmp(winState,'maximized')
         set(mainFig,'WindowState','maximized');
     end
     return
@@ -104,7 +103,7 @@ if percentdone == 0
 end
 % Create new progress bar if needed
 if isempty(progfig)
-    
+    winState=get(mainFig,'WindowState');
     
     %%%%%%%%%% SET WINDOW SIZE AND POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     winwidth = 400;                                         % Width of timebar window
