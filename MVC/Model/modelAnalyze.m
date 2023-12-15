@@ -311,7 +311,7 @@ classdef modelAnalyze < handle
                 d = d.^2;
                 obj.Stats(i).Perimeter = sum(sqrt(sum(d,2)));
                 
-                percent = (i-0.1)/size(obj.Stats,1);
+                percent = (i)/size(obj.Stats,1);
                 workbar(percent,'Please Wait...calculating perimeter','Permimeter',obj.controllerAnalyzeHandle.mainFigure);
                 %                 pause(0.00001)
             end
@@ -373,7 +373,7 @@ classdef modelAnalyze < handle
                 obj.Stats(i).Roundness =A_Fiber/A_Cmax;
                 obj.Stats(i).AreaMaxCS = A_Cmax;
                 obj.Stats(i).AreaMinCS = A_Cmin;
-                percent = (i-0.1)/size(obj.Stats,1);
+                percent = (i)/size(obj.Stats,1);
                 workbar(percent,'Please Wait...calculating roundness','Roundness',obj.controllerAnalyzeHandle.mainFigure);
                 %                 pause(0.0001)
             end
@@ -462,7 +462,7 @@ classdef modelAnalyze < handle
             
             for i=1:1:nObjects
                 obj.Stats(i).AspectRatio = obj.Stats(i).maxDiameter/obj.Stats(i).minDiameter;
-                percent = (i-0.1)/nObjects;
+                percent = (i)/nObjects;
                 workbar(percent,'Please Wait...calculating aspect ratio','Aspect Ratio',obj.controllerAnalyzeHandle.mainFigure);
             end
             
@@ -510,7 +510,7 @@ classdef modelAnalyze < handle
                 obj.Stats(i).ColorRatioBlueRed = obj.Stats(i).ColorBlue/obj.Stats(i).ColorRed;
                 obj.Stats(i).ColorRatioFarredRed = obj.Stats(i).ColorFarRed/obj.Stats(i).ColorRed;
                 obj.Stats(i).ColorValue = max([obj.Stats(i).ColorRed obj.Stats(i).ColorBlue obj.Stats(i).ColorFarRed])/255;
-                percent =   (i-0.1)/nObjects;
+                percent =   (i)/nObjects;
                 workbar(percent,'Please Wait...calculating fiber color','Fiber-Color',obj.controllerAnalyzeHandle.mainFigure);
                 
             end
@@ -580,7 +580,7 @@ classdef modelAnalyze < handle
             obj.InfoMessage = '      - run Pre-Classification...';
             obj.InfoMessage = '         - find objects that are out of parameter range';
             for i=1:1:noElements
-                percent=(i-0.1)/noElements;
+                percent=(i)/noElements;
                 workbar(percent,'Please Wait...pre-classification','Pre-Classification',obj.controllerAnalyzeHandle.mainFigure);
                 
                 if obj.AreaActive && ( obj.Stats(i).Area > obj.MaxArea )
@@ -648,7 +648,7 @@ classdef modelAnalyze < handle
                     tempStats(i) = [];
                 end
             end
-            workbar(0.99,'Please Wait...pre-classification','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
+
             obj.InfoMessage = '         - get min points of cluster';
             %Get Minimum amount of cluster points from User
             inputSuccses = false;
@@ -739,6 +739,8 @@ classdef modelAnalyze < handle
                             newCluster = true;
                             Class(order(i)) = 0; %Noise
                         end
+                        percent = i/size(tempStats,1);
+                        workbar(percent,'Please Wait...searching for clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                         
                     end
                     
@@ -856,7 +858,6 @@ classdef modelAnalyze < handle
                 
                 %Claculate cluster Core points
                 if Cluster == 1
-                    workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                     if mean([tempStats.ColorBlue]) > mean([tempStats.ColorRed])
                         [tempStats.FiberType] = deal('Type 1');
                         [tempStats.FiberTypeMainGroup] = deal(1);
@@ -881,7 +882,7 @@ classdef modelAnalyze < handle
                     C2y = [sum(C2yV)/length(C2yV) 2];
                     
                     while sum(Class(:)==0)>0
-                        percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
+                        percent = 1-((sum(Class(:)==0))/(noElementsWc));
                         workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                         
                         idx = find(Class==0, 1, 'first'); %get index of first 0 element
@@ -933,7 +934,7 @@ classdef modelAnalyze < handle
                     C3y = [sum(C3yV)/length(C3yV) 3];
                     
                     while sum(Class(:)==0)>0
-                        percent = 1-((sum(Class(:)==0)-0.9)/(noElementsWc));
+                        percent = 1-((sum(Class(:)==0))/(noElementsWc));
                         workbar(percent,'Please Wait...match undefined to nearest cluster','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                         
                         idx = find(Class==0, 1, 'first'); %get index of first 0 element
@@ -947,8 +948,6 @@ classdef modelAnalyze < handle
                         idxC = find(distAll==min(distAll),1,'first');
                         Class(idx)=idxC;
                     end
-                    
-                    workbar(0.99,'Please Wait...identify Clusters','OPTICS-Clustering',obj.controllerAnalyzeHandle.mainFigure);
                     %gradient of corepoint
                     dC=[];
                     dC(1,:) = [C1y(1)/C1x(1) 1];
@@ -1325,7 +1324,7 @@ classdef modelAnalyze < handle
             
             % Classify Fiber Type main groups
             for i=1:1:nObjects
-                percent =   (i-0.1)/nObjects;
+                percent =   (i)/nObjects;
                 workbar(percent,'Please Wait...classify Fiber-Type main groups','Fiber-Type main groups',obj.controllerAnalyzeHandle.mainFigure);
                 if strcmp(obj.Stats(i).FiberType , 'undefined')
                     %do nothing. Go to next Fiber
@@ -1362,7 +1361,7 @@ classdef modelAnalyze < handle
             if obj.AnalyzeMode == 2 %Color quad labeling is active
                 % Specify Fiber Type 2 subgroups
                 for i=1:1:nObjects
-                    percent =   (i-0.1)/nObjects;
+                    percent =   (i)/nObjects;
                     workbar(percent,'Please Wait...sepcify Fiber-Type 2 subgroups','Fiber-Type 2 subgroups',obj.controllerAnalyzeHandle.mainFigure);
                     if obj.Stats(i).FiberTypeMainGroup == 2
                         if obj.FarredRedThreshActive
@@ -1567,7 +1566,7 @@ classdef modelAnalyze < handle
                     obj.InfoMessage = '! ERROR in specifyFiberType() FUNCTION!';
                 end
                 
-                percent =   (i-0.1)/nObjects;
+                percent =   (i)/nObjects;
                 workbar(percent,'Please Wait...specifing Fiber-Type','Fiber-Type',obj.controllerAnalyzeHandle.mainFigure);
             end
         end
