@@ -439,8 +439,8 @@ classdef modelResults < handle
                 obj.AreaMinMaxT2(2) = max(cell2mat(obj.StatsMatDataT2(:,4)));
                 obj.AreaMinMaxObjT2(2) = cell2mat(obj.StatsMatDataT2( find([obj.StatsMatDataT2{:,4}]==obj.AreaMinMaxT2(2),1) ,1));
             else
-                obj.AreaMinMaxT2a = '--';
-                obj.AreaMinMaxObjT2a = '--';
+                obj.AreaMinMaxT2 = '--';
+                obj.AreaMinMaxObjT2 = '--';
 
             end
             
