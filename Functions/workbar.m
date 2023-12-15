@@ -90,7 +90,7 @@ if percentdone == 100 % Task completed
         setAlwaysOnTop(progfig,false);
     end
     delete(progfig) % Close progress bar
-    set(mainFig,'WindowState','maximized');
+
     clear progfig progpatch starttime lastupdate % Clear persistent vars
     
     if strcmp(get(mainFig,'WindowState'),'maximized')
