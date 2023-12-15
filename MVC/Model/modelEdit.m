@@ -1833,7 +1833,6 @@ classdef modelEdit < handle
             %           obj:    Handle to modelEdit object
             %           CurPos: current cursor position in the binary image
             %
-            
             obj.x1 = double(CurPos(1,1));
             
             obj.y1 = double(CurPos(1,2));
