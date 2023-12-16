@@ -1317,8 +1317,7 @@ classdef controllerResults < handle
                 fontSizeB = 16; % Font size big
             end
             
-            %find all objevts that are not classified as undefined Type 0
-            
+            %find all objects that are not classified as undefined Type 0
             tempStats = obj.modelResultsHandle.Stats([obj.modelResultsHandle.Stats.FiberTypeMainGroup]>0);
             
             if ~isempty(tempStats)
@@ -1326,8 +1325,7 @@ classdef controllerResults < handle
             obj.modelResultsHandle.InfoMessage = '      - plot Area Histogram';
             
             cla(obj.viewResultsHandle.hAAreaHist);
-%             axes(obj.viewResultsHandle.hAAreaHist);
-            
+           
             h = histfit(obj.viewResultsHandle.hAAreaHist,[tempStats.Area],50);
             mu=mean([tempStats.Area]);
             sigma=std([tempStats.Area]);
