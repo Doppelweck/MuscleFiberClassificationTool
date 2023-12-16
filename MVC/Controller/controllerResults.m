@@ -1339,7 +1339,7 @@ classdef controllerResults < handle
 
             set(obj.viewResultsHandle.hAAreaHist,'FontUnits','normalized','Fontsize',0.03);
             title(obj.viewResultsHandle.hAAreaHist,'Area Histogram','FontUnits','normalized','Fontsize',0.06);
-            xlabel(obj.viewResultsHandle.hAAreaHist,['Area in \mum^2 ( Stepsize bins: ' binWidth ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045);
+            xlabel(obj.viewResultsHandle.hAAreaHist,['Area in \mum^2 ( Bin width: ' binWidth ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045);
             ylabel(obj.viewResultsHandle.hAAreaHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hAAreaHist, 'on');
             l1=legend(obj.viewResultsHandle.hAAreaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
@@ -1363,7 +1363,7 @@ classdef controllerResults < handle
             
             set(obj.viewResultsHandle.hAAspectHist,'FontUnits','normalized','Fontsize',0.03);
             title(obj.viewResultsHandle.hAAspectHist,'Aspect Ratio Histogram','FontUnits','normalized','Fontsize',0.06);
-            xlabel(obj.viewResultsHandle.hAAspectHist,['Aspect Ratio ( Stepsize bins: ' binWidth ' )'],'FontUnits','normalized','Fontsize',0.045);
+            xlabel(obj.viewResultsHandle.hAAspectHist,['Aspect Ratio ( Bin width: ' binWidth ' )'],'FontUnits','normalized','Fontsize',0.045);
             ylabel(obj.viewResultsHandle.hAAspectHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hAAspectHist, 'on');
             l2=legend(obj.viewResultsHandle.hAAspectHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
@@ -1387,7 +1387,7 @@ classdef controllerResults < handle
             
             set(obj.viewResultsHandle.hADiaHist,'FontUnits','normalized','Fontsize',0.03);
             title(obj.viewResultsHandle.hADiaHist,'Diameter Histogram, minimum Fertet-Diameter (Breadth) ','FontUnits','normalized','Fontsize',0.06);
-            xlabel(obj.viewResultsHandle.hADiaHist,['Diameters in \mum ( Stepsize bins: ' binWidth ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045);
+            xlabel(obj.viewResultsHandle.hADiaHist,['Diameters in \mum ( Bin width: ' binWidth ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045);
             ylabel(obj.viewResultsHandle.hADiaHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hADiaHist, 'on');
             l3=legend(obj.viewResultsHandle.hADiaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
@@ -1411,7 +1411,7 @@ classdef controllerResults < handle
             
             set(obj.viewResultsHandle.hARoundHist,'FontUnits','normalized','Fontsize',0.03);
             title(obj.viewResultsHandle.hARoundHist,'Roundness Histogram','FontUnits','normalized','Fontsize',0.06);
-            xlabel(obj.viewResultsHandle.hARoundHist,['Roundness ( Stepsize bins: ' binWidth ' )'],'FontUnits','normalized','Fontsize',0.045);
+            xlabel(obj.viewResultsHandle.hARoundHist,['Roundness ( Bin width: ' binWidth ' )'],'FontUnits','normalized','Fontsize',0.045);
             ylabel(obj.viewResultsHandle.hARoundHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hARoundHist, 'on');
             l4=legend(obj.viewResultsHandle.hARoundHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
