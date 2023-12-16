@@ -1327,6 +1327,7 @@ classdef controllerResults < handle
             cla(obj.viewResultsHandle.hAAreaHist);
            
             h = histfit(obj.viewResultsHandle.hAAreaHist,[tempStats.Area],50);
+            ylim(obj.viewResultsHandle.hAAreaHist,[0 ceil( max(h(1).YData)*1.1 / 5 ) * 5]);
             mu=mean([tempStats.Area]);
             sigma=std([tempStats.Area]);
             xline(obj.viewResultsHandle.hAAreaHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
@@ -1345,6 +1346,7 @@ classdef controllerResults < handle
             cla(obj.viewResultsHandle.hAAspectHist);
             
             h = histfit(obj.viewResultsHandle.hAAspectHist,[tempStats.AspectRatio],50);
+            ylim(obj.viewResultsHandle.hAAspectHist,[0 ceil( max(h(1).YData)*1.1 / 5 ) * 5]);
             mu=mean([tempStats.AspectRatio]);
             sigma=std([tempStats.AspectRatio]);
             xline(obj.viewResultsHandle.hAAspectHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
@@ -1363,6 +1365,7 @@ classdef controllerResults < handle
             cla(obj.viewResultsHandle.hADiaHist);
          
             h = histfit(obj.viewResultsHandle.hADiaHist,[tempStats.minDiameter],50);
+            ylim(obj.viewResultsHandle.hADiaHist,[0 ceil( max(h(1).YData)*1.1 / 5 ) * 5]);
             mu=mean([tempStats.minDiameter]);
             sigma=std([tempStats.minDiameter]);
             xline(obj.viewResultsHandle.hADiaHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
@@ -1381,6 +1384,7 @@ classdef controllerResults < handle
             cla(obj.viewResultsHandle.hARoundHist);
 
             h = histfit(obj.viewResultsHandle.hARoundHist,[tempStats.Roundness],50);
+            ylim(obj.viewResultsHandle.hARoundHist,[0 ceil( max(h(1).YData)*1.1 / 5 ) * 5]);
             mu=mean([tempStats.Roundness]);
             sigma=std([tempStats.Roundness]);
             xline(obj.viewResultsHandle.hARoundHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
