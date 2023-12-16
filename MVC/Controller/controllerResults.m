@@ -585,7 +585,7 @@ classdef controllerResults < handle
                 
             else %Quad labeling was active during calssification 
                 
-                tempColorMap = ColorMapMain;
+                tempColorMap = ColorMapAll;
                 tempColorMap(B == 0,:)=[];
                 bMain = B;
                 bMain(B == 0)=[];
