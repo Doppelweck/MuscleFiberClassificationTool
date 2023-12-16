@@ -493,7 +493,7 @@ classdef controllerResults < handle
                     set(handleToThisBarSeries(b),'FaceColor', ColorMapAll(b,:));
                     % Place text atop the bar
                     barTopper = sprintf('%d',B(b));
-                    hText(b) = text(x(b), B(b), barTopper,'HorizontalAlignment','center',...
+                    hText(b) = text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
                         'VerticalAlignment','bottom', 'FontSize', 15);
                 end
                 
@@ -1303,6 +1303,19 @@ classdef controllerResults < handle
             %
             
             obj.modelResultsHandle.InfoMessage = '   - show Histograms...';
+             if ismac
+                fontSizeS = 12; % Font size small
+                fontSizeM = 14; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 12*0.75; % Font size small
+                fontSizeM = 14*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 12; % Font size small
+                fontSizeM = 14; % Font size medium
+                fontSizeB = 16; % Font size big
+            end
             
             %find all objevts that are not classified as undefined Type 0
             
@@ -1315,69 +1328,78 @@ classdef controllerResults < handle
             cla(obj.viewResultsHandle.hAAreaHist);
 %             axes(obj.viewResultsHandle.hAAreaHist);
             
-            h = histogram(obj.viewResultsHandle.hAAreaHist,[tempStats.Area],50);
-%             h.BinWidth = 50;
-%             noBin = h.BinWidth;
+            h = histfit(obj.viewResultsHandle.hAAreaHist,[tempStats.Area],50);
+            mu=mean([tempStats.Area]);
+            sigma=std([tempStats.Area]);
+            xline(obj.viewResultsHandle.hAAreaHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
+
             set(obj.viewResultsHandle.hAAreaHist,'FontUnits','normalized','Fontsize',0.03);
-            title(obj.viewResultsHandle.hAAreaHist,'Area Histogram','FontUnits','normalized','Fontsize',0.06)
-            xlabel(obj.viewResultsHandle.hAAreaHist,['Area in \mum^2 ( Stepsize bins: ' num2str(h.BinWidth) ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel(obj.viewResultsHandle.hAAreaHist,'Frequency','FontUnits','normalized','Fontsize',0.045)
+            title(obj.viewResultsHandle.hAAreaHist,'Area Histogram','FontUnits','normalized','Fontsize',0.06);
+            xlabel(obj.viewResultsHandle.hAAreaHist,['Area in \mum^2 ( Stepsize bins: ' size(h(1).XData,2) ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045);
+            ylabel(obj.viewResultsHandle.hAAreaHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hAAreaHist, 'on');
-            
+            l1=legend(obj.viewResultsHandle.hAAreaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+            l1.FontSize=fontSizeM;
+
             %%%%%%%%% Aspect Ratio Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             obj.modelResultsHandle.InfoMessage = '      - plot Aspect Ratio Histogram';
             
             cla(obj.viewResultsHandle.hAAspectHist);
-%             axes(obj.viewResultsHandle.hAAspectHist);
             
-            h = histogram(obj.viewResultsHandle.hAAspectHist,[tempStats.AspectRatio],50);
-%             h.BinWidth = 0.02;
+            h = histfit(obj.viewResultsHandle.hAAspectHist,[tempStats.AspectRatio],50);
+            mu=mean([tempStats.AspectRatio]);
+            sigma=std([tempStats.AspectRatio]);
+            xline(obj.viewResultsHandle.hAAspectHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
+            
             set(obj.viewResultsHandle.hAAspectHist,'FontUnits','normalized','Fontsize',0.03);
-            title(obj.viewResultsHandle.hAAspectHist,'Aspect Ratio Histogram','FontUnits','normalized','Fontsize',0.06)
-            xlabel(obj.viewResultsHandle.hAAspectHist,['Aspect Ratio ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel(obj.viewResultsHandle.hAAspectHist,'Frequency','FontUnits','normalized','Fontsize',0.045)
-            
+            title(obj.viewResultsHandle.hAAspectHist,'Aspect Ratio Histogram','FontUnits','normalized','Fontsize',0.06);
+            xlabel(obj.viewResultsHandle.hAAspectHist,['Aspect Ratio ( Stepsize bins: ' size(h(1).XData,2) ' )'],'FontUnits','normalized','Fontsize',0.045);
+            ylabel(obj.viewResultsHandle.hAAspectHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hAAspectHist, 'on');
+            l2=legend(obj.viewResultsHandle.hAAspectHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+            l2.FontSize=fontSizeM;
             
             %%%%%%%%% Diameters Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             obj.modelResultsHandle.InfoMessage = '      - plot Diameter Histogram';
             
             cla(obj.viewResultsHandle.hADiaHist);
-%             axes(obj.viewResultsHandle.hADiaHist);
-            
-            h = histogram(obj.viewResultsHandle.hADiaHist,[tempStats.minDiameter],50);
-%             h.BinWidth = 2;
-%             hold on
-%             h = histogram([tempStats.maxDiameter],'FaceAlpha',0.5);
-%             h.BinWidth = 2;
+         
+            h = histfit(obj.viewResultsHandle.hADiaHist,[tempStats.minDiameter],50);
+            mu=mean([tempStats.minDiameter]);
+            sigma=std([tempStats.minDiameter]);
+            xline(obj.viewResultsHandle.hADiaHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
             
             set(obj.viewResultsHandle.hADiaHist,'FontUnits','normalized','Fontsize',0.03);
-            title(obj.viewResultsHandle.hADiaHist,'Diameter Histogram, minimum Fertet-Diameter (Breadth) ','FontUnits','normalized','Fontsize',0.06)
-            xlabel(obj.viewResultsHandle.hADiaHist,['Diameters in \mum ( Stepsize bins: ' num2str(h.BinWidth) ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045)
-            ylabel(obj.viewResultsHandle.hADiaHist,'Frequency','FontUnits','normalized','Fontsize',0.045)
+            title(obj.viewResultsHandle.hADiaHist,'Diameter Histogram, minimum Fertet-Diameter (Breadth) ','FontUnits','normalized','Fontsize',0.06);
+            xlabel(obj.viewResultsHandle.hADiaHist,['Diameters in \mum ( Stepsize bins: ' size(h(1).XData,2) ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045);
+            ylabel(obj.viewResultsHandle.hADiaHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hADiaHist, 'on');
+            l3=legend(obj.viewResultsHandle.hADiaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+            l3.FontSize=fontSizeM;
             
             %%%%%%%%% Roundness Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             obj.modelResultsHandle.InfoMessage = '      - plot Roundness Histogram';
             
             cla(obj.viewResultsHandle.hARoundHist);
-%             axes(obj.viewResultsHandle.hARoundHist);
+
+            h = histfit(obj.viewResultsHandle.hARoundHist,[tempStats.Roundness],50);
+            mu=mean([tempStats.Roundness]);
+            sigma=std([tempStats.Roundness]);
+            xline(obj.viewResultsHandle.hARoundHist,[mu - sigma mu mu + sigma],'--r',{num2str(mu - sigma),num2str(mu),num2str(mu + sigma)},'LineWidth', 1);
             
-            h = histogram(obj.viewResultsHandle.hARoundHist,[tempStats.Roundness],50);
-%             h.BinWidth = 0.01;
             set(obj.viewResultsHandle.hARoundHist,'FontUnits','normalized','Fontsize',0.03);
-            title(obj.viewResultsHandle.hARoundHist,'Roundness Histogram','FontUnits','normalized','Fontsize',0.06)
-            xlabel(obj.viewResultsHandle.hARoundHist,['Roundness ( Stepsize bins: ' num2str(h.BinWidth) ' )'],'FontUnits','normalized','Fontsize',0.045)
-            ylabel(obj.viewResultsHandle.hARoundHist,'Frequency','FontUnits','normalized','Fontsize',0.045)
-            
+            title(obj.viewResultsHandle.hARoundHist,'Roundness Histogram','FontUnits','normalized','Fontsize',0.06);
+            xlabel(obj.viewResultsHandle.hARoundHist,['Roundness ( Stepsize bins: ' size(h(1).XData,2) ' )'],'FontUnits','normalized','Fontsize',0.045);
+            ylabel(obj.viewResultsHandle.hARoundHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
             grid(obj.viewResultsHandle.hARoundHist, 'on');
-            
+            l4=legend(obj.viewResultsHandle.hARoundHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+            l4.FontSize=fontSizeM;
             else
                 obj.modelResultsHandle.InfoMessage = '      - ERROR: No Data for Histogram';
             end
             
         end
-        
+                
         function updateInfoLogEvent(obj,src,evnt)
             % Listener callback function of the InfoMessage propertie in
             % the model. Is called when InfoMessage string changes. Appends
