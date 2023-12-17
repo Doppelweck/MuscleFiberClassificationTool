@@ -1610,7 +1610,11 @@ classdef controllerAnalyze < handle
                     set(obj.mainFigure, 'Units','normalized');
                     
                     % create figure to show informations at the cursor position
+                    winState=get(mainFig,'WindowState');
                     obj.viewAnalyzeHandle.showInfoToManipulate(PosOut,PosMainFig,PosCurrent,Info);
+                    if strcmp(winState,'maximized')
+                        set(mainFig,'WindowState','maximized');
+                    end
                     
                     % refresh Callbacks on figure manupilate fiber info
                     set(obj.viewAnalyzeHandle.B_ManipulateOK,'Callback',@obj.manipulateFiberOKEvent);
@@ -2238,10 +2242,13 @@ classdef controllerAnalyze < handle
             %       - Input
             %           obj:    Handle to controllerAnalyze object
             %
-            
+            winState=get(obj.mainFigure,'WindowState');
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
                 'Close Program', ...
                 'Yes','No','No');
+            if strcmp(winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+            end
             
             switch choice
                 case 'Yes'

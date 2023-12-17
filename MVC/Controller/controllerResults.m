@@ -1784,9 +1784,13 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResult object
             %
+            winState=get(obj.mainFigure,'WindowState');
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
                 'Close Program', ...
                 'Yes','No','No');
+            if strcmp(winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+            end
             
             switch choice
                 case 'Yes'
