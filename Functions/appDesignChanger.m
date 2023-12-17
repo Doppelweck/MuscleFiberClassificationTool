@@ -1,4 +1,4 @@
-function appDesignChanger(colorMode)
+function appDesignChanger(curFig,colorMode)
 %APPDESIGNCHANGER Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -25,7 +25,7 @@ switch colorMode
         
     otherwise
 end
-h = findobj('-property','BackgroundColor','-and', ...
+h = findobj(curFig,'-property','BackgroundColor','-and', ...
     '-not',{'Style','pushbutton','-or','Style','togglebutton'});
 for i=1:1:length(h)
     try
@@ -34,7 +34,7 @@ for i=1:1:length(h)
     end
 end
 
-h = findobj('Type','uipanel');
+h = findobj(curFig,'Type','uipanel');
 for i=1:1:length(h)
     try
         set(h(i),'BorderWidth',panelBoarderWidth);
@@ -46,7 +46,7 @@ for i=1:1:length(h)
     end
 end
 
-h = findobj('Style','popupmenu','-or','Style','popupmenu','-or','Style','text' ...
+h = findobj(curFig,'Style','popupmenu','-or','Style','popupmenu','-or','Style','text' ...
     ,'-or','Style','edit' ,'-or','Style','pushbutton');
 for i=1:1:length(h)
     try

@@ -537,7 +537,7 @@ classdef viewAnalyze < handle
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
             
-            appDesignChanger('light');
+            appDesignChanger(mainCard,'light');
             
             set(mainCard,'Visible','on');
 
