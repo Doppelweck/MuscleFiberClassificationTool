@@ -1252,22 +1252,30 @@ classdef controllerAnalyze < handle
                         % Type 0
                         %                         Color0(end+1,:) = [1 1 1]';
                         Bound0{end+1,1} =  B{i,1};
+                        Bound0{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 1'
                         Bound1{end+1,1} =  B{i,1};
+                        Bound1{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 2'
                         Bound2{end+1,1} =  B{i,1};
+                        Bound2{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 2x'
                         Bound2x{end+1,1} =  B{i,1};
+                        Bound2x{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 2a'
                         Bound2a{end+1,1} =  B{i,1};
+                        Bound2a{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 2ax'
                         Bound2ax{end+1,1} =  B{i,1};
+                        Bound2ax{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 12h'
                         % Type 3
                         Bound12h{end+1,1} =  B{i,1};
+                        Bound12h{end,2} = ['boundLabel ' num2str(i)];
                     otherwise
                         % error
                         BoundE{end+1,1} =  B{i,1};
+                        BoundE{end,2} = ['boundLabel ' num2str(i)];
                 end
                 percent = (i-0.5)/nObjects;
 
@@ -1275,29 +1283,30 @@ classdef controllerAnalyze < handle
             end
             
             if ~isempty(Bound0)
-                visboundaries(axesh,Bound0,'Color','w','LineWidth',2);
+                htemp=visboundaries(axesh,{Bound0{:,1}},'Color','w','LineWidth',2);
+%                 set(htemp,'Tag',['boundLabel ' num2str(labelNo)])
             end
             if ~isempty(Bound1)
-                visboundaries(axesh,Bound1,'Color','b','LineWidth',2);
+                visboundaries(axesh,{Bound1{:,1}},'Color','b','LineWidth',2);
             end
             if ~isempty(Bound2)
-                visboundaries(axesh,Bound2,'Color','r','LineWidth',2);
+                visboundaries(axesh,{Bound2{:,1}},'Color','r','LineWidth',2);
             end
             
             if ~isempty(Bound2x)
-                visboundaries(axesh,Bound2x,'Color','r','LineWidth',2);
+                visboundaries(axesh,{Bound2x{:,1}},'Color','r','LineWidth',2);
             end
             if ~isempty(Bound2a)
-                visboundaries(axesh,Bound2a,'Color','y','LineWidth',2);
+                visboundaries(axesh,{Bound2a{:,1}},'Color','y','LineWidth',2);
             end
             if ~isempty(Bound2ax)
-                visboundaries(axesh,Bound2ax,'Color',[1 100/255 0],'LineWidth',2);
+                visboundaries(axesh,{Bound2ax{:,1}},'Color',[1 100/255 0],'LineWidth',2);
             end
             if ~isempty(Bound12h)
-                visboundaries(axesh,Bound12h,'Color','m','LineWidth',2);
+                visboundaries(axesh,{Bound12h{:,1}},'Color','m','LineWidth',2);
             end
             if ~isempty(BoundE)
-                visboundaries(axesh,BoundE,'Color','r','LineWidth',2);
+                visboundaries(axesh,{BoundE{:,1}},'Color','k','LineWidth',2);
             end
             hold off
             workbar(1,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);

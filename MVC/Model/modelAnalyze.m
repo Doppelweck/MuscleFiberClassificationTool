@@ -1968,56 +1968,10 @@ classdef modelAnalyze < handle
                 obj.controllerAnalyzeHandle.controllerResultsHandle.clearData();
                 
                 % Fiber Type has changed
-                
-                %get axes with RGB image
-                axesh = obj.handlePicRGB.Parent;
-                
-                %select boundarie color depending on the new fiber type
-                switch newFiberType
-                    case 'undefined'
-                        % Type 0
-                        Color = 'w';
-                    case 'Type 1'
-                        Color = 'b';
-                    case 'Type 2x'
-                        Color = 'r';
-                    case 'Type 2'
-                        Color = 'r';
-                    case 'Type 2a'
-                        Color = 'y';
-                    case 'Type 2ax'
-                        Color = [255/255 165/255 0]; %orange
-                    case 'Type 12h'
-                        % Type 3
-                        Color = 'm';
-                    otherwise
-                        % error
-                        Color = 'k';
-                end
-                
-                % change finer type
                 obj.Stats(labelNo).FiberType = newFiberType;
                 obj.Stats(labelNo).FiberTypeMainGroup = newFiberTypeMainGroup;
-                
-                % find old boundarie and delete them
-                htemp = findobj('Tag',['boundLabel ' num2str(labelNo)]);
-                
-                if strcmp(htemp.Type , 'line')
-                    %Boundaire is a line object
-                    plotline = true;
-                else
-                    %Boundaire is a hggroup object
-                    plotline = false;
-                end
-                delete(htemp);
-                
-                % plot new boundarie
-                if plotline
-                    htemp = line(axesh,obj.Stats(labelNo).Boundarie{1, 1}(:,2),obj.Stats(labelNo).Boundarie{1, 1}(:,1),'Color',Color,'LineWidth',2.5);
-                else
-                    htemp = visboundaries(axesh,obj.Stats(labelNo).Boundarie,'Color',Color,'LineWidth',2);
-                end
-                set(htemp,'Tag',['boundLabel ' num2str(labelNo)])
+                obj.controllerAnalyzeHandle.plotBoundaries()
+
                 obj.InfoMessage = ['   - Fiber-Type object No. ' num2str(labelNo) ' changed by user'];
             end
             
