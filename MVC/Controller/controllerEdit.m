@@ -30,6 +30,8 @@ classdef controllerEdit < handle
         viewEditHandle; %hande to viewEdit instance.
         modelEditHandle; %hande to modelEdit instance.
         controllerAnalyzeHandle; %hande to controllerAnalyze instance.
+        
+        winState;
     end
     
     methods
@@ -1093,9 +1095,10 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             obj.busyIndicator(1);
-            
+            obj.winState=get(obj.mainFigure,'WindowState');
             obj.modelEditHandle.InfoMessage = '   - Checking planes opened';
             PicData = obj.modelEditHandle.sendPicsToController();
+            
             obj.viewEditHandle.checkPlanes(PicData,obj.mainFigure);
             
             % set Callbacks of the cancel and Ok button color planes.
@@ -1324,6 +1327,9 @@ classdef controllerEdit < handle
             h = findobj('Tag','CheckPlanesFigure');
             obj.busyIndicator(0);
             delete(h);
+            if strcmp(obj.winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+            end
             
         end
         
