@@ -332,7 +332,7 @@ classdef viewResults < handle
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
             
-            appDesignChanger(mainCard,'light');
+            appDesignChanger(mainCard,getSettingsValue('Style'));
             set(mainCard,'Visible','on');
 
         end
