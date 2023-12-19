@@ -5,7 +5,7 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
-    addpath(genpath('NotifySounds'));
+%     addpath(genpath('NotifySounds'));
     %     javaaddpath(genpath('bioformats_package.jar'),'-end')
     
     cl;
