@@ -32,6 +32,7 @@ classdef controllerEdit < handle
         controllerAnalyzeHandle; %hande to controllerAnalyze instance.
         
         winState;
+        CheckMaskActive = false;
     end
     
     methods
@@ -303,6 +304,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 
+                 appDesignElementChanger(obj.mainFigure);
+                
                 format = obj.modelEditHandle.openNewFile();
                 obj.busyIndicator(1);
                 
@@ -361,6 +364,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                                
+                                 appDesignElementChanger(obj.mainFigure);
                                 % check wich morphOp buttons must be enabled
                                 obj.morphOpEvent();
                                 
@@ -421,6 +426,9 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
+                                
+                                 appDesignElementChanger(obj.mainFigure);
+                                
                                 obj.morphOpEvent();
                                 
                             case 'false'
@@ -460,8 +468,11 @@ classdef controllerEdit < handle
                                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                     % check wich morphOp buttons must be enabled
+                                    appDesignElementChanger(obj.mainFigure);
                                     obj.morphOpEvent();
                                 end
+                                
+                                 appDesignElementChanger(obj.mainFigure);
                                 
                                 obj.busyIndicator(0);
                                 
@@ -526,6 +537,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                                
+                                 appDesignElementChanger(obj.mainFigure);
                                 % check wich morphOp buttons must be enabled
                                 obj.morphOpEvent();
                                 
@@ -590,6 +603,8 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
+                                
+                                 appDesignElementChanger(obj.mainFigure);
                                 obj.morphOpEvent();
                                 
                             case 'false'
@@ -628,6 +643,8 @@ classdef controllerEdit < handle
                                     set(obj.viewEditHandle.B_AlphaActive,'Enable','on');
                                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                                    
+                                     appDesignElementChanger(obj.mainFigure);
                                     % check wich morphOp buttons must be enabled
                                     obj.morphOpEvent();
                                 end
@@ -675,7 +692,7 @@ classdef controllerEdit < handle
                             % check wich morphOp buttons must be enabled
                             obj.morphOpEvent();
                         end
-                        
+                         appDesignElementChanger(obj.mainFigure);
                         obj.busyIndicator(0);
                         
                     case 'notSupported'
@@ -733,13 +750,14 @@ classdef controllerEdit < handle
                         end
                         
                 end
-                
+                 appDesignElementChanger(obj.mainFigure);
                 obj.busyIndicator(0);
             catch
                 obj.busyIndicator(0);
                 obj.errorMessage(lasterror);
                  %disable GUI objects
                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
+                 appDesignElementChanger(obj.mainFigure);
             end
         end
         
@@ -1074,7 +1092,9 @@ classdef controllerEdit < handle
                     obj.morphOpEvent();
                 end
             end
+            
             set(obj.viewEditHandle.B_NewPic,'Enable','on');
+             appDesignElementChanger(obj.mainFigure);
 %             obj.busyIndicator(0); 
         end
         
@@ -1140,16 +1160,19 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            obj.busyIndicator(1);
+%             obj.busyIndicator(1);
             
-            if src.Value == 1
+            obj.CheckMaskActive = ~obj.CheckMaskActive;
+            
+            if obj.CheckMaskActive == 1
+                
                 obj.modelEditHandle.InfoMessage = '   - check mask';
                 set(obj.mainFigure,'ButtonDownFcn','');
                 set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn','');
                 
                 
                 
-                obj.modelEditHandle.checkMask(src.Value);
+                obj.modelEditHandle.checkMask(obj.CheckMaskActive);
                 obj.busyIndicator(0);
                 
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
@@ -1172,13 +1195,13 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
                 
-            elseif src.Value == 0
+            elseif obj.CheckMaskActive == 0
                 
                 obj.modelEditHandle.InfoMessage = '   - close check mask';
                 obj.addWindowCallbacks();
                 set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn',@obj.startDragEvent);
                 
-                obj.modelEditHandle.checkMask(src.Value);
+                obj.modelEditHandle.checkMask(obj.CheckMaskActive);
                 
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
@@ -1897,7 +1920,7 @@ classdef controllerEdit < handle
             %
             
             switch evnt.Source.Tag
-                case 'textAlpha' % Text Value has changed
+                case 'edit' % Text Value has changed
                 
                 Value = str2double( src.String );
                 
@@ -1962,7 +1985,7 @@ classdef controllerEdit < handle
                     
                 end
                 
-            case 'sliderAlpha'% slider Value has changed
+            case 'slider'% slider Value has changed
                 
                 %Copy the slider value into the text edit box in the GUI
                 set(obj.viewEditHandle.B_AlphaValue,'String',num2str(evnt.Source.Value));
@@ -1973,7 +1996,7 @@ classdef controllerEdit < handle
                 %Change alphamp (transparency) of binary image
                 obj.modelEditHandle.alphaMapEvent();
                 
-            case 'activeAlpha' % active Checkbox has changed
+            case 'checkbox' % active Checkbox has changed
                     obj.modelEditHandle.AlphaMapActive = evnt.Source.Value;
                     %Change alphamp (transparency) of binary image
                     obj.modelEditHandle.alphaMapEvent();
@@ -2039,7 +2062,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if strcmp(evnt.Source.Tag,'textLinewidth')
+            if strcmp(evnt.Source.Tag,'edit')
                 % Text Value has changed
                 
                 Value = get(obj.viewEditHandle.B_LineWidthValue,'String');
@@ -2067,7 +2090,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_LineWidthValue,'String','1');
                     obj.modelEditHandle.LineWidthValue = 1;
                 end
-            elseif strcmp(evnt.Source.Tag,'sliderLinewidth')
+            elseif strcmp(evnt.Source.Tag,'slider')
                 % slider Value has changed
                 
                 Value = round(evnt.Source.Value);
@@ -2077,7 +2100,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.LineWidthValue = Value;
             else
                 % Error Code
-                obj.modelEditHandle.InfoMessage = '! ERROR in alphaMapEvent() FUNCTION !';
+                obj.modelEditHandle.InfoMessage = '! ERROR in lineWidthEvent() FUNCTION !';
             end
             
         end
@@ -2695,6 +2718,7 @@ classdef controllerEdit < handle
                 set( obj.modelEditHandle.busyObj, 'Enable', 'on')
                 end
             end
+             appDesignElementChanger(obj.mainFigure);
         end
         
         function errorMessage(obj,ErrorInfo)
