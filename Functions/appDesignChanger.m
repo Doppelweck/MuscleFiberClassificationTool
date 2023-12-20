@@ -109,9 +109,11 @@ switch colorMode
         uicontainer_BackgroundColor = [1 1 1]; %Color
         
     case 'dark'
-        dark_grey_000 =[0 0 0]; %Black
-        dark_grey_100 =[38 38 38]/255;
-        dark_grey_200 =[50 49 48]/255;
+        textColor =[0 0 0]; %Black
+        dark_grey_100 =[30 30 30]/255;
+        dark_grey_200 =[70 70 70]/255;
+        
+        matlabBlue = [51,153,255]/255;
         
         dark_blue_000 =[5 65 112]/255; %DarkBlue
         dark_blue_100 =[3 85 148]/255;
@@ -121,7 +123,7 @@ switch colorMode
         
         %Buttons Style: pushbutton, togglebutton
         button_backGroundColor = [0.2 0.2 0.2];
-        button_textColor = textColor; %ForegroundColor
+        button_textColor = matlabBlue; %ForegroundColor
         
         %Text Style: text
         text_backGroundColor = dark_grey_100;
@@ -129,19 +131,19 @@ switch colorMode
         
         %Edit Style: edit
         edit_backGroundColor = dark_grey_200;
-        edit_textColor = textColor; %ForegroundColor
+        edit_textColor = matlabBlue; %ForegroundColor
         
         %Slider Style: slider
         slider_backGroundColor = dark_grey_200;
-        slider_textColor = textColor; %ForegroundColor
+        slider_textColor = matlabBlue; %ForegroundColor
         
         %CheckBox Style: checkbox
-        checkBox_backGroundColor = dark_grey_200;
+        checkBox_backGroundColor = dark_grey_100;
         checkBox_textColor = textColor; %ForegroundColor
         
         %popupmenu Style: popupmenu
         pupupmenu_backGroundColor = dark_grey_200;
-        pupupmenu_textColor = textColor; %ForegroundColor
+        pupupmenu_textColor = matlabBlue; %ForegroundColor
         
         %ListBox Style: listbox
         listbox_backGroundColor = dark_grey_100;
@@ -150,8 +152,8 @@ switch colorMode
         %Panel 'Type','uipanel'
         panel_backGroundColor = dark_grey_100;
         panel_textColor = [1 1 1]; %ForegroundColor
-        panel_BoarderColor = [0.7 0.7 0.70]; %HighlightColor
-        panel_ShadowColor = [0.5 0.5 0.5]; %ShadowColor
+        panel_BoarderColor = matlabBlue; %HighlightColor
+        panel_ShadowColor = matlabBlue; %ShadowColor
         panel_BoarderWidth = 2;
         panel_BoarderType = 'etchedin';
         
@@ -177,7 +179,9 @@ h = findobj(curFig,'Style','pushbutton','-or','Style','togglebutton');
 for i=1:1:length(h)
     try
         set(h(i),'BackgroundColor',button_backGroundColor);
-        set(h(i),'ForegroundColor',[1 0 0]);
+        set(h(i),'ForegroundColor',button_textColor);
+        set(h(i),'HighlightColor',dark_blue_200);
+        set(h(i),'ShadowColor',dark_blue_200);
     catch
     end
 end
@@ -301,8 +305,7 @@ for i=1:1:length(h)
     end
 end
 
-
-
+appDesignElementChanger(curFig);
 
 
 
