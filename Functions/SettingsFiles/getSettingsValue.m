@@ -1,7 +1,13 @@
 function value = getSettingsValue(searchString)
 
-data=load('AppSettings.mat');
+currentFile = mfilename( 'fullpath' );
+[pathstr,~,~] = fileparts( currentFile );
+addpath( fullfile( pathstr, 'AppSettings.mat' ) );
+data=load([pathstr '\AppSettings.mat']);
 
-idx=find(contains(data.AppSettings,searchString));
-value = data.AppSettings{idx,2};
+idx=find(contains(data.Settings,searchString));
+
+if(~isempty(idx))
+    value = data.Settings{idx,2};
+end
 end
