@@ -51,17 +51,16 @@ try
     busyIndicator.start;
     
     % create main figure
-    mainFig = figure('Units','normalized','outerposition',[0.005 0.0475 0.99 0.88],...
+    mainFig = figure('Units','normalized','outerposition',hf.Position,...
         'Name','Muscle-Fiber-Classification-Tool','DockControls','off',...
         'doublebuffer', 'off','Menubar','figure','ToolBar','none','Visible','on',...
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
-        'InvertHardcopy','off',...
-        'WindowState','maximized');
-    mainFigPos = get(mainFig,'Position');
-    set(mainFig,'Position',mainFigPos);
+        'InvertHardcopy','off');
+%     mainFigPos = get(mainFig,'Position');
+%     set(mainFig,'Position','maximized');
     
-    set(mainFig,'color','w');
+%     set(mainFig,'color','w');
     figure(hf);
     set(hf,'WindowStyle','modal');
     
@@ -95,6 +94,8 @@ try
     mainCard.Selection = 3;
     drawnow;pause(0.5);
     mainCard.Selection = 1;
+    drawnow;
+    appDesignChanger(mainCard,getSettingsValue('Style'));
     drawnow;
     
     InfoText.String='Loading please wait...   Initialize MODEL-Components...';
@@ -132,6 +133,8 @@ try
     % delete starting screen
     busyIndicator.stop;
     delete(hf);
+    set(mainFig,'Position',[0.01 0.05 0.98 0.85]);
+    set(mainFig,'WindowState','maximized');
     delete(InfoText);
     delete(VersionText);
     
