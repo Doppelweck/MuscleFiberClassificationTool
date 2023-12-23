@@ -265,7 +265,7 @@ classdef controllerEdit < handle
            
             mainTitel = ['Fiber types classification tool: ' obj.modelEditHandle.FileName];
             set(obj.mainFigure,'Name', mainTitel);
-            
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
 %             [r, c] = size(PicBW);
 %             colormap(gray);                              % Use a gray colormap
 % % % axis equal                                   % Make axes grid sizes equal
@@ -1837,7 +1837,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if strcmp(evnt.Source.Tag,'textThreshold')
+            if strcmp(evnt.Source.Tag,'editBinaryThresh')
                 % Text Value has changed
                 
                 Value = str2double( src.String );
@@ -1887,7 +1887,7 @@ classdef controllerEdit < handle
                     obj.modelEditHandle.createBinary();
                 end
                 
-            elseif strcmp(evnt.Source.Tag,'sliderThreshold')
+            elseif strcmp(evnt.Source.Tag,'sliderBinaryThresh')
                 % slider Value has changed
                 set(obj.viewEditHandle.B_ThresholdValue,'String',num2str(evnt.Source.Value));
                 
@@ -1920,7 +1920,7 @@ classdef controllerEdit < handle
             %
             
             switch evnt.Source.Tag
-                case 'edit' % Text Value has changed
+                case 'editAlpha' % Text Value has changed
                 
                 Value = str2double( src.String );
                 
@@ -1985,7 +1985,7 @@ classdef controllerEdit < handle
                     
                 end
                 
-            case 'slider'% slider Value has changed
+            case 'sliderAlpha'% slider Value has changed
                 
                 %Copy the slider value into the text edit box in the GUI
                 set(obj.viewEditHandle.B_AlphaValue,'String',num2str(evnt.Source.Value));
@@ -1996,7 +1996,7 @@ classdef controllerEdit < handle
                 %Change alphamp (transparency) of binary image
                 obj.modelEditHandle.alphaMapEvent();
                 
-            case 'checkbox' % active Checkbox has changed
+            case 'checkboxAlpha' % active Checkbox has changed
                     obj.modelEditHandle.AlphaMapActive = evnt.Source.Value;
                     %Change alphamp (transparency) of binary image
                     obj.modelEditHandle.alphaMapEvent();
@@ -2062,7 +2062,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if strcmp(evnt.Source.Tag,'edit')
+            if strcmp(evnt.Source.Tag,'editLineWidtht')
                 % Text Value has changed
                 
                 Value = get(obj.viewEditHandle.B_LineWidthValue,'String');
@@ -2090,7 +2090,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_LineWidthValue,'String','1');
                     obj.modelEditHandle.LineWidthValue = 1;
                 end
-            elseif strcmp(evnt.Source.Tag,'slider')
+            elseif strcmp(evnt.Source.Tag,'sliderLineWidtht')
                 % slider Value has changed
                 
                 Value = round(evnt.Source.Value);
@@ -2235,6 +2235,7 @@ classdef controllerEdit < handle
                     obj.viewEditHandle.B_MorphOP.Value = 1;
                     obj.modelEditHandle.morphOP = 'choose operation';
                     set(obj.viewEditHandle.B_MorphOP,'Enable','on')
+                    appDesignElementChanger(obj.mainCardPanel);
                     
             end
             
@@ -2255,6 +2256,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
+                appDesignElementChanger(obj.mainCardPanel);
                 
             elseif strcmp(tempMorpStr,'erode') || strcmp(tempMorpStr,'dilate') ||...
                     strcmp(tempMorpStr,'open') || strcmp(tempMorpStr,'close')
@@ -2267,6 +2269,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
+                appDesignElementChanger(obj.mainCardPanel);
                 
                 if ~strcmp(tempSEStr,'') && ~strcmp(tempSEStr,'choose SE')
                     % Morph options with choosen structuring element
@@ -2276,6 +2279,7 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_SizeSE,'Enable','on')
                     set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
+                    appDesignElementChanger(obj.mainCardPanel);
                     
                 end
             elseif   strcmp(tempMorpStr,'smoothing') || strcmp(tempMorpStr,'skel') ...
@@ -2286,6 +2290,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
+                appDesignElementChanger(obj.mainCardPanel);
             else
                 % Morph options that dont need a structuring element
                 
@@ -2295,7 +2300,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off')
                 set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
-                
+                appDesignElementChanger(obj.mainCardPanel);
             end
             
         end
@@ -2400,7 +2405,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
             end
-            
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function morphValuesEvent(obj,src,evnt)
