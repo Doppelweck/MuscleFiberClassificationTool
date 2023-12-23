@@ -139,7 +139,7 @@ switch colorMode
         
         %CheckBox Style: checkbox
         checkBox_backGroundColor = dark_grey_100;
-        checkBox_textColor = textColor; %ForegroundColor
+        checkBox_textColor = matlabBlue; %ForegroundColor
         
         %popupmenu Style: popupmenu
         pupupmenu_backGroundColor = dark_grey_200;
@@ -221,7 +221,7 @@ h = findobj(curFig,'Style','checkbox');
 for i=1:1:length(h)
     try
         set(h(i),'BackgroundColor',checkBox_backGroundColor);
-        set(h(i),'ForegroundColor',checkbox_textColor);
+        set(h(i),'ForegroundColor',checkBox_textColor);
     catch
     end
 end
@@ -274,24 +274,24 @@ end
 h = findobj(curFig,'Type','axes');
 for i=1:1:length(h)
     try
-        set(h(i),'XColor',axes_axisColor);
-        set(h(i),'YColor',axes_axisColor);
-        set(h(i),'ZColor',axes_axisColor);
+        set(h(i),'XColor',matlabBlue);
+        set(h(i),'YColor',matlabBlue);
+        set(h(i),'ZColor',matlabBlue);
         set(h(i),'GridColor', axes_gridColor);
         set(h(i),'MinorGridColor',axes_minorgrid_Color);
         set(h(i),'Color',axes_backGroundColor);
-        set(h(i),'AmbientLightColor',axes_AmbientLightColor);
+        set(h(i),'AmbientLightColor',matlabBlue);
     catch
     end
 end
 
-%Axes
-h = findobj(curFig,'Type','legend');
+
+
+%text
+h = findobj(curFig,'Type','text');
 for i=1:1:length(h)
     try
-        set(h(i),'TextColor',legend_textColor);
-        set(h(i),'Color',legend_BackGroundColor);
-        set(h(i),'EdgeColor',legend_edgeColor);
+        set(h(i),'Color',matlabBlue);
     catch
     end
 end

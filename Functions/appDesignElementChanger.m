@@ -118,6 +118,7 @@ switch colorMode
         dark_blue_200 =[3 157 239]/255; %Light Blue
         
         textColor = [1 1 1];
+        matlabBlue = [51,153,255]/255;
         
         %Buttons Style: pushbutton, togglebutton
         button_backGroundColor = [0.2 0.2 0.2];
@@ -129,19 +130,19 @@ switch colorMode
         
         %Edit Style: edit
         edit_backGroundColor = dark_grey_200;
-        edit_textColor = textColor; %ForegroundColor
+        edit_textColor = matlabBlue; %ForegroundColor
         
         %Slider Style: slider
         slider_backGroundColor = dark_grey_200;
-        slider_textColor = textColor; %ForegroundColor
+        slider_textColor = matlabBlue; %ForegroundColor
         
         %CheckBox Style: checkbox
         checkBox_backGroundColor = dark_grey_200;
-        checkBox_textColor = textColor; %ForegroundColor
+        checkBox_textColor = matlabBlue; %ForegroundColor
         
         %popupmenu Style: popupmenu
         pupupmenu_backGroundColor = dark_grey_200;
-        pupupmenu_textColor = textColor; %ForegroundColor
+        pupupmenu_textColor = matlabBlue; %ForegroundColor
         
         %ListBox Style: listbox
         listbox_backGroundColor = dark_grey_100;
@@ -172,48 +173,45 @@ switch colorMode
     otherwise
 end
 
-if(colorMode ~= 'default')
-    h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
-        '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','frame','Enable','off','ForegroundColor',text_backGroundColor);
-        catch
-        end
+h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
+    '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
+for i=1:1:length(h)
+    try
+        set(h(i),'Style','frame','Enable','off','ForegroundColor',text_backGroundColor);
+    catch
     end
-end   
-    h = findobj(curFig,'Style','frame','-and','Enable','on','-and','Tag','edit');
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','edit','Enable','on','ForegroundColor',edit_textColor);
-        catch
-        end
+end
+
+h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*edit.*'});
+for i=1:1:length(h)
+    try
+        set(h(i),'Style','edit','Enable','on','ForegroundColor',edit_textColor);
+    catch
     end
-    
-    h = findobj(curFig,'Style','frame','-and','Enable','on','-and','Tag','checkbox');
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','checkbox','Enable','on','ForegroundColor',checkbox_textColor);
-        catch
-        end
+end
+
+h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*checkbox.*'});
+for i=1:1:length(h)
+    try
+        set(h(i),'Style','checkbox','Enable','on','ForegroundColor',checkBox_textColor);
+    catch
     end
-    
-    h = findobj(curFig,'Style','frame','-and','Enable','on','-and','Tag','slider');
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','slider','Enable','on','ForegroundColor',slider_textColor);
-        catch
-        end
+end
+
+h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*slider.*'});
+for i=1:1:length(h)
+    try
+        set(h(i),'Style','slider','Enable','on','ForegroundColor',slider_textColor);
+    catch
     end
-    
-    h = findobj(curFig,'Style','frame','-and','Enable','on','-and','Tag','popupmenu');
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',pupupmenu_textColor);
-        catch
-        end
+end
+
+h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*popupmenu.*'});
+for i=1:1:length(h)
+    try
+        set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',pupupmenu_textColor);
+    catch
     end
-    
 end
 
 end
