@@ -2658,10 +2658,20 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
-            
-            InfoText = cat(1, get(obj.viewEditHandle.B_InfoText, 'String'), {obj.modelEditHandle.InfoMessage});
+            temp=get(obj.viewEditHandle.B_InfoText, 'String');
+            temp(end,:)=[];
+            if(isempty(temp))
+               temp =  cat(1, {" "},{" "});
+            else
+                temp(end,:)=[];
+            end
+            InfoText = cat(1, temp, {obj.modelEditHandle.InfoMessage}, {" "},{" "});
+%             jScrollPane = findjobj(obj.viewEditHandle.B_InfoText);
+% %             set(obj.viewEditHandle.B_InfoText, 'Enable', 'inactive');
             set(obj.viewEditHandle.B_InfoText, 'String', InfoText);
             set(obj.viewEditHandle.B_InfoText, 'Value' , length(obj.viewEditHandle.B_InfoText.String));
+%             set(jScrollPane,'VerticalScrollBarPolicy',21);
+%             set(obj.viewEditHandle.B_InfoText, 'Enable', 'on');
             drawnow;
             pause(0.05)
         end
