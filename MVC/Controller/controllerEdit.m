@@ -304,7 +304,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 
-                 appDesignElementChanger(obj.mainFigure);
+                appDesignElementChanger(obj.mainFigure);
                 
                 format = obj.modelEditHandle.openNewFile();
                 obj.busyIndicator(1);
