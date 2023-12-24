@@ -1223,14 +1223,12 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_Color,'Enable','on');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
-                
+                appDesignElementChanger(obj.mainFigure);
                 % check wich morphOp buttons must be enabled
                 obj.morphOpEvent();
                 obj.busyIndicator(0);
             end
-            
-            
-            
+            appDesignElementChanger(obj.mainFigure);  
         end
         
         function checkPlanesOKEvent(obj,~,~)
@@ -2664,13 +2662,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             temp=get(obj.viewEditHandle.B_InfoText, 'String');
-            temp(end,:)=[];
-            if(isempty(temp))
-               temp =  cat(1, {" "},{" "});
-            else
-                temp(end,:)=[];
-            end
-            InfoText = cat(1, temp, {obj.modelEditHandle.InfoMessage}, {" "},{" "});
+            InfoText = cat(1, temp, {obj.modelEditHandle.InfoMessage});
 %             jScrollPane = findjobj(obj.viewEditHandle.B_InfoText);
 % %             set(obj.viewEditHandle.B_InfoText, 'Enable', 'inactive');
             set(obj.viewEditHandle.B_InfoText, 'String', InfoText);

@@ -1677,11 +1677,12 @@ classdef modelEdit < handle
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 4 % Use automatic setup for binarization (Watershed I)
-                            obj.autoBinarizationWatershed_1();
+                            obj.PicBW = obj.autoBinarizationWatershed_1();
+                            obj.handlePicBW.CData = obj.PicBW;
                             
                         case 5 % Use automatic setup for binarization (Watershed II)
-                            obj.autoBinarizationWatershed_2();
-                            
+                            obj.PicBW = obj.autoBinarizationWatershed_2();
+                            obj.handlePicBW.CData = obj.PicBW;
                     end
                 else
                     % Binary pictur is invert
@@ -1707,10 +1708,12 @@ classdef modelEdit < handle
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 4 % Use automatic setup for binarization (Watershed I)
-                            obj.autoBinarizationWatershed_1();
-
+                            obj.PicBW = ~obj.autoBinarizationWatershed_1();
+                            obj.handlePicBW.CData = obj.PicBW;
+                            
                         case 5 % Use automatic setup for binarization (Watershed II)
-                            obj.autoBinarizationWatershed_2();
+                            obj.PicBW = ~obj.autoBinarizationWatershed_2();
+                            obj.handlePicBW.CData = obj.PicBW;
                     end
                     
                 end
@@ -2221,7 +2224,7 @@ classdef modelEdit < handle
             obj.addToBuffer();
         end
         
-        function autoBinarizationWatershed_1(obj)
+        function bicBWreturn = autoBinarizationWatershed_1(obj)
             obj.InfoMessage = '   - running Auto Watershed I Binarization';
             workbar(0,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
@@ -2233,8 +2236,7 @@ classdef modelEdit < handle
                     tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
             end
              
-            obj.PicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',0.9);
-            obj.PicBWisInvert = 'false';
+            tempPicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',0.9);
             
             %create Gradient Magnitude image
             workbar(0.2,'compute Gradient-Magnitude image','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
@@ -2296,14 +2298,12 @@ classdef modelEdit < handle
             se = strel('disk',1);
             f2 = imdilate(f2,se);
             obj.InfoMessage = '      - create binary mask';
-            obj.PicBW = obj.PicBW | f2;
-            obj.handlePicBW.CData = obj.PicBW | f2;
-            
+            bicBWreturn =  tempPicBW | f2;
             obj.InfoMessage = '   - Auto Watershed I Binarization completed';
             workbar(1,'perform watershed transformation','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
         end
         
-        function autoBinarizationWatershed_2(obj)
+        function bicBWreturn = autoBinarizationWatershed_2(obj)
             obj.InfoMessage = '   - running Auto Watershed II Binarization';
             workbar(0.1,'running Auto Watershed II Binarization','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
@@ -2391,8 +2391,7 @@ classdef modelEdit < handle
             %smoothing
             Mask = bwmorph(Mask,'majority',500);
             workbar(0.95,'create final mask','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
-            obj.PicBW = Mask;
-            obj.handlePicBW.CData = Mask;
+            bicBWreturn =  Mask;
             obj.InfoMessage = '   - Auto Watershed II Binarization completed';
             workbar(1,'finished','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
         end
