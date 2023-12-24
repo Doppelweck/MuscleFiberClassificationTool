@@ -5,13 +5,9 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
-%     addpath(genpath('NotifySounds'));
-    %     javaaddpath(genpath('bioformats_package.jar'),'-end')
     
     cl;
     pause(0.1);
-    
-    % if checkSystem()
     
     % create starting screen
     if ismac
@@ -57,10 +53,7 @@ try
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
         'InvertHardcopy','off');
-%     mainFigPos = get(mainFig,'Position');
-%     set(mainFig,'Position','maximized');
-    
-%     set(mainFig,'color','w');
+
     figure(hf);
     set(hf,'WindowStyle','modal');
     
