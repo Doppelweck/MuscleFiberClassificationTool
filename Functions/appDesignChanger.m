@@ -158,16 +158,16 @@ switch colorMode
         panel_BoarderType = 'etchedin';
         
         %Axes 'Type','axes'
-        axes_axisColor = textColor; %XColor YColor ZColor
-        axes_gridColor = [0.15 0.15 0.15]; %GridColor
-        axes_minorgrid_Color = [0.1 0.1 0.1]; %MinorGridColor
+        axes_axisColor = matlabBlue; %XColor YColor ZColor
+        axes_gridColor = dark_blue_000; %GridColor
+        axes_minorgrid_Color = dark_blue_100; %MinorGridColor
         axes_backGroundColor = [0 0 0]; %Color
         axes_AmbientLightColor = [1 1 1]; %AmbientLightColor
         
         %Legelnd 'Type','legend'
-        legend_textColor = [1 1 1]; %TextColor
-        legend_BackGroundColor = [1 1 1]; %Color
-        legend_edgeColor = [0.9 0.9 0.9]; %EdgeColor
+        legend_textColor = matlabBlue; %TextColor
+        legend_BackGroundColor = [0 0 0]; %Color
+        legend_edgeColor = matlabBlue; %EdgeColor
         
         %Container 'Type','uicontainer'
         uicontainer_BackgroundColor = dark_grey_100; %Color
@@ -187,7 +187,7 @@ for i=1:1:length(h)
 end
 
 %Buttons
-h = findobj(curFig,'Style','text');
+h = findobj(curFig,'Style','text','-and',{'-not', 'ForegroundColor', text_textColor,'-or','-not', 'BackgroundColor', text_backGroundColor,});
 for i=1:1:length(h)
     try
         set(h(i),'BackgroundColor',text_backGroundColor);
@@ -195,6 +195,14 @@ for i=1:1:length(h)
     catch
     end
 end
+h = findobj(curFig,'Style','text','-and', 'Tag', 'textFiberInfo','-and','-not', 'ForegroundColor', button_textColor);
+for i=1:1:length(h)
+    try
+        set(h(i),'ForegroundColor',button_textColor);
+    catch
+    end
+end
+
 
 %Edit
 h = findobj(curFig,'Style','edit');
@@ -225,16 +233,6 @@ for i=1:1:length(h)
     catch
     end
 end
-
-% %CheckBox
-% h = findobj(curFig,'Style','checkbox');
-% for i=1:1:length(h)
-%     try
-%         set(h(i),'BackgroundColor',checkbox_backGroundColor);
-%         set(h(i),'ForegroundColor',checkBox_textColor);
-%     catch
-%     end
-% end
 
 %popup
 h = findobj(curFig,'Style','popupmenu');
@@ -274,30 +272,40 @@ end
 h = findobj(curFig,'Type','axes');
 for i=1:1:length(h)
     try
-        set(h(i),'XColor',matlabBlue);
-        set(h(i),'YColor',matlabBlue);
-        set(h(i),'ZColor',matlabBlue);
+        set(h(i),'XColor',axes_axisColor);
+        set(h(i),'YColor',axes_axisColor);
+        set(h(i),'ZColor',axes_axisColor);
         set(h(i),'GridColor', axes_gridColor);
         set(h(i),'MinorGridColor',axes_minorgrid_Color);
         set(h(i),'Color',axes_backGroundColor);
-        set(h(i),'AmbientLightColor',matlabBlue);
+        set(h(i),'AmbientLightColor',axes_axisColor);
+        h(i).Title.Color    =  axes_axisColor;
     catch
     end
 end
-
 
 
 %text
-h = findobj(curFig,'Type','text');
+h = findobj(curFig,'Type','legend');
 for i=1:1:length(h)
     try
-        set(h(i),'Color',matlabBlue);
+        h(i).TextColor = legend_textColor;
+        h(i).EdgeColor = legend_edgeColor;
     catch
     end
 end
 
-%Axes
-h = findobj(curFig,'Type','uicontainer');
+h = findobj(curFig,'Type','legend');
+for i=1:1:length(h)
+    try
+        h(i).TextColor = legend_textColor;
+        h(i).EdgeColor = legend_edgeColor;
+    catch
+    end
+end
+
+
+h = findobj(curFig,'Type','uicontainer','-and','-not', 'BackgroundColor', uicontainer_BackgroundColor);
 for i=1:1:length(h)
     try
         set(h(i),'BackgroundColor',uicontainer_BackgroundColor);
@@ -306,44 +314,6 @@ for i=1:1:length(h)
 end
 
 appDesignElementChanger(curFig);
-
-
-
-% h = findobj(curFig,'-property','BackgroundColor','-and', ...
-%     '-not',{'Style','pushbutton','-or','Style','togglebutton'});
-% for i=1:1:length(h)
-%     try
-%         set(h(i),'BackgroundColor',backGroundColor);
-%     catch
-%     end
-% end
-% 
-% h = findobj(curFig,'Type','edit');
-% for i=1:1:length(h)
-%     try
-%         set(h(i),'BorderWidth',panelBoarderWidth);
-%         set(h(i),'BorderType',panelLineType);
-%         set(h(i),'HighlightColor',highlightColor);
-%         set(h(i),'ShadowColor',shadowColor);
-%         set(h(i),'ForegroundColor',textColor);
-%     catch
-%     end
-% end
-% 
-% h = findobj(curFig,'Style','popupmenu','-or','Style','popupmenu','-or','Style','text' ...
-%     ,'-or','Style','edit' ,'-or','Style','pushbutton','-or','Style','togglebutton');
-% for i=1:1:length(h)
-%     try
-% %         set(h(i),'BorderWidth',panelBoarderWidth);
-% %         set(h(i),'BorderType',panelLineType);
-% %         set(h(i),'HighlightColor',highlightColor);
-% %         set(h(i),'ShadowColor',shadowColor);
-%         set(h(i),'ForegroundColor',textColor);
-%         set(h(i),'BackgroundColor',backGroundColor);
-%     catch
-%         disp('Error');
-%     end
-% end
 
 end
 
