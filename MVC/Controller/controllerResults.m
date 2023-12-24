@@ -240,7 +240,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-            
+            appDesignElementChanger(obj.mainFigure);
             %show results data in the GUI
             obj.modelResultsHandle.startResultMode();
             
@@ -248,7 +248,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_Save,'Enable','on');
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
-            
+            appDesignElementChanger(obj.mainFigure);
             obj.busyIndicator(0);
             
             %Check if a resultsfolder for the file already exist
@@ -273,7 +273,7 @@ classdef controllerResults < handle
             catch
                 obj.errorMessage(lasterror);
             end
-            
+            appDesignElementChanger(obj.mainFigure);
         end
         
         function backAnalyzeModeEvent(obj,~,~)
@@ -337,7 +337,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-            
+            appDesignElementChanger(obj.mainFigure);
             %Save results
             obj.modelResultsHandle.saveResults();
             
@@ -357,6 +357,7 @@ classdef controllerResults < handle
             catch
                 obj.errorMessage(lasterror);
             end
+            appDesignElementChanger(obj.mainFigure);
         end
         
         function showInfoInTableGUI(obj)
@@ -1707,7 +1708,7 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
-                
+                appDesignElementChanger(obj.mainFigure);
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1745,6 +1746,7 @@ classdef controllerResults < handle
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
                 end
             end
+            appDesignElementChanger(obj.mainFigure);
         end
         
         function errorMessage(obj,ErrorInfo)

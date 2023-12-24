@@ -806,7 +806,7 @@ classdef controllerAnalyze < handle
                 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
             end
-            
+            appDesignElementChanger(obj.mainFigure);
         end
         
         function activeParaEvent(obj,src,evnt)
@@ -915,7 +915,7 @@ classdef controllerAnalyze < handle
                 otherwise
                     % Error Code
             end
-            
+            appDesignElementChanger(obj.mainFigure);
         end
         
         function startAnalyzeMode(obj,PicData,InfoText)
@@ -1098,6 +1098,8 @@ classdef controllerAnalyze < handle
             
             obj.modelAnalyzeHandle.InfoMessage = '-Set Parameters and press "Start analyzing"';
             obj.modelAnalyzeHandle.InfoMessage = ' ';
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+            drawnow;
             
         end
         
@@ -1452,16 +1454,17 @@ classdef controllerAnalyze < handle
             
             %show info in GUI fiber information panel.
             %Label Number
+            curretnStyleColor = obj.viewAnalyzeHandle.B_TextMeanGreen.ForegroundColor;
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
             %Area. Display text in red when out of range
             if obj.modelAnalyzeHandle.AreaActive && ~isempty(str2num(Info{2}))
                 if obj.modelAnalyzeHandle.MaxArea < str2num(Info{2})
                     obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[1 0 0];
                 else
-                    obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[0 0 0];
+                    obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=curretnStyleColor;
                 end
             else
-                obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[0 0 0];
+                obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=curretnStyleColor;
             end
             set(obj.viewAnalyzeHandle.B_TextArea,'String', Info{2} );
             
@@ -1471,10 +1474,10 @@ classdef controllerAnalyze < handle
                         obj.modelAnalyzeHandle.MaxAspectRatio < str2num(Info{3})
                     obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[1 0 0];
                 else
-                    obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[0 0 0];
+                    obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=curretnStyleColor;
                 end
             else
-                obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[0 0 0];
+                obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=curretnStyleColor;
             end
             set(obj.viewAnalyzeHandle.B_TextAspectRatio,'String', Info{3} );
             
@@ -1483,10 +1486,10 @@ classdef controllerAnalyze < handle
                 if obj.modelAnalyzeHandle.MinRoundness > str2num(Info{4})
                     obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[1 0 0];
                 else
-                    obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[0 0 0];
+                    obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=curretnStyleColor;
                 end
             else
-                obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[0 0 0];
+                obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=curretnStyleColor;
             end
             set(obj.viewAnalyzeHandle.B_TextRoundness,'String', Info{4} );
             
@@ -1502,10 +1505,10 @@ classdef controllerAnalyze < handle
                 if obj.modelAnalyzeHandle.ColorValue > str2num(Info{11})
                     obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[1 0 0];
                 else
-                    obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[0 0 0];
+                    obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=curretnStyleColor;
                 end
             else
-                obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[0 0 0];
+                obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=curretnStyleColor;
             end
             set(obj.viewAnalyzeHandle.B_TextColorValue,'String', Info{11} );
             
@@ -1610,10 +1613,10 @@ classdef controllerAnalyze < handle
                     set(obj.mainFigure, 'Units','normalized');
                     
                     % create figure to show informations at the cursor position
-                    winState=get(mainFig,'WindowState');
+                    winState=get(obj.mainFigure,'WindowState');
                     obj.viewAnalyzeHandle.showInfoToManipulate(PosOut,PosMainFig,PosCurrent,Info);
                     if strcmp(winState,'maximized')
-                        set(mainFig,'WindowState','maximized');
+                        set(obj.mainFigure,'WindowState','maximized');
                     end
                     
                     % refresh Callbacks on figure manupilate fiber info
@@ -2089,9 +2092,11 @@ classdef controllerAnalyze < handle
                 else
                     %Stats Struct is empty
                 end
+                
             catch
                 obj.errorMessage(lasterror);
             end
+            appDesignChanger(obj.viewAnalyzeHandle.hFPR,getSettingsValue('Style'));
         end
         
         function setInfoTextView(obj,InfoText)
@@ -2205,6 +2210,7 @@ classdef controllerAnalyze < handle
                     set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
                 end
             end
+            appDesignElementChanger(obj.mainFigure);
         end
         
         function errorMessage(obj,ErrorInfo)
