@@ -121,7 +121,7 @@ classdef viewResults < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
             HButtonBoxSave12 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePlots = uicontrol( 'Parent', HButtonBoxSave12,'Style','checkbox','Value',1,'Tag','SaveOverview');
+            obj.B_SavePlots = uicontrol( 'Parent', HButtonBoxSave12,'Style','checkbox','Value',1,'Tag','checkboxSaveOverview');
             
             set( HBoxSave1, 'Widths', [-10 -1] );
             
@@ -134,7 +134,7 @@ classdef viewResults < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
             HButtonBoxSave22 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveHisto = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','SaveHistogram');
+            obj.B_SaveHisto = uicontrol( 'Parent', HButtonBoxSave22,'Style','checkbox','Value',1,'Tag','checkboxSaveHistogram');
             
             set( HBoxSave2, 'Widths', [-10 -1] );
             
@@ -147,7 +147,7 @@ classdef viewResults < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
             HButtonBoxSave32 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePicProc = uicontrol( 'Parent', HButtonBoxSave32,'Style','checkbox','Value',1,'Tag','SavePicProcessed');
+            obj.B_SavePicProc = uicontrol( 'Parent', HButtonBoxSave32,'Style','checkbox','Value',1,'Tag','checkboxSavePicProcessed');
             
             set( HBoxSave3, 'Widths', [-10 -1] );
             
@@ -160,7 +160,7 @@ classdef viewResults < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
             HButtonBoxSave42 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SavePicGroups = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','SavePicGroups');
+            obj.B_SavePicGroups = uicontrol( 'Parent', HButtonBoxSave42,'Style','checkbox','Value',1,'Tag','checkboxSavePicGroups');
             
             set( HBoxSave4, 'Widths', [-10 -1] );
             
@@ -173,7 +173,7 @@ classdef viewResults < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
             HButtonBoxSave52 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveFiberTable = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','SaveFiberTable'); 
+            obj.B_SaveFiberTable = uicontrol( 'Parent', HButtonBoxSave52,'Style','checkbox','Value',1,'Tag','checkboxSaveFiberTable'); 
             
             set( HBoxSave5, 'Widths', [-10 -1] );
             
@@ -186,7 +186,7 @@ classdef viewResults < handle
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
             HButtonBoxSave62 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 1 );
-            obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','SaveScatterAll');
+            obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','checkboxSaveScatterAll');
             
             set( HBoxSave6, 'Widths', [-10 -1] );
 
