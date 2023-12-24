@@ -63,8 +63,11 @@ try
     % Add Menu for Design
     mDesign = uimenu(mainFig,'Text','App Design');
     mDesignitem1 = uimenu(mDesign,'Text','Dark');
+    mDesignitem1.MenuSelectedFcn = @changeAppDesign;
     mDesignitem2 = uimenu(mDesign,'Text','Light');
+    mDesignitem2.MenuSelectedFcn = @changeAppDesign;
     mDesignitem3 = uimenu(mDesign,'Text','Default');
+    mDesignitem3.MenuSelectedFcn = @changeAppDesign;
     
     % Add Menu for Settings
     mSettings = uimenu(mainFig,'Text','App Settings');
@@ -95,7 +98,7 @@ try
     set( findall(mainFig,'ToolTipString','Open File') ,'Visible','Off');
     
     %create card panel onbject
-    mainCard = uix.CardPanel('Parent', mainFig,'Selection',0);
+    mainCard = uix.CardPanel('Parent', mainFig,'Selection',0,'Tag','mainCard');
     InfoText.String='Loading please wait...   Initialize VIEW-Components...';
     %Init VIEW's
     viewEditHandle = viewEdit(mainCard);
@@ -194,4 +197,9 @@ catch
     
     
 end
+
+function changeAppDesign(src,event)
+    setSettingsValue('Style',lower(src.Text));
+        appDesignChanger(findobj(src.Parent.Parent,'Tag','mainCard'),getSettingsValue('Style'));
+    end
 % end
