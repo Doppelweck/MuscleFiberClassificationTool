@@ -53,6 +53,30 @@ try
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
         'InvertHardcopy','off');
+    
+    %%Remove unwanted Menu icons
+    editMenu = findall(mainFig, 'Tag', 'figMenuFile' ,'-or','Tag', 'figMenuEdit',...
+        '-or','Tag', 'figMenuView','-or','Tag', 'figMenuInsert','-or','Tag', 'figMenuDesktop',...
+        '-or','Tag', 'figMenuHelp');
+    delete(editMenu);
+    
+    % Add Menu for Design
+    mDesign = uimenu(mainFig,'Text','App Design');
+    mDesignitem1 = uimenu(mDesign,'Text','Dark');
+    mDesignitem2 = uimenu(mDesign,'Text','Light');
+    mDesignitem3 = uimenu(mDesign,'Text','Default');
+    
+    % Add Menu for Settings
+    mSettings = uimenu(mainFig,'Text','App Settings');
+    mSettingsitem1 = uimenu(mSettings,'Text','Load Default Settings');
+    mSettingsitem2 = uimenu(mSettings,'Text','Load Saved Settings');
+    mSettingsitem3 = uimenu(mSettings,'Text','Save Current Settings');
+
+    % Add Menu for Info
+    mInfo = uimenu(mainFig,'Text','Information');
+
+    
+    
 
     figure(hf);
     set(hf,'WindowStyle','modal');
