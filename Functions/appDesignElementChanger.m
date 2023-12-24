@@ -172,46 +172,83 @@ switch colorMode
         uicontainer_BackgroundColor = dark_grey_100; %Color
     otherwise
 end
-
-h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
-    '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
-for i=1:1:length(h)
-    try
-        set(h(i),'Style','frame','Enable','off','ForegroundColor',text_backGroundColor);
-    catch
+if(strcmp(colorMode,'dark'))
+    h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
+        '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','frame','Enable','off','ForegroundColor',text_backGroundColor);
+        catch
+        end
     end
-end
-
-h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*edit.*'});
-for i=1:1:length(h)
-    try
-        set(h(i),'Style','edit','Enable','on','ForegroundColor',edit_textColor);
-    catch
+    
+    h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*edit.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','edit','Enable','on','ForegroundColor',edit_textColor);
+        catch
+        end
     end
-end
-
-h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*checkbox.*'});
-for i=1:1:length(h)
-    try
-        set(h(i),'Style','checkbox','Enable','on','ForegroundColor',checkBox_textColor);
-    catch
+    
+    h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*checkbox.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','checkbox','Enable','on','ForegroundColor',checkBox_textColor);
+        catch
+        end
     end
-end
-
-h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*slider.*'});
-for i=1:1:length(h)
-    try
-        set(h(i),'Style','slider','Enable','on','ForegroundColor',slider_textColor);
-    catch
+    
+    h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*slider.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','slider','Enable','on','ForegroundColor',slider_textColor);
+        catch
+        end
     end
-end
-
-h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*popupmenu.*'});
-for i=1:1:length(h)
-    try
-        set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',pupupmenu_textColor);
-    catch
+    
+    h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*popupmenu.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',pupupmenu_textColor);
+        catch
+        end
     end
+    
+else
+    %If Stzle is not dark, then frame objects are not needed. Transfer alle
+    %Frame Objects back to normal uicontrols
+    h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*edit.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','edit','ForegroundColor',edit_textColor);
+        catch
+        end
+    end
+    
+    h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*checkbox.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','checkbox','ForegroundColor',checkBox_textColor,'BackgroundColor',checkBox_backGroundColor);
+        catch
+        end
+    end
+    
+    h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*slider.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','slider','ForegroundColor',slider_textColor,'BackgroundColor',slider_backGroundColor);
+        catch
+        end
+    end
+    
+    h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*popupmenu.*'});
+    for i=1:1:length(h)
+        try
+            set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',pupupmenu_textColor,'BackgroundColor',pupupmenu_backGroundColor);
+        catch
+        end
+    end
+    
 end
-
+    
 end
