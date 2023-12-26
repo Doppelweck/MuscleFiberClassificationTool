@@ -1066,7 +1066,7 @@ classdef controllerAnalyze < handle
             end
             
             
-            
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
             
@@ -1096,10 +1096,13 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_YScale, 'String', oldScaleY );
             end
             
+            
             obj.modelAnalyzeHandle.InfoMessage = '-Set Parameters and press "Start analyzing"';
             obj.modelAnalyzeHandle.InfoMessage = ' ';
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+%             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             drawnow;
+            
+            
             
         end
         
@@ -2089,14 +2092,14 @@ classdef controllerAnalyze < handle
                             end
                             legend(LegendString,'Location','Best')
                     end
-                else
-                    %Stats Struct is empty
+                else % if ~isempty(obj.modelAnalyzeHandle.Stats)
+                    obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
+                    obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
                 end
                 
             catch
                 obj.errorMessage(lasterror);
             end
-            appDesignChanger(obj.viewAnalyzeHandle.hFPR,getSettingsValue('Style'));
         end
         
         function setInfoTextView(obj,InfoText)
