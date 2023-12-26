@@ -54,6 +54,7 @@ classdef viewResults < handle
         B_SaveHisto; %Checkbox, select if Histogram plots should be saved.
         B_SavePicProc; %Checkbox, select if processed image with Farred should be saved.
         B_SavePicGroups; %Checkbox, select if processed image without Farred image should be saved.
+        B_SaveBinaryMask; %Checkbox, select if Binary Mask should be saved.
         B_SaveOpenDir %Button, opens the save directory.
         
         B_TableStatistic; %Table, that shows all statistic data.
@@ -78,7 +79,7 @@ classdef viewResults < handle
                 fontSizeM = 12; % Font size medium
                 fontSizeB = 16; % Font size big 
             end
-            mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
+%             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
             mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2 );
             
@@ -96,7 +97,7 @@ classdef viewResults < handle
             PanelSave = uix.Panel('Parent',PanelVBox,'Title','Save options','FontSize',fontSizeB,'Padding',2);
             PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',0);
             
-            set( PanelVBox, 'Heights', [-13 -30 -57], 'Spacing', 2 );
+            set( PanelVBox, 'Heights', [-13 -35 -52], 'Spacing', 2 );
             
             %%%%%%%%%%%%%%%%%% Panel control %%%%%%%%%%%%%%%%%%%%%%%%
             mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0 );
@@ -113,10 +114,10 @@ classdef viewResults < handle
             mainVBBoxSave = uix.VBox('Parent', PanelSave,'Spacing',0,'Padding', 5 );
             
             %%%%%%%%%%%%%%%% 1. Row Save Overview plots 
-            HBoxSave1 = uix.HBox('Parent', mainVBBoxSave);
+            HBoxSave1 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2);
             
-            HButtonBoxSave11 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave11,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Overview plots as .pdf: ' );
+            HButtonBoxSave11 = uix.HButtonBox('Parent', HBoxSave1,'ButtonSize',[6000 20],'Padding', 2);
+            tempH = uicontrol( 'Parent', HButtonBoxSave11,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Overview plots as .pdf: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -129,7 +130,7 @@ classdef viewResults < handle
             HBoxSave2 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave21 = uix.HButtonBox('Parent', HBoxSave2,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Histogram plots as .pdf: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave21,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Histogram plots as .pdf: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -142,7 +143,7 @@ classdef viewResults < handle
             HBoxSave3 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave31 = uix.HButtonBox('Parent', HBoxSave3,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave31,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Processed Image as .pdf: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave31,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Processed Image as .pdf: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -155,7 +156,7 @@ classdef viewResults < handle
             HBoxSave4 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave41 = uix.HButtonBox('Parent', HBoxSave4,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Fiber-Grouping Image as .pdf: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave41,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Fiber-Grouping Image as .pdf: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -168,7 +169,7 @@ classdef viewResults < handle
             HBoxSave5 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave51 = uix.HButtonBox('Parent', HBoxSave5,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Fiber-Table as Excel spreadsheet: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave51,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Fiber-Table as Excel spreadsheet: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -181,7 +182,7 @@ classdef viewResults < handle
             HBoxSave6 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave61 = uix.HButtonBox('Parent', HBoxSave6,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', '  Save Scatterplot all Fibers as .pdf: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave61,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Scatterplot all Fibers as .pdf: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -189,15 +190,28 @@ classdef viewResults < handle
             obj.B_SaveScatterAll = uicontrol( 'Parent', HButtonBoxSave62,'Style','checkbox','Value',1,'Tag','checkboxSaveScatterAll');
             
             set( HBoxSave6, 'Widths', [-10 -1] );
-
-            %%%%%%%%%%%%%%%% 7. Row Save dir
+            
+            %%%%%%%%%%%%%%%% 7. Row Save Binary Mask
             HBoxSave7 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
-            HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[600 30],'Padding', 2 );
-            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave71,'FontUnits','normalized','Fontsize',0.5, 'String', 'Open results folder' );
+            HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[6000 20],'Padding', 2 );
+            tempH = uicontrol( 'Parent', HButtonBoxSave71,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Binary Mask as .pdf: ' );
+            jh = findjobj_fast(tempH);
+            jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
+            
+            HButtonBoxSave72 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[6000 20],'Padding', 2 );
+            obj.B_SaveBinaryMask = uicontrol( 'Parent', HButtonBoxSave72,'Style','checkbox','Value',1,'Tag','checkboxSaveBinaryMask');
+            
+            set( HBoxSave7, 'Widths', [-10 -1] );
+
+            %%%%%%%%%%%%%%%% 7. Row Save dir
+            HBoxSave8 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
+            
+            HButtonBoxSave81 = uix.HButtonBox('Parent', HBoxSave8,'ButtonSize',[600 30],'Padding', 2 );
+            obj.B_SaveOpenDir = uicontrol( 'Parent', HButtonBoxSave81,'FontUnits','normalized','Fontsize',0.5, 'String', 'Open results folder' );
             
             %%%%%%%%
-            set( mainVBBoxSave, 'Heights', [-1 -1 -1 -1 -1 -1 -2] );
+            set( mainVBBoxSave, 'Heights', [-1 -1 -1 -1 -1 -1 -1 -1.5] );
             
             %%%%%%%%%%%%%%%%%%% Pnael Info Text Log %%%%%%%%%%%%%%%%%%%%%%%
             hBoxSize=uix.HButtonBox('Parent', PanelInfo,'ButtonSize',[3000 3000]);

@@ -162,7 +162,7 @@ classdef controllerResults < handle
             %               Data{20}: FarredRedThreshActive
             %               Data{21}: FarredRedThresh
             %               Data{22}: FarredRedDistFarred
-            %               Data{23}: oFarredRedDistRed
+            %               Data{23}: FarredRedDistRed
             %               Data{24}: ColorValueActive
             %               Data{25}: ColorValue
             %               Data{26}: XScale in ?m/pixel
@@ -170,6 +170,7 @@ classdef controllerResults < handle
             %               Data{28}: min Points per Cluster
             %               Data{29}: 1/2 Hybrid Fibers allowed
             %               Data{30}: 2ax Hybrid Fibers allowed
+            %               Data{31}: Binary Mask image
             %           InfoText:   Info text log.
             %
             
@@ -216,7 +217,9 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle.Hybrid12FiberActive = Data{29};
             obj.modelResultsHandle.Hybrid2axFiberActive = Data{30};
-
+            
+            obj.modelResultsHandle.PicBW = Data{31};
+            
             set(obj.viewResultsHandle.B_InfoText, 'String', InfoText);
             set(obj.viewResultsHandle.B_InfoText, 'Value' , length(obj.viewResultsHandle.B_InfoText.String));
             
@@ -326,12 +329,14 @@ classdef controllerResults < handle
             obj.modelResultsHandle.SaveHisto = obj.viewResultsHandle.B_SaveHisto.Value;
             obj.modelResultsHandle.SavePicProcessed = obj.viewResultsHandle.B_SavePicProc.Value;
             obj.modelResultsHandle.SavePicGroups = obj.viewResultsHandle.B_SavePicGroups.Value;
+            obj.modelResultsHandle.SaveBinaryMask = obj.viewResultsHandle.B_SaveBinaryMask.Value;
             
             obj.busyIndicator(1);
             if ( obj.modelResultsHandle.SaveFiberTable || ...
                  obj.modelResultsHandle.SaveScatterAll || ...
                  obj.modelResultsHandle.SavePlots || ...
                  obj.modelResultsHandle.SavePicProcessed || ...
+                 obj.modelResultsHandle.SaveBinaryMask || ...
                  obj.modelResultsHandle.SavePicGroups)
                     
                 

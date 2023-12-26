@@ -41,6 +41,7 @@ classdef modelResults < handle
         PicPRGBFRPlanes; %RGB image create from color plane images red green blue and farred.
         PicPRGBPlanes; %RGB image create from color plane images red green and blue.
         
+        SaveBinaryMask; %Indicates whether the Binary Mask should be saved.
         SaveFiberTable; %Indicates whether the fiber type table should be saved.
         SaveScatterAll; %Indicates whether the scatter plot with for all fibers should be saved.
         SavePlots; %Indicates whether the statistics plots should be saved.
@@ -51,6 +52,7 @@ classdef modelResults < handle
         ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
         LabelMat; %Label array of all fiber objects.
+        PicBW; %Binary Mask
         
         %Analyze parameters
         AnalyzeMode; %Indicates the selected analyze mode.
@@ -1260,19 +1262,18 @@ classdef modelResults < handle
                 picName ='';
                 
             end
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save image with fiber type groups
-            workbar(0.3,'saving Image with fiber type groups','Saving Results',obj.controllerResultsHandle.mainFigure);
-            if obj.SavePicGroups
-                obj.InfoMessage = '      - saving image with fiber groups...';
+             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % save image processed
+            workbar(0.1,'saving Image processed','Saving Results',obj.controllerResultsHandle.mainFigure);
+            if obj.SavePicProcessed
+                obj.InfoMessage = '      - saving image processed...';
                 
                 try
-                    % save picture as vector graphics
                     picName ='';
-                    picName = [fileName '_image_groups' time '.pdf'];
+                    % save picture as vector graphics
+                    picName = [fileName '_image_processed' time '.pdf'];
                     fullFileName = fullfile(SaveDir,picName);
-                    saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,fullFileName);
+                    saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fullFileName);
                     obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
                 catch
                     warning('Problem while saving Image as .pdf. Image could not be saved.');
@@ -1280,8 +1281,8 @@ classdef modelResults < handle
                     
                     % save picture as tif file
                     f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
-                    h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,f);
-                    SizeFig = size(obj.PicPRGBPlanes)/max(size(obj.PicPRGBPlanes));
+                    h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,f);
+                    SizeFig = size(obj.PicPRGBFRPlanes)/max(size(obj.PicPRGBFRPlanes));
                     set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
                     set(h,'Units','normalized');
                     h.Position = [0 0 1 1];
@@ -1290,7 +1291,7 @@ classdef modelResults < handle
                     picName ='';
                     frame = getframe(f);
                     frame=frame.cdata;
-                    picName = [fileName '_image_groups' time '.tif'];
+                    picName = [fileName '_image_processed' time '.tif'];
                     oldPath = pwd;
                     cd(SaveDir)
                     imwrite(frame,picName)
@@ -1300,7 +1301,28 @@ classdef modelResults < handle
                     obj.InfoMessage = '         - image has been saved as .tif';
                 end
                 picName ='';
-                
+            end
+            
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % save Binary Mask
+            workbar(0.3,'saving Image with Binary Mask','Saving Results',obj.controllerResultsHandle.mainFigure);
+            if obj.SaveBinaryMask
+                obj.InfoMessage = '      - saving Binary Mask...';
+                try
+                    picName ='';
+                    
+                    picName = [fileName '_image_Binary' time '.tif'];
+                    oldPath = pwd;
+                    cd(SaveDir)
+                    imwrite(obj.PicBW,picName)
+                    cd(oldPath)
+                    
+                    obj.InfoMessage = '         - image has been saved as .tif';
+                catch
+                    warning('Problem while saving Binary Mask');
+                    obj.InfoMessage = 'ERROR: Problem while saving Binary Mask';
+                end
+                picName ='';
             end
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
