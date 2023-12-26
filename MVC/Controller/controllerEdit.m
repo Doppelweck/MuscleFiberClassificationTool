@@ -265,20 +265,7 @@ classdef controllerEdit < handle
            
             mainTitel = ['Fiber types classification tool: ' obj.modelEditHandle.FileName];
             set(obj.mainFigure,'Name', mainTitel);
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
-%             [r, c] = size(PicBW);
-%             colormap(gray);                              % Use a gray colormap
-% % % axis equal                                   % Make axes grid sizes equal
-% % figure
-% % [r, c] = size(ones(1000,1000));
-% %             colormap(gray);   
-% % him = imagesc(255*ones(1000,1000));
-% % him.Tag = 'him';
-% % axis equal 
-% % set(gca, 'XTick', 0.5:(c+0.5), 'YTick', 0.5:(r+0.5), ...  % Change some axes properties
-% %          'XLim', [0.5 c+0.5], 'YLim', [0.5 r+0.5], ...
-% %          'GridLineStyle', '-', 'XGrid', 'on', 'YGrid', 'on');
-%             
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));            
         end
         
         function newFileEvent(obj,~,~)
