@@ -79,7 +79,7 @@ classdef viewResults < handle
                 fontSizeM = 12; % Font size medium
                 fontSizeB = 16; % Font size big 
             end
-            mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
+%             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
             mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2 );
             
