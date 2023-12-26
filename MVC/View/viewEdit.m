@@ -140,7 +140,7 @@ classdef viewEdit < handle
 %             set(obj.hAP, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)])
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
-            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 0,'Padding',2);
+            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 2,'Padding',2);
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelAlpha = uix.Panel('Parent',PanelVBox,'Title','Image Overlay','FontSize',fontSizeB,'Padding',2);
@@ -148,11 +148,11 @@ classdef viewEdit < handle
             PanelMorphOp = uix.Panel('Parent',PanelVBox,'Title','Morphological operations','FontSize',fontSizeB,'Padding',2);
             PanelInfo = uix.Panel('Parent',PanelVBox,'Units','normalized','Title','Info:','FontSize',fontSizeB,'Padding',0);
             
-            set( PanelVBox, 'Heights', [-4.5 -2.5 -5 -5.5 -6], 'Spacing', 5 );
+            set( PanelVBox, 'Heights', [-18 -10 -22 -23 -27], 'Spacing', 2 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',2);
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0);
             
             HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
@@ -383,7 +383,7 @@ classdef viewEdit < handle
             movegui(obj.hFCP,'center')
             set(obj.hFCP,'WindowStyle','modal');
             
-            tabPanel = uix.TabPanel( 'Parent', obj.hFCP, 'FontSize',fontSizeB,'Padding',5,'TabWidth',300);
+            tabPanel = uix.TabPanel( 'Parent', obj.hFCP, 'FontSize',fontSizeB,'Padding',5,'TabWidth',300, 'Tag', 'checkPlanesTabPanel');
             
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -448,7 +448,7 @@ classdef viewEdit < handle
             HBox = uix.HBox('Parent',MainVBoxColorPlane,'Spacing', 5,'Padding',5);
             
             HButtonBox1ColorPlane = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
-            obj.B_CheckPText = uicontrol( 'Parent', HButtonBox1ColorPlane,'Style','text', 'String', 'Confirm the changes with OK.','FontSize',fontSizeB);
+            obj.B_CheckPText = uicontrol( 'Parent', HButtonBox1ColorPlane,'Style','text', 'String', 'Confirm changes with OK.','FontSize',fontSizeB);
             
             HButtonBox2ColorPlane = uix.HButtonBox('Parent',HBox,'Spacing', 5,'Padding',5,'ButtonSize',[600 600]);
             obj.B_CheckPBack = uicontrol( 'Parent', HButtonBox2ColorPlane,'String', 'Back to Edit-Mode','FontSize',fontSizeB);

@@ -132,25 +132,25 @@ classdef viewAnalyze < handle
             axis image
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
-            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 0,'Padding',2);
+            PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 2,'Padding',2);
             
             PanelControl = uix.Panel('Parent',PanelVBox,'Title','Main controls','FontSize',fontSizeB,'Padding',2);
             PanelPara = uix.Panel('Parent',PanelVBox,'Title','Parameter','FontSize',fontSizeB,'Padding',2);
             obj.PanelFiberInformation = uix.Panel('Parent',PanelVBox,'Title','Fiber informations','FontSize',fontSizeB,'Padding',2);
-            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',2);
+            PanelInfo = uix.Panel('Parent',PanelVBox,'Title','Info:','FontSize',fontSizeB,'Padding',0);
             
             
-            set( PanelVBox, 'Heights', [-3.1 -7 -9.9 -4], 'Spacing', 5 );
+            set( PanelVBox, 'Heights', [-13 -30 -41 -16], 'Spacing', 2 );
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%
-            VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 3 ,'Padding',5);
+            VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0);
             
-            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 3 );
+            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 2 );
             obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('\x25C4 Segmentation'),'FontUnits','normalized','Fontsize',0.4 ,'Tag','pushbuttonBackEdit');
             obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('Results \x25BA'),'FontUnits','normalized','Fontsize',0.4 ,'Tag','pushbuttonStartResults');
             
-            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 3 );
+            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 2 );
             obj.B_StartAnalyze = uicontrol( 'Parent', HBBoxControl2, 'String', sprintf('\x21DB Start analyzing'),'FontUnits','normalized','Fontsize',0.4,'Tag','pushbuttonAnalyze' );
             obj.B_PreResults = uicontrol( 'Parent', HBBoxControl2, 'String', sprintf('Preview results \x2750'),'FontUnits','normalized','Fontsize',0.4 ,'Tag','pushbuttonPreResults');
             
@@ -164,7 +164,7 @@ classdef viewAnalyze < handle
 %             HButtonBoxPara11 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
 %             uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', ' Analyze Mode :' );
             
-            HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
+            HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 2 );
             String= {sprintf('Color-Ratio-Based triple labeling') ; sprintf('Color-Ratio-Based quad labeling');...
             'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'; 'Collagen / Dystrophin'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Value',2,'Tag','popupmenuAnalyzeMode');
@@ -754,7 +754,7 @@ classdef viewAnalyze < handle
             set(obj.hFPR, 'position', [posMainFig(1) posMainFig(2) 0.8 0.8]);
             movegui(obj.hFPR,'center')
             
-            set(obj.hFPR,'WindowStyle','normal');
+            set(obj.hFPR,'WindowStyle','modal');
             
             AxesBox = uix.HBox('Parent', obj.hFPR,'Padding', 25,'Spacing', 10);
             obj.hAPRBR = axes('Parent',uicontainer('Parent', AxesBox), 'FontUnits','normalized','Fontsize',0.015,'Tag','AxesManualClassify');
