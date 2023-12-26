@@ -114,81 +114,78 @@ end
 if(strcmp(colorMode,'dark'))
     h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
         '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','frame','Enable','off','ForegroundColor',black);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','frame','Enable','off','ForegroundColor',black);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
     
     h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*edit.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','edit','Enable','on','ForegroundColor',textHighlightColor);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','edit','Enable','on','ForegroundColor',textHighlightColor);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
+    
     
     h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*checkbox.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','checkbox','Enable','on','ForegroundColor',textHighlightColor);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','checkbox','Enable','on','ForegroundColor',textHighlightColor);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
+    
     
     h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*slider.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','slider','Enable','on','ForegroundColor',textHighlightColor);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','slider','Enable','on','ForegroundColor',textHighlightColor);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
     
+    
     h = findobj(curFig,'Style','frame','-and','Enable','on','-and',{'-regexp', 'Tag', '.*popupmenu.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',textHighlightColor);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','popupmenu','Enable','on','ForegroundColor',textHighlightColor);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
+    
     
 else
     %If Stzle is not dark, then frame objects are not needed. Transfer alle
     %Frame Objects back to normal uicontrols
     h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*edit.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','edit','ForegroundColor',textHighlightColor);
-            set(h(i),'Style','edit','BackgroundColor',objectBackground);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','edit','ForegroundColor',textHighlightColor);
+        set(h(1:length(h)),'Style','edit','BackgroundColor',objectBackground);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
+    
     
     h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*checkbox.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','checkbox','ForegroundColor',textHighlightColor,'BackgroundColor',mainBackground);
-        catch
-        end
+    
+    try
+        set(h(1:length(h)),'Style','checkbox','ForegroundColor',textHighlightColor,'BackgroundColor',mainBackground);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
+    
     
     h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*slider.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','slider','ForegroundColor',textHighlightColor,'BackgroundColor',objectBackground);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','slider','ForegroundColor',textHighlightColor,'BackgroundColor',objectBackground);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
+    
     
     h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*popupmenu.*'});
-    for i=1:1:length(h)
-        try
-            set(h(i),'Style','popupmenu','Enable','on','ForegroundColor',textHighlightColor,'BackgroundColor',objectBackground);
-        catch
-        end
+    try
+        set(h(1:length(h)),'Style','popupmenu','Enable','on','ForegroundColor',textHighlightColor,'BackgroundColor',objectBackground);
+    catch
+        disp('Error: AppDesignElementChanger')
     end
-    
-end
     
 end

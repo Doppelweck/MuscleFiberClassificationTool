@@ -41,6 +41,8 @@ switch colorMode
         
         legendBackGroundColor = white; %Color
         
+        tableBackgroundColor = [white;matlabGrey];
+        
         boarderType = 'etchedin';
         boarderWidth = 1;
         
@@ -66,6 +68,8 @@ switch colorMode
         boarderType = 'line';
         boarderWidth = 2;
         
+        tableBackgroundColor = [white;matlabGrey];
+        
     case 'dark'
         mainBackground = dark_grey_200;
         objectBackground = dark_grey_100;
@@ -84,6 +88,8 @@ switch colorMode
         edgeColor = matlabEdge; %EdgeColor
         
         legendBackGroundColor = black; %Color
+        
+        tableBackgroundColor = [black;dark_grey_100];
         
         boarderType = 'line';
         boarderWidth = 2;
@@ -107,139 +113,185 @@ switch colorMode
         
         legendBackGroundColor = white; %Color
         
+        tableBackgroundColor = [white;matlabGrey];
+        
         boarderType = 'etchedin';
         boarderWidth = 1;
 end
 
 %Buttons
 h = findobj(curFig,'Style','pushbutton','-or','Style','togglebutton');
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',objectBackground);
-        set(h(i),'ForegroundColor',textHighlightColor);
-        set(h(i),'HighlightColor',dark_blue_200);
-        set(h(i),'ShadowColor',dark_blue_200);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',objectBackground);
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+    set(h(1:length(h)),'HighlightColor',dark_blue_200);
+    set(h(1:length(h)),'ShadowColor',dark_blue_200);
+catch
+     disp('Error: AppDesignChanger')
 end
 
 %Buttons
 h = findobj(curFig,'Style','text','-and',{'-not', 'ForegroundColor', textColor,'-or','-not', 'BackgroundColor', mainBackground,});
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',mainBackground);
-        set(h(i),'ForegroundColor',textColor);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',mainBackground);
+    set(h(1:length(h)),'ForegroundColor',textColor);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 h = findobj(curFig,'Style','text','-and', 'Tag', 'textFiberInfo','-and','-not', 'ForegroundColor', textHighlightColor);
-for i=1:1:length(h)
-    try
-        set(h(i),'ForegroundColor',textHighlightColor);
-    catch
-    end
+try
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 
 
 %Edit
 h = findobj(curFig,'Style','edit');
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',objectBackground);
-        set(h(i),'ForegroundColor',textHighlightColor);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',objectBackground);
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 
 %Slider
 h = findobj(curFig,'Style','slider');
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',objectBackground);
-        set(h(i),'ForegroundColor',textHighlightColor);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',objectBackground);
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 
 %CheckBox
 h = findobj(curFig,'Style','checkbox');
 for i=1:1:length(h)
     try
-        set(h(i),'BackgroundColor',mainBackground);
-        set(h(i),'ForegroundColor',textHighlightColor);
+        set(h(1:length(h)),'BackgroundColor',mainBackground);
+        set(h(1:length(h)),'ForegroundColor',textHighlightColor);
     catch
+         disp('Error: AppDesignChanger')
     end
 end
 
 %popup
 h = findobj(curFig,'Style','popupmenu');
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',objectBackground);
-        set(h(i),'ForegroundColor',textHighlightColor);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',objectBackground);
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 
 %ListBox
 h = findobj(curFig,'Style','listbox');
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',objectBackground);
-        set(h(i),'ForegroundColor',textColor);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',objectBackground);
+    set(h(1:length(h)),'ForegroundColor',textColor);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 
 %Panel
 h = findobj(curFig,'Type','uipanel');
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',mainBackground);
-        set(h(i),'ForegroundColor', textColor);
-        set(h(i),'HighlightColor',boarderColor);
-        set(h(i),'ShadowColor',shadowColor);
-        set(h(i),'BoarderWidth',boarderWidth);
-        set(h(i),'BoarderType',boarderType);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',mainBackground);
+    set(h(1:length(h)),'ForegroundColor', textColor);
+    set(h(1:length(h)),'HighlightColor',boarderColor);
+    set(h(1:length(h)),'ShadowColor',shadowColor);
+    set(h(1:length(h)),'BoarderWidth',boarderWidth);
+    set(h(1:length(h)),'BoarderType',boarderType);
+catch
+     disp('Error: AppDesignChanger')
 end
+
 
 %Axes
 h = findobj(curFig,'Type','axes');
-for i=1:1:length(h)
-    try
-        set(h(i),'XColor',axisColor);
-        set(h(i),'YColor',axisColor);
-        set(h(i),'ZColor',axisColor);
-        set(h(i),'GridColor', gridColor);
-        set(h(i),'MinorGridColor',minorGridColor);
-        set(h(i),'Color',axesBackGroundColor);
-        set(h(i),'AmbientLightColor',axesBackGroundColor);
+try
+    for i=1:1:length(h)
         h(i).Title.Color    =  axisColor;
-    catch
     end
+catch
+    disp('Error: AppDesignChanger')
 end
+try
+    set(h(1:length(h)),'XColor',axisColor);
+    set(h(1:length(h)),'YColor',axisColor);
+    set(h(1:length(h)),'ZColor',axisColor);
+    set(h(1:length(h)),'GridColor', gridColor);
+    set(h(1:length(h)),'MinorGridColor',minorGridColor);
+    set(h(1:length(h)),'Color',axesBackGroundColor);
+    set(h(1:length(h)),'AmbientLightColor',axesBackGroundColor);   
+catch
+    disp('Error: AppDesignChanger')
+end
+
 
 
 %Legend
 h = findobj(curFig,'Type','legend');
-for i=1:1:length(h)
-    try
-        h(i).TextColor = textColor;
-        h(i).EdgeColor = edgeColor;
-    catch
-    end
+try
+    set(h(1:length(h)),'TextColor' , textColor);
+    set(h(1:length(h)),'EdgeColor' , edgeColor);
+    set(h(1:length(h)),'Color' , legendBackGroundColor);
+catch
+    disp('Error: AppDesignChanger')
+end
+
+h = findobj(curFig,'-regexp', 'Tag', '.*Legend.*');
+try
+    set(h(1:length(h)),'TextColor' , textColor);
+    set(h(1:length(h)),'EdgeColor' , edgeColor);
+    set(h(1:length(h)),'Color' , legendBackGroundColor);
+catch
+    disp('Error: AppDesignChanger')
+end
+
+
+h = findobj(curFig, 'Type', 'text');
+try
+    set(h(1:length(h)),'Color' ,textHighlightColor);
+    %         h(1:length(h)).EdgeColor = edgeColor;
+    %         h(1:length(h)).Color = legendBackGroundColor;
+catch
+    disp('Error: AppDesignChanger')
 end
 
 
 h = findobj(curFig,'Type','uicontainer','-and','-not', 'BackgroundColor', mainBackground);
-for i=1:1:length(h)
-    try
-        set(h(i),'BackgroundColor',mainBackground);
-    catch
-    end
+try
+    set(h(1:length(h)),'BackgroundColor',mainBackground);
+catch
 end
+
+
+h = findobj(curFig,'Type','uitable');
+try
+    set(h(1:length(h)),'BackgroundColor',tableBackgroundColor);
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+catch
+    disp('Error: AppDesignChanger')
+end
+
+
+h = findobj(curFig,'-regexp', 'Tag', '.*Panel.*');
+
+try   
+    set(h(1:length(h)),'ForegroundColor',textHighlightColor);
+    set(h(1:length(h)),'ShadowColor',textHighlightColor);
+    set(h(1:length(h)),'HighlightColor',textHighlightColor);
+catch
+    disp('Error: AppDesignChanger')
+end
+
 
 appDesignElementChanger(curFig);
 
