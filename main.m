@@ -5,13 +5,9 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
-    addpath(genpath('NotifySounds'));
-    %     javaaddpath(genpath('bioformats_package.jar'),'-end')
     
     cl;
     pause(0.1);
-    
-    % if checkSystem()
     
     % create starting screen
     if ismac
@@ -51,17 +47,40 @@ try
     busyIndicator.start;
     
     % create main figure
-    mainFig = figure('Units','normalized','outerposition',[0.005 0.0475 0.99 0.88],...
+    mainFig = figure('Units','normalized','outerposition',hf.Position,...
         'Name','Muscle-Fiber-Classification-Tool','DockControls','off',...
         'doublebuffer', 'off','Menubar','figure','ToolBar','none','Visible','on',...
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
-        'InvertHardcopy','off',...
-        'WindowState','maximized');
-    mainFigPos = get(mainFig,'Position');
-    set(mainFig,'Position',mainFigPos);
+        'InvertHardcopy','off');
     
-    set(mainFig,'color','w');
+    %%Remove unwanted Menu icons
+    editMenu = findall(mainFig, 'Tag', 'figMenuFile' ,'-or','Tag', 'figMenuEdit',...
+        '-or','Tag', 'figMenuView','-or','Tag', 'figMenuInsert','-or','Tag', 'figMenuDesktop',...
+        '-or','Tag', 'figMenuHelp');
+    delete(editMenu);
+    
+    % Add Menu for Design
+    mDesign = uimenu(mainFig,'Text','App Design');
+    mDesignitem1 = uimenu(mDesign,'Text','Dark');
+    mDesignitem1.MenuSelectedFcn = @changeAppDesign;
+    mDesignitem2 = uimenu(mDesign,'Text','Light');
+    mDesignitem2.MenuSelectedFcn = @changeAppDesign;
+    mDesignitem3 = uimenu(mDesign,'Text','Default');
+    mDesignitem3.MenuSelectedFcn = @changeAppDesign;
+    
+    % Add Menu for Settings
+    mSettings = uimenu(mainFig,'Text','App Settings');
+    mSettingsitem1 = uimenu(mSettings,'Text','Load Default Settings');
+    mSettingsitem2 = uimenu(mSettings,'Text','Load Saved Settings');
+    mSettingsitem3 = uimenu(mSettings,'Text','Save Current Settings');
+
+    % Add Menu for Info
+    mInfo = uimenu(mainFig,'Text','Information');
+
+    
+    
+
     figure(hf);
     set(hf,'WindowStyle','modal');
     
@@ -79,7 +98,7 @@ try
     set( findall(mainFig,'ToolTipString','Open File') ,'Visible','Off');
     
     %create card panel onbject
-    mainCard = uix.CardPanel('Parent', mainFig,'Selection',0);
+    mainCard = uix.CardPanel('Parent', mainFig,'Selection',0,'Tag','mainCard');
     InfoText.String='Loading please wait...   Initialize VIEW-Components...';
     %Init VIEW's
     viewEditHandle = viewEdit(mainCard);
@@ -95,6 +114,8 @@ try
     mainCard.Selection = 3;
     drawnow;pause(0.5);
     mainCard.Selection = 1;
+    drawnow;
+    appDesignChanger(mainCard,getSettingsValue('Style'));
     drawnow;
     
     InfoText.String='Loading please wait...   Initialize MODEL-Components...';
@@ -132,6 +153,8 @@ try
     % delete starting screen
     busyIndicator.stop;
     delete(hf);
+    set(mainFig,'Position',[0.01 0.05 0.98 0.85]);
+    set(mainFig,'WindowState','maximized');
     delete(InfoText);
     delete(VersionText);
     
@@ -174,4 +197,14 @@ catch
     
     
 end
+
+function changeAppDesign(src,event)
+    setSettingsValue('Style',lower(src.Text));
+    mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+    mainCordObj.Visible = 'off';
+    drawnow;
+    appDesignChanger(mainCordObj,getSettingsValue('Style'));
+    drawnow;
+    mainCordObj.Visible = 'on';
+    end
 % end
