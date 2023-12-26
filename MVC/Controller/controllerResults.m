@@ -224,7 +224,7 @@ classdef controllerResults < handle
             Titel = [obj.modelResultsHandle.PathName obj.modelResultsHandle.FileName];
             obj.viewResultsHandle.panelResults.Title = Titel;
             
-           
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             %change the card panel to selection 3: results mode
             obj.mainCardPanel.Selection = 3;
             
@@ -242,6 +242,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
             appDesignElementChanger(obj.mainFigure);
             %show results data in the GUI
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             obj.modelResultsHandle.startResultMode();
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
@@ -249,7 +250,9 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
             appDesignElementChanger(obj.mainFigure);
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             obj.busyIndicator(0);
+            
             
             %Check if a resultsfolder for the file already exist
             % Dlete file extension in the results folder before save
@@ -351,7 +354,7 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.InfoMessage = '- no data has been saved';
             end
             obj.busyIndicator(0);
-            
+            appDesignElementChanger(obj.mainFigure);
             [y,Fs] = audioread('filling-your-inbox.mp3');
             sound(y*0.4,Fs);
             catch
@@ -472,7 +475,7 @@ classdef controllerResults < handle
                     % Place text atop the bar
                     barTopper = sprintf('%d',B(b));
                     hText(b) = text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
-                        'VerticalAlignment','bottom', 'FontSize', 15);
+                        'VerticalAlignment','bottom', 'FontSize', 15,'Tag','areaPlotTextRsults');
                 end
                 
                 l1 = legend(obj.viewResultsHandle.hACount,'Type 1','Type 12h','Type 2','undefind',...
@@ -495,7 +498,7 @@ classdef controllerResults < handle
                     % Place text atop the bar
                     barTopper = sprintf('%d',B(b));
                     hText(b) = text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
-                        'VerticalAlignment','bottom', 'FontSize', 15);
+                        'VerticalAlignment','bottom', 'FontSize', 15,'Tag','areaPlotTextRsults');
                 end
                 
                 l1 = legend(obj.viewResultsHandle.hACount,'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind',...
@@ -509,7 +512,7 @@ classdef controllerResults < handle
             maxTextPos = max(max([hText]));
             % make Axes for Count Data the current Axes
 %             axes(obj.viewResultsHandle.hACount);
-            ylim(obj.viewResultsHandle.hACount,[0 maxTextPos+round(maxTextPos/10)]);
+            ylim(obj.viewResultsHandle.hACount,[0 ceil((max(B)+round(max(B)/10))/10)*10]);
             l1.FontSize=fontSizeM;
             
             set(l1,'Tag','LegendNumberPlot');
@@ -999,6 +1002,7 @@ classdef controllerResults < handle
             
             grid(obj.viewResultsHandle.hAScatterAll, 'on');
             hold(obj.viewResultsHandle.hAScatterAll, 'off');
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
         end
         
         function showPicProcessedGUI(obj)
@@ -1080,7 +1084,7 @@ classdef controllerResults < handle
             axesResultsPicProc.YTick = [0:100:maxPixelY];
             axesResultsPicProc.YTickLabel = axesResultsPicProc.XTick*Yvalue;
             t=title(['Total Area = ' num2str(obj.modelResultsHandle.AreaPic) ' ' sprintf('\x3BCm^2') ' = ' num2str(obj.modelResultsHandle.AreaPic*(10^(-6))) ' mm^2']);
-            set(t,'FontUnits','normalized','Fontsize',0.03);
+            set(t,'FontUnits','normalized','Fontsize',0.02);
            
         end
         
@@ -1287,7 +1291,7 @@ classdef controllerResults < handle
             axesResultsGroups.YTick = [0:100:maxPixelY];
             axesResultsGroups.YTickLabel = axesResultsGroups.XTick*Yvalue;
             t=title(['Image with Fiber-Type-Groups highlighted and number of objects within each Group.']);
-            set(t,'FontUnits','normalized','Fontsize',0.03)
+            set(t,'FontUnits','normalized','Fontsize',0.02)
             
         end
         
