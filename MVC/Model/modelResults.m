@@ -51,6 +51,7 @@ classdef modelResults < handle
         ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
         LabelMat; %Label array of all fiber objects.
+        PicBW; %Binary Mask
         
         %Analyze parameters
         AnalyzeMode; %Indicates the selected analyze mode.

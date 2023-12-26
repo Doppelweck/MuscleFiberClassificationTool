@@ -2069,6 +2069,8 @@ classdef modelAnalyze < handle
             Data{29} = obj.Hybrid12FiberActive;
             Data{30} = obj.Hybrid2axFiberActive;
             
+            Data{31} = obj.PicBW;
+            
         end
         
         function Info = getFiberInfo(obj,Pos)
