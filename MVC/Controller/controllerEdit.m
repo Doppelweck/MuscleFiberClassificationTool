@@ -1157,9 +1157,6 @@ classdef controllerEdit < handle
                 set(obj.mainFigure,'ButtonDownFcn','');
                 set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn','');
                 
-                
-                
-                obj.modelEditHandle.checkMask(obj.CheckMaskActive);
                 obj.busyIndicator(0);
                 
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
@@ -1181,6 +1178,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                
+                obj.modelEditHandle.checkMask(obj.CheckMaskActive);
                 
             elseif obj.CheckMaskActive == 0
                 
@@ -1210,6 +1209,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_Color,'Enable','on');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
+                
+                
                 appDesignElementChanger(obj.mainFigure);
                 % check wich morphOp buttons must be enabled
                 obj.morphOpEvent();
