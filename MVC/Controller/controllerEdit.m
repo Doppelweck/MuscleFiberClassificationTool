@@ -220,7 +220,6 @@ classdef controllerEdit < handle
             
             % set axes in the GUI as the current axes
             axes(obj.viewEditHandle.hAP);
-%             axtoolbar(obj.viewEditHandle.hAP,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
                 % first start of the programm. No image handle exist.
@@ -231,7 +230,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.handlePicRGB.CData = Pic;
             end
             
-            hold on
+            hold(obj.viewEditHandle.hAP, 'on');
             
             if isa(obj.modelEditHandle.handlePicBW,'struct')
                 % first start of the programm. No image handle exist.
@@ -246,10 +245,11 @@ classdef controllerEdit < handle
             end
             
             % show x and y axis
-            axis on
-            axis image
-            hold off
-            title(obj.viewEditHandle.hAP,'Create Binary Mask')
+            axis(obj.viewEditHandle.hAP, 'on');
+            axis(obj.viewEditHandle.hAP, 'image');
+            hold(obj.viewEditHandle.hAP, 'off');
+            title(obj.viewEditHandle.hAP,'Create Binary Mask');
+            
             lhx=xlabel(obj.viewEditHandle.hAP, 'x/pixel','Fontsize',12);
             lhy=ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',12);
             axtoolbar(gca,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
