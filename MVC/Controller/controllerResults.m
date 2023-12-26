@@ -243,7 +243,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
             %show results data in the GUI
             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             obj.modelResultsHandle.startResultMode();
@@ -252,7 +252,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_Save,'Enable','on');
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             obj.busyIndicator(0);
             
@@ -279,7 +279,7 @@ classdef controllerResults < handle
             catch
                 obj.errorMessage(lasterror);
             end
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function backAnalyzeModeEvent(obj,~,~)
@@ -345,7 +345,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
             %Save results
             obj.modelResultsHandle.saveResults();
             
@@ -359,13 +359,13 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.InfoMessage = '- no data has been saved';
             end
             obj.busyIndicator(0);
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
             [y,Fs] = audioread('filling-your-inbox.mp3');
             sound(y*0.4,Fs);
             catch
                 obj.errorMessage(lasterror);
             end
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function showInfoInTableGUI(obj)
@@ -1717,7 +1717,7 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
-                appDesignElementChanger(obj.mainFigure);
+                appDesignElementChanger(obj.mainCardPanel);
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1755,7 +1755,7 @@ classdef controllerResults < handle
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
                 end
             end
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function errorMessage(obj,ErrorInfo)

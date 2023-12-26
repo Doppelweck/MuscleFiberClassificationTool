@@ -806,7 +806,7 @@ classdef controllerAnalyze < handle
                 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
             end
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function activeParaEvent(obj,src,evnt)
@@ -915,7 +915,7 @@ classdef controllerAnalyze < handle
                 otherwise
                     % Error Code
             end
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function startAnalyzeMode(obj,PicData,InfoText)
@@ -2213,7 +2213,7 @@ classdef controllerAnalyze < handle
                     set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
                 end
             end
-            appDesignElementChanger(obj.mainFigure);
+            appDesignElementChanger(obj.mainCardPanel);
         end
         
         function errorMessage(obj,ErrorInfo)

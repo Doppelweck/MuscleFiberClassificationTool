@@ -124,8 +124,8 @@ h = findobj(curFig,'Style','pushbutton','-or','Style','togglebutton');
 try
     set(h(1:length(h)),'BackgroundColor',objectBackground);
     set(h(1:length(h)),'ForegroundColor',textHighlightColor);
-    set(h(1:length(h)),'HighlightColor',dark_blue_200);
-    set(h(1:length(h)),'ShadowColor',dark_blue_200);
+%     set(h(1:length(h)),'HighlightColor',dark_blue_200);
+%     set(h(1:length(h)),'ShadowColor',dark_blue_200);
 catch
      disp('Error: AppDesignChanger')
 end
@@ -206,8 +206,8 @@ try
     set(h(1:length(h)),'ForegroundColor', textColor);
     set(h(1:length(h)),'HighlightColor',boarderColor);
     set(h(1:length(h)),'ShadowColor',shadowColor);
-    set(h(1:length(h)),'BoarderWidth',boarderWidth);
-    set(h(1:length(h)),'BoarderType',boarderType);
+%     set(h(1:length(h)),'BoarderWidth',boarderWidth);
+%     set(h(1:length(h)),'BoarderType',boarderType);
 catch
      disp('Error: AppDesignChanger')
 end

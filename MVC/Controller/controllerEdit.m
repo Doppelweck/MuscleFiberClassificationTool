@@ -291,7 +291,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 
-                appDesignElementChanger(obj.mainFigure);
+                appDesignElementChanger(obj.mainCardPanel);
                 
                 format = obj.modelEditHandle.openNewFile();
                 obj.busyIndicator(1);
@@ -352,7 +352,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 
-                                 appDesignElementChanger(obj.mainFigure);
+                                 appDesignElementChanger(obj.mainCardPanel);
                                 % check wich morphOp buttons must be enabled
                                 obj.morphOpEvent();
                                 
@@ -414,7 +414,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
                                 
-                                 appDesignElementChanger(obj.mainFigure);
+                                 appDesignElementChanger(obj.mainCardPanel);
                                 
                                 obj.morphOpEvent();
                                 
@@ -455,11 +455,11 @@ classdef controllerEdit < handle
                                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                     % check wich morphOp buttons must be enabled
-                                    appDesignElementChanger(obj.mainFigure);
+                                    appDesignElementChanger(obj.mainCardPanel);
                                     obj.morphOpEvent();
                                 end
                                 
-                                 appDesignElementChanger(obj.mainFigure);
+                                 appDesignElementChanger(obj.mainCardPanel);
                                 
                                 obj.busyIndicator(0);
                                 
@@ -525,7 +525,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 
-                                 appDesignElementChanger(obj.mainFigure);
+                                 appDesignElementChanger(obj.mainCardPanel);
                                 % check wich morphOp buttons must be enabled
                                 obj.morphOpEvent();
                                 
@@ -591,7 +591,7 @@ classdef controllerEdit < handle
                                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                 % check wich morphOp buttons must be enabled
                                 
-                                 appDesignElementChanger(obj.mainFigure);
+                                 appDesignElementChanger(obj.mainCardPanel);
                                 obj.morphOpEvent();
                                 
                             case 'false'
@@ -631,7 +631,7 @@ classdef controllerEdit < handle
                                     set(obj.viewEditHandle.B_MorphOP,'Enable','on');
                                     set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                                     
-                                     appDesignElementChanger(obj.mainFigure);
+                                     appDesignElementChanger(obj.mainCardPanel);
                                     % check wich morphOp buttons must be enabled
                                     obj.morphOpEvent();
                                 end
@@ -679,7 +679,7 @@ classdef controllerEdit < handle
                             % check wich morphOp buttons must be enabled
                             obj.morphOpEvent();
                         end
-                         appDesignElementChanger(obj.mainFigure);
+                         appDesignElementChanger(obj.mainCardPanel);
                         obj.busyIndicator(0);
                         
                     case 'notSupported'
@@ -737,14 +737,14 @@ classdef controllerEdit < handle
                         end
                         
                 end
-                 appDesignElementChanger(obj.mainFigure);
+                 appDesignElementChanger(obj.mainCardPanel);
                 obj.busyIndicator(0);
             catch
                 obj.busyIndicator(0);
                 obj.errorMessage(lasterror);
                  %disable GUI objects
                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
-                 appDesignElementChanger(obj.mainFigure);
+                 appDesignElementChanger(obj.mainCardPanel);
             end
         end
         
@@ -1081,7 +1081,7 @@ classdef controllerEdit < handle
             end
             
             set(obj.viewEditHandle.B_NewPic,'Enable','on');
-             appDesignElementChanger(obj.mainFigure);
+             appDesignElementChanger(obj.mainCardPanel);
 %             obj.busyIndicator(0); 
         end
         
@@ -1211,12 +1211,12 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on');
                 
                 
-                appDesignElementChanger(obj.mainFigure);
+                appDesignElementChanger(obj.mainCardPanel);
                 % check wich morphOp buttons must be enabled
                 obj.morphOpEvent();
                 obj.busyIndicator(0);
             end
-            appDesignElementChanger(obj.mainFigure);  
+            appDesignElementChanger(obj.mainCardPanel);  
         end
         
         function checkPlanesOKEvent(obj,~,~)
@@ -2713,7 +2713,7 @@ classdef controllerEdit < handle
                 set( obj.modelEditHandle.busyObj, 'Enable', 'on')
                 end
             end
-             appDesignElementChanger(obj.mainFigure);
+             appDesignElementChanger(obj.mainCardPanel);
         end
         
         function errorMessage(obj,ErrorInfo)
