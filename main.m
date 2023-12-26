@@ -200,6 +200,11 @@ end
 
 function changeAppDesign(src,event)
     setSettingsValue('Style',lower(src.Text));
-        appDesignChanger(findobj(src.Parent.Parent,'Tag','mainCard'),getSettingsValue('Style'));
+    mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+    mainCordObj.Visible = 'off';
+    drawnow;
+    appDesignChanger(mainCordObj,getSettingsValue('Style'));
+    drawnow;
+    mainCordObj.Visible = 'on';
     end
 % end
