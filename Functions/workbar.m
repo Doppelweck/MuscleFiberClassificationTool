@@ -1,4 +1,4 @@
-function workbar(fractiondone, message, progtitle, mainFig,isVisible)
+function percentdone=workbar(fractiondone, message, progtitle, mainFig,isVisible)
 % WORKBAR Graphically monitors progress of calculations
 %   WORKBAR(X) creates and displays the workbar with the fractional length
 %   "X". It is an alternative to the built-in matlab function WAITBAR,
