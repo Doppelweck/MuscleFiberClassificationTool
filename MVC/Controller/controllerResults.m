@@ -404,20 +404,7 @@ classdef controllerResults < handle
             end
         end
         
-        function showAxesDataInGUI(obj)
-            % Shows the fibertype data and the statistc data in the
-            % corresponding axes in the GUI. Including area statistics
-            % plot, number of fiber types plot, scatter plot fiber types
-            % and scatter plot all objects.
-            %
-            %   showAxesDataInGUI(obj);
-            %
-            %   ARGUMENTS:
-            %
-            %       - Input
-            %           obj:    Handle to controllerResults object.
-            %
-                
+        function showAxesFiberCountGUI(obj)
             obj.modelResultsHandle.InfoMessage = '   - plot data into GUI axes...';
             
             AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
@@ -528,17 +515,45 @@ classdef controllerResults < handle
             
             grid(obj.viewResultsHandle.hACount, 'on');
             hold(obj.viewResultsHandle.hACount, 'off');
+        end
+        
+        function showAxesFiberAreaGUI(obj)
+            AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % Plot Area in Axes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Define costom color map
+            ColorMapMain(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapMain(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapMain(3,:) = [255 51 51]; % Red Fiber Type 2
+            ColorMapMain(4,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapMain(5,:) = [51 255 51]; % Green Collagen
+            ColorMapMain = ColorMapMain/255;
             
+            ColorMapAll(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapAll(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapAll(3,:) = [255 51 51]; % Red Fiber Type 2x
+            ColorMapAll(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+            ColorMapAll(5,:) = [255 153 51]; % orange Fiber Type 2ax
+            ColorMapAll(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapAll(7,:) = [51 255 51]; % Green Collagen
+            ColorMapAll = ColorMapAll/255;
+            
+            % Define costom fonts
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            end
             obj.modelResultsHandle.InfoMessage = '      - plot area...';
-            
-            % make Axes for Count Data the current Axes
-%             axes(obj.viewResultsHandle.hAArea);
+
             cla(obj.viewResultsHandle.hAArea);
-            
             
             B_main = [obj.modelResultsHandle.AreaType1PC obj.modelResultsHandle.AreaType12hPC ...
                 obj.modelResultsHandle.AreaType2PC obj.modelResultsHandle.AreaType0PC ...
@@ -569,29 +584,6 @@ classdef controllerResults < handle
                     title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
                 end
                 
-%                 No = length(B_main);
-%                 z =~(B_main == 0);
-%                 j = 1:2:2*No;
-%                 index = 0;
-%                 for i = 1:No
-%                     if(z(i) ~= 0)
-%                         index = index +1;
-%                         set(hPie(j(index)),'facecolor',ColorMapMain(i,:))
-%                         set(hPie(j(index)+1),'FontSize',13)
-%                     end
-%                 end
-%                 drawnow;
-%                 StringLegend = {'Type 1','Type 12h','Type 2','undefind','Collagen'};
-%                 StringLegend(z==0)=[];
-% %                 axes(obj.viewResultsHandle.hAArea)
-%                 title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
-%                 
-%                 if ~isempty(StringLegend)
-%                 l2 = legend(obj.viewResultsHandle.hAArea,StringLegend,'Location','Best');
-%                 set(l2,'Tag','LegendAreaPlot');
-%                 l2.FontSize=fontSizeM;
-%                 end
-                
             else %Quad labeling was active during calssification 
                 
                 tempColorMap = ColorMapAll;
@@ -611,38 +603,44 @@ classdef controllerResults < handle
                     l2.FontSize=fontSizeM;
                     title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
                 end
-
-%                 hPie = pie(obj.viewResultsHandle.hAArea,B);
-%                 
-%                 No = length(B);
-%                 z =~(B == 0);
-%                 j = 1:2:2*No;
-%                 index = 0;
-%                 for i = 1:No
-%                     if(z(i) ~= 0)
-%                         index = index +1;
-%                         set(hPie(j(index)),'facecolor',ColorMapAll(i,:))
-%                         set(hPie(j(index)+1),'FontSize',13)
-%                     end
-%                 end
-%                 
-%                 StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
-%                 StringLegend(z==0)=[];
-%                 title(obj.viewResultsHandle.hAArea,'Area of fiber in relation to the image','FontUnits','normalized','Fontsize',0.06)
-%                 
-%                 if ~isempty(StringLegend)
-%                 l2_1 = legend(obj.viewResultsHandle.hAArea,StringLegend,'Location','Best');
-%                 set(l2_1,'Tag','LegendAreaPlot');
-%                 l2_1.FontSize=fontSizeM;
-%                 end
+            end       
+        end
+        
+        function showAxesScatterBlueRedGUI(obj)
+            AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
+            
+            % Define costom color map
+            ColorMapMain(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapMain(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapMain(3,:) = [255 51 51]; % Red Fiber Type 2
+            ColorMapMain(4,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapMain(5,:) = [51 255 51]; % Green Collagen
+            ColorMapMain = ColorMapMain/255;
+            
+            ColorMapAll(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapAll(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapAll(3,:) = [255 51 51]; % Red Fiber Type 2x
+            ColorMapAll(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+            ColorMapAll(5,:) = [255 153 51]; % orange Fiber Type 2ax
+            ColorMapAll(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapAll(7,:) = [51 255 51]; % Green Collagen
+            ColorMapAll = ColorMapAll/255;
+            
+            % Define costom fonts
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
             end
-            
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % Plot Scatter Blue/Red Classification %%%%%%%%%%%%%%%%%%%%%%%%
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
-            obj.modelResultsHandle.InfoMessage = '      - plot scatter...';
+             obj.modelResultsHandle.InfoMessage = '      - plot scatter...';
             
             %clear axes
             cla(obj.viewResultsHandle.hAScatterBlueRed)
@@ -792,16 +790,51 @@ classdef controllerResults < handle
             
             grid(obj.viewResultsHandle.hAScatterBlueRed, 'on');
             hold(obj.viewResultsHandle.hAScatterBlueRed, 'off');
+        end
+        
+        function showAxesScatterFarredRedGUI(obj)
+            AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
             
-
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % Scatter Plot Farred/Red Classification %%%%%%%%%%%%%%%%%%%%%%
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % Define costom color map
+            ColorMapMain(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapMain(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapMain(3,:) = [255 51 51]; % Red Fiber Type 2
+            ColorMapMain(4,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapMain(5,:) = [51 255 51]; % Green Collagen
+            ColorMapMain = ColorMapMain/255;
+            
+            ColorMapAll(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapAll(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapAll(3,:) = [255 51 51]; % Red Fiber Type 2x
+            ColorMapAll(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+            ColorMapAll(5,:) = [255 153 51]; % orange Fiber Type 2ax
+            ColorMapAll(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapAll(7,:) = [51 255 51]; % Green Collagen
+            ColorMapAll = ColorMapAll/255;
+            
+            % Define costom fonts
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            end
             
             cla(obj.viewResultsHandle.hAScatterFarredRed);
 %             axes(obj.viewResultsHandle.hAScatterFarredRed);
             set(obj.viewResultsHandle.hAScatterFarredRed,'FontUnits','normalized','Fontsize',0.03);
             LegendString = {};
+            PosColorRed =13;
+            PosColorBlue =15;
+            PosColorFarRed =16;
+            PosColorGreen =14;
             
             hold(obj.viewResultsHandle.hAScatterFarredRed, 'on');
             
@@ -919,12 +952,64 @@ classdef controllerResults < handle
                 grid(obj.viewResultsHandle.hAScatterFarredRed, 'on');
                 hold(obj.viewResultsHandle.hAScatterFarredRed, 'off');
                 
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % Scatter Plot all Fiber objects %%%%%%%%%%%%%%%%%%%%%%
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        end
+        
+        function showAxesScatterAllGUI(obj)
+            % Shows the fibertype data and the statistc data in the
+            % corresponding axes in the GUI. Including area statistics
+            % plot, number of fiber types plot, scatter plot fiber types
+            % and scatter plot all objects.
+            %
+            %   showAxesDataInGUI(obj);
+            %
+            %   ARGUMENTS:
+            %
+            %       - Input
+            %           obj:    Handle to controllerResults object.
+            %
+                
+            
+            
+           AnalyzeMode = obj.modelResultsHandle.AnalyzeMode;
+            
+            % Define costom color map
+            ColorMapMain(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapMain(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapMain(3,:) = [255 51 51]; % Red Fiber Type 2
+            ColorMapMain(4,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapMain(5,:) = [51 255 51]; % Green Collagen
+            ColorMapMain = ColorMapMain/255;
+            
+            ColorMapAll(1,:) = [51 51 255]; % Blue Fiber Type 1
+            ColorMapAll(2,:) = [255 51 255]; % Magenta Fiber Type 12h
+            ColorMapAll(3,:) = [255 51 51]; % Red Fiber Type 2x
+            ColorMapAll(4,:) = [255 255 51]; % Yellow Fiber Type 2a
+            ColorMapAll(5,:) = [255 153 51]; % orange Fiber Type 2ax
+            ColorMapAll(6,:) = [224 224 224]; % Grey Fiber Type undifiend
+            ColorMapAll(7,:) = [51 255 51]; % Green Collagen
+            ColorMapAll = ColorMapAll/255;
+            
+            % Define costom fonts
+            if ismac
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            elseif ispc
+                fontSizeS = 10*0.75; % Font size small
+                fontSizeM = 12*0.75; % Font size medium
+                fontSizeB = 16*0.75; % Font size big
+            else
+                fontSizeS = 10; % Font size small
+                fontSizeM = 12; % Font size medium
+                fontSizeB = 16; % Font size big
+            end
+            
             cla(obj.viewResultsHandle.hAScatterAll);
-%             axes(obj.viewResultsHandle.hAScatterAll);
             LegendString={};
+            PosColorRed =13;
+            PosColorBlue =15;
+            PosColorFarRed =16;
+            PosColorGreen =14;
             
             if ~isempty(obj.modelResultsHandle.StatsMatDataT1)
             x = cell2mat(obj.modelResultsHandle.StatsMatDataT1(:,PosColorRed)); %meanRed Values
@@ -1762,7 +1847,7 @@ classdef controllerResults < handle
             Text = [];
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';
-            workbar(1,'delete workbar','delete workbar',obj.mainFigure);
+            workbar(1.2,'delete workbar','delete workbar',obj.mainFigure);
             
             if any(strcmp('stack',fieldnames(ErrorInfo)))
                 

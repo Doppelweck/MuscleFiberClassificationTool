@@ -201,29 +201,50 @@ classdef modelResults < handle
             obj.InfoMessage = '- updating GUI...';
             workbar(0.01,'Transform Data','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.transformDataStructToMatrix();
+            drawnow;
             workbar(0.1,'calculate Fiber Numbers','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.calculateFiberNubers();
-            workbar(0.2,'calculate Area Features','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.15,'calculate Area Features','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.calculateAreaFeatures();
-            workbar(0.3,'create Statistic Table','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.2,'create Statistic Table','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.createMatStatisticTable();
-            workbar(0.4,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.25,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.findFiberGroups();
-            workbar(0.5,'show Axes Data in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
-            obj.controllerResultsHandle.showAxesDataInGUI();
-            workbar(0.6,'show Info Table in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.5,'plot Fiber Count','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesFiberCountGUI();
+            drawnow;
+            workbar(0.55,'plot Fiber Area','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesFiberAreaGUI();
+            drawnow;
+            workbar(0.6,'plot Fiber Blue Red','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesScatterBlueRedGUI();
+            drawnow;
+            workbar(0.65,'plot Fiber Farre Blue','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesScatterFarredRedGUI();
+            drawnow;
+            workbar(0.7,'plot all Fiber Scatter','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesScatterAllGUI();
+            drawnow;
+            workbar(0.75,'plot Info Table in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showInfoInTableGUI();
-            workbar(0.7,'show Histogram in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.8,'plot Histogram in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showHistogramGUI();
-            workbar(0.8,'show Imaged Processed in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.85,'plot Imaged Processed in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicProcessedGUI();
-            workbar(0.9,'show Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            drawnow;
+            workbar(0.9,'plot Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicGroupsGUI();
             drawnow;
-            pause(0.5);
+            workbar(0.95,'update GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             drawnow;
             obj.InfoMessage = '- updating GUI complete';
-            workbar(1,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
+            workbar(1.5,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.ResultUpdateStaus = true;
             end
         end
@@ -860,27 +881,15 @@ classdef modelResults < handle
             BW = zeros(size(obj.LabelMat));
             BW(obj.LabelMat>0)=1;
             Hull = BW_C | BW;
-%             Hull = bwconvhull(HullC);
             Hull = imdilate(Hull,se);
             
             obj.InfoMessage = '      - lable space withount fibers';
             Imag(Hull==0)=max(max(Imag))+1;
             ImagDist = bwdist(Imag); %Dist transform
           
-            
-%             figure(9)
-%             imshow(Hull,[])
             obj.InfoMessage = '      - minimize collagen thickness';
             I_WS=watershed(ImagDist); 
-%             I_BW=ones(size(I_WS));
-%             I_BW(I_WS==0)=0; %Binary Mat without Collagen thiknes
-%             
-%             
-%             [I_Bound,I_Label] = bwboundaries(I_BW,8,'noholes');
-%             I_Label = I_Label*(-1); %Set all Labels negativ
-%             
-%             figure()
-%             imshow(Imag,[])
+
             I_Label = double(I_WS)*(-1);
             n = max(max(obj.LabelMat)); %No. of Objects
             
@@ -889,18 +898,7 @@ classdef modelResults < handle
                 Value = unique( I_Label(Imag==i));
                 I_Label(I_Label==Value)=i;
             end
-%             figure()
-%             imshow(I_Label)
-%             figure(10)
-%             imshow(Imag)
-%             CH = bwconvhull(Imag);
-%             figure(11)
-%             imshow(CH)
-% %             CH= activecontour(Imag,CH,100,'edge');
-%             I_Label(CH==0)=0;
-%             
-%             figure(12)
-%             imshow(CH)
+%
             obj.InfoMessage = '      - searching for fiber type groups...';
             IsType1 = find( strcmp({obj.Stats.FiberType} , 'Type 1') );
             IsType12h = find( strcmp({obj.Stats.FiberType} , 'Type 12h') );
@@ -916,19 +914,10 @@ classdef modelResults < handle
             LrgbT2a = [];
             LrgbT2ax = [];
             
-            
-            
-%             
-%             IsType1 = find([obj.Stats.FiberTypeMainGroup] == 1);
-%             IsType2 = find([obj.Stats.FiberTypeMainGroup] == 2);
-%             IsType3 = find([obj.Stats.FiberTypeMainGroup] == 3);
-%             IBWT1=[];
-%             IBWT2=[];
-%             IBWT3=[];
             se = strel('disk',1);
             
             %%%%%%%%%%%%%%%%%%%%% Type-1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.25,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType1)
                 obj.InfoMessage = '         - find Type-1 groups';
                 IBWT1=zeros(size(I_Label));  
@@ -967,7 +956,7 @@ classdef modelResults < handle
             end
             
             %%%%%%%%%%%%%%%%%%%%% Type-12h %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.3,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType12h)
                 obj.InfoMessage = '         - find Type-12h groups';
                 IBWT12h=zeros(size(I_Label));   
@@ -1006,7 +995,7 @@ classdef modelResults < handle
             end
             
              %%%%%%%%%%%%%%%%%%%%% Type-2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.35,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2)
                 obj.InfoMessage = '         - find Type-2 groups';
                 IBWT2=zeros(size(I_Label));  
@@ -1047,6 +1036,7 @@ classdef modelResults < handle
             end
             
             %%%%%%%%%%%%%%%%%%%%% Type-2x %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            workbar(0.4,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2x)
                 obj.InfoMessage = '         - find Type-2x groups';
                 IBWT2x=zeros(size(I_Label));  
@@ -1086,6 +1076,7 @@ classdef modelResults < handle
                 
             end
             %%%%%%%%%%%%%%%%%%%%% Type-2a %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            workbar(0.45,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2a)
                 obj.InfoMessage = '         - find Type-2a groups';
                 IBWT2a=zeros(size(I_Label));  
@@ -1123,7 +1114,7 @@ classdef modelResults < handle
                 obj.GroupStats.NoObjT2a = [];
             end
             %%%%%%%%%%%%%%%%%%%%% Type-2ax %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.49,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2ax)
                 obj.InfoMessage = '         - find Type-2ax groups';
                 IBWT2ax=zeros(size(I_Label));  
@@ -1187,10 +1178,13 @@ classdef modelResults < handle
             
             obj.InfoMessage = ' ';
             obj.InfoMessage = '   - saving data in the same dir than the file was selected';
-            workbar(0.01,'Transform Data','Saving Results',obj.controllerResultsHandle.mainFigure);
+            
+            
             %Cell arrays for saving data in excel sheet
             CellStatisticTable = {};
             CellFiberTable = {};
+            
+            workbar(0.1,'Transform Data','Saving Results',obj.controllerResultsHandle.mainFigure);
             
             %Current date and time
             time = datestr(now,'_yyyy_mm_dd_HHMM');
@@ -1201,7 +1195,7 @@ classdef modelResults < handle
             % Save dir is the same as the dir from the selected Pic
             SaveDir = [obj.PathName fileName '_RESULTS'];
             obj.InfoMessage = ['   -' obj.PathName fileName '_RESULTS'];
-            
+             
             % Check if reslut folder already exist.
             if exist( SaveDir ,'dir') == 7
                 % Reslut folder already exist.
@@ -1223,9 +1217,10 @@ classdef modelResults < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % save image processed
-            workbar(0.1,'saving Image processed','Saving Results',obj.controllerResultsHandle.mainFigure);
+            
             if obj.SavePicProcessed
                 obj.InfoMessage = '      - saving image processed...';
+                workbar(0.1,'saving Image processed','Saving Results',obj.controllerResultsHandle.mainFigure);
                 
                 try
                     picName ='';
@@ -1657,91 +1652,6 @@ classdef modelResults < handle
                     end
                     workbar(0.98,'file has been created','Saving Results',obj.controllerResultsHandle.mainFigure);
                     
-%                 elseif ispc
-% 
-%                     obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
-%                     
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-3.8-20120326.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-schemas-3.8-20120326.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/xmlbeans-2.3.0.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/dom4j-1.6.1.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
-%                     javaaddpath(path);
-%                     
-%                     xlsfileName = [fileName '_processed' time '.xlsx'];
-% 
-% %                     oldPath = pwd;
-% %                     cd(SaveDir);
-%                     fullFileName = fullfile(SaveDir,xlsfileName);
-%                     
-%                     obj.InfoMessage = '            - write all fiber types ';
-%                     sheetName = 'Fyber Types';
-%                     startRange = 'B2';
-%                     % undocumented function from the file exchange Matlab Forum
-%                     % for creating .xlsx files on a macintosh OS
-%                     status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
-%                     
-%                     sheetName = 'Statistics';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write statistic table ';
-%                     status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
-%                     
-%                     
-%                     sheetName = 'Type 1';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 1 fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 12h';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 12h fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2 fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2x';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2x fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2a';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2a fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2ax';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2ax fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
-%                     
-% %                     cd(oldPath);
-%                     
-%                     if status
-%                         obj.InfoMessage = '         - .xlxs file has been created';
-%                     else
-%                         obj.InfoMessage = '         - .xlxs file could not be created';
-%                         obj.InfoMessage = '         - creating .txt file instead...';
-%                         txtfileName = [fileName '_processed' time '.txt'];
-%                         oldPath = pwd;
-%                         cd(SaveDir)
-%                         fid=fopen(txtfileName,'a+');
-%                         % undocumented function from the file exchange Matlab Forum
-%                         % for creating .txt files.
-%                         cell2file(fid,DataFile,'EndOfLine','\r\n');
-%                         fclose(fid);
-%                         cd(oldPath)
-%                         obj.InfoMessage = '         - .txt file has been created';
-%                     end
-%                 end
                 
             end
             obj.InfoMessage = '   - Saving data complete';
