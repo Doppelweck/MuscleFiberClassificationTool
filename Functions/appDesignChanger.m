@@ -1,4 +1,4 @@
-function appDesignChanger(curFig,colorMode)
+function [mainBackgroundColor, mainTextColor, mainTextHighColor] = appDesignChanger(curFig,colorMode)
 %APPDESIGNCHANGER Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -117,6 +117,13 @@ switch colorMode
         
         boarderType = 'etchedin';
         boarderWidth = 1;
+end
+
+h = findobj(curFig,'Type','figure');
+try
+    set(h(1:length(h)),'Color',mainBackground);
+catch
+     disp('Error: AppDesignChanger')
 end
 
 %Buttons
@@ -294,6 +301,9 @@ end
 
 
 appDesignElementChanger(curFig);
+mainBackgroundColor = mainBackground;
+    mainTextColor = textColor;
+    mainTextHighColor  = textHighlightColor;
 
 end
 
