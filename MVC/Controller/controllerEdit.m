@@ -1101,13 +1101,13 @@ classdef controllerEdit < handle
             %       - Input
             %           obj:    Handle to controllerEdit object
             %
-            obj.busyIndicator(1);
+
             obj.winState=get(obj.mainFigure,'WindowState');
             obj.modelEditHandle.InfoMessage = '   - Checking planes opened';
             PicData = obj.modelEditHandle.sendPicsToController();
             
             obj.viewEditHandle.checkPlanes(PicData,obj.mainFigure);
-            
+
             % set Callbacks of the cancel and Ok button color planes.
             set(obj.viewEditHandle.B_CheckPOK,'Callback',@obj.checkPlanesOKEvent);
             set(obj.viewEditHandle.B_CheckPBack,'Callback',@obj.checkPlanesBackEvent);
@@ -1130,8 +1130,6 @@ classdef controllerEdit < handle
             h = findobj('Tag','CheckPlanesFigure');
             % set the close request functio of the figure h
             set(h,'CloseRequestFcn',@obj.checkPlanesBackEvent);
-            
-            obj.busyIndicator(0);
         end
         
         function checkMaskEvent(obj,src,evnt)
@@ -1147,8 +1145,6 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-%             obj.busyIndicator(1);
-            
             obj.CheckMaskActive = ~obj.CheckMaskActive;
             
             if obj.CheckMaskActive == 1
@@ -1156,9 +1152,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.InfoMessage = '   - check mask';
                 set(obj.mainFigure,'ButtonDownFcn','');
                 set(obj.modelEditHandle.handlePicBW,'ButtonDownFcn','');
-                
-                obj.busyIndicator(0);
-                
+                                
                 set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
                 set(obj.viewEditHandle.B_NewPic,'Enable','off');
                 set(obj.viewEditHandle.B_Undo,'Enable','off');
@@ -1178,6 +1172,7 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_SizeSE,'Enable','off');
                 set(obj.viewEditHandle.B_NoIteration,'Enable','off');
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','off');
+                appDesignElementChanger(obj.mainCardPanel);
                 
                 obj.modelEditHandle.checkMask(obj.CheckMaskActive);
                 
@@ -1214,9 +1209,8 @@ classdef controllerEdit < handle
                 appDesignElementChanger(obj.mainCardPanel);
                 % check wich morphOp buttons must be enabled
                 obj.morphOpEvent();
-                obj.busyIndicator(0);
-            end
-            appDesignElementChanger(obj.mainCardPanel);  
+                
+            end 
         end
         
         function checkPlanesOKEvent(obj,~,~)
@@ -1329,13 +1323,15 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
-            obj.busyIndicator(1);
+            
             
             obj.modelEditHandle.InfoMessage = '   - Checking planes closed';
             % find the handle h of the checkplanes figure
             h = findobj('Tag','CheckPlanesFigure');
-            obj.busyIndicator(0);
+            set(h,'Visible','off');
+            obj.busyIndicator(1);
             delete(h);
+            obj.busyIndicator(0);
             if strcmp(obj.winState,'maximized')
                 set(obj.mainFigure,'WindowState','maximized');
             end
@@ -2572,7 +2568,7 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
-            
+
             obj.modelEditHandle.InfoMessage = ' ';
             
             %get all pic data from the model
@@ -2581,7 +2577,7 @@ classdef controllerEdit < handle
             %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
             obj.controllerAnalyzeHandle.startAnalyzeMode(PicData,InfoText);
-            
+
         end
         
         function undoEvent(obj,src,evnt)
@@ -2674,6 +2670,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelEditHandle.busyObj, 'Enable', 'off')
+                appDesignElementChanger(obj.mainCardPanel);
                 
                 try
                     % R2010a and newer
@@ -2696,14 +2693,6 @@ classdef controllerEdit < handle
             else
                 %delete indicator object and disable GUI elements
                 
-                if ~isempty(obj.modelEditHandle.busyIndicator)
-                obj.modelEditHandle.busyIndicator.stop;
-                [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
-                obj.modelEditHandle.busyIndicator = [];
-                delete(hContainer);
-                end
-                
-                
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
                 
@@ -2711,16 +2700,25 @@ classdef controllerEdit < handle
                     valid = isvalid(obj.modelEditHandle.busyObj);
                     obj.modelEditHandle.busyObj(~valid)=[];
                 set( obj.modelEditHandle.busyObj, 'Enable', 'on')
+                appDesignElementChanger(obj.mainCardPanel);
                 end
+                
+                if ~isempty(obj.modelEditHandle.busyIndicator)
+                obj.modelEditHandle.busyIndicator.stop;
+                [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                obj.modelEditHandle.busyIndicator = [];
+                delete(hContainer);
+                end
+                workbar(1.1,'delete workbar','delete workbar',obj.mainFigure);
             end
-             appDesignElementChanger(obj.mainCardPanel);
+             
         end
         
         function errorMessage(obj,ErrorInfo)
             Text = [];
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';
-            workbar(1,'delete workbar','delete workbar',obj.mainFigure);
+            workbar(1.1,'delete workbar','delete workbar',obj.mainFigure);
             if any(strcmp('stack',fieldnames(ErrorInfo)))
                 
                 for i=1:size(ErrorInfo.stack,1)
