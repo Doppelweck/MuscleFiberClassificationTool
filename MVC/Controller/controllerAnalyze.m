@@ -56,7 +56,7 @@ classdef controllerAnalyze < handle
             %           obj:            Handle to controllerAnalyze object.
             %
             
-            obj.mainFigure =mainFigure;
+            obj.mainFigure = mainFigure;
             obj.mainCardPanel =mainCardPanel;
             
             obj.viewAnalyzeHandle = viewAnalyzeH;
@@ -538,7 +538,7 @@ classdef controllerAnalyze < handle
         end
         
         function analyzeModeEvent(obj,src,evnt)
-            % Checks wich analyze mode is selecred. Only changes the values
+            % Checks wich analyze mode is selected. Only changes the values
             % in the view (GUI) not in the model. Data will be send to the
             % model after pressing start analyze button.
             %
@@ -700,7 +700,7 @@ classdef controllerAnalyze < handle
                 
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
-                obj.viewAnalyzeHandle.ParaCard.Selection = 2;
+                
                 
             elseif src.Value == 5
                 obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification triple labeling';
@@ -949,7 +949,7 @@ classdef controllerAnalyze < handle
             %
             %           InfoText:   Info text log.
             %
-            
+            obj.busyIndicator(1);
             obj.viewAnalyzeHandle.PanelFiberInformation.Title = 'Fiber informations';
             
             % Set PicData Properties in the Analyze Model
@@ -1065,16 +1065,15 @@ classdef controllerAnalyze < handle
                 delete(preFig);
             end
             
+            %change the figure callbacks for the analyze mode
+            obj.addWindowCallbacks()
             
+            obj.busyIndicator(0);
             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
             
-            %change the figure callbacks for the analyze mode
-            obj.addWindowCallbacks()
-            
             obj.modelAnalyzeHandle.InfoMessage = '*** Start analyzing mode ***';
-            
             
             oldScaleX = get(obj.viewAnalyzeHandle.B_XScale, 'String');
             oldScaleY = get(obj.viewAnalyzeHandle.B_YScale, 'String');
@@ -1098,12 +1097,7 @@ classdef controllerAnalyze < handle
             
             
             obj.modelAnalyzeHandle.InfoMessage = '-Set Parameters and press "Start analyzing"';
-            obj.modelAnalyzeHandle.InfoMessage = ' ';
-%             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
-            drawnow;
-            
-            
-            
+            obj.modelAnalyzeHandle.InfoMessage = ' ';        
         end
         
         function startAnalyzeEvent(obj,~,~)
@@ -1122,7 +1116,9 @@ classdef controllerAnalyze < handle
             
             % If a window for Fibertype manipulation already exists,
             % delete it
+            
             try
+                obj.busyIndicator(1);
                 OldFig = findobj('Tag','FigureManipulate');
                 if ~isempty(OldFig)
                     delete(OldFig);
@@ -1149,7 +1145,6 @@ classdef controllerAnalyze < handle
                     obj.addWindowCallbacks()
                 end
                 
-                obj.busyIndicator(1);
                 % Set all Vlaues form the GUI objects in the correspondending
                 % model properties.
                 obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
@@ -1203,6 +1198,7 @@ classdef controllerAnalyze < handle
                 [y,Fs] = audioread('filling-your-inbox.mp3');
                 sound(y,Fs);
             catch
+                obj.busyIndicator(0);
                 obj.errorMessage(lasterror);
             end
             
@@ -1282,7 +1278,7 @@ classdef controllerAnalyze < handle
                         BoundE{end+1,1} =  B{i,1};
                         BoundE{end,2} = ['boundLabel ' num2str(i)];
                 end
-                percent = (i-0.5)/nObjects;
+                percent = (i)/nObjects;
 
                 workbar(percent,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
             end
@@ -1330,7 +1326,7 @@ classdef controllerAnalyze < handle
             %       - Input
             %           obj:    Handle to controllerAnalyze object.
             %
-            
+            obj.busyIndicator(1);
             obj.modelAnalyzeHandle.InfoMessage = ' ';
             
             %clear Data
@@ -1366,7 +1362,7 @@ classdef controllerAnalyze < handle
             
             % set log text from Analyze GUI to Pic GUI
             obj.controllerEditHandle.setInfoTextView(get(obj.viewAnalyzeHandle.B_InfoText, 'String'));
-            
+            obj.busyIndicator(0);
             %change the card panel to selection 1: edit mode
             obj.mainCardPanel.Selection = 1;
             
