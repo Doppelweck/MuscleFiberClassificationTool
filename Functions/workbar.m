@@ -85,7 +85,7 @@ end
 
 % If task completed, close figure and clear vars, then exit
 percentdone = floor(100*fractiondone);
-if percentdone == 100 % Task completed
+if percentdone > 100 % Task completed
     if ~isempty(progfig)
         setAlwaysOnTop(progfig,false);
     end
@@ -204,12 +204,13 @@ if isempty(progfig)
         'string','');                                       % Initialize the estimated time as blank
     
     text(4) = uicontrol(progfig,'style','text',...          % Prepare the percentage progress
-        'pos',[winwidth-35 winheight-50 30 20],...          % Set the textbox position and size
+        'pos',[winwidth-45 winheight-50 40 20],...          % Set the textbox position and size
         'hor','right',...                                   % Left align the text in the textbox
         'backgroundcolor',[1 1 1],...                      % Set the textbox background color
         'foregroundcolor',0*[1 1 1],...                     % Set the textbox foreground color
         'string','');                                       % Initialize the progress text as blank
     
+    [mainBackgroundColor, mainTextColor, mainTextHighColor] = appDesignChanger(progfig,getSettingsValue('Style'));
     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
     iconsSizeEnums = javaMethod('values',iconsClassName);
     SIZE_32x32 = iconsSizeEnums(1);  % (1) = 16x16,  (2) = 32x32
@@ -217,9 +218,9 @@ if isempty(progfig)
     busyIndicator.setPaintsWhenStopped(false);  % default = false
     busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
     javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.86,progfig.Position(4)*0.35,20,20], progfig);
-    busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
+    busyIndicator.getComponent.setBackground(java.awt.Color(mainBackgroundColor(1), mainBackgroundColor(2),mainBackgroundColor(3)));
     busyIndicator.start;
-        
+    
     % Set time of last update to ensure a redraw
     lastupdate = clock - 1;
     
@@ -241,7 +242,7 @@ set(progpatch,'XData',[1 fractiondone fractiondone 1])
 
 % Set all dynamic text
 runtime = etime(clock,starttime);
-if ~fractiondone,
+if ~fractiondone
     fractiondone = 0.001;
 end
 work = get(progfig,'userdata');
@@ -266,6 +267,7 @@ drawnow
 
 % Record time of this update
 lastupdate = clock;
+
 
 
 
