@@ -1,4 +1,4 @@
-function workbar(fractiondone, message, progtitle, mainFig)
+function workbar(fractiondone, message, progtitle, mainFig,isVisible)
 % WORKBAR Graphically monitors progress of calculations
 %   WORKBAR(X) creates and displays the workbar with the fractional length
 %   "X". It is an alternative to the built-in matlab function WAITBAR,
@@ -52,7 +52,13 @@ function workbar(fractiondone, message, progtitle, mainFig)
 % Daniel Claxton
 %
 % Last Modified: 3-17-05
-
+arguments
+    fractiondone double = 0
+    message char = ' '
+    progtitle char = ' '
+    mainFig handle = gcf
+    isVisible char = 'on'
+end
 
 persistent progfig progpatch starttime lastupdate text winState
 
@@ -67,7 +73,7 @@ try
     
     % If progress bar needs to be reset, close figure and set handle to empty
     if fractiondone == 0
-        setAlwaysOnTop(progfig,false);
+%         setAlwaysOnTop(progfig,false);
         delete(progfig) % Close progress bar
         progfig = []; % Set to empty so a new progress bar is created
     end
@@ -87,7 +93,7 @@ end
 percentdone = floor(100*fractiondone);
 if percentdone > 100 % Task completed
     if ~isempty(progfig)
-        setAlwaysOnTop(progfig,false);
+%         setAlwaysOnTop(progfig,false);
     end
     delete(progfig) % Close progress bar
 
@@ -143,12 +149,12 @@ if isempty(progfig)
          'color',[1 1 1],...                               % Set the figure color
          'resize','off',...                                 % Turn of figure resizing
          'tag','timebar',...                                % Tag the figure for later checking
-         'WindowStyle','normal',...                            % Stay figure in forground                          
+         'WindowStyle','modal',...                            % Stay figure in forground                          
          'Visible','off');
     
     movegui(progfig,'center');
     set(progfig,'Visible','on')
-    setAlwaysOnTop(progfig,true);
+%     setAlwaysOnTop(progfig,true);
     
     
     
@@ -261,7 +267,7 @@ set(progfig,'Name',titlebarstr)
 set(text(1),'string',message);
 set(text(3),'string',timeleftstr);
 set(text(4),'string',[num2str(percentdone) ' %']);
-
+set(progfig,'Visible',isVisible);
 % Force redraw to show changes
 drawnow
 
