@@ -1510,7 +1510,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCGreen = smoothedBackground;
                     obj.FilenameBCGreen = 'calculated from Green plane background';
-                    workbar(1,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Blue'
                     workbar(0.1,'create image for Blue Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
@@ -1547,7 +1547,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCBlue = smoothedBackground;
                     obj.FilenameBCBlue = 'calculated from Blue plane background';
-                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Red'
                     workbar(0.1,'create image for Red Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
@@ -1584,7 +1584,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCRed = smoothedBackground;
                     obj.FilenameBCRed = 'calculated from Red plane background';
-                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Farred'
                     workbar(0.1,'create image for Farred Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
@@ -1621,7 +1621,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCFarRed = smoothedBackground;
                     obj.FilenameBCFarRed = 'calculated from Farred plane background';
-                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 otherwise %calculate all missing images
                     disp('all missing');
@@ -2226,7 +2226,7 @@ classdef modelEdit < handle
         
         function bicBWreturn = autoBinarizationWatershed_1(obj)
             obj.InfoMessage = '   - running Auto Watershed I Binarization';
-            workbar(0,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.1,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
             %green Plane
             switch obj.FiberForeBackGround
