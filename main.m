@@ -148,8 +148,9 @@ try
     pause(0.2)
     
     InfoText.String='Run application';
-    pause(0.5);
     drawnow;
+    pause(0.5);
+    
     % delete starting screen
     busyIndicator.stop;
     delete(hf);
