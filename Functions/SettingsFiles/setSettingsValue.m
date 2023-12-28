@@ -2,9 +2,9 @@ function setSettingsValue(settingsString,value)
 
 currentFile = mfilename( 'fullpath' );
 [pathstr,~,~] = fileparts( currentFile );
-addpath( fullfile( pathstr, 'AppSettings.mat' ) );
+addpath( pathstr );
 
-data=load([pathstr '\AppSettings.mat']);
+data=load(fullfile( pathstr, 'AppSettings.mat' ));
 
 %Check if setting exist
 idx=find(contains(data.Settings,settingsString));
@@ -18,7 +18,7 @@ else
 end
 
 %Save to File
-savePath = [pathstr '\AppSettings.mat'];
+savePath = fullfile( pathstr, 'AppSettings.mat' );
 Settings = data.Settings;
 save( savePath ,'Settings');
 end
