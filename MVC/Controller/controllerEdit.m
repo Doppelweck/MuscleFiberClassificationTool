@@ -2718,7 +2718,7 @@ classdef controllerEdit < handle
             Text = [];
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';
-            workbar(1.1,'delete workbar','delete workbar',obj.mainFigure);
+
             if any(strcmp('stack',fieldnames(ErrorInfo)))
                 
                 for i=1:size(ErrorInfo.stack,1)
@@ -2736,6 +2736,7 @@ classdef controllerEdit < handle
             beep
             uiwait(errordlg(Text,'ERROR: Edit-Mode',mode));
             
+            workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             obj.busyIndicator(0);
         end
         
