@@ -1231,7 +1231,7 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   - plot boundaries...';
             end
             
-            hold on
+            hold(axesh, 'on')
             
             B = bwboundaries(obj.modelAnalyzeHandle.PicInvertBW,4,'noholes');
             Bound0={};
@@ -1278,31 +1278,31 @@ classdef controllerAnalyze < handle
             end
             
             if ~isempty(Bound0)
-                htemp=visboundaries(axesh,{Bound0{:,1}},'Color','w','LineWidth',2);
+                visboundaries(axesh,Bound0(:,1),'Color','w','LineWidth',2);
             end
             if ~isempty(Bound1)
-                visboundaries(axesh,{Bound1{:,1}},'Color','b','LineWidth',2);
+                visboundaries(axesh,Bound1(:,1),'Color','b','LineWidth',2);
             end
             if ~isempty(Bound2)
-                visboundaries(axesh,{Bound2{:,1}},'Color','r','LineWidth',2);
+                visboundaries(axesh,Bound2(:,1),'Color','r','LineWidth',2);
             end
             
             if ~isempty(Bound2x)
-                visboundaries(axesh,{Bound2x{:,1}},'Color','r','LineWidth',2);
+                visboundaries(axesh,Bound2x(:,1),'Color','r','LineWidth',2);
             end
             if ~isempty(Bound2a)
-                visboundaries(axesh,{Bound2a{:,1}},'Color','y','LineWidth',2);
+                visboundaries(axesh,Bound2a(:,1),'Color','y','LineWidth',2);
             end
             if ~isempty(Bound2ax)
-                visboundaries(axesh,{Bound2ax{:,1}},'Color',[1 100/255 0],'LineWidth',2);
+                visboundaries(axesh,Bound2ax(:,1),'Color',[1 100/255 0],'LineWidth',2);
             end
             if ~isempty(Bound12h)
-                visboundaries(axesh,{Bound12h{:,1}},'Color','m','LineWidth',2);
+                visboundaries(axesh,Bound12h(:,1),'Color','m','LineWidth',2);
             end
             if ~isempty(BoundE)
-                visboundaries(axesh,{BoundE{:,1}},'Color','k','LineWidth',2);
+                visboundaries(axesh,BoundE(:,1),'Color','k','LineWidth',2);
             end
-            hold off
+            hold(axesh, 'off')
             workbar(1,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
         end
         
@@ -1717,7 +1717,8 @@ classdef controllerAnalyze < handle
                         % If figure dont exist create a new figure
                         obj.viewAnalyzeHandle.showFigurePreResults(obj.mainFigure);
                     end
-                    
+                    preFig = findobj('Tag','FigurePreResults');
+                     
                     %Color Map for FIber Types
                     ColorMap(1,:) = [51 51 255]; % Blue Fiber Type 1
                     ColorMap(2,:) = [255 51 255]; % Magenta Fiber Type 12h
@@ -1760,7 +1761,6 @@ classdef controllerAnalyze < handle
                         case {3,4} %Cluster Based. Need two plots instead of the other ones
                             %Handle to axes Pre-Results Blue over Red
                             ax = obj.viewAnalyzeHandle.hAPRBR;
-                            %                             axes(ax)
                             axes(ax);
                             axs1=subplot(2,1,1); %Plot for main Fibers
                             LegendString = {};
@@ -2074,7 +2074,7 @@ classdef controllerAnalyze < handle
                     obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
                     obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
                 end
-                
+                appDesignChanger(preFig,getSettingsValue('Style'));
             catch
                 obj.errorMessage(lasterror);
             end
