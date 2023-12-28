@@ -134,11 +134,8 @@ classdef viewEdit < handle
             set(  obj.panelEdit, 'Widths', [-80 -20] );
             set(obj.panelPicture,'Title','PICTURE');
             obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.012,'Title','PICTURE');
-%             axtoolbar(obj.hAP,{'datacursor','pan','zoomin','zoomout','restoreview'});
-%             obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.35);
             axis image
-%             InSet = get(obj.hAP, 'TightInset');
-%             set(obj.hAP, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)])
+
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
             PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 2,'Padding',2);
@@ -182,6 +179,7 @@ classdef viewEdit < handle
             obj.B_ImageOverlaySelection = uicontrol( 'Parent', HButtonBoxAlpha1_2,'Style','popupmenu','Tag','popupmenuOverlay','FontUnits','normalized','Fontsize',0.6, 'String', {'RGB Image' , 'Green Plane', 'Blue Plane', 'Red Plane', 'Farred Plane'} ,'Enable','on');
             
             set( HBoxAlpha2, 'Widths', [-1.3 -3.7] );
+            
             %%%%%%%%%%%%%%%% 2. Row Alpha %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             HBoxAlpha2 = uix.HBox('Parent', mainVBoxAlpha,'Spacing',2,'Padding', 2 );
@@ -202,7 +200,6 @@ classdef viewEdit < handle
             
             set( HBoxAlpha2, 'Widths', [-0.5 -0.5 -2 -1] );
             
-
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Hand Draw Grid %%%%%%%%%%%%%%%%%%%%%%%%%%%
             mainVBoxBinari = uix.VBox('Parent', PanelBinari);
@@ -421,7 +418,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneBlue, 'position', [0 0 1 1]);
             imshow(Pics{6})
-%             VButtonBox4 = uix.VButtonBox('Parent', VBox4ColorPlane,'ButtonSize',[400 40]);
+
             String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4ColorPlane,'Style','popupmenu','Tag','popupmenu', 'String', String , 'Value' ,2,'FontUnits','normalized','Fontsize',0.35);
             set(VBox4ColorPlane,'Heights',[-10 40])
@@ -431,7 +428,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneRed, 'position', [0 0 1 1]);
             imshow(Pics{7})
-%             VButtonBox5 = uix.VButtonBox('Parent', VBox5ColorPlane,'ButtonSize',[400 40]);
+
             String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5ColorPlane,'Style','popupmenu','Tag','popupmenu', 'String', String , 'Value' ,3,'FontUnits','normalized','Fontsize',0.35);
             set(VBox5ColorPlane,'Heights',[-10 40])
@@ -441,7 +438,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneFarRed, 'position', [0 0 1 1]);
             imshow(Pics{8})
-%             VButtonBox6 = uix.VButtonBox('Parent', VBox6ColorPlane,'ButtonSize',[400 40]);
+
             String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6ColorPlane,'Style','popupmenu','Tag','popupmenu', 'String', String , 'Value' ,4,'FontUnits','normalized','Fontsize',0.35);
             set(VBox6ColorPlane,'Heights',[-10 40])
@@ -654,9 +651,7 @@ classdef viewEdit < handle
             set(obj.B_ShapeSE,'tooltipstring',StructuringToolTip);
             set(obj.B_SizeSE,'tooltipstring',StructuringSizeToolTip);
             set(obj.B_NoIteration,'tooltipstring',NoOfIterationsToolTip);
-            set(obj.B_StartMorphOP,'tooltipstring',RunMorphToolTip);
-            
-           
+            set(obj.B_StartMorphOP,'tooltipstring',RunMorphToolTip); 
         end
         
         function delete(obj)
