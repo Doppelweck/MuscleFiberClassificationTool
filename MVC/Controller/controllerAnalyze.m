@@ -492,7 +492,7 @@ classdef controllerAnalyze < handle
                         % Value is not numerical. Set value to 1
                         set(obj.viewAnalyzeHandle.B_XScale,'String','1');
                     end
-                    Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);
+                    Xvalue = str2double(obj.viewAnalyzeHandle.B_XScale.String);
                     maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
                     obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
                     obj.viewAnalyzeHandle.hAP.XTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Xvalue;
@@ -517,10 +517,10 @@ classdef controllerAnalyze < handle
                         set(obj.viewAnalyzeHandle.B_YScale,'String','1');
                     end
                     maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
-                    Yvalue = str2num(obj.viewAnalyzeHandle.B_YScale.String);
+                    Yvalue = str2double(obj.viewAnalyzeHandle.B_YScale.String);
                     obj.viewAnalyzeHandle.hAP.YTick = [0:100:maxPixelY];
                     obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Yvalue;
-                    %                 Yvalue = str2num(obj.viewAnalyzeHandle.B_YScale.String);
+                    %                 Yvalue = str2double(obj.viewAnalyzeHandle.B_YScale.String);
                     %                 maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
                     %                 NoTicksY = 100*floor(maxPixelY/100)/100;
                     %                 YStep = (NoTicksY*ceil(maxPixelY/NoTicksY)*round(Yvalue))/(NoTicksY*Yvalue);
@@ -540,7 +540,7 @@ classdef controllerAnalyze < handle
             
         end
         
-        function analyzeModeEvent(obj,src,evnt)
+        function analyzeModeEvent(obj,src,~)
             % Checks wich analyze mode is selected. Only changes the values
             % in the view (GUI) not in the model. Data will be send to the
             % model after pressing start analyze button.
@@ -966,72 +966,68 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.PicPlaneFarRed = PicData{8};
             obj.modelAnalyzeHandle.PicPRGBPlanes = PicData{9};
             
-            % get axes for PicRGB in Analyze GUI
-%             axes(obj.viewAnalyzeHandle.hAP);
-            
-            % show PicRGB in Analyze GUI
-            switch obj.viewAnalyzeHandle.B_AnalyzeMode.Value 
+            switch obj.viewAnalyzeHandle.B_AnalyzeMode.Value
                 
                 case 1
-                
-                %Show image for triple labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
-                
+                    
+                    %Show image for triple labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
                 case 2
-                
-                %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
-                
+                    
+                    %Show image for quad labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
                 case 3
-                
-                %Show image for triple labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
-                
+                    
+                    %Show image for triple labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
                 case 4
-                
-                %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
-                
+                    
+                    %Show image for quad labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
                 case 5
-                
-                %Show image for triple labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
-                
+                    
+                    %Show image for triple labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
                 case 6
-                
-                %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
+                    %Show image for quad labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
                 case 7
-                
-                %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
-                axis(obj.viewAnalyzeHandle.hAP, 'on')
-                axis(obj.viewAnalyzeHandle.hAP, 'image')
+                    
+                    %Show image for quad labeling
+                    obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                    axis(obj.viewAnalyzeHandle.hAP, 'on')
+                    axis(obj.viewAnalyzeHandle.hAP, 'image')
             end
             
             lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',12);
-            lhy=ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',12);
+            ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',12);
             title(obj.viewAnalyzeHandle.hAP,'Analyzing Fibers')
             axtoolbar(obj.viewAnalyzeHandle.hAP,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
-            Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);
+            Xvalue = str2double(obj.viewAnalyzeHandle.B_XScale.String);
             maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
             obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
             obj.viewAnalyzeHandle.hAP.XTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Xvalue;
             maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
-            Yvalue = str2num(obj.viewAnalyzeHandle.B_YScale.String);
+            Yvalue = str2double(obj.viewAnalyzeHandle.B_YScale.String);
             obj.viewAnalyzeHandle.hAP.YTick = [0:100:maxPixelY];
             obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Yvalue;
             
@@ -1040,7 +1036,6 @@ classdef controllerAnalyze < handle
             obj.viewAnalyzeHandle.panelPicture.Title = Titel;
             
             % get axes for zoomed Pic in Analyze GUI FIber Information Panel
-%             axes(obj.viewAnalyzeHandle.B_AxesInfo);
             obj.modelAnalyzeHandle.handleInfoAxes = imshow([],'Parent',obj.viewAnalyzeHandle.B_AxesInfo);
             axis(obj.viewAnalyzeHandle.B_AxesInfo, 'on');
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'image');
@@ -1091,7 +1086,6 @@ classdef controllerAnalyze < handle
                 MetaData = PicData{1,19};
                 YScale = str2double(MetaData(2).GlobalScaleFactorforY);
                 set(obj.viewAnalyzeHandle.B_YScale, 'String', num2str(YScale) );
-                %                '<HTML><FONT color="   -INFO: Program has changed Values">Red</FONT></HTML>'
                 obj.modelAnalyzeHandle.InfoMessage = '<HTML><FONT color="orange">-INFO: Program has changed Values: </FONT></HTML>';
                 obj.modelAnalyzeHandle.InfoMessage = '     -XScale and YScale have been adjusted';
                 obj.modelAnalyzeHandle.InfoMessage = '     -Found in image MetaData';
@@ -1102,7 +1096,7 @@ classdef controllerAnalyze < handle
             
             
             obj.modelAnalyzeHandle.InfoMessage = '-Set Parameters and press "Start analyzing"';
-            obj.modelAnalyzeHandle.InfoMessage = ' ';        
+            obj.modelAnalyzeHandle.InfoMessage = ' ';
         end
         
         function startAnalyzeEvent(obj,~,~)
@@ -1153,7 +1147,6 @@ classdef controllerAnalyze < handle
                 % Set all Vlaues form the GUI objects in the correspondending
                 % model properties.
                 obj.modelAnalyzeHandle.AnalyzeMode = obj.viewAnalyzeHandle.B_AnalyzeMode.Value;
-                
                 
                 obj.modelAnalyzeHandle.AreaActive = obj.viewAnalyzeHandle.B_AreaActive.Value;
                 if obj.modelAnalyzeHandle.AreaActive == 1
@@ -1220,8 +1213,6 @@ classdef controllerAnalyze < handle
             %           obj:    Handle to modelAnalyze object
             %
             
-            
-            
             %Make axes with rgb image the current axes
             axesh = obj.modelAnalyzeHandle.handlePicRGB.Parent;
             %             axes(axesh)
@@ -1255,8 +1246,6 @@ classdef controllerAnalyze < handle
                 %select boundarie color for diffrent fiber types
                 switch obj.modelAnalyzeHandle.Stats(i).FiberType
                     case 'undefined'
-                        % Type 0
-                        %                         Color0(end+1,:) = [1 1 1]';
                         Bound0{end+1,1} =  B{i,1};
                         Bound0{end,2} = ['boundLabel ' num2str(i)];
                     case 'Type 1'
@@ -1284,13 +1273,12 @@ classdef controllerAnalyze < handle
                         BoundE{end,2} = ['boundLabel ' num2str(i)];
                 end
                 percent = (i)/nObjects;
-
+                
                 workbar(percent,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
             end
             
             if ~isempty(Bound0)
                 htemp=visboundaries(axesh,{Bound0{:,1}},'Color','w','LineWidth',2);
-%                 set(htemp,'Tag',['boundLabel ' num2str(labelNo)])
             end
             if ~isempty(Bound1)
                 visboundaries(axesh,{Bound1{:,1}},'Color','b','LineWidth',2);
@@ -1392,7 +1380,7 @@ classdef controllerAnalyze < handle
                 %           obj:    Handle to controllerAnalyze object.
                 %
                 obj.mainCardPanel.Selection = 3;
-%                 obj.busyIndicator(1);
+                %                 obj.busyIndicator(1);
                 if isempty(obj.modelAnalyzeHandle.Stats)
                     obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
                     obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
@@ -1430,7 +1418,7 @@ classdef controllerAnalyze < handle
                     % send all data to the result controller and start the
                     % result mode
                     obj.controllerResultsHandle.startResultsMode(Data,InfoText);
-%                     obj.busyIndicator(0);
+                    %                     obj.busyIndicator(0);
                 end
             catch
                 obj.errorMessage(lasterror);
@@ -1463,8 +1451,8 @@ classdef controllerAnalyze < handle
             curretnStyleColor = obj.viewAnalyzeHandle.B_TextMeanGreen.ForegroundColor;
             set(obj.viewAnalyzeHandle.B_TextObjNo,'String', Info{1} );
             %Area. Display text in red when out of range
-            if obj.modelAnalyzeHandle.AreaActive && ~isempty(str2num(Info{2}))
-                if obj.modelAnalyzeHandle.MaxArea < str2num(Info{2})
+            if obj.modelAnalyzeHandle.AreaActive && ~isempty(str2double(Info{2}))
+                if obj.modelAnalyzeHandle.MaxArea < str2double(Info{2})
                     obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=[1 0 0];
                 else
                     obj.viewAnalyzeHandle.B_TextArea.ForegroundColor=curretnStyleColor;
@@ -1475,9 +1463,9 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_TextArea,'String', Info{2} );
             
             % Aspect Ratio. Display text in red when out of range
-            if obj.modelAnalyzeHandle.AspectRatioActive && ~isempty(str2num(Info{3}))
-                if obj.modelAnalyzeHandle.MinAspectRatio > str2num(Info{3}) ||...
-                        obj.modelAnalyzeHandle.MaxAspectRatio < str2num(Info{3})
+            if obj.modelAnalyzeHandle.AspectRatioActive && ~isempty(str2double(Info{3}))
+                if obj.modelAnalyzeHandle.MinAspectRatio > str2double(Info{3}) ||...
+                        obj.modelAnalyzeHandle.MaxAspectRatio < str2double(Info{3})
                     obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=[1 0 0];
                 else
                     obj.viewAnalyzeHandle.B_TextAspectRatio.ForegroundColor=curretnStyleColor;
@@ -1488,8 +1476,8 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_TextAspectRatio,'String', Info{3} );
             
             % Roundnes. Display text in red when out of range
-            if obj.modelAnalyzeHandle.RoundnessActive && isnumeric(str2num(Info{4}))
-                if obj.modelAnalyzeHandle.MinRoundness > str2num(Info{4})
+            if obj.modelAnalyzeHandle.RoundnessActive && isnumeric(str2double(Info{4}))
+                if obj.modelAnalyzeHandle.MinRoundness > str2double(Info{4})
                     obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=[1 0 0];
                 else
                     obj.viewAnalyzeHandle.B_TextRoundness.ForegroundColor=curretnStyleColor;
@@ -1507,8 +1495,8 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_TextMeanFarred,'String', Info{10} );
             
             % Roundnes. Display text in red when out of range
-            if obj.modelAnalyzeHandle.ColorValueActive && isnumeric(str2num(Info{11}))
-                if obj.modelAnalyzeHandle.ColorValue > str2num(Info{11})
+            if obj.modelAnalyzeHandle.ColorValueActive && isnumeric(str2double(Info{11}))
+                if obj.modelAnalyzeHandle.ColorValue > str2double(Info{11})
                     obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=[1 0 0];
                 else
                     obj.viewAnalyzeHandle.B_TextColorValue.ForegroundColor=curretnStyleColor;
@@ -1549,7 +1537,6 @@ classdef controllerAnalyze < handle
             
             visboundaries(obj.viewAnalyzeHandle.B_AxesInfo,Info{14},'Color',Color,'LineWidth',1);
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'tight');
-            
         end
         
         function manipulateFiberShowInfoEvent(obj,~,~)
@@ -1631,9 +1618,6 @@ classdef controllerAnalyze < handle
                     set(obj.viewAnalyzeHandle.hFM,'closereq',@obj.manipulateFiberCancelEvent);
                     obj.busyIndicator(0);
                 else
-                    % click was on the background
-                    % refresh Callback function in figure AnalyzeMode
-                    %                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
                     obj.addWindowCallbacks();
                 end
             end
@@ -1655,7 +1639,7 @@ classdef controllerAnalyze < handle
             %
             
             NewFiberType = get(obj.viewAnalyzeHandle.B_FiberTypeManipulate, 'Value');
-            LabelNumber = str2num( get(obj.viewAnalyzeHandle.B_TextObjNo, 'String') );
+            LabelNumber = str2double( get(obj.viewAnalyzeHandle.B_TextObjNo, 'String') );
             
             %change fiber type
             obj.busyIndicator(1);
@@ -1771,14 +1755,12 @@ classdef controllerAnalyze < handle
                     Index = strcmp({obj.modelAnalyzeHandle.Stats.FiberType}, 'undefined');
                     T0 = obj.modelAnalyzeHandle.Stats(Index);
                     
-                    
-                    
                     switch obj.modelAnalyzeHandle.AnalyzeMode
                         
                         case {3,4} %Cluster Based. Need two plots instead of the other ones
                             %Handle to axes Pre-Results Blue over Red
                             ax = obj.viewAnalyzeHandle.hAPRBR;
-%                             axes(ax)
+                            %                             axes(ax)
                             axes(ax);
                             axs1=subplot(2,1,1); %Plot for main Fibers
                             LegendString = {};
@@ -1837,8 +1819,7 @@ classdef controllerAnalyze < handle
                             ylabel(axs1,'y: mean Blue','FontSize',12);
                             ylim(axs1,[ 0 maxLim+10 ] );
                             xlim(axs1,[ 0 maxLim+10 ] );
-                            %                         saveTightFigureOrAxes(gca,'ScatMainTest.pdf');
-%                             axes(ax)
+                            
                             axs2=subplot(2,1,2); %Plot Reachability Plot for main Fibers
                             if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotMain)
                                 bar(axs2,obj.modelAnalyzeHandle.ClusterData.ReachPlotMain);
@@ -1851,15 +1832,12 @@ classdef controllerAnalyze < handle
                             title(axs2,'OPTICS-Clustering: Reachability Plot for Fiber Type Maingroups','FontSize',14)
                             xlabel(axs2,'x: Order','FontSize',12);
                             ylabel(axs2,'y: Reachability distance R_D','FontSize',12);
-                            %                         saveTightFigureOrAxes(gca,'ReachMainTest.pdf');
-                            
                             
                             %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             ax = obj.viewAnalyzeHandle.hAPRFRR;
-%                             axes(ax)
                             LegendString = {};
                             axes(ax);
-                            axs3=subplot(2,1,1) %Plot for Type-2 sub Fibers
+                            axs3=subplot(2,1,1); %Plot for Type-2 sub Fibers
                             
                             hold(axs3, 'on')
                             if ~isempty(T2)
@@ -1902,7 +1880,7 @@ classdef controllerAnalyze < handle
                             ylim(axs3,[ 0 maxLim+10 ] );
                             xlim(axs3,[ 0 maxLim+10 ] );
                             grid(axs3, 'on')
-%                             axes(ax);
+                            
                             axs4 = subplot(2,1,2); %Plot Reachability Plot for sub Type-2 Fibers
                             if ~isempty(obj.modelAnalyzeHandle.ClusterData.ReachPlotSub)
                                 bar(axs4,obj.modelAnalyzeHandle.ClusterData.ReachPlotSub);
@@ -1923,7 +1901,6 @@ classdef controllerAnalyze < handle
                             
                             LegendString = {};
                             
-%                             axes(ax)
                             hold(ax, 'on')
                             if ~isempty(T1)
                                 h=scatter(ax,[T1.ColorRed],[T1.ColorBlue],20,ColorMap(1,:),'filled');
@@ -1997,10 +1974,8 @@ classdef controllerAnalyze < handle
                                 LegendString{end+1}= ['f_{BRthresh}(R) = ' num2str(BlueRedTh) ' * R'];
                             elseif obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 2
                                 BlueRedTh = 1;
-                                BlueRedDistB = 0;
-                                BlueRedDistR = 0;
                                 f_BRthresh =  BlueRedTh * R; %Blue/Red thresh fcn
-                                LegendString{end+1}= ['f_{BRthresh}(R) = R (not active)'];
+                                LegendString{end+1}= 'f_{BRthresh}(R) = R (not active)';
                                 hold(ax, 'on')
                                 plot(ax,R,f_BRthresh,'k');
                                 
@@ -2017,7 +1992,7 @@ classdef controllerAnalyze < handle
                             
                             %%% Plot Farred over Red %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             ax = obj.viewAnalyzeHandle.hAPRFRR;
-%                             axes(ax)
+                            %                             axes(ax)
                             LegendString = {};
                             
                             hold(ax, 'on')
@@ -2075,10 +2050,8 @@ classdef controllerAnalyze < handle
                                 LegendString{end+1} = ['f_{FRthresh}(R) = ' num2str(FarredRedTh) ' * R'];
                             elseif obj.modelAnalyzeHandle.AnalyzeMode == 2
                                 FarredRedTh = 1;
-                                FarredRedDistFR = 0;
-                                FarredRedDistR = 0;
                                 f_BRthresh =  FarredRedTh * R; %Blue/Red thresh fcn
-                                LegendString{end+1} = ['f_{FRthresh}(R) = R (not active)'];
+                                LegendString{end+1} = 'f_{FRthresh}(R) = R (not active)';
                                 hold(ax, 'on')
                                 plot(ax,R,f_BRthresh,'k');
                             end
@@ -2125,7 +2098,7 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_InfoText, 'Value' , length(obj.viewAnalyzeHandle.B_InfoText.String));
         end
         
-        function updateInfoLogEvent(obj,src,evnt)
+        function updateInfoLogEvent(obj,~,~)
             % Listener callback function of the InfoMessage propertie in
             % the model. Is called when InfoMessage string changes. Appends
             % the text in InfoMessage to the log text in the GUI.
@@ -2212,7 +2185,7 @@ classdef controllerAnalyze < handle
                 
                 if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
                     obj.modelAnalyzeHandle.busyIndicator.stop;
-                    [hjObj, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                    [~, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                     obj.modelAnalyzeHandle.busyIndicator = [];
                     delete(hContainer) ;
                 end
