@@ -203,7 +203,8 @@ function changeAppDesign(src,event)
     mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
     mainCordObj.Visible = 'off';
     drawnow;
-    appDesignChanger(mainCordObj,getSettingsValue('Style'));
+    mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+    appDesignChanger(mainFigObj,getSettingsValue('Style'));
     drawnow;
     mainCordObj.Visible = 'on';
     end
