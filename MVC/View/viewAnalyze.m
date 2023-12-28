@@ -145,13 +145,13 @@ classdef viewAnalyze < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%
-            VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0);
+            VBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 2 ,'Padding',2);
             
-            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 2 );
+            HBBoxControl1 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2  );
             obj.B_BackEdit = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('\x25C4 Segmentation'),'FontUnits','normalized','Fontsize',0.4 ,'Tag','pushbuttonBackEdit');
             obj.B_StartResults = uicontrol( 'Parent', HBBoxControl1, 'String', sprintf('Results \x25BA'),'FontUnits','normalized','Fontsize',0.4 ,'Tag','pushbuttonStartResults');
             
-            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 2 );
+            HBBoxControl2 = uix.HButtonBox('Parent', VBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2  );
             obj.B_StartAnalyze = uicontrol( 'Parent', HBBoxControl2, 'String', sprintf('\x21DB Start analyzing'),'FontUnits','normalized','Fontsize',0.4,'Tag','pushbuttonAnalyze' );
             obj.B_PreResults = uicontrol( 'Parent', HBBoxControl2, 'String', sprintf('Preview results \x2750'),'FontUnits','normalized','Fontsize',0.4 ,'Tag','pushbuttonPreResults');
             

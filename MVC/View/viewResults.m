@@ -82,7 +82,7 @@ classdef viewResults < handle
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
-            obj.mainPanelResults = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2,'Tag','mainPanelResults');
+            obj.mainPanelResults = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2);
             
             obj.panelResults = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.mainPanelResults,'FontSize',fontSizeB,'Padding',0);
             obj.panelControl = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.mainPanelResults,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
@@ -101,13 +101,13 @@ classdef viewResults < handle
             set( PanelVBox, 'Heights', [-13 -35 -52], 'Spacing', 2 );
             
             %%%%%%%%%%%%%%%%%% Panel control %%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0 );
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 2 ,'Padding',2 );
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',5,'Padding', 2);
             obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', sprintf('\x25C4 Classification'),'FontUnits','normalized','Fontsize',0.4 );
             obj.B_CloseProgramm = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Close program \x2612') );
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',5,'Padding', 2);
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
             obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', sprintf('Save data \x2611'),'FontUnits','normalized','Fontsize',0.4 );
             

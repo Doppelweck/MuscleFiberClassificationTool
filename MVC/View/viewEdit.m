@@ -153,17 +153,17 @@ classdef viewEdit < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0);
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 2 ,'Padding',2);
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2 );
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
             obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('Analyze \x25BA') ,'Enable','off');
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2 );
             obj.B_CheckMask = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('\x2593 Check mask') ,'Enable','off');
             obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Check planes \x2750') ,'Enable','off');
             
-            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing',2);
+            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2 );
             obj.B_Undo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('\x21BA Undo'),'FontUnits','normalized','Fontsize',0.4);
             obj.B_Redo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('Redo \x21BB'),'FontUnits','normalized','Fontsize',0.4);
             
