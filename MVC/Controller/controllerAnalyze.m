@@ -27,6 +27,7 @@ classdef controllerAnalyze < handle
     properties
         mainFigure; %handle to main figure.
         mainCardPanel; %handle to card panel in the main figure.
+        panelAnalyze; %handle to mainPanelBox in editlAnalyze
         viewAnalyzeHandle; %hande to viewAnalyze instance.
         modelAnalyzeHandle; %hande to modelAnalyze instance.
         controllerEditHandle; %handle to controllerEdit instance.
@@ -60,7 +61,9 @@ classdef controllerAnalyze < handle
             obj.mainCardPanel =mainCardPanel;
             
             obj.viewAnalyzeHandle = viewAnalyzeH;
-            obj.modelAnalyzeHandle =modelAnalyzeH;
+            obj.modelAnalyzeHandle = modelAnalyzeH;
+            
+            obj.panelAnalyze = obj.viewAnalyzeHandle.panelAnalyze;
             
             obj.setInitValueInModel();
             

@@ -28,6 +28,7 @@ classdef controllerResults < handle
         
         mainFigure; %handle to main figure.
         mainCardPanel; %handle to card panel in the main figure.
+        mainCardPanelResults; %handle to card panel selection 3 in the main figure.
         viewResultsHandle; %hande to viewResults instance.
         modelResultsHandle; %hande to modelResults instance.
         controllerAnalyzeHandle; %handle to controllerAnalyze instance.
@@ -62,6 +63,8 @@ classdef controllerResults < handle
             obj.viewResultsHandle = viewResultsH;
             
             obj.modelResultsHandle = modelResultsH;
+            
+            obj.mainCardPanelResults = obj.viewResultsHandle.panelResults;
             
             obj.addMyCallback();
             

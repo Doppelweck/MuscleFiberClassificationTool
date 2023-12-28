@@ -27,6 +27,7 @@ classdef controllerEdit < handle
     properties
         mainFigure; %handle to main figure.
         mainCardPanel; %handle to card panel in the main figure.
+        panelEdit; %handle to mainPanelBox in editVIEW
         viewEditHandle; %hande to viewEdit instance.
         modelEditHandle; %hande to modelEdit instance.
         controllerAnalyzeHandle; %hande to controllerAnalyze instance.
@@ -63,6 +64,8 @@ classdef controllerEdit < handle
             obj.viewEditHandle = viewEditH;
             
             obj.modelEditHandle = modelEditH;
+            
+            obj.panelEdit = obj.viewEditHandle.panelEdit;
             
             obj.addMyListener();
             
