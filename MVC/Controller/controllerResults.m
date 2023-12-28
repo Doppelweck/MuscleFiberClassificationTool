@@ -1135,33 +1135,33 @@ classdef controllerResults < handle
             % get axes in the results GUI
             axesResultsPicProc = obj.viewResultsHandle.hAPProcessed;
             % show RGB image with farred plane
-            axes(axesResultsPicProc)
+%             axes(axesResultsPicProc)
             
             AMode = obj.modelResultsHandle.AnalyzeMode;
             
             if AMode == 1 || AMode == 3 || AMode == 5 || AMode == 7
-                imshow(obj.modelResultsHandle.PicPRGBPlanes);
+                imshow(obj.modelResultsHandle.PicPRGBPlanes,'Parent',axesResultsPicProc);
             elseif AMode == 2 || AMode == 4 || AMode == 6 
-                imshow(obj.modelResultsHandle.PicPRGBFRPlanes);
+                imshow(obj.modelResultsHandle.PicPRGBFRPlanes,'Parent',axesResultsPicProc);
             end
             
             copyobj(hBounds ,axesResultsPicProc);
-            hold on
+            hold(axesResultsPicProc, 'on');
             %Show labels
             obj.modelResultsHandle.InfoMessage = '         - show labels...';
             
             %plot labels in the image
             for k = 1:size(obj.modelResultsHandle.Stats,1)
-                hold on
+                hold(axesResultsPicProc, 'on');
                 c = obj.modelResultsHandle.Stats(k).Centroid;
-                text(c(1)/obj.modelResultsHandle.XScale, c(2)/obj.modelResultsHandle.YScale, sprintf('%d', k),'Color','g', ...
+                text(axesResultsPicProc,c(1)/obj.modelResultsHandle.XScale, c(2)/obj.modelResultsHandle.YScale, sprintf('%d', k),'Color','g', ...
                     'HorizontalAlignment', 'center', 'FontWeight','bold',...
                     'VerticalAlignment', 'middle','FontSize',fontSizeB,...
                     'Clipping','on');
             end
-            axis image
-            axis on
-            hold off
+            axis(axesResultsPicProc, 'image');
+            axis(axesResultsPicProc, 'on');
+            hold(axesResultsPicProc, 'off');
             lhx=xlabel(axesResultsPicProc, sprintf('x/\x3BCm'),'Fontsize',fontSizeM);
             lhy=ylabel(axesResultsPicProc, sprintf('y/\x3BCm'),'Fontsize',fontSizeM);
             set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
@@ -1173,7 +1173,7 @@ classdef controllerResults < handle
             Yvalue = obj.modelResultsHandle.YScale;
             axesResultsPicProc.YTick = [0:100:maxPixelY];
             axesResultsPicProc.YTickLabel = axesResultsPicProc.XTick*Yvalue;
-            t=title(['Total Area = ' num2str(obj.modelResultsHandle.AreaPic) ' ' sprintf('\x3BCm^2') ' = ' num2str(obj.modelResultsHandle.AreaPic*(10^(-6))) ' mm^2']);
+            t=title(axesResultsPicProc,['Total Area = ' num2str(obj.modelResultsHandle.AreaPic) ' ' sprintf('\x3BCm^2') ' = ' num2str(obj.modelResultsHandle.AreaPic*(10^(-6))) ' mm^2']);
             set(t,'FontUnits','normalized','Fontsize',0.02);
            
         end
@@ -1212,27 +1212,27 @@ classdef controllerResults < handle
             %get axes in the results GUI
             axesResultsGroups = obj.viewResultsHandle.hAPGroups;
             % show RGB image with farred plane
-            axes(axesResultsGroups)
+%             axes(axesResultsGroups)
             
             AMode = obj.modelResultsHandle.AnalyzeMode;
             
             if AMode == 1 || AMode == 3 || AMode == 5 || AMode == 7
-                imshow(obj.modelResultsHandle.PicPRGBPlanes);
+                imshow(obj.modelResultsHandle.PicPRGBPlanes,'Parent',axesResultsGroups);
             elseif AMode == 2 || AMode == 4 || AMode == 6 
-                imshow(obj.modelResultsHandle.PicPRGBFRPlanes);
+                imshow(obj.modelResultsHandle.PicPRGBFRPlanes,'Parent',axesResultsGroups);
             end
             
             obj.modelResultsHandle.InfoMessage = '      - load Group image';
-            hold on
-            himage = imshow(GroupStats.Lrgb);
+            hold(axesResultsGroups, 'on');
+            himage = imshow(GroupStats.Lrgb,'Parent',axesResultsGroups);
             himage.AlphaData = 0.5;
             
             obj.modelResultsHandle.InfoMessage = '      - show Group boundaries';
             
             obj.modelResultsHandle.InfoMessage = '         - show Type 1 Groups';
             if ~isempty(GroupStats.BoundT1)
-                hold on
-                visboundaries(GroupStats.BoundT1,'Color','b','LineWidth', 2)
+                hold(axesResultsGroups, 'on');
+                visboundaries(axesResultsGroups,GroupStats.BoundT1,'Color','b','LineWidth', 2)
                 n=max(max(GroupStats.LabelT1));
                 tempStats=regionprops('struct',GroupStats.LabelT1,'Centroid');
                 for i=1:1:n
@@ -1244,8 +1244,8 @@ classdef controllerResults < handle
 %                     px = GroupStats.BoundT1{i,1}(1,2);
 %                     py = tempStats(i).Extrema(1,2);
 %                     px = tempStats(i).Extrema(1,1);
-                    hold on
-                    text(c(1), c(2), sprintf('%d', NoObj),'Color','w', ...
+                    hold(axesResultsGroups, 'on');
+                    text(axesResultsGroups,c(1), c(2), sprintf('%d', NoObj),'Color','w', ...
                     'HorizontalAlignment', 'center', 'EdgeColor','b', ...
                     'BackgroundColor','b','Margin',1,...
                     'LineWidth', 2,'FontWeight','bold',...
@@ -1256,8 +1256,8 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle.InfoMessage = '         - show Type 12h Groups';
             if ~isempty(GroupStats.BoundT12h)
-                hold on
-                visboundaries(GroupStats.BoundT12h,'Color','m','LineWidth', 2)
+                hold(axesResultsGroups, 'on');
+                visboundaries(axesResultsGroups,GroupStats.BoundT12h,'Color','m','LineWidth', 2)
                 n=max(max(GroupStats.LabelT12h));
                 tempStats=regionprops('struct',GroupStats.LabelT12h,'Centroid');
                 for i=1:1:n
@@ -1265,8 +1265,8 @@ classdef controllerResults < handle
 %                     Vec(Vec==0)=[];
                     NoObj=GroupStats.NoObjT12h(i);
                     c=tempStats(i).Centroid;
-                    hold on
-                    text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                    hold(axesResultsGroups, 'on');
+                    text(axesResultsGroups,c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
                     'HorizontalAlignment', 'center', 'EdgeColor','m', ...
                     'BackgroundColor','m','Margin',1,...
                     'LineWidth', 2,'FontWeight','bold',...
@@ -1279,8 +1279,8 @@ classdef controllerResults < handle
                 
                 obj.modelResultsHandle.InfoMessage = '         - show Type 2 Groups';
                 if ~isempty(GroupStats.BoundT2)
-                    hold on
-                    visboundaries(GroupStats.BoundT2,'Color','r','LineWidth', 2)
+                    hold(axesResultsGroups, 'on');
+                    visboundaries(axesResultsGroups,GroupStats.BoundT2,'Color','r','LineWidth', 2)
                     n=max(max(GroupStats.LabelT2));
                     tempStats=regionprops('struct',GroupStats.LabelT2,'Centroid');
                     for i=1:1:n
@@ -1288,8 +1288,8 @@ classdef controllerResults < handle
                         %                     Vec(Vec==0)=[];
                         NoObj=GroupStats.NoObjT2(i);
                         c=tempStats(i).Centroid;
-                        hold on
-                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                        hold(axesResultsGroups, 'on');
+                        text(axesResultsGroups,axesResultsGroups,c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
                             'HorizontalAlignment', 'center', 'EdgeColor','r', ...
                             'BackgroundColor','r','Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
@@ -1302,8 +1302,8 @@ classdef controllerResults < handle
                 
                 obj.modelResultsHandle.InfoMessage = '         - show Type 2x Groups';
                 if ~isempty(GroupStats.BoundT2x)
-                    hold on
-                    visboundaries(GroupStats.BoundT2x,'Color','r','LineWidth', 2)
+                    hold(axesResultsGroups, 'on');
+                    visboundaries(axesResultsGroups,GroupStats.BoundT2x,'Color','r','LineWidth', 2)
                     n=max(max(GroupStats.LabelT2x));
                     tempStats=regionprops('struct',GroupStats.LabelT2x,'Centroid');
                     for i=1:1:n
@@ -1311,8 +1311,8 @@ classdef controllerResults < handle
                         %                     Vec(Vec==0)=[];
                         NoObj=GroupStats.NoObjT2x(i);
                         c=tempStats(i).Centroid;
-                        hold on
-                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                        hold(axesResultsGroups, 'on');
+                        text(axesResultsGroups,c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
                             'HorizontalAlignment', 'center', 'EdgeColor','r', ...
                             'BackgroundColor','r','Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
@@ -1323,8 +1323,8 @@ classdef controllerResults < handle
                 
                 obj.modelResultsHandle.InfoMessage = '         - show Type 2a Groups';
                 if ~isempty(GroupStats.BoundT2a)
-                    hold on
-                    visboundaries(GroupStats.BoundT2a,'Color','y','LineWidth', 2)
+                    hold(axesResultsGroups, 'on');
+                    visboundaries(axesResultsGroups,GroupStats.BoundT2a,'Color','y','LineWidth', 2)
                     n=max(max(GroupStats.LabelT2a));
                     tempStats=regionprops('struct',GroupStats.LabelT2a,'Centroid');
                     for i=1:1:n
@@ -1332,8 +1332,8 @@ classdef controllerResults < handle
                         %                     Vec(Vec==0)=[];
                         NoObj=GroupStats.NoObjT2a(i);
                         c=tempStats(i).Centroid;
-                        hold on
-                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                        hold(axesResultsGroups, 'on');
+                        text(axesResultsGroups,c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
                             'HorizontalAlignment', 'center', 'EdgeColor','y', ...
                             'BackgroundColor','y','Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
@@ -1344,8 +1344,8 @@ classdef controllerResults < handle
                 
                 obj.modelResultsHandle.InfoMessage = '         - show Type 2ax Groups';
                 if ~isempty(GroupStats.BoundT2ax)
-                    hold on
-                    visboundaries(GroupStats.BoundT2ax,'Color',[255/255 100/255 0],'LineWidth', 2)
+                    hold(axesResultsGroups, 'on');
+                    visboundaries(axesResultsGroups,GroupStats.BoundT2ax,'Color',[255/255 100/255 0],'LineWidth', 2)
                     n=max(max(GroupStats.LabelT2ax));
                     tempStats=regionprops('struct',GroupStats.LabelT2ax,'Centroid');
                     for i=1:1:n
@@ -1353,8 +1353,8 @@ classdef controllerResults < handle
                         %                     Vec(Vec==0)=[];
                         NoObj=GroupStats.NoObjT2ax(i);
                         c=tempStats(i).Centroid;
-                        hold on
-                        text(c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
+                        hold(axesResultsGroups, 'on');
+                        text(axesResultsGroups,c(1), c(2), sprintf('%d', NoObj),'Color','k', ...
                             'HorizontalAlignment', 'center', 'EdgeColor',[255/255 100/255 0], ...
                             'BackgroundColor',[255/255 100/255 0],'Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
@@ -1366,9 +1366,9 @@ classdef controllerResults < handle
             textObj = findobj(axesResultsGroups,'Type','text');
             uistack(textObj,'top');
             
-            axis image
-            axis on
-            hold off
+            axis(axesResultsGroups, 'image');
+            axis(axesResultsGroups, 'on');
+            hold(axesResultsGroups, 'off');
             lhx=xlabel(axesResultsGroups, sprintf('x/\x3BCm'),'Fontsize',fontSizeM);
             lhy=ylabel(axesResultsGroups, sprintf('y/\x3BCm'),'Fontsize',fontSizeM);
             set(lhx, 'Units', 'Normalized', 'Position', [1 0]);
@@ -1380,7 +1380,7 @@ classdef controllerResults < handle
             Yvalue = obj.modelResultsHandle.YScale;
             axesResultsGroups.YTick = [0:100:maxPixelY];
             axesResultsGroups.YTickLabel = axesResultsGroups.XTick*Yvalue;
-            t=title(['Image with Fiber-Type-Groups highlighted and number of objects within each Group.']);
+            t=title(axesResultsGroups,['Image with Fiber-Type-Groups highlighted and number of objects within each Group.']);
             set(t,'FontUnits','normalized','Fontsize',0.02)
             
         end
@@ -1847,7 +1847,6 @@ classdef controllerResults < handle
             Text = [];
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';
-            workbar(1.2,'delete workbar','delete workbar',obj.mainFigure);
             
             if any(strcmp('stack',fieldnames(ErrorInfo)))
                 
@@ -1866,6 +1865,7 @@ classdef controllerResults < handle
             beep
             uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
             
+            workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             obj.busyIndicator(0);
         end
         
