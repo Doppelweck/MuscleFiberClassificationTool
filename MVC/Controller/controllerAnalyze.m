@@ -964,62 +964,64 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle.PicPRGBPlanes = PicData{9};
             
             % get axes for PicRGB in Analyze GUI
-            axes(obj.viewAnalyzeHandle.hAP);
+%             axes(obj.viewAnalyzeHandle.hAP);
             
             % show PicRGB in Analyze GUI
-            if obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 1
+            switch obj.viewAnalyzeHandle.B_AnalyzeMode.Value 
+                
+                case 1
                 
                 %Show image for triple labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
-                axis on
-                axis image
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
                 
-            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 2
+                case 2
                 
                 %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
-                axis on
-                axis image
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
                 
-            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 3
+                case 3
                 
                 %Show image for triple labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
-                axis on
-                axis image
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
                 
-            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 4
+                case 4
                 
                 %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
-                axis on
-                axis image
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
                 
-            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 5
+                case 5
                 
                 %Show image for triple labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9});
-                axis on
-                axis image
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{9},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
                 
-            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value == 6
-                
-                %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
-                axis on
-                axis image
-            elseif obj.viewAnalyzeHandle.B_AnalyzeMode.Value ==7
+                case 6
                 
                 %Show image for quad labeling
-                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3});
-                axis on
-                axis image
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
+                case 7
+                
+                %Show image for quad labeling
+                obj.modelAnalyzeHandle.handlePicRGB = imshow(PicData{3},'Parent',obj.viewAnalyzeHandle.hAP);
+                axis(obj.viewAnalyzeHandle.hAP, 'on')
+                axis(obj.viewAnalyzeHandle.hAP, 'image')
             end
             
             lhx=xlabel(obj.viewAnalyzeHandle.hAP, sprintf('x/\x3BCm'),'Fontsize',12);
             lhy=ylabel(obj.viewAnalyzeHandle.hAP, sprintf('y/\x3BCm'),'Fontsize',12);
             title(obj.viewAnalyzeHandle.hAP,'Analyzing Fibers')
-            axtoolbar(gca,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
+            axtoolbar(obj.viewAnalyzeHandle.hAP,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             Xvalue = str2num(obj.viewAnalyzeHandle.B_XScale.String);
             maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
@@ -1035,10 +1037,10 @@ classdef controllerAnalyze < handle
             obj.viewAnalyzeHandle.panelPicture.Title = Titel;
             
             % get axes for zoomed Pic in Analyze GUI FIber Information Panel
-            axes(obj.viewAnalyzeHandle.B_AxesInfo);
+%             axes(obj.viewAnalyzeHandle.B_AxesInfo);
+            obj.modelAnalyzeHandle.handleInfoAxes = imshow([],'Parent',obj.viewAnalyzeHandle.B_AxesInfo);
+            axis(obj.viewAnalyzeHandle.B_AxesInfo, 'on');
             axis(obj.viewAnalyzeHandle.B_AxesInfo,'image');
-            obj.modelAnalyzeHandle.handleInfoAxes = imshow([]);
-            axis on
             
             % set InfoText log in View
             set(obj.viewAnalyzeHandle.B_InfoText, 'String', InfoText);
