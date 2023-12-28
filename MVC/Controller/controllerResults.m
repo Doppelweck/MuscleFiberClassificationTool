@@ -461,12 +461,12 @@ classdef controllerResults < handle
                 for b = 1 : length(B)
                     hold(obj.viewResultsHandle.hACount, 'on');
                     % Plot one single bar as a separate bar series.
-                    handleToThisBarSeries(b) = bar(obj.viewResultsHandle.hACount,x(b), B(b), 'BarWidth', 0.9);
+                    handleToThisBarSeries = bar(obj.viewResultsHandle.hACount,x(b), B(b), 'BarWidth', 0.9);
                     % Apply the color to this bar series.
-                    set(handleToThisBarSeries(b),'FaceColor', ColorMapMain(b,:));
+                    set(handleToThisBarSeries,'FaceColor', ColorMapMain(b,:));
                     % Place text atop the bar
                     barTopper = sprintf('%d',B(b));
-                    hText(b) = text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
+                    text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
                         'VerticalAlignment','bottom', 'FontSize', 15,'Tag','areaPlotTextRsults');
                 end
                 
@@ -484,12 +484,12 @@ classdef controllerResults < handle
                 for b = 1 : length(B)
                     hold(obj.viewResultsHandle.hACount, 'on');
                     % Plot one single bar as a separate bar series.
-                    handleToThisBarSeries(b) = bar(obj.viewResultsHandle.hACount,x(b), B(b), 'BarWidth', 0.9);
+                    handleToThisBarSeries = bar(obj.viewResultsHandle.hACount,x(b), B(b), 'BarWidth', 0.9);
                     % Apply the color to this bar series.
-                    set(handleToThisBarSeries(b),'FaceColor', ColorMapAll(b,:));
+                    set(handleToThisBarSeries,'FaceColor', ColorMapAll(b,:));
                     % Place text atop the bar
                     barTopper = sprintf('%d',B(b));
-                    hText(b) = text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
+                    text(obj.viewResultsHandle.hACount,x(b), B(b), barTopper,'HorizontalAlignment','center',...
                         'VerticalAlignment','bottom', 'FontSize', 15,'Tag','areaPlotTextRsults');
                 end
                 
@@ -500,10 +500,6 @@ classdef controllerResults < handle
                 
             end
             
-            % get highest position of text objects
-            maxTextPos = max(max([hText]));
-            % make Axes for Count Data the current Axes
-%             axes(obj.viewResultsHandle.hACount);
             ylim(obj.viewResultsHandle.hACount,[0 ceil((max(B)+round(max(B)/10))/10)*10]);
             l1.FontSize=fontSizeM;
             
@@ -1157,7 +1153,7 @@ classdef controllerResults < handle
                 text(axesResultsPicProc,c(1)/obj.modelResultsHandle.XScale, c(2)/obj.modelResultsHandle.YScale, sprintf('%d', k),'Color','g', ...
                     'HorizontalAlignment', 'center', 'FontWeight','bold',...
                     'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                    'Clipping','on');
+                    'Clipping','on','Tag','fiberLabelsProcessed');
             end
             axis(axesResultsPicProc, 'image');
             axis(axesResultsPicProc, 'on');
@@ -1250,7 +1246,7 @@ classdef controllerResults < handle
                     'BackgroundColor','b','Margin',1,...
                     'LineWidth', 2,'FontWeight','bold',...
                     'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                    'Clipping','on');
+                    'Clipping','on','Tag','fiberLabelsProcessed');
                 end
             end
             
@@ -1271,7 +1267,7 @@ classdef controllerResults < handle
                     'BackgroundColor','m','Margin',1,...
                     'LineWidth', 2,'FontWeight','bold',...
                     'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                    'Clipping','on');
+                    'Clipping','on','Tag','fiberLabelsProcessed');
                 end
             end
             
@@ -1294,7 +1290,7 @@ classdef controllerResults < handle
                             'BackgroundColor','r','Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
                             'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                            'Clipping','on');
+                            'Clipping','on','Tag','fiberLabelsProcessed');
                     end
                 end
                 
@@ -1317,7 +1313,7 @@ classdef controllerResults < handle
                             'BackgroundColor','r','Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
                             'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                            'Clipping','on');
+                            'Clipping','on','Tag','fiberLabelsProcessed');
                     end
                 end
                 
@@ -1338,7 +1334,7 @@ classdef controllerResults < handle
                             'BackgroundColor','y','Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
                             'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                            'Clipping','on');
+                            'Clipping','on','Tag','fiberLabelsProcessed');
                     end
                 end
                 
@@ -1359,7 +1355,7 @@ classdef controllerResults < handle
                             'BackgroundColor',[255/255 100/255 0],'Margin',1,...
                             'LineWidth', 2,'FontWeight','bold',...
                             'VerticalAlignment', 'middle','FontSize',fontSizeB,...
-                            'Clipping','on');
+                            'Clipping','on','Tag','fiberLabelsProcessed');
                     end
                 end
             end

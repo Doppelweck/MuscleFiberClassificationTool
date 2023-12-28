@@ -141,8 +141,9 @@ if(~isempty(h))
     end
 end
 
-%Buttons
-h = findobj(curFig,'Style','text','-and',{'-not', 'ForegroundColor', textColor,'-or','-not', 'BackgroundColor', mainBackground,});
+%Text
+h = findobj(curFig,'Style','text','-and',{'-not', 'ForegroundColor', textColor,'-or','-not', 'BackgroundColor', mainBackground,}...
+    ,'-and','-not','Tag','fiberLabelsProcessed');
 if(~isempty(h))
     try
         set(h(1:length(h)),'BackgroundColor',mainBackground);
@@ -288,7 +289,7 @@ if(~isempty(h))
 end
 
 
-h = findobj(curFig, 'Type', 'text','-and','-not', 'Color', textHighlightColor);
+h = findobj(curFig, 'Type', 'text','-and','-not', 'Color', textHighlightColor,'-and','-not','Tag','fiberLabelsProcessed');
 if(~isempty(h))
     try
         set(h(1:length(h)),'Color' ,textHighlightColor);
