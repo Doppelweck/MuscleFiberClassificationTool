@@ -28,7 +28,7 @@ classdef controllerResults < handle
         
         mainFigure; %handle to main figure.
         mainCardPanel; %handle to card panel in the main figure.
-        mainCardPanelResults; %handle to card panel selection 3 in the main figure.
+        panelResults; %handle to card panel selection 3 in the main figure.
         viewResultsHandle; %hande to viewResults instance.
         modelResultsHandle; %hande to modelResults instance.
         controllerAnalyzeHandle; %handle to controllerAnalyze instance.
@@ -64,7 +64,7 @@ classdef controllerResults < handle
             
             obj.modelResultsHandle = modelResultsH;
             
-            obj.mainCardPanelResults = obj.viewResultsHandle.panelResults;
+            obj.panelResults = obj.viewResultsHandle.panelResults;
             
             obj.addMyCallback();
             
@@ -246,7 +246,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-            appDesignElementChanger(obj.mainCardPanel);
+            appDesignElementChanger(obj.panelResults);
             %show results data in the GUI
             obj.modelResultsHandle.startResultMode();
             
@@ -254,8 +254,8 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_Save,'Enable','on');
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
-            appDesignElementChanger(obj.mainCardPanel);
-%             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+            appDesignElementChanger(obj.panelResults);
+%             appDesignChanger(obj.panelResults,getSettingsValue('Style'));
             
             
             
@@ -281,7 +281,7 @@ classdef controllerResults < handle
             catch
                 obj.errorMessage(lasterror);
             end
-%             appDesignElementChanger(obj.mainCardPanel);
+%             appDesignElementChanger(obj.panelResults);
             obj.busyIndicator(0);
         end
         
@@ -348,7 +348,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','off');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-            appDesignElementChanger(obj.mainCardPanel);
+            appDesignElementChanger(obj.panelResults);
             %Save results
             obj.modelResultsHandle.saveResults();
             
@@ -362,13 +362,13 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.InfoMessage = '- no data has been saved';
             end
             obj.busyIndicator(0);
-            appDesignElementChanger(obj.mainCardPanel);
+            appDesignElementChanger(obj.panelResults);
             [y,Fs] = audioread('filling-your-inbox.mp3');
             sound(y*0.4,Fs);
             catch
                 obj.errorMessage(lasterror);
             end
-            appDesignElementChanger(obj.mainCardPanel);
+            appDesignElementChanger(obj.panelResults);
         end
         
         function showInfoInTableGUI(obj)
@@ -1095,7 +1095,7 @@ classdef controllerResults < handle
             grid(obj.viewResultsHandle.hAScatterAll, 'on');
             hold(obj.viewResultsHandle.hAScatterAll, 'off');
             axtoolbar(obj.viewResultsHandle.hAScatterAll,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.panelResults,getSettingsValue('Style'));
         end
         
         function showPicProcessedGUI(obj)
@@ -1752,7 +1752,7 @@ classdef controllerResults < handle
             delete(lTemp);
             
             obj.modelResultsHandle.ResultUpdateStaus = false;
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.panelResults,getSettingsValue('Style'));
         end
         
         function openSaveDirectory(obj,~,~)
@@ -1825,7 +1825,7 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelResults);
 
             else
                 %delete indicator object and disable GUI elements
@@ -1834,7 +1834,7 @@ classdef controllerResults < handle
                     valid = isvalid(obj.modelResultsHandle.busyObj);
                     obj.modelResultsHandle.busyObj(~valid)=[];
                     set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
-                    appDesignElementChanger(obj.mainCardPanel);
+                    appDesignElementChanger(obj.panelResults);
                 end
                 
                 if ~isempty(obj.modelResultsHandle.busyIndicator)

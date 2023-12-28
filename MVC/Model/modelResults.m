@@ -216,48 +216,48 @@ classdef modelResults < handle
             
             workbar(0.5,'plot Fiber Count','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showAxesFiberCountGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.55,'plot Fiber Area','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showAxesFiberAreaGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.6,'plot Fiber Blue Red','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showAxesScatterBlueRedGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.65,'plot Fiber Farre Blue','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showAxesScatterFarredRedGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.7,'plot all Fiber Scatter','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showAxesScatterAllGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.75,'plot Info Table in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showInfoInTableGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.8,'plot Histogram in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showHistogramGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.85,'plot Imaged Processed in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicProcessedGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.9,'plot Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicGroupsGUI();
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             workbar(0.95,'update GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             
             obj.InfoMessage = '- updating GUI complete';
             workbar(1,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.ResultUpdateStaus = true;
             
-            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.controllerResultsHandle.panelResults,getSettingsValue('Style'));
             end
         end
         

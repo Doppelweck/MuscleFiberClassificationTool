@@ -1074,7 +1074,7 @@ classdef controllerAnalyze < handle
             obj.addWindowCallbacks()
             
             obj.busyIndicator(0);
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+            appDesignChanger(obj.panelAnalyze,getSettingsValue('Style'));
             %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
             
@@ -2218,7 +2218,7 @@ classdef controllerAnalyze < handle
                 end
                 workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             end
-            appDesignElementChanger(obj.mainCardPanel);
+            appDesignElementChanger(obj.panelAnalyze);
         end
         
         function errorMessage(obj,ErrorInfo)
