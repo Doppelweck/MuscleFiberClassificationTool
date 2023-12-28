@@ -257,7 +257,6 @@ classdef viewResults < handle
             set(obj.hAScatterBlueRed, 'LooseInset', [0,0,0,0]);
             axtoolbar(obj.hAScatterBlueRed,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             
-            
             PanelStatisticTabel = uix.Panel('Parent',statisticTabHBox,'Padding',5,'Title', 'Fiber-Type statistics','FontSize',fontSizeM);
             
             set(statisticTabHBox,'Widths', [-2 -2 -1.2])
@@ -278,7 +277,6 @@ classdef viewResults < handle
 
             obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeS);
             
-           
             %%%%%%%%%%%%%%%%%%%%%%%% Tab Histogramms %%%%%%%%%%%%%%%%%%%%%%
             
             histoTabHBox = uix.HBox('Parent',histogramTabPanel,'Spacing',2,'Padding',2);
@@ -342,7 +340,7 @@ classdef viewResults < handle
             obj.hAScatterAll = axes('Parent',uicontainer('Parent',mainScatterallPanel),'Units','normalized','OuterPosition',[0 0 1 1]);
             set(obj.hAScatterAll, 'LooseInset', [0,0,0,0]);
             axtoolbar(obj.hAScatterAll,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
-%             set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
+
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
             
@@ -378,8 +376,6 @@ classdef viewResults < handle
             set(obj.B_CloseProgramm,'tooltipstring',CloseToolTip);
             set(obj.B_NewPic,'tooltipstring',NewPicToolTip);
             set(obj.B_Save,'tooltipstring',SaveToolTip);
-
-            
         end
         
          function delete(obj)
