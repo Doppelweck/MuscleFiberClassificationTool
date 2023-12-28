@@ -224,7 +224,7 @@ classdef controllerEdit < handle
             if isa(obj.modelEditHandle.handlePicRGB,'struct')
                 % first start of the programm. No image handle exist.
                 % create image handle for Pic RGB
-                obj.modelEditHandle.handlePicRGB = imshow(obj.viewEditHandle.hAP,Pic);
+                obj.modelEditHandle.handlePicRGB = imshow(Pic ,'Parent',obj.viewEditHandle.hAP);
             else
                 % New image was selected. Change data in existing handle
                 obj.modelEditHandle.handlePicRGB.CData = Pic;
@@ -235,7 +235,7 @@ classdef controllerEdit < handle
             if isa(obj.modelEditHandle.handlePicBW,'struct')
                 % first start of the programm. No image handle exist.
                 % create image handle for Pic BW
-                obj.modelEditHandle.handlePicBW = imshow(obj.viewEditHandle.hAP,PicBW);
+                obj.modelEditHandle.handlePicBW = imshow(PicBW,'Parent',obj.viewEditHandle.hAP);
                 
                 % Callback for modelEditHandle.handlePicBW must be refresh
                 obj.addMyCallbacks();
@@ -1481,21 +1481,21 @@ classdef controllerEdit < handle
                 obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
                 obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
-                imshow(obj.modelEditHandle.PicBCGreen);
-                caxis([0, 1])
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                imshow(obj.modelEditHandle.PicBCGreen,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessGreen,[0, 1])
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
-                imshow(obj.modelEditHandle.PicBCBlue);
-                caxis([0, 1])
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                imshow(obj.modelEditHandle.PicBCBlue,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessBlue,[0, 1])
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
-                imshow(obj.modelEditHandle.PicBCRed);
-                caxis([0, 1])
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                imshow(obj.modelEditHandle.PicBCRed,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessRed,[0, 1])
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
-                imshow(obj.modelEditHandle.PicBCFarRed);
-                caxis([0, 1])
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
+                imshow(obj.modelEditHandle.PicBCFarRed,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessFarRed);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessFarRed,[0, 1])
                 
                 obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
                 obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
@@ -1566,17 +1566,17 @@ classdef controllerEdit < handle
                 obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
                 obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
-                imshow(obj.modelEditHandle.PicBCGreen);
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                imshow(obj.modelEditHandle.PicBCGreen,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessGreen);
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
-                imshow(obj.modelEditHandle.PicBCBlue);
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                imshow(obj.modelEditHandle.PicBCBlue,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessBlue);
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
-                imshow(obj.modelEditHandle.PicBCRed);
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                imshow(obj.modelEditHandle.PicBCRed,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessRed);
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
-                imshow(obj.modelEditHandle.PicBCFarRed);
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
+                imshow(obj.modelEditHandle.PicBCFarRed,'Parent',obj.viewEditHandle.B_AxesCheckBrightnessFarRed);
                 
                 obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
                 obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
@@ -1646,19 +1646,22 @@ classdef controllerEdit < handle
                 obj.viewEditHandle.B_AxesCheckRGB_noBC.Children.CData = obj.modelEditHandle.PicRGBFRPlanesNoBC;
                 obj.viewEditHandle.B_AxesCheckRGB_BC.Children.CData = obj.modelEditHandle.PicRGBFRPlanes;
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
-                imshow(obj.modelEditHandle.PicBCGreen,[]);
-                caxis([0, 1])
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                imshow(obj.modelEditHandle.PicBCGreen,[],'Parent',obj.viewEditHandle.B_AxesCheckBrightnessGreen);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessGreen,[0, 1])
                 
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
-                imshow(obj.modelEditHandle.PicBCBlue,[]);
-                caxis([0, 1])
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
-                imshow(obj.modelEditHandle.PicBCRed,[]);
-                caxis([0, 1])
-                axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
-                imshow(obj.modelEditHandle.PicBCFarRed,[]);
-                caxis([0, 1])
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                imshow(obj.modelEditHandle.PicBCBlue,[],'Parent',obj.viewEditHandle.B_AxesCheckBrightnessBlue);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessBlue,[0, 1])
+                
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                imshow(obj.modelEditHandle.PicBCRed,[],'Parent',obj.viewEditHandle.B_AxesCheckBrightnessRed);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessRed,[0, 1])
+                
+%                 axes(obj.viewEditHandle.B_AxesCheckBrightnessFarRed)
+                imshow(obj.modelEditHandle.PicBCFarRed,[],'Parent',obj.viewEditHandle.B_AxesCheckBrightnessFarRed);
+                caxis(obj.viewEditHandle.B_AxesCheckBrightnessFarRed,[0, 1])
+                
                 obj.viewEditHandle.B_CurBrightImGreen.String = obj.modelEditHandle.FilenameBCGreen;
                 obj.viewEditHandle.B_CurBrightImBlue.String = obj.modelEditHandle.FilenameBCBlue;
                 obj.viewEditHandle.B_CurBrightImRed.String = obj.modelEditHandle.FilenameBCRed;
@@ -2709,7 +2712,7 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.busyIndicator = [];
                 delete(hContainer);
                 end
-                workbar(1.1,'delete workbar','delete workbar',obj.mainFigure);
+                workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             end
              
         end
