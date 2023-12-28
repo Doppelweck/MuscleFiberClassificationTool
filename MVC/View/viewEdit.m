@@ -28,6 +28,7 @@ classdef viewEdit < handle
         
         panelControl;    %handle to panel with the controls included
         panelPicture;   %handle to panel with the image axes included
+        panelEdit; %handle to panel with editView components.
         hAP;    %handle to axes that shows the image.
         hFCP;   %handle to figure with planes to check. Opens after the check plane button was pressed.
         
@@ -125,12 +126,12 @@ classdef viewEdit < handle
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
-            mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',2,'Padding',2);
+            obj.panelEdit = uix.HBox( 'Parent', mainCard, 'Spacing',2,'Padding',2);
             
-            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',0);
-            obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
-            set( mainPanelBox, 'MinimumWidths', [1 320] );
-            set( mainPanelBox, 'Widths', [-80 -20] );
+            obj.panelPicture = uix.Panel('Parent',  obj.panelEdit,'FontSize',fontSizeB,'Padding',0);
+            obj.panelControl = uix.Panel('Parent',  obj.panelEdit,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
+            set(  obj.panelEdit, 'MinimumWidths', [1 320] );
+            set(  obj.panelEdit, 'Widths', [-80 -20] );
             set(obj.panelPicture,'Title','PICTURE');
             obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.012,'Title','PICTURE');
 %             axtoolbar(obj.hAP,{'datacursor','pan','zoomin','zoomout','restoreview'});
