@@ -153,7 +153,7 @@ if(strcmp(colorMode,'dark'))
     
     
 else
-    %If Stzle is not dark, then frame objects are not needed. Transfer alle
+    %If Style is not dark, then frame objects are not needed. Transfer alle
     %Frame Objects back to normal uicontrols
     h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*edit.*'});
     try
