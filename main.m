@@ -5,7 +5,7 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
-    
+    warning('off', 'all');
     cl;
     pause(0.1);
     
