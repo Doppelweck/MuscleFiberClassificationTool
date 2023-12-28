@@ -2669,15 +2669,7 @@ classdef controllerEdit < handle
             
             if status
                 %create indicator object and disable GUI elements
-                
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','watch');
-                %find all objects that are enabled and disable them
-                obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
-                set( obj.modelEditHandle.busyObj, 'Enable', 'off')
-                appDesignElementChanger(obj.mainCardPanel);
-                
+               
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -2695,6 +2687,14 @@ classdef controllerEdit < handle
                 obj.modelEditHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
                 javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelEditHandle.busyIndicator.start;
+                
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','watch');
+                %find all objects that are enabled and disable them
+                obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
+                set( obj.modelEditHandle.busyObj, 'Enable', 'off');
+                appDesignElementChanger(obj.mainCardPanel);
 
             else
                 %delete indicator object and disable GUI elements
@@ -2710,10 +2710,10 @@ classdef controllerEdit < handle
                 end
                 
                 if ~isempty(obj.modelEditHandle.busyIndicator)
-                obj.modelEditHandle.busyIndicator.stop;
-                [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
-                obj.modelEditHandle.busyIndicator = [];
-                delete(hContainer);
+                    obj.modelEditHandle.busyIndicator.stop;
+                    [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                    obj.modelEditHandle.busyIndicator = [];
+                    delete(hContainer);
                 end
                 workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             end

@@ -254,8 +254,10 @@ classdef modelResults < handle
             appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
             
             obj.InfoMessage = '- updating GUI complete';
-            workbar(1.5,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
+            workbar(1,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.ResultUpdateStaus = true;
+            
+            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
             end
         end
         

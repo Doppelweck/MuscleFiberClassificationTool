@@ -1391,7 +1391,8 @@ classdef controllerAnalyze < handle
                 %       - Input
                 %           obj:    Handle to controllerAnalyze object.
                 %
-                
+                obj.mainCardPanel.Selection = 3;
+%                 obj.busyIndicator(1);
                 if isempty(obj.modelAnalyzeHandle.Stats)
                     obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
                     obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
@@ -1429,6 +1430,7 @@ classdef controllerAnalyze < handle
                     % send all data to the result controller and start the
                     % result mode
                     obj.controllerResultsHandle.startResultsMode(Data,InfoText);
+%                     obj.busyIndicator(0);
                 end
             catch
                 obj.errorMessage(lasterror);
@@ -2171,13 +2173,6 @@ classdef controllerAnalyze < handle
             if status
                 %create indicator object and disable GUI elements
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','watch');
-                %find all objects that are enabled and disable them
-                obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
-                set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
-                
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -2196,16 +2191,15 @@ classdef controllerAnalyze < handle
                 javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelAnalyzeHandle.busyIndicator.start;
                 
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','watch');
+                %find all objects that are enabled and disable them
+                obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
+                set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
+                
             else
                 %delete indicator object and disable GUI elements
-                
-                if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
-                    obj.modelAnalyzeHandle.busyIndicator.stop;
-                    [hjObj, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
-                    obj.modelAnalyzeHandle.busyIndicator = [];
-                    delete(hContainer) ;
-                end
-                
                 
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
@@ -2215,6 +2209,14 @@ classdef controllerAnalyze < handle
                     obj.modelAnalyzeHandle.busyObj(~valid)=[];
                     set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
                 end
+                
+                if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
+                    obj.modelAnalyzeHandle.busyIndicator.stop;
+                    [hjObj, hContainer] = javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                    obj.modelAnalyzeHandle.busyIndicator = [];
+                    delete(hContainer) ;
+                end
+                workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             end
             appDesignElementChanger(obj.mainCardPanel);
         end

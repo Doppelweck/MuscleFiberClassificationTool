@@ -177,6 +177,11 @@ classdef controllerResults < handle
             %           InfoText:   Info text log.
             %
             
+            obj.mainCardPanel.Selection = 3;
+            obj.busyIndicator(1);
+            
+            %change the card panel to selection 3: results mode
+            
             try
             % Set PicData Properties in the Results Model
             obj.modelResultsHandle.FileName = Data{1};
@@ -229,12 +234,7 @@ classdef controllerResults < handle
             % set panel title to filename and path
             Titel = [obj.modelResultsHandle.PathName obj.modelResultsHandle.FileName];
             obj.viewResultsHandle.panelResults.Title = Titel;
-            
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
-            %change the card panel to selection 3: results mode
-            obj.mainCardPanel.Selection = 3;
-            
-            obj.busyIndicator(1);
+
             
             %change the figure callbacks for the results mode
             obj.addWindowCallbacks()
@@ -248,7 +248,6 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
             appDesignElementChanger(obj.mainCardPanel);
             %show results data in the GUI
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
             obj.modelResultsHandle.startResultMode();
             
             set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
@@ -256,8 +255,8 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.B_NewPic,'Enable','on');
             set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
             appDesignElementChanger(obj.mainCardPanel);
-            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
-            obj.busyIndicator(0);
+%             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
+            
             
             
             %Check if a resultsfolder for the file already exist
@@ -282,7 +281,8 @@ classdef controllerResults < handle
             catch
                 obj.errorMessage(lasterror);
             end
-            appDesignElementChanger(obj.mainCardPanel);
+%             appDesignElementChanger(obj.mainCardPanel);
+            obj.busyIndicator(0);
         end
         
         function backAnalyzeModeEvent(obj,~,~)
@@ -512,6 +512,7 @@ classdef controllerResults < handle
             ylabel(obj.viewResultsHandle.hACount,'Numbers','FontUnits','normalized','Fontsize',0.045);
             title(obj.viewResultsHandle.hACount,['Number of fiber types (Total: ' num2str(sum(B)) ')'],'FontUnits','normalized','Fontsize',0.06)
             
+            axtoolbar(obj.viewResultsHandle.hACount,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             grid(obj.viewResultsHandle.hACount, 'on');
             hold(obj.viewResultsHandle.hACount, 'off');
         end
@@ -602,7 +603,8 @@ classdef controllerResults < handle
                     l2.FontSize=fontSizeM;
                     title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
                 end
-            end       
+            end 
+            axtoolbar(obj.viewResultsHandle.hAArea,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
         end
         
         function showAxesScatterBlueRedGUI(obj)
@@ -787,6 +789,7 @@ classdef controllerResults < handle
             set(obj.viewResultsHandle.hAScatterBlueRed,'xtick',[0:20:maxLim*2]);
             set(obj.viewResultsHandle.hAScatterBlueRed,'ytick',[0:20:maxLim*2]);
             
+            axtoolbar(obj.viewResultsHandle.hAScatterBlueRed,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             grid(obj.viewResultsHandle.hAScatterBlueRed, 'on');
             hold(obj.viewResultsHandle.hAScatterBlueRed, 'off');
         end
@@ -950,7 +953,7 @@ classdef controllerResults < handle
                     
                 grid(obj.viewResultsHandle.hAScatterFarredRed, 'on');
                 hold(obj.viewResultsHandle.hAScatterFarredRed, 'off');
-                
+                axtoolbar(obj.viewResultsHandle.hAScatterFarredRed,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
         end
         
         function showAxesScatterAllGUI(obj)
@@ -1091,6 +1094,7 @@ classdef controllerResults < handle
             
             grid(obj.viewResultsHandle.hAScatterAll, 'on');
             hold(obj.viewResultsHandle.hAScatterAll, 'off');
+            axtoolbar(obj.viewResultsHandle.hAScatterAll,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
         end
         
@@ -1438,7 +1442,8 @@ classdef controllerResults < handle
             grid(obj.viewResultsHandle.hAAreaHist, 'on');
             l1=legend(obj.viewResultsHandle.hAAreaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
             l1.FontSize=fontSizeM;
-
+            axtoolbar(obj.viewResultsHandle.hAAreaHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
+            
             %%%%%%%%% Aspect Ratio Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             obj.modelResultsHandle.InfoMessage = '      - plot Aspect Ratio Histogram';
             
@@ -1462,6 +1467,7 @@ classdef controllerResults < handle
             grid(obj.viewResultsHandle.hAAspectHist, 'on');
             l2=legend(obj.viewResultsHandle.hAAspectHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
             l2.FontSize=fontSizeM;
+            axtoolbar(obj.viewResultsHandle.hAAspectHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             
             %%%%%%%%% Diameters Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             obj.modelResultsHandle.InfoMessage = '      - plot Diameter Histogram';
@@ -1486,7 +1492,8 @@ classdef controllerResults < handle
             grid(obj.viewResultsHandle.hADiaHist, 'on');
             l3=legend(obj.viewResultsHandle.hADiaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
             l3.FontSize=fontSizeM;
-            
+            axtoolbar(obj.viewResultsHandle.hADiaHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
+             
             %%%%%%%%% Roundness Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             obj.modelResultsHandle.InfoMessage = '      - plot Roundness Histogram';
             
@@ -1510,6 +1517,7 @@ classdef controllerResults < handle
             grid(obj.viewResultsHandle.hARoundHist, 'on');
             l4=legend(obj.viewResultsHandle.hARoundHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
             l4.FontSize=fontSizeM;
+            axtoolbar(obj.viewResultsHandle.hARoundHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             else
                 obj.modelResultsHandle.InfoMessage = '      - ERROR: No Data for Histogram';
             end
@@ -1744,6 +1752,7 @@ classdef controllerResults < handle
             delete(lTemp);
             
             obj.modelResultsHandle.ResultUpdateStaus = false;
+            appDesignChanger(obj.mainCardPanel,getSettingsValue('Style'));
         end
         
         function openSaveDirectory(obj,~,~)
@@ -1790,18 +1799,8 @@ classdef controllerResults < handle
         
         function busyIndicator(obj,status)
             % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
-            
-            
             if status
                 %create indicator object and disable GUI elements
-                
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','watch');
-                %find all objects that are enabled and disable them
-                obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
-                set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
-                appDesignElementChanger(obj.mainCardPanel);
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1819,27 +1818,37 @@ classdef controllerResults < handle
                 obj.modelResultsHandle.busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
                 javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelResultsHandle.busyIndicator.start;
+                
+                figHandles = findobj('Type','figure');
+                set(figHandles,'pointer','watch');
+                %find all objects that are enabled and disable them
+                obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
+                set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
+                appDesignElementChanger(obj.mainCardPanel);
 
             else
                 %delete indicator object and disable GUI elements
                 
+                if ~isempty(obj.modelResultsHandle.busyObj)
+                    valid = isvalid(obj.modelResultsHandle.busyObj);
+                    obj.modelResultsHandle.busyObj(~valid)=[];
+                    set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
+                    appDesignElementChanger(obj.mainCardPanel);
+                end
+                
                 if ~isempty(obj.modelResultsHandle.busyIndicator)
-                obj.modelResultsHandle.busyIndicator.stop;
-                [hjObj, hContainer] = javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
-                delete(hContainer) ;
-                obj.modelResultsHandle.busyIndicator = [];
+                    obj.modelResultsHandle.busyIndicator.stop;
+                    [hjObj, hContainer] = javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                    delete(hContainer) ;
+                    obj.modelResultsHandle.busyIndicator = [];
                 end
                 
                 figHandles = findobj('Type','figure');
                 set(figHandles,'pointer','arrow');
-                
-                if ~isempty(obj.modelResultsHandle.busyObj)
-                    valid = isvalid(obj.modelResultsHandle.busyObj);
-                    obj.modelResultsHandle.busyObj(~valid)=[];
-                set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
-                end
+                workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             end
-            appDesignElementChanger(obj.mainCardPanel);
+            
         end
         
         function errorMessage(obj,ErrorInfo)
