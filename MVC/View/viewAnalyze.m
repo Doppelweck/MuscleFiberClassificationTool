@@ -162,16 +162,11 @@ classdef viewAnalyze < handle
             %%%%%%%%%%%%%%%% 1. Row Analyze Mode
             HBoxPara1 = uix.HBox('Parent', mainVBoxPara);
             
-%             HButtonBoxPara11 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 1 );
-%             uicontrol( 'Parent', HButtonBoxPara11,'Style','text','FontUnits','normalized','Fontsize',0.6, 'HorizontalAlignment','left', 'String', ' Analyze Mode :' );
-            
             HButtonBoxPara12 = uix.HButtonBox('Parent', HBoxPara1,'ButtonSize',[6000 20],'Padding', 2 );
             String= {sprintf('Color-Ratio-Based triple labeling') ; sprintf('Color-Ratio-Based quad labeling');...
             'OPTICS-Cluster-Based triple labeling' ; 'OPTICS-Cluster-Based quad labeling';'Manual CLassification triple labeling';'Manual CLassification quad labeling'; 'Collagen / Dystrophin'};
             obj.B_AnalyzeMode = uicontrol( 'Parent', HButtonBoxPara12,'Style','popupmenu','FontUnits','normalized','Fontsize',0.6, 'String', String ,'Value',2,'Tag','popupmenuAnalyzeMode');
-            
-%             set( HBoxPara1, 'Widths', [-2 -5] );
-            
+                       
             %%%%%%%%%%%%%%%% 2. Row: Area
             HBoxPara2 = uix.HBox('Parent', mainVBoxPara);
             
@@ -370,6 +365,7 @@ classdef viewAnalyze < handle
              set( HBoxPara8, 'Widths', [-1 -1 -1 -1] );
             
             set( mainVBoxPara, 'Heights', [-1 -1 -1 -1 -1 -2 -1], 'Spacing', 0 );
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%% Panel FiberInformation %%%%%%%%%%%%%%%%%%%%%
             VBoxMainInfoFiber = uix.VBox('Parent', obj.PanelFiberInformation,'Padding', 5);
@@ -620,9 +616,7 @@ classdef viewAnalyze < handle
                 %quad labeling was active all fibers allowed
             set(obj.B_FiberTypeManipulate,'String',{'Type 1 (blue)' , 'Type 12h (magenta)', 'Type 2x (red)', 'Type 2a (yellow)', 'Type 2ax (orange)' ,'Type 0 undefined (white)' })    
             end
-%             uix.Empty( 'Parent', VButtonBoxleftInfo);
-%             uix.Empty( 'Parent', VButtonBoxleftValue);
-            
+           
             HBBoxCont = uix.HButtonBox('Parent', mainVBoxInfo,'Spacing', 5,'Padding',5,'ButtonSize',[6000 200]);
             obj.B_ManipulateCancel = uicontrol( 'Parent', HBBoxCont, 'String', 'Cancel','FontUnits','normalized','Fontsize',0.6 );
             obj.B_ManipulateOK = uicontrol( 'Parent', HBBoxCont, 'String', 'Change Info','FontUnits','normalized','Fontsize',0.6 );
@@ -704,17 +698,10 @@ classdef viewAnalyze < handle
             set(obj.hFMC, 'position', [posMainFig(1) posMainFig(2) 0.6 0.8]);
             movegui(obj.hFMC,'center')
             
-%             set(obj.hFMC, 'position', [0.2 0.1 0.6 0.8]);
             set(obj.hFMC,'WindowStyle','normal');
             
             VBox = uix.VBox('Parent', obj.hFMC );
-%             %VBox 1 with info text
-%             HBoxText = uix.HButtonBox('Parent', VBox,'ButtonSize',[6000 40],'Padding', 1 );
-%             String = 'Select a Area by clicking the mouse and choose fiber type';
-%             uicontrol( 'Parent', HBoxText,'Style','text','FontSize',fontSizeB, 'String', String);
-%             String = 'Select Main Fiber types 1 12h and 2';
-%             obj.B_ManualInfoText = uicontrol( 'Parent', HBoxText,'Style','text','FontSize',fontSizeB, 'String', String,'Tag','ManualInfoText');
-%             
+     
             %VBox 2 with axes
             AxesBox = uix.HBox('Parent', VBox,'Padding', 1 );
             obj.hAMC = axes('Parent',uicontainer('Parent', AxesBox), 'FontSize',fontSizeB,'Tag','AxesManualClassify');
@@ -760,11 +747,9 @@ classdef viewAnalyze < handle
             AxesBox = uix.HBox('Parent', obj.hFPR,'Padding', 25,'Spacing', 10);
             obj.hAPRBR = axes('Parent',uicontainer('Parent', AxesBox), 'FontUnits','normalized','Fontsize',0.015,'Tag','AxesManualClassify');
             set(obj.hAPRBR, 'LooseInset', [0,0,0,0]);
-            %daspect(obj.hAPRBR,[1 1 1]);
             obj.hAPRFRR = axes('Parent',uicontainer('Parent', AxesBox), 'FontUnits','normalized','Fontsize',0.015,'Tag','AxesManualClassify');
             set(obj.hAPRFRR, 'LooseInset', [0,0,0,0]);
             
-            %daspect(obj.hAPRFRR,[1 1 1]);
             appDesignChanger(obj.hFPR,getSettingsValue('Style'));
             set(obj.hFPR, 'Visible', 'on');
         end
@@ -843,9 +828,6 @@ classdef viewAnalyze < handle
             set(obj.B_FarredRedThresh,'tooltipstring',FRRTreshToolTip);
             set(obj.B_FarredRedDistFarred,'tooltipstring',FRRDistFRhToolTip);
             set(obj.B_FarredRedDistRed,'tooltipstring',FRRDistRhToolTip);
-            
-            
-            
         end
         
         function delete(obj)
