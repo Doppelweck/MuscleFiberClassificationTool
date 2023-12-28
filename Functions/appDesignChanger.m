@@ -124,7 +124,7 @@ if(~isempty(h))
     try
         set(h(1:length(h)),'Color',mainBackground);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger0')
     end
 end
 
@@ -137,7 +137,7 @@ if(~isempty(h))
         %     set(h(1:length(h)),'HighlightColor',dark_blue_200);
         %     set(h(1:length(h)),'ShadowColor',dark_blue_200);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger1')
     end
 end
 
@@ -149,7 +149,7 @@ if(~isempty(h))
         set(h(1:length(h)),'BackgroundColor',mainBackground);
         set(h(1:length(h)),'ForegroundColor',textColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger2')
     end
 end
 
@@ -158,7 +158,7 @@ if(~isempty(h))
     try
         set(h(1:length(h)),'ForegroundColor',textHighlightColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger3')
     end
 end
 
@@ -170,7 +170,7 @@ if(~isempty(h))
         set(h(1:length(h)),'BackgroundColor',objectBackground);
         set(h(1:length(h)),'ForegroundColor',textHighlightColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger4')
     end
 end
 
@@ -182,7 +182,7 @@ if(~isempty(h))
         set(h(1:length(h)),'BackgroundColor',objectBackground);
         set(h(1:length(h)),'ForegroundColor',textHighlightColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger5')
     end
 end
 
@@ -195,7 +195,7 @@ if(~isempty(h))
             set(h(1:length(h)),'BackgroundColor',mainBackground);
             set(h(1:length(h)),'ForegroundColor',textHighlightColor);
         catch
-            disp('Error: AppDesignChanger')
+            disp('Error: AppDesignChanger6')
         end
     end
 end
@@ -207,7 +207,7 @@ if(~isempty(h))
         set(h(1:length(h)),'BackgroundColor',objectBackground);
         set(h(1:length(h)),'ForegroundColor',textHighlightColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger7')
     end
 end
 
@@ -219,7 +219,7 @@ if(~isempty(h))
         set(h(1:length(h)),'BackgroundColor',objectBackground);
         set(h(1:length(h)),'ForegroundColor',textColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger8')
     end
 end
 
@@ -235,7 +235,7 @@ if(~isempty(h))
         %     set(h(1:length(h)),'BoarderWidth',boarderWidth);
         %     set(h(1:length(h)),'BoarderType',boarderType);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger9')
     end
 end
 
@@ -248,7 +248,7 @@ if(~isempty(h))
             h(i).Title.Color    =  axisColor;
         end
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger10')
     end
     try
         set(h(1:length(h)),'XColor',axisColor);
@@ -259,7 +259,7 @@ if(~isempty(h))
         set(h(1:length(h)),'Color',axesBackGroundColor);
 %         set(h(1:length(h)),'AmbientLightColor',axesBackGroundColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger11')
     end
 end
 
@@ -273,7 +273,7 @@ if(~isempty(h))
         set(h(1:length(h)),'EdgeColor' , edgeColor);
         set(h(1:length(h)),'Color' , legendBackGroundColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger12')
     end
 end
 
@@ -284,7 +284,7 @@ if(~isempty(h))
         set(h(1:length(h)),'EdgeColor' , edgeColor);
         set(h(1:length(h)),'Color' , legendBackGroundColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger13')
     end
 end
 
@@ -296,7 +296,7 @@ if(~isempty(h))
         %         h(1:length(h)).EdgeColor = edgeColor;
         %         h(1:length(h)).Color = legendBackGroundColor;
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger14')
     end
 end
 
@@ -315,7 +315,7 @@ if(~isempty(h))
         set(h(1:length(h)),'BackgroundColor',tableBackgroundColor);
         set(h(1:length(h)),'ForegroundColor',textHighlightColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger15')
     end
 end
 
@@ -327,7 +327,7 @@ if(~isempty(h))
         set(h(1:length(h)),'ShadowColor',textHighlightColor);
         set(h(1:length(h)),'HighlightColor',textHighlightColor);
     catch
-        disp('Error: AppDesignChanger')
+        disp('Error: AppDesignChanger16')
     end
 end
 
