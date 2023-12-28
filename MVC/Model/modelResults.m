@@ -246,10 +246,10 @@ classdef modelResults < handle
             obj.controllerResultsHandle.showPicProcessedGUI();
             appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
             
-%             workbar(0.9,'plot Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
-%             obj.controllerResultsHandle.showPicGroupsGUI();
-%             appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
-%             
+            workbar(0.9,'plot Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showPicGroupsGUI();
+            appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
+            
             workbar(0.95,'update GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             appDesignChanger(obj.controllerResultsHandle.mainCardPanel,getSettingsValue('Style'));
             
