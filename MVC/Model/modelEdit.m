@@ -648,8 +648,20 @@ classdef modelEdit < handle
                     try
                         %get bit per pixel from OME Meta Data
                         try
-                            bpp= str2double(obj.MetaData(2).GlobalAcquisitionBitDepth);
-                            obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
+                            bpp = str2double(obj.MetaData(2).GlobalAcquisitionBitDepth);
+                            if(isempty(bpp)||isnan(bpp))
+                                obj.InfoMessage = '         - No Pixel Depth MetaData found';
+                                obj.InfoMessage = '            - assume Pixel Depth...';
+                                bpp = assumePixelDepth(obj);
+                                
+                                if isempty(bpp)
+                                    obj.InfoMessage = '               - failed';
+                                else
+                                    obj.InfoMessage = ['            - Pixel Depth :' num2str(bpp)];
+                                end
+                            else
+                                obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
+                            end
                         catch
                             obj.InfoMessage = '         - No Pixel Depth MetaData found';
                             obj.InfoMessage = '            - assume Pixel Depth...';
