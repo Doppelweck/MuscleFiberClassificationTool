@@ -869,17 +869,32 @@ classdef modelEdit < handle
         end
         
         function pixelDepth = assumePixelDepth(obj)
-            maxValue = max([max(max(obj.PicPlane1)) max(max(obj.PicPlane2)) max(max(obj.PicPlane3)) max(max(obj.PicPlane4))]);
-            if maxValue <=255
-                pixelDepth = 8;
-            elseif maxValue <=4095
-                pixelDepth = 12;
-            elseif maxValue <=65535
-                pixelDepth = 16;
-            else
-                pixelDepth = [];
+            dataClass = class(obj.PicPlane1);
+            switch dataClass
+                case 'uint8'
+                    pixelDepth = 8;
+                case 'uint16'
+                    pixelDepth = 16;
+                case 'single'
+                    pixelDepth = 32;
+                case 'double'
+                    pixelDepth = 64;
+                otherwise
+                    maxValue = max([max(max(obj.PicPlane1)) max(max(obj.PicPlane2)) max(max(obj.PicPlane3)) max(max(obj.PicPlane4))]);
+                    if maxValue <=255
+                        pixelDepth = 8;
+                    elseif maxValue <=4095
+                        pixelDepth = 12;
+                    elseif maxValue <=65535
+                        pixelDepth = 16;
+                    elseif maxValue <=16777215
+                        pixelDepth = 24;
+                    elseif maxValue <=4294967295
+                        pixelDepth = 32;
+                    else
+                        pixelDepth = [];
+                    end
             end
-                
         end
         
         function status = openImage(obj)
