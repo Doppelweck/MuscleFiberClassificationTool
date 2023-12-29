@@ -1155,18 +1155,7 @@ classdef modelEdit < handle
             obj.PicPlaneGreen = im2uint8(obj.PicPlaneGreen);
             obj.PicPlaneBlue = im2uint8(obj.PicPlaneBlue);
             obj.PicPlaneRed = im2uint8(obj.PicPlaneRed);
-            obj.PicPlaneFarRed = im2uint8(obj.PicPlaneFarRed);
-            
-%             obj.PicPlane1 = uint8(obj.PicPlane1./max(max(max(obj.PicPlane1)))*255);
-%             obj.PicPlane2 = uint8(obj.PicPlane2./max(max(max(obj.PicPlane2)))*255);
-%             obj.PicPlane3 = uint8(obj.PicPlane3./max(max(max(obj.PicPlane3)))*255);
-%             obj.PicPlane4 = uint8(obj.PicPlane4./max(max(max(obj.PicPlane4)))*255);
-%             
-%             obj.PicPlaneGreen = uint8(obj.PicPlaneGreen./max(max(max(obj.PicPlaneGreen)))*255);
-%             obj.PicPlaneBlue = uint8(obj.PicPlaneBlue./max(max(max(obj.PicPlaneBlue)))*255);
-%             obj.PicPlaneRed = uint8(obj.PicPlaneRed./max(max(max(obj.PicPlaneRed)))*255);
-%             obj.PicPlaneFarRed = uint8(obj.PicPlaneFarRed./max(max(max(obj.PicPlaneFarRed)))*255);
-            
+            obj.PicPlaneFarRed = im2uint8(obj.PicPlaneFarRed);           
         end
         
         function createRGBImages(obj)
