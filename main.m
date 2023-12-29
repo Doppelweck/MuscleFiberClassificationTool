@@ -74,13 +74,13 @@ try
     mSettingsitem1 = uimenu(mSettings,'Text','Load Default Settings');
     mSettingsitem2 = uimenu(mSettings,'Text','Load Saved Settings');
     mSettingsitem3 = uimenu(mSettings,'Text','Save Current Settings');
-
+    
     % Add Menu for Info
     mInfo = uimenu(mainFig,'Text','Information');
-
     
     
-
+    
+    
     figure(hf);
     set(hf,'WindowStyle','modal');
     
@@ -161,21 +161,18 @@ try
     
 catch
     ErrorInfo = lasterror;
-    Text = [];
+    Text = cell(5*size(ErrorInfo.stack,1)+2,1);
     Text{1,1} = ErrorInfo.message;
     Text{2,1} = '';
     
     if any(strcmp('stack',fieldnames(ErrorInfo)))
-        
         for i=1:size(ErrorInfo.stack,1)
-            
-            Text{end+1,1} = [ErrorInfo.stack(i).file];
-            Text{end+1,1} = [ErrorInfo.stack(i).name];
-            Text{end+1,1} = ['Line: ' num2str(ErrorInfo.stack(i).line)];
-            Text{end+1,1} = '------------------------------------------';
-            
+            idx = (i - 1) * 5 + 2;
+            Text{idx+1,1} = [ErrorInfo.stack(i).file];
+            Text{idx+2,1} = [ErrorInfo.stack(i).name];
+            Text{idx+3,1} = ['Line: ' num2str(ErrorInfo.stack(i).line)];
+            Text{idx+4,1} = '------------------------------------------';
         end
-        
     end
     
     mode = struct('WindowStyle','modal','Interpreter','tex');
@@ -195,18 +192,18 @@ catch
     %find all figures and delete them
     figHandles = findobj('Type','figure');
     delete(figHandles);
-    
-    
 end
 
-function changeAppDesign(src,event)
-    setSettingsValue('Style',lower(src.Text));
-    mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
-    mainCordObj.Visible = 'off';
-    drawnow;
-    mainFigObj=findobj(src.Parent.Parent,'Type','figure');
-    appDesignChanger(mainFigObj,getSettingsValue('Style'));
-    drawnow;
-    mainCordObj.Visible = 'on';
-    end
+function changeAppDesign(src,~)
+
+setSettingsValue('Style',lower(src.Text));
+mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+mainCordObj.Visible = 'off';
+drawnow;
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+appDesignChanger(mainFigObj,getSettingsValue('Style'));
+drawnow;
+mainCordObj.Visible = 'on';
+
+end
 % end
