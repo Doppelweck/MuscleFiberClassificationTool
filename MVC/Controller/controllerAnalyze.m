@@ -202,7 +202,7 @@ classdef controllerAnalyze < handle
             addlistener(obj.modelAnalyzeHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
         end
         
-        function valueUpdateEvent(obj,src,evnt)
+        function valueUpdateEvent(obj,~,evnt)
             % Checks if a value in the GUI parameter panel has changed. If
             % a value has changed the function checks which source has
             % triggered the event. Checks if the value is in the permitted
@@ -494,7 +494,7 @@ classdef controllerAnalyze < handle
                     end
                     Xvalue = str2double(obj.viewAnalyzeHandle.B_XScale.String);
                     maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
-                    obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
+                    obj.viewAnalyzeHandle.hAP.XTick = 0:100:maxPixelX;
                     obj.viewAnalyzeHandle.hAP.XTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Xvalue;
                     
                 case obj.viewAnalyzeHandle.B_YScale.Tag
@@ -518,7 +518,7 @@ classdef controllerAnalyze < handle
                     end
                     maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
                     Yvalue = str2double(obj.viewAnalyzeHandle.B_YScale.String);
-                    obj.viewAnalyzeHandle.hAP.YTick = [0:100:maxPixelY];
+                    obj.viewAnalyzeHandle.hAP.YTick = 0:100:maxPixelY;
                     obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Yvalue;
                     %                 Yvalue = str2double(obj.viewAnalyzeHandle.B_YScale.String);
                     %                 maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
@@ -1024,11 +1024,11 @@ classdef controllerAnalyze < handle
             set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             Xvalue = str2double(obj.viewAnalyzeHandle.B_XScale.String);
             maxPixelX = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,2);
-            obj.viewAnalyzeHandle.hAP.XTick = [0:100:maxPixelX];
+            obj.viewAnalyzeHandle.hAP.XTick = 0:100:maxPixelX;
             obj.viewAnalyzeHandle.hAP.XTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Xvalue;
             maxPixelY = size(obj.modelAnalyzeHandle.PicPRGBFRPlanes,1);
             Yvalue = str2double(obj.viewAnalyzeHandle.B_YScale.String);
-            obj.viewAnalyzeHandle.hAP.YTick = [0:100:maxPixelY];
+            obj.viewAnalyzeHandle.hAP.YTick = 0:100:maxPixelY;
             obj.viewAnalyzeHandle.hAP.YTickLabel = obj.viewAnalyzeHandle.hAP.XTick*Yvalue;
             
             % set panel title to filename and path
@@ -1197,7 +1197,7 @@ classdef controllerAnalyze < handle
                 sound(y,Fs);
             catch
                 obj.busyIndicator(0);
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
             
         end
@@ -1421,7 +1421,7 @@ classdef controllerAnalyze < handle
                     %                     obj.busyIndicator(0);
                 end
             catch
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
         end
         
@@ -1623,7 +1623,7 @@ classdef controllerAnalyze < handle
             end
         end
         
-        function manipulateFiberOKEvent(obj,src,evnt)
+        function manipulateFiberOKEvent(obj,~,~)
             % Callback function of the ok button in the maipulate fiber
             % type figure. Calls the manipulateFiberOK() fuction in the
             % model to change the fiber type into the new one.
@@ -1660,7 +1660,7 @@ classdef controllerAnalyze < handle
             delete(OldBox);
         end
         
-        function manipulateFiberCancelEvent(obj,src,evnt)
+        function manipulateFiberCancelEvent(obj,~,~)
             % Callback function of the cancel button in the maipulate fiber
             % type figure. Deletes the maipulate fiber figure object and
             % refresh the callback functions of the main figure.
@@ -1690,7 +1690,7 @@ classdef controllerAnalyze < handle
             obj.addWindowCallbacks();
         end
         
-        function showPreResultsEvent(obj,src,evnt)
+        function showPreResultsEvent(obj,~,~)
             try
                 %refresh main figure callbacks
                 addWindowCallbacks(obj);
@@ -1810,7 +1810,6 @@ classdef controllerAnalyze < handle
                             
                             Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
                             Bmax = max([obj.modelAnalyzeHandle.Stats.ColorBlue]);
-                            R = [0 10*Rmax]; %Red value vector
                             grid(axs1, 'on')
                             legend(axs1,LegendString,'Location','best')
                             title(axs1,{'Fiber Type main group classification'; '(Type-1, all Type-2, Type-12h, Type-0)'},'FontSize',14)
@@ -1865,7 +1864,6 @@ classdef controllerAnalyze < handle
                             
                             Rmax = max([obj.modelAnalyzeHandle.Stats.ColorRed]);
                             FRmax = max([obj.modelAnalyzeHandle.Stats.ColorFarRed]);
-                            R = [0 10*Rmax]; %Red value vector
                             hold(axs3, 'on')
                             legend(axs3,LegendString,'Location','best')
                             if obj.modelAnalyzeHandle.AnalyzeMode == 1 || obj.modelAnalyzeHandle.AnalyzeMode == 3 || ...
@@ -2076,7 +2074,7 @@ classdef controllerAnalyze < handle
                 end
                 appDesignChanger(preFig,getSettingsValue('Style'));
             catch
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
         end
         
@@ -2194,7 +2192,8 @@ classdef controllerAnalyze < handle
             appDesignElementChanger(obj.panelAnalyze);
         end
         
-        function errorMessage(obj,ErrorInfo)
+        function errorMessage(obj)
+            ErrorInfo=lasterror;
             Text = cell(5*size(ErrorInfo.stack,1)+2,1);
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';

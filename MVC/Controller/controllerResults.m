@@ -75,8 +75,8 @@ classdef controllerResults < handle
                 obj.fontSizeB = 16; % Font size big
             end
             
-            obj.mainFigure =mainFigure;
-            obj.mainCardPanel =mainCardPanel;
+            obj.mainFigure = mainFigure;
+            obj.mainCardPanel = mainCardPanel;
             
             obj.viewResultsHandle = viewResultsH;
             
@@ -293,7 +293,7 @@ classdef controllerResults < handle
                 end
                 
             catch
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
             %             appDesignElementChanger(obj.panelResults);
             obj.busyIndicator(0);
@@ -380,7 +380,7 @@ classdef controllerResults < handle
                 [y,Fs] = audioread('filling-your-inbox.mp3');
                 sound(y*0.4,Fs);
             catch
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
             appDesignElementChanger(obj.panelResults);
         end
@@ -414,7 +414,7 @@ classdef controllerResults < handle
                 pos = obj.viewResultsHandle.B_TableStatistic.Position(3);
                 obj.viewResultsHandle.B_TableStatistic.ColumnWidth={pos/2 pos/2-20};
             catch
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
         end
         
@@ -745,8 +745,8 @@ classdef controllerResults < handle
             xlabel(obj.viewResultsHandle.hAScatterBlueRed,'x: mean Red (R)','FontUnits','normalized','Fontsize',0.045);
             ylim(obj.viewResultsHandle.hAScatterBlueRed,[ 0 maxLim ] );
             xlim(obj.viewResultsHandle.hAScatterBlueRed,[ 0 maxLim ] );
-            set(obj.viewResultsHandle.hAScatterBlueRed,'xtick',[0:20:maxLim*2]);
-            set(obj.viewResultsHandle.hAScatterBlueRed,'ytick',[0:20:maxLim*2]);
+            set(obj.viewResultsHandle.hAScatterBlueRed,'xtick',0:20:maxLim*2);
+            set(obj.viewResultsHandle.hAScatterBlueRed,'ytick',0:20:maxLim*2);
             
             axtoolbar(obj.viewResultsHandle.hAScatterBlueRed,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             grid(obj.viewResultsHandle.hAScatterBlueRed, 'on');
@@ -1662,7 +1662,7 @@ classdef controllerResults < handle
                 end
                 
             catch
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
             end
         end
         
@@ -1720,7 +1720,8 @@ classdef controllerResults < handle
             
         end
         
-        function errorMessage(obj,ErrorInfo)
+        function errorMessage(obj)
+            ErrorInfo = lasterror;
             Text = cell(5*size(ErrorInfo.stack,1)+2,1);
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';

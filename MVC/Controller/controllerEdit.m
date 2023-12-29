@@ -254,13 +254,13 @@ classdef controllerEdit < handle
             title(obj.viewEditHandle.hAP,'Create Binary Mask');
             
             lhx=xlabel(obj.viewEditHandle.hAP, 'x/pixel','Fontsize',12);
-            lhy=ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',12);
+            ylabel(obj.viewEditHandle.hAP, 'y/pixel','Fontsize',12);
             axtoolbar(obj.viewEditHandle.hAP,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             set(lhx, 'Units', 'Normalized', 'Position', [1.05 0]);
             maxPixelX = size(PicBW,2);
-            obj.viewEditHandle.hAP.XTick = [0:100:maxPixelX];
+            obj.viewEditHandle.hAP.XTick = 0:100:maxPixelX;
             maxPixelY = size(PicBW,1);
-            obj.viewEditHandle.hAP.YTick = [0:100:maxPixelY];
+            obj.viewEditHandle.hAP.YTick = 0:100:maxPixelY;
             
             Titel = [obj.modelEditHandle.PathName obj.modelEditHandle.FileName];
             obj.viewEditHandle.panelPicture.Title = Titel;
@@ -741,7 +741,7 @@ classdef controllerEdit < handle
                 obj.busyIndicator(0);
             catch
                 obj.busyIndicator(0);
-                obj.errorMessage(lasterror);
+                obj.errorMessage();
                 %disable GUI objects
                 set(obj.viewEditHandle.B_NewPic,'Enable','on');
                 appDesignElementChanger(obj.panelEdit);
@@ -791,7 +791,7 @@ classdef controllerEdit < handle
                 
                 case 'image' %Image (1 to 4 images) file was selected
                     set(obj.viewEditHandle.B_InfoText,'Value',1, 'String','*** New Image selected ***')
-                    statusImag = obj.modelEditHandle.openImage();
+                    obj.modelEditHandle.openImage();
                 case 'bioformat' %BioFormat was selected
                     
                 case 'false' %No file was selected
@@ -1132,7 +1132,7 @@ classdef controllerEdit < handle
             set(h,'CloseRequestFcn',@obj.checkPlanesBackEvent);
         end
         
-        function checkMaskEvent(obj,src,evnt)
+        function checkMaskEvent(obj,~,~)
             % Callback function of the Check mask button in the GUI.
             %
             %   checkPlanesEvent(obj);
@@ -1336,12 +1336,12 @@ classdef controllerEdit < handle
             
         end
         
-        function selectNewBrightnessImage(obj,src,evnt)
+        function selectNewBrightnessImage(obj,~,evnt)
             
             %Get file extension of the current bioformat file. Brightness
             %adjusment images must have the same extension, that means that
             %they must made with the same microscope.
-            [pathstr,name,BioExt] = fileparts(obj.modelEditHandle.FileName);
+            [~,~,BioExt] = fileparts(obj.modelEditHandle.FileName);
             
             obj.busyIndicator(1);
             
@@ -1351,7 +1351,7 @@ classdef controllerEdit < handle
             switch evnt.Source.Tag
                 
                 case obj.viewEditHandle.B_SelectBrightImGreen.Tag
-                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Green Plane','MultiSelect','off');
+                    [FileName,PathName,~] = uigetfile(['*' BioExt],'Select Brightness Image for Green Plane','MultiSelect','off');
                     
                     if isequal(FileName ,0)
                         %No file was selected
@@ -1375,7 +1375,7 @@ classdef controllerEdit < handle
                     end
                     
                 case obj.viewEditHandle.B_SelectBrightImBlue.Tag
-                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Blue Plane','MultiSelect','off');
+                    [FileName,PathName,~] = uigetfile(['*' BioExt],'Select Brightness Image for Blue Plane','MultiSelect','off');
                     
                     if isequal(FileName ,0)
                         %No file was selected
@@ -1399,7 +1399,7 @@ classdef controllerEdit < handle
                     end
                     
                 case obj.viewEditHandle.B_SelectBrightImRed.Tag
-                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Red Plane','MultiSelect','off');
+                    [FileName,PathName,~] = uigetfile(['*' BioExt],'Select Brightness Image for Red Plane','MultiSelect','off');
                     
                     if isequal(FileName ,0)
                         %No file was selected
@@ -1423,7 +1423,7 @@ classdef controllerEdit < handle
                     end
                     
                 case obj.viewEditHandle.B_SelectBrightImFarRed.Tag
-                    [FileName,PathName,FilterIndex] = uigetfile(['*' BioExt],'Select Brightness Image for Farred Plane','MultiSelect','off');
+                    [FileName,PathName,~] = uigetfile(['*' BioExt],'Select Brightness Image for Farred Plane','MultiSelect','off');
                     
                     if isequal(FileName ,0)
                         %No file was selected
@@ -1500,7 +1500,7 @@ classdef controllerEdit < handle
             
         end
         
-        function deleteBrightnessImage(obj,src,evnt)
+        function deleteBrightnessImage(obj,~,evnt)
             
             obj.busyIndicator(1);
             
@@ -1568,7 +1568,7 @@ classdef controllerEdit < handle
             
         end
         
-        function calculateBrightnessImage(obj,src,evnt)
+        function calculateBrightnessImage(obj,~,evnt)
             
             obj.busyIndicator(1);
             
@@ -1642,7 +1642,7 @@ classdef controllerEdit < handle
             obj.busyIndicator(0);
         end
         
-        function fibersInForeOrBackground(obj,src,evnt)
+        function fibersInForeOrBackground(obj,src,~)
             % Callback function of the Fiber in Fore or Background popupmenu in the
             % GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values in the
@@ -1671,7 +1671,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.addToBuffer();
         end
         
-        function thresholdModeEvent(obj,src,evnt)
+        function thresholdModeEvent(obj,src,~)
             % Callback function of the threshold mode popupmenu in the
             % GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values in the
@@ -1960,7 +1960,7 @@ classdef controllerEdit < handle
             
         end
         
-        function alphaImageEvent(obj,src,evnt)
+        function alphaImageEvent(obj,~,~)
             % Callback function of the alpha Image dropdown menu.
             %
             %   alphaImageEvent(obj,src,evnt);
@@ -1998,7 +1998,7 @@ classdef controllerEdit < handle
             end
         end
         
-        function lineWidthEvent(obj,src,evnt)
+        function lineWidthEvent(obj,~,evnt)
             % Callback function of the linewidth slider and the text edit
             % box in the GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values
@@ -2057,7 +2057,7 @@ classdef controllerEdit < handle
             
         end
         
-        function colorEvent(obj,src,evnt)
+        function colorEvent(obj,~,evnt)
             % Callback function of the color popupmenu in the
             % GUI. Sets the corresponding value in the
             % model depending on the selection.
@@ -2091,7 +2091,7 @@ classdef controllerEdit < handle
             
         end
         
-        function invertEvent(obj,src,evnt)
+        function invertEvent(obj,~,~)
             % Callback function of the invert button in the
             % GUI. Sets the corresponding value in the
             % model depending on the selection.
@@ -2108,7 +2108,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.invertPicBWEvent();
         end
         
-        function morphOpEvent(obj,src,evnt)
+        function morphOpEvent(obj,~,~)
             % Callback function of the Morphol. opertion popupmenu in the
             % GUI. Sets the corresponding value in the
             % model depending on the selection. Controlls the visibility of
@@ -2257,7 +2257,7 @@ classdef controllerEdit < handle
             
         end
         
-        function structurElementEvent(obj,src,evnt)
+        function structurElementEvent(obj,src,~)
             % Callback function of the structering element popupmenu in the
             % GUI. Sets the corresponding value in the
             % model depending on the selection. Controlls the visibility of
@@ -2360,7 +2360,7 @@ classdef controllerEdit < handle
             appDesignElementChanger(obj.panelEdit);
         end
         
-        function morphValuesEvent(obj,src,evnt)
+        function morphValuesEvent(obj,~,~)
             % Callback function of the value textedit boxes Size and
             % NoInterations in the GUI. Checks whether the value is within
             % the permitted value range. Sets the corresponding value in
@@ -2404,7 +2404,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_NoIteration,'String',num2str(ValueNoI));
         end
         
-        function startMorphOPEvent(obj,src,evnt)
+        function startMorphOPEvent(obj,~,~)
             % Callback function of the run morph operation button in the
             % GUI. Runs the runMorphOperation function in the editModel
             % object.
@@ -2505,19 +2505,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.stopDragFcn();
         end
         
-        function test(obj,~,~)
-            Pos = get(obj.viewEditHandle.hAP, 'CurrentPoint');
-            x = int16(Pos(1,1));
-            y = int16(Pos(1,2));
-            [xOut yOut isInAxes] = obj.modelEditHandle.checkPosition(x,y);
-            if isInAxes
-                set(obj.mainFigure,'pointer','fullcrosshair')
-            else
-                set(obj.mainFigure,'pointer','arrow')
-            end
-        end
-        
-        function startAnalyzeModeEvent(obj,src,evnt)
+        function startAnalyzeModeEvent(obj,~,~)
             % Callback function of the Start Analyze Mode-Button in the GUI.
             % Calls the function sendPicsToController() in the editModel to
             % send all image Data to the analyze model. Calls the
@@ -2544,7 +2532,7 @@ classdef controllerEdit < handle
             
         end
         
-        function undoEvent(obj,src,evnt)
+        function undoEvent(obj,~,~)
             % Callback function of the Undo Button in the GUI. Calls the
             % undo() function in the editModel.
             %
@@ -2561,7 +2549,7 @@ classdef controllerEdit < handle
             obj.modelEditHandle.undo();
         end
         
-        function redoEvent(obj,src,evnt)
+        function redoEvent(obj,~,~)
             % Callback function of the Redo Button in the GUI. Calls the
             % redo() function in the editModel.
             %
@@ -2595,7 +2583,7 @@ classdef controllerEdit < handle
             set(obj.viewEditHandle.B_InfoText, 'Value' , length(obj.viewEditHandle.B_InfoText.String));
         end
         
-        function updateInfoLogEvent(obj,src,evnt)
+        function updateInfoLogEvent(obj,~,~)
             % Listener callback function of the InfoMessage propertie in
             % the model. Is called when InfoMessage string changes. Appends
             % the text in InfoMessage to the log text in the GUI.
@@ -2665,7 +2653,7 @@ classdef controllerEdit < handle
                 
                 if ~isempty(obj.modelEditHandle.busyIndicator)
                     obj.modelEditHandle.busyIndicator.stop;
-                    [hjObj, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
+                    [~, hContainer] = javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                     obj.modelEditHandle.busyIndicator = [];
                     delete(hContainer);
                 end
@@ -2674,7 +2662,8 @@ classdef controllerEdit < handle
             
         end
         
-        function errorMessage(obj,ErrorInfo)
+        function errorMessage(obj)
+            ErrorInfo = lasterror;
             Text = cell(5*size(ErrorInfo.stack,1)+2,1);
             Text{1,1} = ErrorInfo.message;
             Text{2,1} = '';
@@ -2708,11 +2697,11 @@ classdef controllerEdit < handle
             %           obj:    Handle to controllerEdit object
             %
             
-            winState=get(obj.mainFigure,'WindowState');
+            obj.winState=get(obj.mainFigure,'WindowState');
             choice = questdlg({'Are you sure you want to quit? ','All unsaved data will be lost.'},...
                 'Close Program', ...
                 'Yes','No','No');
-            if strcmp(winState,'maximized')
+            if strcmp(obj.winState,'maximized')
                 set(obj.mainFigure,'WindowState','maximized');
             end
             
