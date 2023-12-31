@@ -463,7 +463,7 @@ classdef controllerEdit < handle
                                 
                                 appDesignElementChanger(obj.panelEdit);
                                 
-                                obj.busyIndicator(0);
+                                
                                 
                         end % switch statusImag
                         
@@ -636,8 +636,6 @@ classdef controllerEdit < handle
                                     obj.morphOpEvent();
                                 end
                                 
-                                obj.busyIndicator(0);
-                                
                         end % switch statusBio
                         
                     case 'false' %No file was selected %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -680,7 +678,6 @@ classdef controllerEdit < handle
                             obj.morphOpEvent();
                         end
                         appDesignElementChanger(obj.panelEdit);
-                        obj.busyIndicator(0);
                         
                     case 'notSupported'
                         
@@ -1144,7 +1141,8 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
-            
+            set(obj.viewEditHandle.B_CheckMask,'Callback','');
+
             obj.CheckMaskActive = ~obj.CheckMaskActive;
             
             if obj.CheckMaskActive == 1
@@ -1211,6 +1209,7 @@ classdef controllerEdit < handle
                 obj.morphOpEvent();
                 
             end
+            set(obj.viewEditHandle.B_CheckMask,'Callback',@obj.checkMaskEvent);
         end
         
         function checkPlanesOKEvent(obj,~,~)
@@ -2523,13 +2522,10 @@ classdef controllerEdit < handle
             
             obj.modelEditHandle.InfoMessage = ' ';
             
-            %get all pic data from the model
-            PicData = obj.modelEditHandle.sendPicsToController();
-            
             %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
-            obj.controllerAnalyzeHandle.startAnalyzeMode(PicData,InfoText);
             
+            obj.controllerAnalyzeHandle.startAnalyzeMode(InfoText);
         end
         
         function undoEvent(obj,~,~)
@@ -2608,10 +2604,9 @@ classdef controllerEdit < handle
         function busyIndicator(obj,status)
             % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
             
-            
             if status
                 %create indicator object and disable GUI elements
-                
+                set(obj.mainFigure,'pointer','watch');
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -2630,19 +2625,20 @@ classdef controllerEdit < handle
                 javacomponent(obj.modelEditHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelEditHandle.busyIndicator.start;
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','watch');
+%                 figHandles = findobj('Type','figure');
+                
                 %find all objects that are enabled and disable them
-                obj.modelEditHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
+                obj.modelEditHandle.busyObj = getUIControlEnabledHandles(obj.viewEditHandle);
+%                 findall(obj.panelEdit, '-property', 'Enable','-and','Enable','on',...
+%                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelEditHandle.busyObj, 'Enable', 'off');
                 appDesignElementChanger(obj.panelEdit);
                 
             else
                 %delete indicator object and disable GUI elements
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','arrow');
+%                 figHandles = findobj('Type','figure');
+                
                 
                 if ~isempty(obj.modelEditHandle.busyObj)
                     valid = isvalid(obj.modelEditHandle.busyObj);
@@ -2658,10 +2654,10 @@ classdef controllerEdit < handle
                     delete(hContainer);
                 end
                 workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
+                set(obj.mainFigure,'pointer','arrow');
             end
-            
         end
-        
+              
         function errorMessage(obj)
             ErrorInfo = lasterror;
             Text = cell(5*size(ErrorInfo.stack,1)+2,1);

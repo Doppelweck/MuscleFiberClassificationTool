@@ -196,9 +196,17 @@ classdef controllerResults < handle
             %           InfoText:   Info text log.
             %
             
+            if obj.modelResultsHandle.ResultUpdateStaus
+                %nothing has changed. 
+                obj.modelResultsHandle.InfoMessage = '- No new analysis has been done';
+                obj.modelResultsHandle.InfoMessage = '- updating data is not necessary';
+                obj.modelResultsHandle.InfoMessage = '- updating GUI is not necessary';
+            else
+                
             %change the card panel to selection 3: results mode
-            obj.mainCardPanel.Selection = 3;
+            obj.mainCardPanel.Visible = 0;
             obj.busyIndicator(1);
+            obj.mainCardPanel.Selection = 3;
             
             try
                 % Set PicData Properties in the Results Model
@@ -291,12 +299,15 @@ classdef controllerResults < handle
                     set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
                     
                 end
+                obj.busyIndicator(0);
+                obj.mainCardPanel.Visible = 1;
                 
             catch
                 obj.errorMessage();
             end
-            %             appDesignElementChanger(obj.panelResults);
-            obj.busyIndicator(0);
+            end
+%             appDesignChanger(obj.panelResults,getSettingsValue('Style'));
+            
         end
         
         function backAnalyzeModeEvent(obj,~,~)
@@ -554,15 +565,6 @@ classdef controllerResults < handle
                 tempString = StringLegend;
                 tempString(B_main == 0)=[];
                 
-                if ~isempty(StringLegend)
-                    pie(obj.viewResultsHandle.hAArea,bMain);
-                    obj.viewResultsHandle.hAArea.Colormap = tempColorMap;
-                    l2 = legend(obj.viewResultsHandle.hAArea,tempString,'Location','Best');
-                    set(l2,'Tag','LegendAreaPlot');
-                    l2.FontSize=obj.fontSizeM;
-                    title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
-                end
-                
             else %Quad labeling was active during calssification
                 
                 tempColorMap = ColorMapAll;
@@ -573,15 +575,15 @@ classdef controllerResults < handle
                 StringLegend = {'Type 1','Type 12h','Type 2x','Type 2a','Type 2ax','undefind','Collagen'};
                 tempString = StringLegend;
                 tempString(B == 0)=[];
-                
-                if ~isempty(StringLegend)
-                    pie(obj.viewResultsHandle.hAArea,bMain);
-                    obj.viewResultsHandle.hAArea.Colormap = tempColorMap;
-                    l2 = legend(obj.viewResultsHandle.hAArea,tempString,'Location','Best');
-                    set(l2,'Tag','LegendAreaPlot');
-                    l2.FontSize=obj.fontSizeM;
-                    title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
-                end
+            end
+            
+            if ~isempty(StringLegend)
+                pie(obj.viewResultsHandle.hAArea,bMain);
+                obj.viewResultsHandle.hAArea.Colormap = tempColorMap;
+                l2 = legend(obj.viewResultsHandle.hAArea,tempString,'Location','Best');
+                set(l2,'Tag','LegendAreaPlot');
+                l2.FontSize=obj.fontSizeM;
+                title(obj.viewResultsHandle.hAArea,'Area of fiber types','FontUnits','normalized','Fontsize',0.06)
             end
             axtoolbar(obj.viewResultsHandle.hAArea,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
         end
@@ -1668,8 +1670,11 @@ classdef controllerResults < handle
         
         function busyIndicator(obj,status)
             % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
+            
             if status
                 %create indicator object and disable GUI elements
+%                 figHandles = findobj('Type','figure');
+                set(obj.mainFigure,'pointer','watch');
                 try
                     % R2010a and newer
                     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
@@ -1688,11 +1693,11 @@ classdef controllerResults < handle
                 javacomponent(obj.modelResultsHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelResultsHandle.busyIndicator.start;
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','watch');
+                
                 %find all objects that are enabled and disable them
-                obj.modelResultsHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
+                obj.modelResultsHandle.busyObj = getUIControlEnabledHandles(obj.viewResultsHandle);
+%                 findall(figHandles, '-property', 'Enable','-and','Enable','on',...
+%                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
                 appDesignElementChanger(obj.panelResults);
                 
@@ -1713,9 +1718,10 @@ classdef controllerResults < handle
                     obj.modelResultsHandle.busyIndicator = [];
                 end
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','arrow');
+%                 figHandles = findobj('Type','figure');
+                
                 workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
+                set(obj.mainFigure,'pointer','arrow');
             end
             
         end
@@ -1741,6 +1747,7 @@ classdef controllerResults < handle
             uiwait(errordlg(Text,'ERROR: Results-Mode',mode));
             
             workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
+            obj.mainCardPanel.Visible = 1;
             obj.busyIndicator(0);
         end
         

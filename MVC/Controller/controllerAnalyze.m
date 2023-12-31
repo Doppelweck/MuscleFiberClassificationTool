@@ -921,7 +921,7 @@ classdef controllerAnalyze < handle
             appDesignElementChanger(obj.mainCardPanel);
         end
         
-        function startAnalyzeMode(obj,PicData,InfoText)
+        function startAnalyzeMode(obj,InfoText)
             % Called by the controllerEdit instance when the user change
             % the program state to analyze-mode. Saves all nessessary Data
             % from the edit model into the analyze model.
@@ -952,8 +952,14 @@ classdef controllerAnalyze < handle
             %
             %           InfoText:   Info text log.
             %
+            tic;
             obj.busyIndicator(1);
+            disp(toc);
+            obj.mainCardPanel.Selection = 2;
             obj.viewAnalyzeHandle.PanelFiberInformation.Title = 'Fiber informations';
+            
+            %get all pic data from the model
+            PicData = obj.controllerEditHandle.modelEditHandle.sendPicsToController();
             
             % Set PicData Properties in the Analyze Model
             obj.modelAnalyzeHandle.FileName = PicData{1};
@@ -1068,7 +1074,6 @@ classdef controllerAnalyze < handle
             %change the figure callbacks for the analyze mode
             obj.addWindowCallbacks()
             
-            obj.busyIndicator(0);
             appDesignChanger(obj.panelAnalyze,getSettingsValue('Style'));
             %change the card panel to selection 2: analyze mode
             obj.mainCardPanel.Selection = 2;
@@ -1094,7 +1099,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_YScale, 'String', oldScaleY );
             end
             
-            
+            obj.busyIndicator(0);
             obj.modelAnalyzeHandle.InfoMessage = '-Set Parameters and press "Start analyzing"';
             obj.modelAnalyzeHandle.InfoMessage = ' ';
         end
@@ -1306,7 +1311,7 @@ classdef controllerAnalyze < handle
             workbar(1,'Please Wait...ploting boundaries','Boundaries',obj.mainFigure);
         end
         
-        function backEditModeEvent(obj,~,~)
+        function clearDataModel(obj)
             % Callback function of the back edit mode button in the GUI.
             % Clears the data in the analyze model and change the state of
             % the program to the edit mode. Refresh the figure callbacks
@@ -1319,7 +1324,7 @@ classdef controllerAnalyze < handle
             %       - Input
             %           obj:    Handle to controllerAnalyze object.
             %
-            obj.busyIndicator(1);
+%             obj.busyIndicator(1);
             obj.modelAnalyzeHandle.InfoMessage = ' ';
             
             %clear Data
@@ -1355,10 +1360,14 @@ classdef controllerAnalyze < handle
             
             % set log text from Analyze GUI to Pic GUI
             obj.controllerEditHandle.setInfoTextView(get(obj.viewAnalyzeHandle.B_InfoText, 'String'));
-            obj.busyIndicator(0);
+%             obj.busyIndicator(0);
             %change the card panel to selection 1: edit mode
-            obj.mainCardPanel.Selection = 1;
+        end
+        
+        function backEditModeEvent(obj,~,~)
             
+            obj.mainCardPanel.Selection = 1;
+            obj.clearDataModel();
             %change the figure callbacks for the edit mode
             obj.controllerEditHandle.addWindowCallbacks();
             
@@ -1379,13 +1388,13 @@ classdef controllerAnalyze < handle
                 %       - Input
                 %           obj:    Handle to controllerAnalyze object.
                 %
-                obj.mainCardPanel.Selection = 3;
+                
                 %                 obj.busyIndicator(1);
                 if isempty(obj.modelAnalyzeHandle.Stats)
                     obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
                     obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
                 else
-                    
+%                     obj.mainCardPanel.Selection = 3;
                     % If a window for Fibertype manipulation already exists,
                     % delete it
                     OldFig = findobj('Tag','FigureManipulate');
@@ -2068,11 +2077,11 @@ classdef controllerAnalyze < handle
                             end
                             legend(ax,LegendString,'Location','Best')
                     end
+                    appDesignChanger(preFig,getSettingsValue('Style'));
                 else % if ~isempty(obj.modelAnalyzeHandle.Stats)
                     obj.modelAnalyzeHandle.InfoMessage = '   - No data are analyzed';
                     obj.modelAnalyzeHandle.InfoMessage = '   - Press "Start analyzing"';
                 end
-                appDesignChanger(preFig,getSettingsValue('Style'));
             catch
                 obj.errorMessage();
             end
@@ -2139,9 +2148,10 @@ classdef controllerAnalyze < handle
         
         function busyIndicator(obj,status)
             % See: http://undocumentedmatlab.com/blog/animated-busy-spinning-icon
-            
-            
+
             if status
+%                 figHandles = findobj('Type','figure');
+                set(obj.mainFigure,'pointer','watch');
                 %create indicator object and disable GUI elements
                 
                 try
@@ -2162,23 +2172,25 @@ classdef controllerAnalyze < handle
                 javacomponent(obj.modelAnalyzeHandle.busyIndicator.getComponent, [10,10,80,80], obj.mainFigure);
                 obj.modelAnalyzeHandle.busyIndicator.start;
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','watch');
+                
                 %find all objects that are enabled and disable them
-                obj.modelAnalyzeHandle.busyObj = findall(figHandles, '-property', 'Enable','-and','Enable','on',...
-                    '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
+                obj.modelAnalyzeHandle.busyObj = getUIControlEnabledHandles(obj.viewAnalyzeHandle);
+%                 findall(obj.panelAnalyze, '-property', 'Enable','-and','Enable','on',...
+%                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
+                appDesignElementChanger(obj.panelAnalyze);
                 
             else
                 %delete indicator object and disable GUI elements
                 
-                figHandles = findobj('Type','figure');
-                set(figHandles,'pointer','arrow');
+%                 figHandles = findobj('Type','figure');
+                
                 
                 if ~isempty(obj.modelAnalyzeHandle.busyObj)
                     valid = isvalid(obj.modelAnalyzeHandle.busyObj);
                     obj.modelAnalyzeHandle.busyObj(~valid)=[];
                     set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
+                    appDesignElementChanger(obj.panelAnalyze);
                 end
                 
                 if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
@@ -2188,8 +2200,10 @@ classdef controllerAnalyze < handle
                     delete(hContainer) ;
                 end
                 workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
+                
+                set(obj.mainFigure,'pointer','arrow');
             end
-            appDesignElementChanger(obj.panelAnalyze);
+            
         end
         
         function errorMessage(obj)
