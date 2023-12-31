@@ -61,12 +61,12 @@ try
     delete(editMenu);
     
     % Add Menu for Design
-    mDesign = uimenu(mainFig,'Text','App Design');
-    mDesignitem1 = uimenu(mDesign,'Text','Dark');
+    mDesign = uimenu(mainFig,'Text','App Design','Tag','menuDesignSelection');
+    mDesignitem1 = uimenu(mDesign,'Text','Dark','Tag','menuDesignDark');
     mDesignitem1.MenuSelectedFcn = @changeAppDesign;
-    mDesignitem2 = uimenu(mDesign,'Text','Light');
+    mDesignitem2 = uimenu(mDesign,'Text','Light','Tag','menuDesignLight');
     mDesignitem2.MenuSelectedFcn = @changeAppDesign;
-    mDesignitem3 = uimenu(mDesign,'Text','Default');
+    mDesignitem3 = uimenu(mDesign,'Text','Default','Tag','menuDesignDefault');
     mDesignitem3.MenuSelectedFcn = @changeAppDesign;
     
     % Add Menu for Settings
@@ -115,8 +115,6 @@ try
     drawnow;pause(0.5);
     mainCard.Selection = 1;
     drawnow;
-    appDesignChanger(mainCard,getSettingsValue('Style'));
-    drawnow;
     
     InfoText.String='Loading please wait...   Initialize MODEL-Components...';
     %Init MODEL's
@@ -137,6 +135,12 @@ try
     modelEditHandle.controllerEditHandle = controllerEditHandle;
     modelAnalyzeHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
     modelResultsHandle.controllerResultsHandle = controllerResultsHandle;
+    pause(0.2)
+    
+    InfoText.String='Loading please wait...   Update app design...';
+    appDesignChanger(mainCard,getSettingsValue('Style'));
+    appDesignElementChanger(mainCard);
+    drawnow;
     pause(0.2)
     
     InfoText.String='Loading please wait...   Start application...';
@@ -202,6 +206,7 @@ mainCordObj.Visible = 'off';
 drawnow;
 mainFigObj=findobj(src.Parent.Parent,'Type','figure');
 appDesignChanger(mainFigObj,getSettingsValue('Style'));
+appDesignElementChanger(mainFigObj);
 drawnow;
 mainCordObj.Visible = 'on';
 
