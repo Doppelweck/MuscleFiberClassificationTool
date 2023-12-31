@@ -95,6 +95,7 @@ if percentdone > 100 % Task completed
     if ~isempty(progfig)
 %         setAlwaysOnTop(progfig,false);
     end
+    set(progfig,'pointer','arrow');
     delete(progfig) % Close progress bar
 
     clear progfig progpatch starttime lastupdate % Clear persistent vars
@@ -154,9 +155,7 @@ if isempty(progfig)
     
     movegui(progfig,'center');
     set(progfig,'Visible','on')
-%     setAlwaysOnTop(progfig,true);
-    
-    
+%     setAlwaysOnTop(progfig,true);    
     
     set(progfig,'CloseRequestFcn','');
     work.progtitle = progtitle;                             % Store initial values for title
@@ -268,6 +267,11 @@ set(text(1),'string',message);
 set(text(3),'string',timeleftstr);
 set(text(4),'string',[num2str(percentdone) ' %']);
 set(progfig,'Visible',isVisible);
+if(strcmp(get(progfig,'Visible'),'on'))
+    set(progfig,'pointer','watch');
+else
+    set(progfig,'pointer','arrow');
+end
 % Force redraw to show changes
 drawnow
 
