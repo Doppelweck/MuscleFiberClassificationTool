@@ -1,5 +1,6 @@
 function appDesignElementChanger(curFig)
 
+
 colorMode = getSettingsValue('Style');
 
 black = [0 0 0];
@@ -151,7 +152,7 @@ if(strcmp(colorMode,'dark'))
         disp('Error: AppDesignElementChanger')
     end
     
-    
+   
 else
     %If Style is not dark, then frame objects are not needed. Transfer alle
     %Frame Objects back to normal uicontrols
@@ -165,7 +166,6 @@ else
     
     
     h = findobj(curFig,'Style','frame','-and',{'-regexp', 'Tag', '.*checkbox.*'});
-    
     try
         set(h(1:length(h)),'Style','checkbox','ForegroundColor',textHighlightColor,'BackgroundColor',mainBackground);
     catch
@@ -188,4 +188,6 @@ else
         disp('Error: AppDesignElementChanger')
     end
     
+end
+
 end
