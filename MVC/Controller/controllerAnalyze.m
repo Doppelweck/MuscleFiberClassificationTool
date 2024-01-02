@@ -594,7 +594,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                
+                appDesignElementChanger(obj.mainCardPanel);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
@@ -632,7 +632,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                
+                appDesignElementChanger(obj.mainCardPanel);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
@@ -669,7 +669,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                
+                appDesignElementChanger(obj.mainCardPanel);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 2;
@@ -706,10 +706,10 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                
+                appDesignElementChanger(obj.mainCardPanel);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
-                
+                obj.viewAnalyzeHandle.ParaCard.Selection = 2;
                 
             elseif src.Value == 5
                 obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification triple labeling';
@@ -742,8 +742,8 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                
-                
+                appDesignElementChanger(obj.mainCardPanel);
+                obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
             elseif src.Value == 6
@@ -777,7 +777,8 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                
+                appDesignElementChanger(obj.mainCardPanel);
+                obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
             elseif src.Value == 7
@@ -812,10 +813,11 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',0);
-                
+                appDesignElementChanger(obj.mainCardPanel);
+                obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
             end
-            appDesignElementChanger(obj.mainCardPanel);
+            
         end
         
         function activeParaEvent(obj,src,evnt)
