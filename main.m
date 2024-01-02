@@ -209,6 +209,6 @@ appDesignChanger(mainFigObj,getSettingsValue('Style'));
 appDesignElementChanger(mainFigObj);
 drawnow;
 mainCordObj.Visible = 'on';
-
+drawnow;
 end
 % end
