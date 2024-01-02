@@ -27,7 +27,7 @@ classdef viewEdit < handle
     properties(SetObservable)
         
         panelControl;    %handle to panel with the controls included
-        panelPicture;   %handle to panel with the image axes included
+        panelAxes;   %handle to panel with the image axes included
         panelEdit; %handle to panel with editView components.
         hAP;    %handle to axes that shows the image.
         hFCP;   %handle to figure with planes to check. Opens after the check plane button was pressed.
@@ -128,12 +128,12 @@ classdef viewEdit < handle
             set(mainCard,'Visible','off');
             obj.panelEdit = uix.HBox( 'Parent', mainCard, 'Spacing',2,'Padding',2);
             
-            obj.panelPicture = uix.Panel('Parent',  obj.panelEdit,'FontSize',fontSizeB,'Padding',0);
+            obj.panelAxes = uix.Panel('Parent',  obj.panelEdit,'FontSize',fontSizeB,'Padding',0);
             obj.panelControl = uix.Panel('Parent',  obj.panelEdit,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
             set(  obj.panelEdit, 'MinimumWidths', [1 320] );
             set(  obj.panelEdit, 'Widths', [-80 -20] );
-            set(obj.panelPicture,'Title','PICTURE');
-            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.012,'Title','PICTURE');
+            set(obj.panelAxes,'Title','PICTURE');
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelAxes),'FontUnits','normalized','Fontsize',0.012,'Title','PICTURE');
             axis image
 
             set(obj.hAP, 'LooseInset', [0,0,0,0]);

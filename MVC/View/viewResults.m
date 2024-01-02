@@ -27,8 +27,8 @@ classdef viewResults < handle
     properties
         hFR; %handle to figure with Results and controls.
         panelControl; %handle to panel with controls.
-        panelResults; %handle to panel with results.
-        mainPanelResults; %handle to mainPanelBox in  in resultsVIEW
+        panelAxes; %handle to panel with resultsView.
+        panelResults; %handle to mainPanelBox in  in resultsVIEW
         hAPProcessed; %handle to axes with processed image in the picture Panel all planes.
         hAPGroups; %handle to axes with image created from the Red Green and Blue color-planes.
         
@@ -82,12 +82,12 @@ classdef viewResults < handle
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
-            obj.mainPanelResults = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2);
+            obj.panelResults = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2);
             
-            obj.panelResults = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.mainPanelResults,'FontSize',fontSizeB,'Padding',0);
-            obj.panelControl = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.mainPanelResults,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
-            set( obj.mainPanelResults, 'MinimumWidths', [1 320] );
-            set( obj.mainPanelResults, 'Widths', [-4 -1] );
+            obj.panelAxes = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.panelResults,'FontSize',fontSizeB,'Padding',0);
+            obj.panelControl = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.panelResults,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
+            set( obj.panelResults, 'MinimumWidths', [1 320] );
+            set( obj.panelResults, 'Widths', [-4 -1] );
             
             %%%%%%%%%%%%%%%%%% Panel controls %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,7 +221,7 @@ classdef viewResults < handle
             %%%%%%%%%%%%%%%%%%% Panel with Tabs %%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
-            tabPanel = uix.TabPanel('Parent',obj.panelResults,'FontSize',fontSizeB,'Padding',2,'TabWidth',200,'Tag','tabMainPanel');
+            tabPanel = uix.TabPanel('Parent',obj.panelAxes,'FontSize',fontSizeB,'Padding',2,'TabWidth',200,'Tag','tabMainPanel');
             
             statisticTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line','Tag','tabPanel');
             histogramTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line','Tag','tabPanel');

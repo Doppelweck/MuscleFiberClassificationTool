@@ -27,7 +27,7 @@ classdef viewAnalyze < handle
     properties(SetObservable)
 
         panelControl;    %handle to panel with controls.
-        panelPicture;   %handle to panel with image.
+        panelAxes;   %handle to panel with image.
         panelAnalyze; %handle to panel with editAnalyze components.
         hAP;    %handle to axes with image.
         hAMC; %handle to axes for manual classification mode.
@@ -123,12 +123,12 @@ classdef viewAnalyze < handle
             set(mainCard,'Visible','off');
             obj.panelAnalyze = uix.HBox( 'Parent', mainCard ,'Spacing',2,'Padding',2);
             
-            obj.panelPicture = uix.Panel('Parent', obj.panelAnalyze, 'Title', 'PICTURE','FontSize',fontSizeB,'Padding',2);
+            obj.panelAxes = uix.Panel('Parent', obj.panelAnalyze, 'Title', 'PICTURE','FontSize',fontSizeB,'Padding',2);
             obj.panelControl = uix.Panel('Parent', obj.panelAnalyze, 'Title', 'CLASSIFICATION','FontSize',fontSizeB,'TitlePosition','centertop');
             set( obj.panelAnalyze, 'MinimumWidths', [1 320] );
             set( obj.panelAnalyze, 'Widths', [-80 -20] );
             
-            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture), 'FontUnits','normalized','Fontsize',0.012);
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelAxes), 'FontUnits','normalized','Fontsize',0.012);
             axtoolbar(obj.hAP,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             axis image
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
