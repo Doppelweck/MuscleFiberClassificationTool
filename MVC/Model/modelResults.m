@@ -1302,7 +1302,7 @@ classdef modelResults < handle
                 obj.InfoMessage = '      - saving Histograms plots...';
                 
                 obj.InfoMessage = '         - saving Area histogram as .pdf';
-                picName = [fileName '_AreaHistogram' time '.pdf'];
+                picName = [fileName '_HistogramArea' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
                 fTemp = figure('Visible','off');
                 lTemp = findobj('Tag','LegendAreaHist');
@@ -1311,10 +1311,9 @@ classdef modelResults < handle
                 appDesignChanger(fTemp,'light');
                 saveTightFigureOrAxes(fTemp,fullFileName);
                 clf(fTemp);
-                delete(lTemp);
                 
                 obj.InfoMessage = '         - saving AspectRatio histogram as .pdf';
-                picName = [fileName '_AspectRatioHistogram' time '.pdf'];
+                picName = [fileName '_HistogramAspectRatio' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
 %                 fTemp = figure('Visible','off');
                 lTemp = findobj('Tag','LegendAspectHist');
@@ -1323,10 +1322,9 @@ classdef modelResults < handle
                 appDesignChanger(fTemp,'light');
                 saveTightFigureOrAxes(fTemp,fullFileName);
                 clf(fTemp);
-                delete(lTemp);
                 
                 obj.InfoMessage = '         - saving Diameter histogram as .pdf';
-                picName = [fileName '_DiameterHistogram' time '.pdf'];
+                picName = [fileName '_HistogramDiameter' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
 %                 fTemp = figure('Visible','off');
                 lTemp = findobj('Tag','LegendDiaHist');
@@ -1335,10 +1333,9 @@ classdef modelResults < handle
                 appDesignChanger(fTemp,'light');
                 saveTightFigureOrAxes(fTemp,fullFileName);
                 clf(fTemp);
-                delete(lTemp);
                 
                 obj.InfoMessage = '         - saving Roundness histogram as .pdf';
-                picName = [fileName '_RoundnessHistogram' time '.pdf'];
+                picName = [fileName '_HistogramRoundness' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
 %                 fTemp = figure('Visible','off');
                 lTemp = findobj('Tag','LegendRoundHist');
@@ -1347,7 +1344,6 @@ classdef modelResults < handle
                 appDesignChanger(fTemp,'light');
                 saveTightFigureOrAxes(fTemp,fullFileName);
                 delete(fTemp);
-                delete(lTemp);
                 
                 obj.InfoMessage = '   - saving Histograms complete';
             end
@@ -1361,7 +1357,7 @@ classdef modelResults < handle
                 obj.InfoMessage = '      - saving image processed...';
                 try
                     % save picture as vector graphics
-                    picName = [fileName '_imageProcessed' time '.pdf'];
+                    picName = [fileName '_ImageProcessed' time '.pdf'];
                     fullFileName = fullfile(SaveDir,picName);
                     fTemp = figure('Visible','off');
                     copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fTemp);
@@ -1384,7 +1380,7 @@ classdef modelResults < handle
                     
                     frame = getframe(f);
                     frame=frame.cdata;
-                    picName = [fileName '_imageProcessed' time '.tif'];
+                    picName = [fileName '_ImageProcessed' time '.tif'];
                     oldPath = pwd;
                     cd(SaveDir)
                     imwrite(frame,picName)
@@ -1407,7 +1403,7 @@ classdef modelResults < handle
                 try
                     picName ='';
                     % save picture as vector graphics
-                    picName = [fileName '_image_fiberGroups' time '.pdf'];
+                    picName = [fileName '_ImageFiberGroups' time '.pdf'];
                     fullFileName = fullfile(SaveDir,picName);
                     fTemp = figure('Visible','off');
                     copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,fTemp);
@@ -1431,7 +1427,7 @@ classdef modelResults < handle
                     picName ='';
                     frame = getframe(f);
                     frame=frame.cdata;
-                    picName = [fileName '_image_fiberGroups' time '.tif'];
+                    picName = [fileName '_ImageFiberGroups' time '.tif'];
                     oldPath = pwd;
                     cd(SaveDir)
                     imwrite(frame,picName)
@@ -1450,7 +1446,7 @@ classdef modelResults < handle
             if obj.SaveScatterAll
                 obj.InfoMessage = '      - saving Scatter all Fibers...';
                 obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
-                picName = [fileName '_scatterPlotAll' time '.pdf'];
+                picName = [fileName '_ScatterPlotAll' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
                 
                 fTemp = figure('Visible','off');
@@ -1583,7 +1579,7 @@ classdef modelResults < handle
                     javaaddpath(path);
                 end
                 
-                xlsfileName = [fileName '_processed' time '.xlsx'];
+                xlsfileName = [fileName '_TablesProcessed' time '.xlsx'];
                 
                 fullFileName = fullfile(SaveDir,xlsfileName);
                 %                     oldPath = pwd;
@@ -1644,7 +1640,7 @@ classdef modelResults < handle
                 else
                     obj.InfoMessage = '         - .xlxs file could not be created';
                     obj.InfoMessage = '         - creating .txt file instead...';
-                    txtfileName = [fileName '_processed' time '.txt'];
+                    txtfileName = [fileName '_TablesProcessed' time '.txt'];
                     oldPath = pwd;
                     cd(SaveDir)
                     fid=fopen(txtfileName,'a+');
