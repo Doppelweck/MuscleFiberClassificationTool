@@ -29,6 +29,8 @@ classdef controllerResults < handle
         mainFigure; %handle to main figure.
         mainCardPanel; %handle to card panel in the main figure.
         panelResults; %handle to card panel selection 3 in the main figure.
+        panelControl; %handle to panel with controls.
+        panelAxes; %handle to panel with resultsView.
         viewResultsHandle; %hande to viewResults instance.
         modelResultsHandle; %hande to modelResults instance.
         controllerAnalyzeHandle; %handle to controllerAnalyze instance.
@@ -83,6 +85,8 @@ classdef controllerResults < handle
             obj.modelResultsHandle = modelResultsH;
             
             obj.panelResults = obj.viewResultsHandle.panelResults;
+            obj.panelControl = obj.viewResultsHandle.panelControl;
+            obj.panelAxes = obj.viewResultsHandle.panelAxes;
             
             obj.addMyCallback();
             
@@ -195,19 +199,18 @@ classdef controllerResults < handle
             %               Data{31}: Binary Mask image
             %           InfoText:   Info text log.
             %
+            %change the card panel to selection 3: results mode
+            obj.panelAxes.Visible = 0;
+            obj.busyIndicator(1);
+            obj.mainCardPanel.Selection = 3;
             
             if obj.modelResultsHandle.ResultUpdateStaus
                 %nothing has changed. 
                 obj.modelResultsHandle.InfoMessage = '- No new analysis has been done';
-                obj.modelResultsHandle.InfoMessage = '- updating data is not necessary';
-                obj.modelResultsHandle.InfoMessage = '- updating GUI is not necessary';
+                obj.modelResultsHandle.InfoMessage = '   - updating data is not necessary';
+                obj.modelResultsHandle.InfoMessage = '   - updating GUI is not necessary';
             else
                 
-            %change the card panel to selection 3: results mode
-            obj.mainCardPanel.Visible = 0;
-            obj.busyIndicator(1);
-            obj.mainCardPanel.Selection = 3;
-            
             try
                 % Set PicData Properties in the Results Model
                 obj.modelResultsHandle.FileName = Data{1};
@@ -259,7 +262,7 @@ classdef controllerResults < handle
                 
                 % set panel title to filename and path
                 Titel = [obj.modelResultsHandle.PathName obj.modelResultsHandle.FileName];
-                obj.viewResultsHandle.panelResults.Title = Titel;
+                obj.viewResultsHandle.panelAxes.Title = Titel;
                 
                 %change the figure callbacks for the results mode
                 obj.addWindowCallbacks()
@@ -271,7 +274,7 @@ classdef controllerResults < handle
                 set(obj.viewResultsHandle.B_NewPic,'Enable','off');
                 set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
                 set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-                appDesignElementChanger(obj.panelResults);
+                appDesignElementChanger(obj.panelControl);
                 %show results data in the GUI
                 obj.modelResultsHandle.startResultMode();
                 
@@ -279,7 +282,7 @@ classdef controllerResults < handle
                 set(obj.viewResultsHandle.B_Save,'Enable','on');
                 set(obj.viewResultsHandle.B_NewPic,'Enable','on');
                 set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
-                appDesignElementChanger(obj.panelResults);
+                appDesignElementChanger(obj.panelControl);
                 
                 %Check if a resultsfolder for the file already exist
                 % Dlete file extension in the results folder before save
@@ -299,15 +302,17 @@ classdef controllerResults < handle
                     set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
                     
                 end
-                obj.busyIndicator(0);
-                obj.mainCardPanel.Visible = 1;
                 
+                
+            appDesignChanger(obj.panelResults,getSettingsValue('Style'));
+            drawnow;
             catch
                 obj.errorMessage();
             end
             end
-%             appDesignChanger(obj.panelResults,getSettingsValue('Style'));
             
+            obj.busyIndicator(0);
+            obj.panelAxes.Visible = 1;
         end
         
         function backAnalyzeModeEvent(obj,~,~)
@@ -363,6 +368,7 @@ classdef controllerResults < handle
                 if ( obj.modelResultsHandle.SaveFiberTable || ...
                         obj.modelResultsHandle.SaveScatterAll || ...
                         obj.modelResultsHandle.SavePlots || ...
+                        obj.modelResultsHandle.SaveHisto || ...
                         obj.modelResultsHandle.SavePicProcessed || ...
                         obj.modelResultsHandle.SaveBinaryMask || ...
                         obj.modelResultsHandle.SavePicGroups)
@@ -373,7 +379,7 @@ classdef controllerResults < handle
                     set(obj.viewResultsHandle.B_NewPic,'Enable','off');
                     set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
                     set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
-                    appDesignElementChanger(obj.panelResults);
+                    appDesignElementChanger(obj.panelControl);
                     %Save results
                     obj.modelResultsHandle.saveResults();
                     
@@ -384,16 +390,16 @@ classdef controllerResults < handle
                     set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','on');
                 else
                     obj.modelResultsHandle.InfoMessage = '- no data is selected for saving';
-                    obj.modelResultsHandle.InfoMessage = '- no data has been saved';
+                    obj.modelResultsHandle.InfoMessage = '   - no data has been saved';
                 end
                 obj.busyIndicator(0);
-                appDesignElementChanger(obj.panelResults);
+                appDesignElementChanger(obj.panelControl);
                 [y,Fs] = audioread('filling-your-inbox.mp3');
                 sound(y*0.4,Fs);
             catch
                 obj.errorMessage();
             end
-            appDesignElementChanger(obj.panelResults);
+            appDesignElementChanger(obj.panelControl);
         end
         
         function showInfoInTableGUI(obj)
@@ -1294,15 +1300,15 @@ classdef controllerResults < handle
             if ~isempty(tempStats)
                 %%%%%%%%% Area Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 obj.modelResultsHandle.InfoMessage = '      - plot Area Histogram';
-                
                 cla(obj.viewResultsHandle.hAAreaHist);
-                
+            
                 h = histfit(obj.viewResultsHandle.hAAreaHist,[tempStats.Area],50);
                 if(size(tempStats,1)>1)
                     binWidth = num2str(abs(h(1).XEndPoints(2)-h(1).XEndPoints(1)));
                 else
                     binWidth = 'only 1 bin';
                 end
+           
                 ylim(obj.viewResultsHandle.hAAreaHist,[0 ceil( max(h(1).YData)*1.1 / 5 ) * 5]);
                 mu=mean([tempStats.Area]);
                 sigma=std([tempStats.Area]);
@@ -1313,10 +1319,10 @@ classdef controllerResults < handle
                 xlabel(obj.viewResultsHandle.hAAreaHist,['Area in \mum^2 ( Bin width: ' binWidth ' \mum^2 )'],'FontUnits','normalized','Fontsize',0.045);
                 ylabel(obj.viewResultsHandle.hAAreaHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
                 grid(obj.viewResultsHandle.hAAreaHist, 'on');
-                l1=legend(obj.viewResultsHandle.hAAreaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+                l1=legend(obj.viewResultsHandle.hAAreaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ),'Tag','LegendAreaHist');
                 l1.FontSize=obj.fontSizeM;
+            
                 axtoolbar(obj.viewResultsHandle.hAAreaHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
-                
                 %%%%%%%%% Aspect Ratio Histogram %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 obj.modelResultsHandle.InfoMessage = '      - plot Aspect Ratio Histogram';
                 
@@ -1338,7 +1344,7 @@ classdef controllerResults < handle
                 xlabel(obj.viewResultsHandle.hAAspectHist,['Aspect Ratio ( Bin width: ' binWidth ' )'],'FontUnits','normalized','Fontsize',0.045);
                 ylabel(obj.viewResultsHandle.hAAspectHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
                 grid(obj.viewResultsHandle.hAAspectHist, 'on');
-                l2=legend(obj.viewResultsHandle.hAAspectHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+                l2=legend(obj.viewResultsHandle.hAAspectHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ),'Tag','LegendAspectHist');
                 l2.FontSize=obj.fontSizeM;
                 axtoolbar(obj.viewResultsHandle.hAAspectHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
                 
@@ -1363,7 +1369,7 @@ classdef controllerResults < handle
                 xlabel(obj.viewResultsHandle.hADiaHist,['Diameters in \mum ( Bin width: ' binWidth ' \mum )'] ,'FontUnits','normalized','Fontsize',0.045);
                 ylabel(obj.viewResultsHandle.hADiaHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
                 grid(obj.viewResultsHandle.hADiaHist, 'on');
-                l3=legend(obj.viewResultsHandle.hADiaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+                l3=legend(obj.viewResultsHandle.hADiaHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ),'Tag','LegendDiaHist');
                 l3.FontSize=obj.fontSizeM;
                 axtoolbar(obj.viewResultsHandle.hADiaHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
                 
@@ -1388,7 +1394,7 @@ classdef controllerResults < handle
                 xlabel(obj.viewResultsHandle.hARoundHist,['Roundness ( Bin width: ' binWidth ' )'],'FontUnits','normalized','Fontsize',0.045);
                 ylabel(obj.viewResultsHandle.hARoundHist,'Frequency','FontUnits','normalized','Fontsize',0.045);
                 grid(obj.viewResultsHandle.hARoundHist, 'on');
-                l4=legend(obj.viewResultsHandle.hARoundHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ));
+                l4=legend(obj.viewResultsHandle.hARoundHist,"Histogram",sprintf( ['Gaussian:\n-m: ' num2str(mu) '\n-std: ' num2str(sigma) ] ),'Tag','LegendRoundHist');
                 l4.FontSize=obj.fontSizeM;
                 axtoolbar(obj.viewResultsHandle.hARoundHist,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             else
@@ -1699,7 +1705,7 @@ classdef controllerResults < handle
 %                 findall(figHandles, '-property', 'Enable','-and','Enable','on',...
 %                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelResultsHandle.busyObj, 'Enable', 'off')
-                appDesignElementChanger(obj.panelResults);
+                appDesignElementChanger(obj.panelControl);
                 
             else
                 %delete indicator object and disable GUI elements
@@ -1708,7 +1714,7 @@ classdef controllerResults < handle
                     valid = isvalid(obj.modelResultsHandle.busyObj);
                     obj.modelResultsHandle.busyObj(~valid)=[];
                     set( obj.modelResultsHandle.busyObj, 'Enable', 'on')
-                    appDesignElementChanger(obj.panelResults);
+                    appDesignElementChanger(obj.panelControl);
                 end
                 
                 if ~isempty(obj.modelResultsHandle.busyIndicator)
@@ -1719,9 +1725,8 @@ classdef controllerResults < handle
                 end
                 
 %                 figHandles = findobj('Type','figure');
-                
-                workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
                 set(obj.mainFigure,'pointer','arrow');
+                workbar(1.5,'delete workbar','delete workbar',obj.mainFigure);
             end
             
         end

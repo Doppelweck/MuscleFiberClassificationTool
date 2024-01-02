@@ -26,8 +26,12 @@ classdef controllerAnalyze < handle
     
     properties
         mainFigure; %handle to main figure.
+        
         mainCardPanel; %handle to card panel in the main figure.
-        panelAnalyze; %handle to mainPanelBox in editlAnalyze
+        panelControl;    %handle to panel with controls.
+        panelAxes;   %handle to panel with image.
+        panelAnalyze; %handle to panel with editAnalyze components.
+        
         viewAnalyzeHandle; %hande to viewAnalyze instance.
         modelAnalyzeHandle; %hande to modelAnalyze instance.
         controllerEditHandle; %handle to controllerEdit instance.
@@ -64,7 +68,9 @@ classdef controllerAnalyze < handle
             obj.modelAnalyzeHandle = modelAnalyzeH;
             
             obj.panelAnalyze = obj.viewAnalyzeHandle.panelAnalyze;
-            
+            obj.panelControl = obj.viewAnalyzeHandle.panelControl;
+            obj.panelAxes = obj.viewAnalyzeHandle.panelAxes;
+
             obj.setInitValueInModel();
             
             obj.addMyListener();
@@ -1039,7 +1045,7 @@ classdef controllerAnalyze < handle
             
             % set panel title to filename and path
             Titel = [obj.modelAnalyzeHandle.PathName obj.modelAnalyzeHandle.FileName];
-            obj.viewAnalyzeHandle.panelPicture.Title = Titel;
+            obj.viewAnalyzeHandle.panelAxes.Title = Titel;
             
             % get axes for zoomed Pic in Analyze GUI FIber Information Panel
             obj.modelAnalyzeHandle.handleInfoAxes = imshow([],'Parent',obj.viewAnalyzeHandle.B_AxesInfo);
@@ -2178,7 +2184,7 @@ classdef controllerAnalyze < handle
 %                 findall(obj.panelAnalyze, '-property', 'Enable','-and','Enable','on',...
 %                     '-and','-not','style','listbox','-and','-not','style','text','-and','-not','Type','uitable');
                 set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'off')
-                appDesignElementChanger(obj.panelAnalyze);
+                appDesignElementChanger(obj.panelControl);
                 
             else
                 %delete indicator object and disable GUI elements
@@ -2190,7 +2196,7 @@ classdef controllerAnalyze < handle
                     valid = isvalid(obj.modelAnalyzeHandle.busyObj);
                     obj.modelAnalyzeHandle.busyObj(~valid)=[];
                     set( obj.modelAnalyzeHandle.busyObj, 'Enable', 'on')
-                    appDesignElementChanger(obj.panelAnalyze);
+                    appDesignElementChanger(obj.panelControl);
                 end
                 
                 if ~isempty(obj.modelAnalyzeHandle.busyIndicator)
