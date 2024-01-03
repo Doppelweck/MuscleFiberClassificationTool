@@ -128,9 +128,10 @@ if(~isempty(h))
     end
 end
 
-h = findobj(curFig,'Style','pushbutton','-or','Style','edit','-or','Style','slider','-or','Style','checkbox','-or','Style','popupmenu',...
-    '-or','Style','listbox','-or','Type','uipanel','-or','Type','axes','-or','Type','legend','-or','Type','uicontainer',...
-    '-or','Type','uitable','-or','Style','text','-or','Type','text','-and','-not','Tag','fiberLabelsProcessed');
+h = findobj(curFig,'-not','Tag','fiberLabelsProcessed','-and',{'-property','Type'},'-and',{'-property','BackgroundColor','-or','-property','ForegroundColor','-or','-property','Color'});
+% h = findobj(curFig,'Style','pushbutton','-or','Style','edit','-or','Style','slider','-or','Style','checkbox','-or','Style','popupmenu',...
+%     '-or','Style','listbox','-or','Type','uipanel','-or','Type','axes','-or','Type','legend','-or','Type','uicontainer',...
+%     '-or','Type','uitable','-or','Style','text','-or','Type','text','-and','-not','Tag','fiberLabelsProcessed');
 
 for i = 1:numel(h)
     if isprop(h(i),'Style')
@@ -188,7 +189,7 @@ for i = 1:numel(h)
         case 'not found'
             disp('Error: AppDesignChanger for loop no obj found')
         otherwise
-            disp('Error: AppDesignChanger for loop')
+%             disp('Error: AppDesignChanger for loop')
     end
 end
 
