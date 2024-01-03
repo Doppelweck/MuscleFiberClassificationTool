@@ -1437,6 +1437,13 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResul object
             %
+            set(obj.viewResultsHandle.B_BackAnalyze,'Enable','off');
+            set(obj.viewResultsHandle.B_Save,'Enable','off');
+            set(obj.viewResultsHandle.B_NewPic,'Enable','off');
+            set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
+            set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
+            
+            winState=get(obj.mainFigure,'WindowState');
             
             choice = questdlg({'Are you sure you want to open a new file? ','All unsaved data will be lost.'},...
                 'New File', ...
@@ -1454,6 +1461,16 @@ classdef controllerResults < handle
                 otherwise
                     obj.modelResultsHandle.InfoMessage = '   - closing program canceled';
             end
+            
+            if strcmp(winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+            end
+            
+            set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
+            set(obj.viewResultsHandle.B_Save,'Enable','on');
+            set(obj.viewResultsHandle.B_NewPic,'Enable','on');
+            set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
+            set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','on');
         end
         
         function clearData(obj)
@@ -1646,6 +1663,12 @@ classdef controllerResults < handle
             %       - Input
             %           obj:    Handle to controllerResult object
             %
+            set(obj.viewResultsHandle.B_BackAnalyze,'Enable','off');
+            set(obj.viewResultsHandle.B_Save,'Enable','off');
+            set(obj.viewResultsHandle.B_NewPic,'Enable','off');
+            set(obj.viewResultsHandle.B_CloseProgramm,'Enable','off');
+            set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','off');
+            drawnow;
             try
                 if exist(obj.modelResultsHandle.SavePath,'dir') == 7
                     
@@ -1672,6 +1695,11 @@ classdef controllerResults < handle
             catch
                 obj.errorMessage();
             end
+            set(obj.viewResultsHandle.B_BackAnalyze,'Enable','on');
+            set(obj.viewResultsHandle.B_Save,'Enable','on');
+            set(obj.viewResultsHandle.B_NewPic,'Enable','on');
+            set(obj.viewResultsHandle.B_CloseProgramm,'Enable','on');
+            set(obj.viewResultsHandle.B_SaveOpenDir,'Enable','on');
         end
         
         function busyIndicator(obj,status)
