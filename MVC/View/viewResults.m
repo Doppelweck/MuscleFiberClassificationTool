@@ -196,7 +196,7 @@ classdef viewResults < handle
             HBoxSave7 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave71,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Binary Mask as .pdf: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave71,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Binary Mask as .tif: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
