@@ -733,7 +733,8 @@ classdef viewAnalyze < handle
                 fontSizeB = 16; % Font size big 
             end
             
-            obj.hFPR = figure('NumberTitle','off','Units','normalized','Name','Preview Results','Visible','off','MenuBar','none','ToolBar','none','Color',[1 1 1]);
+            obj.hFPR = figure('NumberTitle','off','Units','normalized','Name','Preview Results','Visible','off','MenuBar','none','ToolBar','none','Color',[1 1 1],...
+                'WindowStyle', 'modal');
             set(obj.hFPR,'Tag','FigurePreResults')
             
             %get position of mainFigure
