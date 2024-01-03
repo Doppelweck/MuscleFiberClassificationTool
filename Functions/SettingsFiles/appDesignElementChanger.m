@@ -113,8 +113,9 @@ switch colorMode
 end
 
 if(strcmp(colorMode,'dark'))
-    h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
-        '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
+     h = findobj(curFig,'Enable','off','-and','-not','Style','checkbox');
+%     h = findobj(curFig,{'Style','edit','-and','Enable','off'},'-or',{'Style','checkbox4','-and','Enable','off'}, ...
+%         '-or',{'Style','slider','-and','Enable','off'},'-or',{'Style','popupmenu','-and','Enable','off'});
     try
         set(h(1:length(h)),'Style','frame','Enable','off','ForegroundColor',black);
     catch
