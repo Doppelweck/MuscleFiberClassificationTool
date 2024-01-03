@@ -36,6 +36,8 @@ classdef controllerAnalyze < handle
         modelAnalyzeHandle; %hande to modelAnalyze instance.
         controllerEditHandle; %handle to controllerEdit instance.
         controllerResultsHandle; %handle to controllerRsults instance.
+        
+        winState; %Check if window was maximized
     end
     
     
@@ -594,7 +596,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
@@ -632,7 +634,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
@@ -669,7 +671,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 2;
@@ -706,7 +708,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
                 obj.viewAnalyzeHandle.ParaCard.Selection = 2;
@@ -742,7 +744,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image without farred plane';
                 
@@ -777,7 +779,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',1);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
                 
@@ -813,7 +815,7 @@ classdef controllerAnalyze < handle
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_ColorValueActive,'Value',0);
-                appDesignElementChanger(obj.mainCardPanel);
+                appDesignElementChanger(obj.panelControl);
                 obj.viewAnalyzeHandle.ParaCard.Selection = 1;
                 obj.modelAnalyzeHandle.InfoMessage = '   -show image with farred plane';
             end
@@ -837,18 +839,7 @@ classdef controllerAnalyze < handle
             %           evnt:   callback event data.
             %
             
-            % If a window already exists, delete it
-            OldFig = findobj('Tag','FigureManipulate');
-            if ~isempty(OldFig) && isvalid(OldFig)
-                delete(OldFig);
-            end
-            
-            % If a highlight BoundarieBox already exists, delete it
-            OldBox = findobj('Tag','highlightBox');
-            if ~isempty(OldBox) && isvalid(OldBox)
-                delete(OldBox);
-            end
-            
+                    
             % Which element has triggered the callback
             Tag = evnt.Source.Tag;
             % Value that has changed. Can only be 1 or 0 (true or false)
@@ -867,6 +858,7 @@ classdef controllerAnalyze < handle
                         set(obj.viewAnalyzeHandle.B_MinArea,'Enable','on')
                         set(obj.viewAnalyzeHandle.B_MaxArea,'Enable','on')
                     end
+                    appDesignElementChanger(obj.panelControl);
                     
                 case obj.viewAnalyzeHandle.B_RoundnessActive.Tag
                     % RoundActive has changed. If it is zero, Roundness parameter
@@ -876,6 +868,7 @@ classdef controllerAnalyze < handle
                     elseif Value == 1
                         set(obj.viewAnalyzeHandle.B_MinRoundness,'Enable','on')
                     end
+                    appDesignElementChanger(obj.panelControl);
                     
                 case obj.viewAnalyzeHandle.B_AspectRatioActive.Tag
                     % AspectRatioActive has changed. If it is zero AspectRatio parameters
@@ -887,6 +880,7 @@ classdef controllerAnalyze < handle
                         set(obj.viewAnalyzeHandle.B_MinAspectRatio,'Enable','on')
                         set(obj.viewAnalyzeHandle.B_MaxAspectRatio,'Enable','on')
                     end
+                    appDesignElementChanger(obj.panelControl);
                     
                 case obj.viewAnalyzeHandle.B_BlueRedThreshActive.Tag
                     % BlueRedThreshActive has changed. If it is zero AspectRatio parameters
@@ -900,6 +894,7 @@ classdef controllerAnalyze < handle
                         set(obj.viewAnalyzeHandle.B_BlueRedDistBlue,'Enable','on')
                         set(obj.viewAnalyzeHandle.B_BlueRedDistRed,'Enable','on')
                     end
+                    appDesignElementChanger(obj.panelControl);
                     
                 case obj.viewAnalyzeHandle.B_FarredRedThreshActive.Tag
                     % BlueRedThreshActive has changed. If it is zero AspectRatio parameters
@@ -913,6 +908,7 @@ classdef controllerAnalyze < handle
                         set(obj.viewAnalyzeHandle.B_FarredRedDistFarred,'Enable','on')
                         set(obj.viewAnalyzeHandle.B_FarredRedDistRed,'Enable','on')
                     end
+                    appDesignElementChanger(obj.panelControl);
                     
                 case obj.viewAnalyzeHandle.B_ColorValueActive.Tag
                     % ColorValueActive has changed. If it is zero ColorValue parameters
@@ -922,11 +918,22 @@ classdef controllerAnalyze < handle
                     elseif Value == 1
                         set(obj.viewAnalyzeHandle.B_ColorValue,'Enable','on')
                     end
-                    
+                     appDesignElementChanger(obj.panelControl);
+                     
                 otherwise
                     % Error Code
             end
-            appDesignElementChanger(obj.mainCardPanel);
+           % If a window already exists, delete it
+            OldFig = findobj('Tag','FigureManipulate');
+            if ~isempty(OldFig) && isvalid(OldFig)
+                delete(OldFig);
+            end
+            
+            % If a highlight BoundarieBox already exists, delete it
+            OldBox = findobj('Tag','highlightBox');
+            if ~isempty(OldBox) && isvalid(OldBox)
+                delete(OldBox);
+            end  
         end
         
         function startAnalyzeMode(obj,InfoText)
@@ -960,9 +967,9 @@ classdef controllerAnalyze < handle
             %
             %           InfoText:   Info text log.
             %
-            tic;
+            
             obj.busyIndicator(1);
-            disp(toc);
+            
             obj.mainCardPanel.Selection = 2;
             obj.viewAnalyzeHandle.PanelFiberInformation.Title = 'Fiber informations';
             
@@ -1374,16 +1381,31 @@ classdef controllerAnalyze < handle
         
         function backEditModeEvent(obj,~,~)
             
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_PreResults,'Enable','off')
+            
             obj.mainCardPanel.Selection = 1;
             obj.clearDataModel();
             %change the figure callbacks for the edit mode
             obj.controllerEditHandle.addWindowCallbacks();
+            
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_PreResults,'Enable','on')
             
             obj.controllerEditHandle.modelEditHandle.InfoMessage = '*** Back to Edit mode ***';
             
         end
         
         function startResultsModeEvent(obj,~,~)
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_PreResults,'Enable','off')
+            drawnow;
             try
                 % Callback function of the show rsults button in the GUI.
                 % Starts the rusults mode. transfers all data from the analyze
@@ -1440,6 +1462,10 @@ classdef controllerAnalyze < handle
             catch
                 obj.errorMessage();
             end
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_PreResults,'Enable','on')
         end
         
         function showFiberInfo(obj,~,~)
@@ -1572,10 +1598,15 @@ classdef controllerAnalyze < handle
             
             % Show the fiber information from the selected object on the
             % right side of the GUI
+            
+            
             obj.showFiberInfo();
             
             % If a window already exists, delete it
             OldFig = findobj('Tag','FigureManipulate');
+            if(isempty(OldFig))
+                obj.winState=get(obj.mainFigure,'WindowState');
+            end
             delete(OldFig);
             
             % If a highlight BoundarieBox already exists, delete it
@@ -1588,6 +1619,9 @@ classdef controllerAnalyze < handle
             
             if isnan(PosOut(1)) || isnan(PosOut(1))
                 set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
+                if strcmp(obj.winState,'maximized')
+                    set(obj.mainFigure,'WindowState','maximized');
+                end
             end
             
             if ~isnan(PosOut(1)) && ~isnan(PosOut(2)) && ~isempty(obj.modelAnalyzeHandle.LabelMat)
@@ -1623,11 +1657,7 @@ classdef controllerAnalyze < handle
                     set(obj.mainFigure, 'Units','normalized');
                     
                     % create figure to show informations at the cursor position
-                    winState=get(obj.mainFigure,'WindowState');
                     obj.viewAnalyzeHandle.showInfoToManipulate(PosOut,PosMainFig,PosCurrent,Info);
-                    if strcmp(winState,'maximized')
-                        set(obj.mainFigure,'WindowState','maximized');
-                    end
                     
                     % refresh Callbacks on figure manupilate fiber info
                     set(obj.viewAnalyzeHandle.B_ManipulateOK,'Callback',@obj.manipulateFiberOKEvent);
@@ -1675,6 +1705,10 @@ classdef controllerAnalyze < handle
             % delete it
             OldBox = findobj('Tag','highlightBox');
             delete(OldBox);
+            
+            if strcmp(obj.winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+           end
         end
         
         function manipulateFiberCancelEvent(obj,~,~)
@@ -1701,6 +1735,10 @@ classdef controllerAnalyze < handle
             OldBox = findobj('Tag','highlightBox');
             delete(OldBox);
             
+            if strcmp(obj.winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+            end
+            
             % refresh Callback function in figure AnalyzeMode
             set(obj.mainFigure,'WindowButtonMotionFcn',@obj.showFiberInfo);
             %refresh main figure callbacks
@@ -1708,6 +1746,10 @@ classdef controllerAnalyze < handle
         end
         
         function showPreResultsEvent(obj,~,~)
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
+            set(obj.viewAnalyzeHandle.B_PreResults,'Enable','off')
             try
                 %refresh main figure callbacks
                 addWindowCallbacks(obj);
@@ -2093,6 +2135,10 @@ classdef controllerAnalyze < handle
             catch
                 obj.errorMessage();
             end
+            set(obj.viewAnalyzeHandle.B_BackEdit,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
+            set(obj.viewAnalyzeHandle.B_PreResults,'Enable','on')
         end
         
         function setInfoTextView(obj,InfoText)
