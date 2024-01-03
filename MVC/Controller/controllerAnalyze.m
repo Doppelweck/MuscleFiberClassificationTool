@@ -1750,6 +1750,9 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','off')
             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off')
             set(obj.viewAnalyzeHandle.B_PreResults,'Enable','off')
+            
+            obj.winState=get(obj.mainFigure,'WindowState');
+            
             try
                 %refresh main figure callbacks
                 addWindowCallbacks(obj);
@@ -1777,6 +1780,7 @@ classdef controllerAnalyze < handle
                         obj.viewAnalyzeHandle.showFigurePreResults(obj.mainFigure);
                     end
                     preFig = findobj('Tag','FigurePreResults');
+                    set(preFig,'CloseRequestFcn', @obj.closePreResultsEvent)
                      
                     %Color Map for FIber Types
                     ColorMap(1,:) = [51 51 255]; % Blue Fiber Type 1
@@ -2139,6 +2143,13 @@ classdef controllerAnalyze < handle
             set(obj.viewAnalyzeHandle.B_StartAnalyze,'Enable','on')
             set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on')
             set(obj.viewAnalyzeHandle.B_PreResults,'Enable','on')
+        end
+        
+        function closePreResultsEvent(obj,src,~)
+            delete(src);
+            if strcmp(obj.winState,'maximized')
+                set(obj.mainFigure,'WindowState','maximized');
+            end
         end
         
         function setInfoTextView(obj,InfoText)
