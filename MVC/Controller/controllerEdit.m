@@ -1104,6 +1104,12 @@ classdef controllerEdit < handle
             %       - Input
             %           obj:    Handle to controllerEdit object
             %
+            set(obj.viewEditHandle.B_NewPic,'Enable','off');
+            set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+            set(obj.viewEditHandle.B_CheckMask,'Enable','off');
+            set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+            set(obj.viewEditHandle.B_Undo,'Enable','off');
+            set(obj.viewEditHandle.B_Redo,'Enable','off');
             
             obj.winState=get(obj.mainFigure,'WindowState');
             obj.modelEditHandle.InfoMessage = '   - Checking planes opened';
@@ -1338,7 +1344,12 @@ classdef controllerEdit < handle
             if strcmp(obj.winState,'maximized')
                 set(obj.mainFigure,'WindowState','maximized');
             end
-            
+            set(obj.viewEditHandle.B_NewPic,'Enable','on');
+            set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+            set(obj.viewEditHandle.B_CheckMask,'Enable','on');
+            set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
+            set(obj.viewEditHandle.B_Undo,'Enable','on');
+            set(obj.viewEditHandle.B_Redo,'Enable','on');
         end
         
         function selectNewBrightnessImage(obj,~,evnt)
@@ -2525,13 +2536,24 @@ classdef controllerEdit < handle
             %           src:    source of the callback
             %           evnt:   callback event data
             %
-            
+            set(obj.viewEditHandle.B_NewPic,'Enable','off');
+            set(obj.viewEditHandle.B_CheckPlanes,'Enable','off');
+            set(obj.viewEditHandle.B_CheckMask,'Enable','off');
+            set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','off');
+            set(obj.viewEditHandle.B_Undo,'Enable','off');
+            set(obj.viewEditHandle.B_Redo,'Enable','off');
             obj.modelEditHandle.InfoMessage = ' ';
             
             %Send Data to Controller Analyze
             InfoText = get(obj.viewEditHandle.B_InfoText, 'String');
             
             obj.controllerAnalyzeHandle.startAnalyzeMode(InfoText);
+            set(obj.viewEditHandle.B_NewPic,'Enable','on');
+            set(obj.viewEditHandle.B_CheckPlanes,'Enable','on');
+            set(obj.viewEditHandle.B_CheckMask,'Enable','on');
+            set(obj.viewEditHandle.B_StartAnalyzeMode,'Enable','on');
+            set(obj.viewEditHandle.B_Undo,'Enable','on');
+            set(obj.viewEditHandle.B_Redo,'Enable','on');
         end
         
         function undoEvent(obj,~,~)
