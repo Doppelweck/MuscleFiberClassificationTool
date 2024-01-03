@@ -27,7 +27,8 @@ classdef viewResults < handle
     properties
         hFR; %handle to figure with Results and controls.
         panelControl; %handle to panel with controls.
-        panelResults; %handle to panel with results.
+        panelAxes; %handle to panel with resultsView.
+        panelResults; %handle to mainPanelBox in  in resultsVIEW
         hAPProcessed; %handle to axes with processed image in the picture Panel all planes.
         hAPGroups; %handle to axes with image created from the Red Green and Blue color-planes.
         
@@ -81,12 +82,12 @@ classdef viewResults < handle
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
-            mainPanelBox = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2 );
+            obj.panelResults = uix.HBox( 'Parent', mainCard,'Spacing',2,'Padding',2);
             
-            obj.panelResults = uix.Panel( 'Title', 'RESULTS', 'Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',0);
-            obj.panelControl = uix.Panel( 'Title', 'RESULTS', 'Parent', mainPanelBox,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
-            set( mainPanelBox, 'MinimumWidths', [1 320] );
-            set( mainPanelBox, 'Widths', [-4 -1] );
+            obj.panelAxes = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.panelResults,'FontSize',fontSizeB,'Padding',0);
+            obj.panelControl = uix.Panel( 'Title', 'RESULTS', 'Parent', obj.panelResults,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
+            set( obj.panelResults, 'MinimumWidths', [1 320] );
+            set( obj.panelResults, 'Widths', [-4 -1] );
             
             %%%%%%%%%%%%%%%%%% Panel controls %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,13 +101,13 @@ classdef viewResults < handle
             set( PanelVBox, 'Heights', [-13 -35 -52], 'Spacing', 2 );
             
             %%%%%%%%%%%%%%%%%% Panel control %%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0 );
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 2 ,'Padding',2 );
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',5,'Padding', 2);
             obj.B_BackAnalyze = uicontrol( 'Parent', HBoxControl1, 'String', sprintf('\x25C4 Classification'),'FontUnits','normalized','Fontsize',0.4 );
             obj.B_CloseProgramm = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Close program \x2612') );
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',5,'Padding', 2);
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
             obj.B_Save = uicontrol( 'Parent', HBoxControl2, 'String', sprintf('Save data \x2611'),'FontUnits','normalized','Fontsize',0.4 );
             
@@ -195,7 +196,7 @@ classdef viewResults < handle
             HBoxSave7 = uix.HBox('Parent', mainVBBoxSave,'Spacing',2,'Padding', 2 );
             
             HButtonBoxSave71 = uix.HButtonBox('Parent', HBoxSave7,'ButtonSize',[6000 20],'Padding', 2 );
-            tempH = uicontrol( 'Parent', HButtonBoxSave71,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Binary Mask as .pdf: ' );
+            tempH = uicontrol( 'Parent', HButtonBoxSave71,'Style','text','FontUnits','normalized','Fontsize',0.7, 'HorizontalAlignment','left','String', 'Save Binary Mask as .tif: ' );
             jh = findjobj_fast(tempH);
             jh.setVerticalAlignment(javax.swing.JLabel.CENTER);
             
@@ -220,7 +221,7 @@ classdef viewResults < handle
             %%%%%%%%%%%%%%%%%%% Panel with Tabs %%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
-            tabPanel = uix.TabPanel('Parent',obj.panelResults,'FontSize',fontSizeB,'Padding',2,'TabWidth',200,'Tag','tabMainPanel');
+            tabPanel = uix.TabPanel('Parent',obj.panelAxes,'FontSize',fontSizeB,'Padding',2,'TabWidth',200,'Tag','tabMainPanel');
             
             statisticTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line','Tag','tabPanel');
             histogramTabPanel = uix.Panel('Parent',tabPanel,'BorderType','line','Tag','tabPanel');
@@ -256,7 +257,6 @@ classdef viewResults < handle
             set(obj.hAScatterBlueRed, 'LooseInset', [0,0,0,0]);
             axtoolbar(obj.hAScatterBlueRed,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
             
-            
             PanelStatisticTabel = uix.Panel('Parent',statisticTabHBox,'Padding',5,'Title', 'Fiber-Type statistics','FontSize',fontSizeM);
             
             set(statisticTabHBox,'Widths', [-2 -2 -1.2])
@@ -277,7 +277,6 @@ classdef viewResults < handle
 
             obj.B_TableStatistic = uitable('Parent',PanelStatisticTabel,'FontSize',fontSizeS);
             
-           
             %%%%%%%%%%%%%%%%%%%%%%%% Tab Histogramms %%%%%%%%%%%%%%%%%%%%%%
             
             histoTabHBox = uix.HBox('Parent',histogramTabPanel,'Spacing',2,'Padding',2);
@@ -341,7 +340,7 @@ classdef viewResults < handle
             obj.hAScatterAll = axes('Parent',uicontainer('Parent',mainScatterallPanel),'Units','normalized','OuterPosition',[0 0 1 1]);
             set(obj.hAScatterAll, 'LooseInset', [0,0,0,0]);
             axtoolbar(obj.hAScatterAll,{'export','datacursor','pan','zoomin','zoomout','restoreview'});
-%             set(obj.hAScatterAll,'Units','normalized','OuterPosition',[0 0 1 1]);
+
             %%%%%%%%%%%%%%% call edit functions for GUI
             obj.setToolTipStrings();
             
@@ -377,8 +376,6 @@ classdef viewResults < handle
             set(obj.B_CloseProgramm,'tooltipstring',CloseToolTip);
             set(obj.B_NewPic,'tooltipstring',NewPicToolTip);
             set(obj.B_Save,'tooltipstring',SaveToolTip);
-
-            
         end
         
          function delete(obj)

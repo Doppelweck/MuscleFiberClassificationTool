@@ -5,7 +5,7 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
-    
+    warning('off', 'all');
     cl;
     pause(0.1);
     
@@ -61,12 +61,12 @@ try
     delete(editMenu);
     
     % Add Menu for Design
-    mDesign = uimenu(mainFig,'Text','App Design');
-    mDesignitem1 = uimenu(mDesign,'Text','Dark');
+    mDesign = uimenu(mainFig,'Text','App Design','Tag','menuDesignSelection');
+    mDesignitem1 = uimenu(mDesign,'Text','Dark','Tag','menuDesignDark');
     mDesignitem1.MenuSelectedFcn = @changeAppDesign;
-    mDesignitem2 = uimenu(mDesign,'Text','Light');
+    mDesignitem2 = uimenu(mDesign,'Text','Light','Tag','menuDesignLight');
     mDesignitem2.MenuSelectedFcn = @changeAppDesign;
-    mDesignitem3 = uimenu(mDesign,'Text','Default');
+    mDesignitem3 = uimenu(mDesign,'Text','Default','Tag','menuDesignDefault');
     mDesignitem3.MenuSelectedFcn = @changeAppDesign;
     
     % Add Menu for Settings
@@ -74,13 +74,13 @@ try
     mSettingsitem1 = uimenu(mSettings,'Text','Load Default Settings');
     mSettingsitem2 = uimenu(mSettings,'Text','Load Saved Settings');
     mSettingsitem3 = uimenu(mSettings,'Text','Save Current Settings');
-
+    
     % Add Menu for Info
     mInfo = uimenu(mainFig,'Text','Information');
-
     
     
-
+    
+    
     figure(hf);
     set(hf,'WindowStyle','modal');
     
@@ -115,8 +115,6 @@ try
     drawnow;pause(0.5);
     mainCard.Selection = 1;
     drawnow;
-    appDesignChanger(mainCard,getSettingsValue('Style'));
-    drawnow;
     
     InfoText.String='Loading please wait...   Initialize MODEL-Components...';
     %Init MODEL's
@@ -137,6 +135,12 @@ try
     modelEditHandle.controllerEditHandle = controllerEditHandle;
     modelAnalyzeHandle.controllerAnalyzeHandle = controllerAnalyzeHandle;
     modelResultsHandle.controllerResultsHandle = controllerResultsHandle;
+    pause(0.2)
+    
+    InfoText.String='Loading please wait...   Update app design...';
+    appDesignChanger(mainCard,getSettingsValue('Style'));
+    appDesignElementChanger(mainCard);
+    drawnow;
     pause(0.2)
     
     InfoText.String='Loading please wait...   Start application...';
@@ -161,21 +165,18 @@ try
     
 catch
     ErrorInfo = lasterror;
-    Text = [];
+    Text = cell(5*size(ErrorInfo.stack,1)+2,1);
     Text{1,1} = ErrorInfo.message;
     Text{2,1} = '';
     
     if any(strcmp('stack',fieldnames(ErrorInfo)))
-        
         for i=1:size(ErrorInfo.stack,1)
-            
-            Text{end+1,1} = [ErrorInfo.stack(i).file];
-            Text{end+1,1} = [ErrorInfo.stack(i).name];
-            Text{end+1,1} = ['Line: ' num2str(ErrorInfo.stack(i).line)];
-            Text{end+1,1} = '------------------------------------------';
-            
+            idx = (i - 1) * 5 + 2;
+            Text{idx+1,1} = [ErrorInfo.stack(i).file];
+            Text{idx+2,1} = [ErrorInfo.stack(i).name];
+            Text{idx+3,1} = ['Line: ' num2str(ErrorInfo.stack(i).line)];
+            Text{idx+4,1} = '------------------------------------------';
         end
-        
     end
     
     mode = struct('WindowStyle','modal','Interpreter','tex');
@@ -195,18 +196,19 @@ catch
     %find all figures and delete them
     figHandles = findobj('Type','figure');
     delete(figHandles);
-    
-    
 end
 
-function changeAppDesign(src,event)
-    setSettingsValue('Style',lower(src.Text));
-    mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
-    mainCordObj.Visible = 'off';
-    drawnow;
-    mainFigObj=findobj(src.Parent.Parent,'Type','figure');
-    appDesignChanger(mainFigObj,getSettingsValue('Style'));
-    drawnow;
-    mainCordObj.Visible = 'on';
-    end
+function changeAppDesign(src,~)
+
+setSettingsValue('Style',lower(src.Text));
+mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+mainCordObj.Visible = 'off';
+drawnow;
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+appDesignChanger(mainFigObj,getSettingsValue('Style'));
+appDesignElementChanger(mainFigObj);
+drawnow;
+mainCordObj.Visible = 'on';
+drawnow;
+end
 % end

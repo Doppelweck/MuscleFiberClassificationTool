@@ -27,7 +27,8 @@ classdef viewEdit < handle
     properties(SetObservable)
         
         panelControl;    %handle to panel with the controls included
-        panelPicture;   %handle to panel with the image axes included
+        panelAxes;   %handle to panel with the image axes included
+        panelEdit; %handle to panel with editView components.
         hAP;    %handle to axes that shows the image.
         hFCP;   %handle to figure with planes to check. Opens after the check plane button was pressed.
         
@@ -125,19 +126,16 @@ classdef viewEdit < handle
             end
 %             mainCard = figure('Units','normalized','Position',[0.01 0.05 0.98 0.85]);
             set(mainCard,'Visible','off');
-            mainPanelBox = uix.HBox( 'Parent', mainCard, 'Spacing',2,'Padding',2);
+            obj.panelEdit = uix.HBox( 'Parent', mainCard, 'Spacing',2,'Padding',2);
             
-            obj.panelPicture = uix.Panel('Parent', mainPanelBox,'FontSize',fontSizeB,'Padding',0);
-            obj.panelControl = uix.Panel('Parent', mainPanelBox,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
-            set( mainPanelBox, 'MinimumWidths', [1 320] );
-            set( mainPanelBox, 'Widths', [-80 -20] );
-            set(obj.panelPicture,'Title','PICTURE');
-            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.012,'Title','PICTURE');
-%             axtoolbar(obj.hAP,{'datacursor','pan','zoomin','zoomout','restoreview'});
-%             obj.hAP = axes('Parent',uicontainer('Parent', obj.panelPicture),'FontUnits','normalized','Fontsize',0.35);
+            obj.panelAxes = uix.Panel('Parent',  obj.panelEdit,'FontSize',fontSizeB,'Padding',0);
+            obj.panelControl = uix.Panel('Parent',  obj.panelEdit,'Title', 'SEGMENTATION' ,'FontSize',fontSizeB,'TitlePosition','centertop','Padding',0);
+            set(  obj.panelEdit, 'MinimumWidths', [1 320] );
+            set(  obj.panelEdit, 'Widths', [-80 -20] );
+            set(obj.panelAxes,'Title','PICTURE');
+            obj.hAP = axes('Parent',uicontainer('Parent', obj.panelAxes),'FontUnits','normalized','Fontsize',0.012,'Title','PICTURE');
             axis image
-%             InSet = get(obj.hAP, 'TightInset');
-%             set(obj.hAP, 'Position', [InSet(1:2), 1-InSet(1)-InSet(3), 1-InSet(2)-InSet(4)])
+
             set(obj.hAP, 'LooseInset', [0,0,0,0]);
             
             PanelVBox = uix.VBox('Parent',obj.panelControl,'Spacing', 2,'Padding',2);
@@ -152,17 +150,17 @@ classdef viewEdit < handle
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 0 ,'Padding',0);
+            mainVBBoxControl = uix.VButtonBox('Parent', PanelControl,'ButtonSize',[600 600],'Spacing', 2 ,'Padding',2);
             
-            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl1 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2 );
             obj.B_NewPic = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('\x2633 New file') );
             obj.B_StartAnalyzeMode = uicontrol( 'Parent', HBoxControl1,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('Analyze \x25BA') ,'Enable','off');
             
-            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40], 'Spacing',2);
+            HBoxControl2 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2 );
             obj.B_CheckMask = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4,'Style','pushbutton', 'String', sprintf('\x2593 Check mask') ,'Enable','off');
             obj.B_CheckPlanes = uicontrol( 'Parent', HBoxControl2,'FontUnits','normalized','Fontsize',0.4, 'String', sprintf('Check planes \x2750') ,'Enable','off');
             
-            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing',2);
+            HBoxControl3 = uix.HButtonBox('Parent', mainVBBoxControl,'ButtonSize',[600 40],'Spacing', 5 ,'Padding',2 );
             obj.B_Undo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('\x21BA Undo'),'FontUnits','normalized','Fontsize',0.4);
             obj.B_Redo = uicontrol( 'Parent', HBoxControl3, 'String', sprintf('Redo \x21BB'),'FontUnits','normalized','Fontsize',0.4);
             
@@ -181,6 +179,7 @@ classdef viewEdit < handle
             obj.B_ImageOverlaySelection = uicontrol( 'Parent', HButtonBoxAlpha1_2,'Style','popupmenu','Tag','popupmenuOverlay','FontUnits','normalized','Fontsize',0.6, 'String', {'RGB Image' , 'Green Plane', 'Blue Plane', 'Red Plane', 'Farred Plane'} ,'Enable','on');
             
             set( HBoxAlpha2, 'Widths', [-1.3 -3.7] );
+            
             %%%%%%%%%%%%%%%% 2. Row Alpha %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             HBoxAlpha2 = uix.HBox('Parent', mainVBoxAlpha,'Spacing',2,'Padding', 2 );
@@ -201,7 +200,6 @@ classdef viewEdit < handle
             
             set( HBoxAlpha2, 'Widths', [-0.5 -0.5 -2 -1] );
             
-
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %%%%%%%%%%%%%% Panel Hand Draw Grid %%%%%%%%%%%%%%%%%%%%%%%%%%%
             mainVBoxBinari = uix.VBox('Parent', PanelBinari);
@@ -420,7 +418,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneBlue, 'position', [0 0 1 1]);
             imshow(Pics{6})
-%             VButtonBox4 = uix.VButtonBox('Parent', VBox4ColorPlane,'ButtonSize',[400 40]);
+
             String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneBlue = uicontrol( 'Parent', VBox4ColorPlane,'Style','popupmenu','Tag','popupmenu', 'String', String , 'Value' ,2,'FontUnits','normalized','Fontsize',0.35);
             set(VBox4ColorPlane,'Heights',[-10 40])
@@ -430,7 +428,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneRed, 'position', [0 0 1 1]);
             imshow(Pics{7})
-%             VButtonBox5 = uix.VButtonBox('Parent', VBox5ColorPlane,'ButtonSize',[400 40]);
+
             String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneRed = uicontrol( 'Parent', VBox5ColorPlane,'Style','popupmenu','Tag','popupmenu', 'String', String , 'Value' ,3,'FontUnits','normalized','Fontsize',0.35);
             set(VBox5ColorPlane,'Heights',[-10 40])
@@ -440,7 +438,7 @@ classdef viewEdit < handle
             axis image
             set(obj.B_AxesCheckPlaneFarRed, 'position', [0 0 1 1]);
             imshow(Pics{8})
-%             VButtonBox6 = uix.VButtonBox('Parent', VBox6ColorPlane,'ButtonSize',[400 40]);
+
             String = {'Green Plane - Collagen (pseudo color: green)' , 'Blue Plane - Type 1 fibers (pseudo color: blue)', 'Red Plane - Type 2 fibers (all) (pseudo color: red)', 'FarRed Plane - Type 2 fibers specification (2x,2a,2ax) (pseudo color: yellow)'};
             obj.B_ColorPlaneFarRed = uicontrol( 'Parent', VBox6ColorPlane,'Style','popupmenu','Tag','popupmenu', 'String', String , 'Value' ,4,'FontUnits','normalized','Fontsize',0.35);
             set(VBox6ColorPlane,'Heights',[-10 40])
@@ -653,9 +651,7 @@ classdef viewEdit < handle
             set(obj.B_ShapeSE,'tooltipstring',StructuringToolTip);
             set(obj.B_SizeSE,'tooltipstring',StructuringSizeToolTip);
             set(obj.B_NoIteration,'tooltipstring',NoOfIterationsToolTip);
-            set(obj.B_StartMorphOP,'tooltipstring',RunMorphToolTip);
-            
-           
+            set(obj.B_StartMorphOP,'tooltipstring',RunMorphToolTip); 
         end
         
         function delete(obj)
