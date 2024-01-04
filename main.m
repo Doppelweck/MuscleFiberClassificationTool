@@ -53,7 +53,7 @@ try
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
         'InvertHardcopy','off');
-    
+
     %%Remove unwanted Menu icons
     editMenu = findall(mainFig, 'Tag', 'figMenuFile' ,'-or','Tag', 'figMenuEdit',...
         '-or','Tag', 'figMenuView','-or','Tag', 'figMenuInsert','-or','Tag', 'figMenuDesktop',...
@@ -72,14 +72,14 @@ try
     % Add Menu for Settings
     mSettings = uimenu(mainFig,'Text','App Settings');
     mSettingsitem1 = uimenu(mSettings,'Text','Load Default Settings');
-    mSettingsitem2 = uimenu(mSettings,'Text','Load Saved Settings');
-    mSettingsitem3 = uimenu(mSettings,'Text','Save Current Settings');
+    mSettingsitem1.MenuSelectedFcn = @loadDefaultSettings;
+    mSettingsitem2 = uimenu(mSettings,'Text','Load User Settings');
+    mSettingsitem2.MenuSelectedFcn = @loadUserSettings;
+    mSettingsitem3 = uimenu(mSettings,'Text','Save User Settings');
+    mSettingsitem3.MenuSelectedFcn = @saveUserSettings;
     
     % Add Menu for Info
     mInfo = uimenu(mainFig,'Text','Information');
-    
-    
-    
     
     figure(hf);
     set(hf,'WindowStyle','modal');
@@ -210,5 +210,49 @@ appDesignElementChanger(mainFigObj);
 drawnow;
 mainCordObj.Visible = 'on';
 drawnow;
+end
+
+function loadDefaultSettings(src,~)
+
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+    '-and','-not','Style','pushbutton');
+
+for i = 1:numel(uiControls)
+    
+    reverseEnable = false;
+    if(strcmp(uiControls(i).Enable ,'off'))
+        set( uiControls(i), 'Enable', 'on');
+        appDesignElementChanger(uiControls(i));
+        reverseEnable = true;
+    end
+    
+    if(strcmp(uiControls(i).Style,'edit'))
+        uiControls(i).String = getDefaultSettingsValue(uiControls(i).Tag);
+    else
+        uiControls(i).Value = str2double( getDefaultSettingsValue(uiControls(i).Tag) );
+    end
+    
+    if(reverseEnable)
+        set( uiControls(i), 'Enable', 'off');
+        appDesignElementChanger(uiControls(i));
+    end
+    
+    if isprop(uiControls(i),'Callback')
+        if ~isempty(uiControls(i).Callback)
+            feval(get(uiControls(i),'Callback'),uiControls(i));
+        end
+    end
+end 
+
+end
+
+function loadUserSettings(src,~)
+mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+end
+
+function saveUserSettings(src,~)
+mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
 end
 % end
