@@ -1,4 +1,4 @@
-function value = getSettingsValue(searchString)
+function value = getDefaultSettingsValue(searchString)
 currentFile = mfilename( 'fullpath' );
 
 [pathstr,~,~] = fileparts( currentFile );
