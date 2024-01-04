@@ -8,6 +8,8 @@ if(~contains(matlabpath, pathstr))
 end
 
 data=load(fullfile( pathstr, 'AppSettings.mat' ));
+stringCellArray = cellfun(@(x) isnumeric(x) || islogical(x), data.Settings);
+data.Settings(stringCellArray) = cellfun(@num2str, data.Settings(stringCellArray), 'UniformOutput', false);
 
 idx=find(contains(data.Settings,searchString));
 

@@ -5,7 +5,8 @@ currentFile = mfilename( 'fullpath' );
 addpath( pathstr );
 
 data=load(fullfile( pathstr, 'AppSettings.mat' ));
-
+stringCellArray = cellfun(@(x) isnumeric(x) || islogical(x), data.Settings);
+data.Settings(stringCellArray) = cellfun(@num2str, data.Settings(stringCellArray), 'UniformOutput', false);
 %Check if setting exist
 idx=find(contains(data.Settings,settingsString));
 
