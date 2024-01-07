@@ -253,6 +253,34 @@ mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
 end
 
 function saveUserSettings(src,~)
-mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+    '-and','-not','Style','pushbutton');
+
+for i = 1:numel(uiControls)
+    
+    reverseEnable = false;
+    if(strcmp(uiControls(i).Enable ,'off'))
+        set( uiControls(i), 'Enable', 'on');
+        appDesignElementChanger(uiControls(i));
+        reverseEnable = true;
+    end
+    
+    if(strcmp(uiControls(i).Style,'edit'))
+        setSettingsValue(uiControls(i).Tag, uiControls(i).String);
+    else
+        uiControls(i).Value = str2double( getDefaultSettingsValue(uiControls(i).Tag) );
+        setSettingsValue(uiControls(i).Tag, num2str(uiControls(i).Value));
+    end
+    
+    if(reverseEnable)
+        set( uiControls(i), 'Enable', 'off');
+        appDesignElementChanger(uiControls(i));
+    end
+
+end
+
 end
 % end
