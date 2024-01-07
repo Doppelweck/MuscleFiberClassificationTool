@@ -1990,7 +1990,8 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            obj.modelEditHandle.handlePicRGB
+            
+                
             switch obj.viewEditHandle.B_ImageOverlaySelection.Value
                 case 1 %RGB
                     Pic = obj.modelEditHandle.PicRGBFRPlanes;
@@ -2005,13 +2006,19 @@ classdef controllerEdit < handle
                 otherwise
                     Pic = obj.modelEditHandle.PicRGBFRPlanes;
             end
-            if isa(obj.modelEditHandle.handlePicRGB,'struct')
-                % first start of the programm. No image handle exist.
-                % create image handle for Pic RGB
-                obj.modelEditHandle.handlePicRGB = imshow(Pic);
+            
+            if ~isempty(Pic)
+                if isa(obj.modelEditHandle.handlePicRGB,'struct')
+                    % first start of the programm. No image handle exist.
+                    % create image handle for Pic RGB
+                    obj.modelEditHandle.handlePicRGB = imshow(Pic);
+                else
+                    % New image was selected. Change data in existing handle
+                    obj.modelEditHandle.handlePicRGB.CData = Pic;
+                end
+                
             else
-                % New image was selected. Change data in existing handle
-                obj.modelEditHandle.handlePicRGB.CData = Pic;
+                %No Image loaded
             end
         end
         
@@ -2145,6 +2152,17 @@ classdef controllerEdit < handle
             Strings = obj.viewEditHandle.B_MorphOP.String;
             String = Strings{obj.viewEditHandle.B_MorphOP.Value};
             
+            if isempty(obj.modelEditHandle.handlePicBW)
+                
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
+                set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
+                set(obj.viewEditHandle.B_SizeSE,'Enable','off')
+                set(obj.viewEditHandle.B_NoIteration,'Enable','off')
+                set(obj.viewEditHandle.B_MorphOP,'Enable','off')
+                appDesignElementChanger(obj.panelControl);
+                
+            else
+            
             switch String
                 
                 case 'erode'
@@ -2270,6 +2288,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
                 appDesignElementChanger(obj.panelControl);
+            end
+            
             end
             
         end
