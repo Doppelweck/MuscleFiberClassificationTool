@@ -116,6 +116,33 @@ try
     mainCard.Selection = 1;
     drawnow;
     
+    InfoText.String='Loading please wait...   Load User Settings...';
+    % LOAD USER Settings
+    uiControls = findobj(mainCard,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+        '-and','-not','Style','pushbutton');
+    
+    for i = 1:numel(uiControls)
+        reverseEnable = false;
+        if(strcmp(uiControls(i).Enable ,'off'))
+            set( uiControls(i), 'Enable', 'on');
+            appDesignElementChanger(uiControls(i));
+            reverseEnable = true;
+        end
+        
+        if(strcmp(uiControls(i).Style,'edit'))
+            uiControls(i).String = getSettingsValue(uiControls(i).Tag);
+        else
+            uiControls(i).Value = str2double( getSettingsValue(uiControls(i).Tag) );
+        end
+        
+        if(reverseEnable)
+            set( uiControls(i), 'Enable', 'off');
+            appDesignElementChanger(uiControls(i));
+        end
+    end
+    
+    drawnow;pause(1);
+    
     InfoText.String='Loading please wait...   Initialize MODEL-Components...';
     %Init MODEL's
     modelEditHandle = modelEdit();
@@ -220,7 +247,7 @@ uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not'
     '-and','-not','Style','pushbutton');
 
 for i = 1:numel(uiControls)
-    
+    workbar(i/numel(uiControls),'load settings','Load DEFAULT settings',mainFigObj);
     reverseEnable = false;
     if(strcmp(uiControls(i).Enable ,'off'))
         set( uiControls(i), 'Enable', 'on');
@@ -245,11 +272,43 @@ for i = 1:numel(uiControls)
         end
     end
 end 
-
+workbar(2,'load settings','Load DEFAULT settings',mainFigObj);
 end
 
 function loadUserSettings(src,~)
-mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+% mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+    '-and','-not','Style','pushbutton');
+
+for i = 1:numel(uiControls)
+    workbar(i/numel(uiControls),'load settings','Load USER settings',mainFigObj);
+    reverseEnable = false;
+    if(strcmp(uiControls(i).Enable ,'off'))
+        set( uiControls(i), 'Enable', 'on');
+        appDesignElementChanger(uiControls(i));
+        reverseEnable = true;
+    end
+    
+    if(strcmp(uiControls(i).Style,'edit'))
+        uiControls(i).String = getSettingsValue(uiControls(i).Tag);
+    else
+        uiControls(i).Value = str2double( getSettingsValue(uiControls(i).Tag) );
+    end
+    
+    if(reverseEnable)
+        set( uiControls(i), 'Enable', 'off');
+        appDesignElementChanger(uiControls(i));
+    end
+    
+    if isprop(uiControls(i),'Callback')
+        if ~isempty(uiControls(i).Callback)
+            feval(get(uiControls(i),'Callback'),uiControls(i));
+        end
+    end
+end 
+workbar(2,'load settings','Load USER settings',mainFigObj);
 end
 
 function saveUserSettings(src,~)
@@ -260,7 +319,10 @@ uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not'
     '-and','-not','Style','pushbutton');
 
 for i = 1:numel(uiControls)
-    
+    if i==37
+        disp('')
+    end
+    workbar(i/numel(uiControls),'Save settings','Save USER settings',mainFigObj);
     reverseEnable = false;
     if(strcmp(uiControls(i).Enable ,'off'))
         set( uiControls(i), 'Enable', 'on');
@@ -271,7 +333,6 @@ for i = 1:numel(uiControls)
     if(strcmp(uiControls(i).Style,'edit'))
         setSettingsValue(uiControls(i).Tag, uiControls(i).String);
     else
-        uiControls(i).Value = str2double( getDefaultSettingsValue(uiControls(i).Tag) );
         setSettingsValue(uiControls(i).Tag, num2str(uiControls(i).Value));
     end
     
@@ -281,6 +342,6 @@ for i = 1:numel(uiControls)
     end
 
 end
-
+workbar(2,'Save settings','Save USER settings',mainFigObj);
 end
 % end
