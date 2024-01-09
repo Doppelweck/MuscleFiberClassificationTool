@@ -85,15 +85,15 @@ classdef controllerEdit < handle
             
             %show init text in the info log
             obj.modelEditHandle.InfoMessage = '*** Start program ***';
-            obj.modelEditHandle.InfoMessage = 'Fiber-Type-Classification-Tool';
+            obj.modelEditHandle.InfoMessage = 'Muscle-Fiber-Type-Classification-Tool';
+            obj.modelEditHandle.InfoMessage = ['Version ' getSettingsValue('Version') ' ' getSettingsValue('Year')];
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Developed by:';
-            obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences, GER';
+            obj.modelEditHandle.InfoMessage = 'Sebastian Friedrich';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'In cooperation with:';
+            obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences, GER';
             obj.modelEditHandle.InfoMessage = 'The Royal Veterinary College, UK';
-            obj.modelEditHandle.InfoMessage = ' ';
-            obj.modelEditHandle.InfoMessage = 'Version 1.4 2023';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Press "New file" to start';
             
