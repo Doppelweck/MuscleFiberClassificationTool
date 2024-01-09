@@ -568,7 +568,10 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based triple labeling';
                 obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 2 12h fibers';
                 % Color-Based triple labeling classification
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                catch
+                end
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',1)
                 set(obj.viewAnalyzeHandle.B_BlueRedThresh,'Enable','on')
@@ -605,7 +608,10 @@ classdef controllerAnalyze < handle
                 obj.modelAnalyzeHandle.InfoMessage = '   -Color-Based quad labeling';
                 obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h 2x 2a 2ax fibers';
                 % Color-Based quad labeling classification
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                catch
+                end
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','on')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',1)
@@ -642,7 +648,11 @@ classdef controllerAnalyze < handle
             elseif src.Value == 3
                 obj.modelAnalyzeHandle.InfoMessage = '   -OPTICS -Cluster-Based triple labeling';
                 obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 2 and 12h fibers';
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                catch
+                end
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
@@ -679,7 +689,11 @@ classdef controllerAnalyze < handle
             elseif src.Value == 4
                 obj.modelAnalyzeHandle.InfoMessage = '   -OPTICS -Cluster-Based quad labeling';
                 obj.modelAnalyzeHandle.InfoMessage = '      -searching for Type 1 12h 2x 2a 2ax fibers';
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                catch
+                end
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
@@ -715,7 +729,11 @@ classdef controllerAnalyze < handle
                 
             elseif src.Value == 5
                 obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification triple labeling';
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBPlanes;
+                catch
+                end
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
@@ -750,7 +768,11 @@ classdef controllerAnalyze < handle
                 
             elseif src.Value == 6
                 obj.modelAnalyzeHandle.InfoMessage = '   -Manual Classification quad labeling';
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                catch
+                end
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
@@ -786,7 +808,11 @@ classdef controllerAnalyze < handle
             elseif src.Value == 7
                 obj.modelAnalyzeHandle.InfoMessage = '   - No Classification';
                 obj.modelAnalyzeHandle.InfoMessage = '      - only determination of fiber object properties';
-                obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                
+                try
+                    obj.modelAnalyzeHandle.handlePicRGB.CData = obj.modelAnalyzeHandle.PicPRGBFRPlanes;
+                catch
+                end
                 
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Enable','off')
                 set(obj.viewAnalyzeHandle.B_BlueRedThreshActive,'Value',0)
@@ -822,7 +848,7 @@ classdef controllerAnalyze < handle
             
         end
         
-        function activeParaEvent(obj,src,evnt)
+        function activeParaEvent(obj,src,~)
             % Checks if the active status of a parameter has changed.
             % Disables or enables the correspondening edit box elements in
             % the GUI if nessesary. Only changes the values in the view
@@ -841,7 +867,7 @@ classdef controllerAnalyze < handle
             
                     
             % Which element has triggered the callback
-            Tag = evnt.Source.Tag;
+            Tag = src.Tag;
             % Value that has changed. Can only be 1 or 0 (true or false)
             Value = src.Value;
             

@@ -2479,22 +2479,25 @@ classdef modelEdit < handle
             %       - Input
             %           obj:    Handle to modelEdit object.
             %
-            
-            if obj.PicBufferPointer >= obj.BufferSize
-                temp = obj.PicBuffer;
-                
-                for i=1:1:obj.BufferSize-1
-                    obj.PicBuffer{1,i}=temp{1,i+1};
+            try
+                if obj.PicBufferPointer >= obj.BufferSize
+                    temp = obj.PicBuffer;
+
+                    for i=1:1:obj.BufferSize-1
+                        obj.PicBuffer{1,i}=temp{1,i+1};
+                    end
+                    obj.PicBufferPointer = obj.BufferSize;
+                    obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
+                    obj.PicBW = obj.handlePicBW.CData;
+                    obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
+                else
+                    obj.PicBufferPointer =obj.PicBufferPointer+1;
+                    obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
+                    obj.PicBW = obj.handlePicBW.CData;
+                    obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
                 end
-                obj.PicBufferPointer = obj.BufferSize;
-                obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
-                obj.PicBW = obj.handlePicBW.CData;
-                obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
-            else
-                obj.PicBufferPointer =obj.PicBufferPointer+1;
-                obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
-                obj.PicBW = obj.handlePicBW.CData;
-                obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
+            catch
+                disp('Error PIC Buffer EditMode')
             end
         end
         

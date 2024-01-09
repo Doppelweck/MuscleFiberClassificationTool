@@ -9,6 +9,11 @@ try
     cl;
     pause(0.1);
     
+    setSettingsValue('Version','1.5');
+    setSettingsValue('Day','30');
+    setSettingsValue('Month','January');
+    setSettingsValue('Year','2024');
+    
     % create starting screen
     if ismac
         fontSizeS = 18; % Font size small
@@ -23,15 +28,18 @@ try
     
     %Create Start Screen
     hf = startSrcreen();
+    versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
     TitleText1=text(hf.Children,0.45,0.92,'Muscle Fiber',...
         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
     TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
-    VersionText=text(hf.Children,0.45,0.75,'Version 1.4 30-November-2023','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+    VersionText=text(hf.Children,0.45,0.75,versionString,'units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
-    text(hf.Children,0.05,0.3,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
-    text(hf.Children,0.05,0.15,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
-    text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
+    text(hf.Children,0.03,0.32,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+    text(hf.Children,0.08,0.28,['Sebastian Friedrich  2017 - ' getSettingsValue('Year')],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
+    text(hf.Children,0.08,0.24,['mail.de'],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
+    text(hf.Children,0.03,0.19,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+%     text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
     % setAlwaysOnTop(hf,true);
     drawnow;
     
@@ -53,7 +61,7 @@ try
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
         'InvertHardcopy','off');
-    
+
     %%Remove unwanted Menu icons
     editMenu = findall(mainFig, 'Tag', 'figMenuFile' ,'-or','Tag', 'figMenuEdit',...
         '-or','Tag', 'figMenuView','-or','Tag', 'figMenuInsert','-or','Tag', 'figMenuDesktop',...
@@ -72,14 +80,14 @@ try
     % Add Menu for Settings
     mSettings = uimenu(mainFig,'Text','App Settings');
     mSettingsitem1 = uimenu(mSettings,'Text','Load Default Settings');
-    mSettingsitem2 = uimenu(mSettings,'Text','Load Saved Settings');
-    mSettingsitem3 = uimenu(mSettings,'Text','Save Current Settings');
+    mSettingsitem1.MenuSelectedFcn = @loadDefaultSettings;
+    mSettingsitem2 = uimenu(mSettings,'Text','Load User Settings');
+    mSettingsitem2.MenuSelectedFcn = @loadUserSettings;
+    mSettingsitem3 = uimenu(mSettings,'Text','Save User Settings');
+    mSettingsitem3.MenuSelectedFcn = @saveUserSettings;
     
     % Add Menu for Info
     mInfo = uimenu(mainFig,'Text','Information');
-    
-    
-    
     
     figure(hf);
     set(hf,'WindowStyle','modal');
@@ -115,6 +123,33 @@ try
     drawnow;pause(0.5);
     mainCard.Selection = 1;
     drawnow;
+    
+    InfoText.String='Loading please wait...   Load User Settings...';
+    % LOAD USER Settings
+    uiControls = findobj(mainCard,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+        '-and','-not','Style','pushbutton');
+    
+    for i = 1:numel(uiControls)
+        reverseEnable = false;
+        if(strcmp(uiControls(i).Enable ,'off'))
+            set( uiControls(i), 'Enable', 'on');
+            appDesignElementChanger(uiControls(i));
+            reverseEnable = true;
+        end
+        
+        if(strcmp(uiControls(i).Style,'edit'))
+            uiControls(i).String = getSettingsValue(uiControls(i).Tag);
+        else
+            uiControls(i).Value = str2double( getSettingsValue(uiControls(i).Tag) );
+        end
+        
+        if(reverseEnable)
+            set( uiControls(i), 'Enable', 'off');
+            appDesignElementChanger(uiControls(i));
+        end
+    end
+    
+    drawnow;pause(1);
     
     InfoText.String='Loading please wait...   Initialize MODEL-Components...';
     %Init MODEL's
@@ -210,5 +245,111 @@ appDesignElementChanger(mainFigObj);
 drawnow;
 mainCordObj.Visible = 'on';
 drawnow;
+end
+
+function loadDefaultSettings(src,~)
+
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+    '-and','-not','Style','pushbutton');
+
+for i = 1:numel(uiControls)
+    workbar(i/numel(uiControls),'load settings','Load DEFAULT settings',mainFigObj);
+    reverseEnable = false;
+    if(strcmp(uiControls(i).Enable ,'off'))
+        set( uiControls(i), 'Enable', 'on');
+        appDesignElementChanger(uiControls(i));
+        reverseEnable = true;
+    end
+    
+    if(strcmp(uiControls(i).Style,'edit'))
+        uiControls(i).String = getDefaultSettingsValue(uiControls(i).Tag);
+    else
+        uiControls(i).Value = str2double( getDefaultSettingsValue(uiControls(i).Tag) );
+    end
+    
+    if(reverseEnable)
+        set( uiControls(i), 'Enable', 'off');
+        appDesignElementChanger(uiControls(i));
+    end
+    
+    if isprop(uiControls(i),'Callback')
+        if ~isempty(uiControls(i).Callback)
+            feval(get(uiControls(i),'Callback'),uiControls(i));
+        end
+    end
+end 
+workbar(2,'load settings','Load DEFAULT settings',mainFigObj);
+end
+
+function loadUserSettings(src,~)
+% mainCordObj=findobj(src.Parent.Parent,'Tag','mainCard');
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+    '-and','-not','Style','pushbutton');
+
+for i = 1:numel(uiControls)
+    workbar(i/numel(uiControls),'load settings','Load USER settings',mainFigObj);
+    reverseEnable = false;
+    if(strcmp(uiControls(i).Enable ,'off'))
+        set( uiControls(i), 'Enable', 'on');
+        appDesignElementChanger(uiControls(i));
+        reverseEnable = true;
+    end
+    
+    if(strcmp(uiControls(i).Style,'edit'))
+        uiControls(i).String = getSettingsValue(uiControls(i).Tag);
+    else
+        uiControls(i).Value = str2double( getSettingsValue(uiControls(i).Tag) );
+    end
+    
+    if(reverseEnable)
+        set( uiControls(i), 'Enable', 'off');
+        appDesignElementChanger(uiControls(i));
+    end
+    
+    if isprop(uiControls(i),'Callback')
+        if ~isempty(uiControls(i).Callback)
+            feval(get(uiControls(i),'Callback'),uiControls(i));
+        end
+    end
+end 
+workbar(2,'load settings','Load USER settings',mainFigObj);
+end
+
+function saveUserSettings(src,~)
+
+mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+uiControls = findobj(mainFigObj,'-not','Tag','','-and','Type','uicontrol','-not','Tag','textFiberInfo',...
+    '-and','-not','Style','pushbutton');
+
+for i = 1:numel(uiControls)
+    if i==37
+        disp('')
+    end
+    workbar(i/numel(uiControls),'Save settings','Save USER settings',mainFigObj);
+    reverseEnable = false;
+    if(strcmp(uiControls(i).Enable ,'off'))
+        set( uiControls(i), 'Enable', 'on');
+        appDesignElementChanger(uiControls(i));
+        reverseEnable = true;
+    end
+    
+    if(strcmp(uiControls(i).Style,'edit'))
+        setSettingsValue(uiControls(i).Tag, uiControls(i).String);
+    else
+        setSettingsValue(uiControls(i).Tag, num2str(uiControls(i).Value));
+    end
+    
+    if(reverseEnable)
+        set( uiControls(i), 'Enable', 'off');
+        appDesignElementChanger(uiControls(i));
+    end
+
+end
+workbar(2,'Save settings','Save USER settings',mainFigObj);
 end
 % end

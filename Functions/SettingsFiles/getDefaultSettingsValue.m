@@ -1,4 +1,4 @@
-function value = getSettingsValue(searchString)
+function value = getDefaultSettingsValue(searchString)
 currentFile = mfilename( 'fullpath' );
 
 [pathstr,~,~] = fileparts( currentFile );
@@ -14,7 +14,7 @@ data.Settings(stringCellArray) = cellfun(@num2str, data.Settings(stringCellArray
 idx=find(contains(data.Settings,searchString));
 
 if(~isempty(idx))
-    value = data.Settings{idx,2};
+    value = data.Settings{idx,3};
 else
     value = [];
 end

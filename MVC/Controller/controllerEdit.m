@@ -36,6 +36,8 @@ classdef controllerEdit < handle
         modelEditHandle; %hande to modelEdit instance.
         controllerAnalyzeHandle; %hande to controllerAnalyze instance.
         
+        allListeners;
+        
         winState;
         CheckMaskActive = false;
     end
@@ -83,15 +85,15 @@ classdef controllerEdit < handle
             
             %show init text in the info log
             obj.modelEditHandle.InfoMessage = '*** Start program ***';
-            obj.modelEditHandle.InfoMessage = 'Fiber-Type-Classification-Tool';
+            obj.modelEditHandle.InfoMessage = 'Muscle-Fiber-Type-Classification-Tool';
+            obj.modelEditHandle.InfoMessage = ['Version ' getSettingsValue('Version') ' ' getSettingsValue('Year')];
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Developed by:';
-            obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences, GER';
+            obj.modelEditHandle.InfoMessage = 'Sebastian Friedrich';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'In cooperation with:';
+            obj.modelEditHandle.InfoMessage = 'Trier University of Applied Sciences, GER';
             obj.modelEditHandle.InfoMessage = 'The Royal Veterinary College, UK';
-            obj.modelEditHandle.InfoMessage = ' ';
-            obj.modelEditHandle.InfoMessage = 'Version 1.4 2023';
             obj.modelEditHandle.InfoMessage = ' ';
             obj.modelEditHandle.InfoMessage = 'Press "New file" to start';
             
@@ -112,14 +114,13 @@ classdef controllerEdit < handle
             %       - Input
             %           obj:    Handle to controllerEdit object
             %
-            
             % listeners MODEL
-            addlistener(obj.modelEditHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
+            obj.allListeners{end+1} = addlistener(obj.modelEditHandle,'InfoMessage', 'PostSet',@obj.updateInfoLogEvent);
             
             % listeners VIEW
-            addlistener(obj.viewEditHandle.B_Threshold, 'ContinuousValueChange',@obj.thresholdEvent);
-            addlistener(obj.viewEditHandle.B_Alpha, 'ContinuousValueChange',@obj.alphaMapEvent);
-            addlistener(obj.viewEditHandle.B_LineWidth, 'ContinuousValueChange',@obj.lineWidthEvent);
+            obj.allListeners{end+1} = addlistener(obj.viewEditHandle.B_Threshold, 'ContinuousValueChange',@obj.thresholdEvent);
+            obj.allListeners{end+1} = addlistener(obj.viewEditHandle.B_Alpha, 'ContinuousValueChange',@obj.alphaMapEvent);
+            obj.allListeners{end+1} = addlistener(obj.viewEditHandle.B_LineWidth, 'ContinuousValueChange',@obj.lineWidthEvent);
         end
         
         function addMyCallbacks(obj)
@@ -1806,7 +1807,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if strcmp(evnt.Source.Tag,'editBinaryThresh')
+            if strcmp(src.Tag,'editBinaryThresh')
                 % Text Value has changed
                 
                 Value = str2double( src.String );
@@ -1856,12 +1857,12 @@ classdef controllerEdit < handle
                     obj.modelEditHandle.createBinary();
                 end
                 
-            elseif strcmp(evnt.Source.Tag,'sliderBinaryThresh')
+            elseif strcmp(src.Tag,'sliderBinaryThresh')
                 % slider Value has changed
-                set(obj.viewEditHandle.B_ThresholdValue,'String',num2str(evnt.Source.Value));
+                set(obj.viewEditHandle.B_ThresholdValue,'String',num2str(src.Value));
                 
                 %Set threshold value in the model
-                obj.modelEditHandle.ThresholdValue = evnt.Source.Value;
+                obj.modelEditHandle.ThresholdValue = src.Value;
                 
                 %Create binary image with new threshold
                 obj.modelEditHandle.createBinary();
@@ -1888,7 +1889,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            switch evnt.Source.Tag
+            switch src.Tag
                 case 'editAlpha' % Text Value has changed
                     
                     Value = str2double( src.String );
@@ -1957,16 +1958,16 @@ classdef controllerEdit < handle
                 case 'sliderAlpha'% slider Value has changed
                     
                     %Copy the slider value into the text edit box in the GUI
-                    set(obj.viewEditHandle.B_AlphaValue,'String',num2str(evnt.Source.Value));
+                    set(obj.viewEditHandle.B_AlphaValue,'String',num2str(src.Value));
                     
                     %Set alphamap value in the model
-                    obj.modelEditHandle.AlphaMapValue = evnt.Source.Value;
+                    obj.modelEditHandle.AlphaMapValue = src.Value;
                     
                     %Change alphamp (transparency) of binary image
                     obj.modelEditHandle.alphaMapEvent();
                     
                 case 'checkboxAlpha' % active Checkbox has changed
-                    obj.modelEditHandle.AlphaMapActive = evnt.Source.Value;
+                    obj.modelEditHandle.AlphaMapActive = src.Value;
                     %Change alphamp (transparency) of binary image
                     obj.modelEditHandle.alphaMapEvent();
                 otherwise
@@ -1989,7 +1990,8 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            obj.modelEditHandle.handlePicRGB
+            
+                
             switch obj.viewEditHandle.B_ImageOverlaySelection.Value
                 case 1 %RGB
                     Pic = obj.modelEditHandle.PicRGBFRPlanes;
@@ -2004,17 +2006,23 @@ classdef controllerEdit < handle
                 otherwise
                     Pic = obj.modelEditHandle.PicRGBFRPlanes;
             end
-            if isa(obj.modelEditHandle.handlePicRGB,'struct')
-                % first start of the programm. No image handle exist.
-                % create image handle for Pic RGB
-                obj.modelEditHandle.handlePicRGB = imshow(Pic);
+            
+            if ~isempty(Pic)
+                if isa(obj.modelEditHandle.handlePicRGB,'struct')
+                    % first start of the programm. No image handle exist.
+                    % create image handle for Pic RGB
+                    obj.modelEditHandle.handlePicRGB = imshow(Pic);
+                else
+                    % New image was selected. Change data in existing handle
+                    obj.modelEditHandle.handlePicRGB.CData = Pic;
+                end
+                
             else
-                % New image was selected. Change data in existing handle
-                obj.modelEditHandle.handlePicRGB.CData = Pic;
+                %No Image loaded
             end
         end
         
-        function lineWidthEvent(obj,~,evnt)
+        function lineWidthEvent(obj,src,~)
             % Callback function of the linewidth slider and the text edit
             % box in the GUI. Checks whether the value is within the
             % permitted value range. Sets the corresponding values
@@ -2030,7 +2038,7 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if strcmp(evnt.Source.Tag,'editLineWidtht')
+            if strcmp(src.Tag,'editLineWidtht')
                 % Text Value has changed
                 
                 Value = get(obj.viewEditHandle.B_LineWidthValue,'String');
@@ -2058,10 +2066,10 @@ classdef controllerEdit < handle
                     set(obj.viewEditHandle.B_LineWidthValue,'String','1');
                     obj.modelEditHandle.LineWidthValue = 1;
                 end
-            elseif strcmp(evnt.Source.Tag,'sliderLineWidtht')
+            elseif strcmp(src.Tag,'sliderLineWidtht')
                 % slider Value has changed
                 
-                Value = round(evnt.Source.Value);
+                Value = round(src.Value);
                 
                 set(obj.viewEditHandle.B_LineWidthValue,'String',num2str(Value));
                 set(obj.viewEditHandle.B_LineWidth,'Value',Value);
@@ -2073,7 +2081,7 @@ classdef controllerEdit < handle
             
         end
         
-        function colorEvent(obj,~,evnt)
+        function colorEvent(obj,src,~)
             % Callback function of the color popupmenu in the
             % GUI. Sets the corresponding value in the
             % model depending on the selection.
@@ -2088,16 +2096,16 @@ classdef controllerEdit < handle
             %           evnt:   callback event data
             %
             
-            if evnt.Source.Value == 1
+            if src.Value == 1
                 % White Color
                 obj.modelEditHandle.ColorValue = 1;
-            elseif evnt.Source.Value == 2
+            elseif src.Value == 2
                 % Black Color
                 obj.modelEditHandle.ColorValue = 0;
-            elseif evnt.Source.Value == 3
+            elseif src.Value == 3
                 % White Color fill region
                 obj.modelEditHandle.ColorValue = 1;
-            elseif evnt.Source.Value == 4
+            elseif src.Value == 4
                 % Black Color fill region
                 obj.modelEditHandle.ColorValue = 0;
             else
@@ -2143,6 +2151,17 @@ classdef controllerEdit < handle
             %check wich morph operation is selected
             Strings = obj.viewEditHandle.B_MorphOP.String;
             String = Strings{obj.viewEditHandle.B_MorphOP.Value};
+            
+            if isempty(obj.modelEditHandle.handlePicBW)
+                
+                set(obj.viewEditHandle.B_StartMorphOP,'Enable','off')
+                set(obj.viewEditHandle.B_ShapeSE,'Enable','off')
+                set(obj.viewEditHandle.B_SizeSE,'Enable','off')
+                set(obj.viewEditHandle.B_NoIteration,'Enable','off')
+                set(obj.viewEditHandle.B_MorphOP,'Enable','off')
+                appDesignElementChanger(obj.panelControl);
+                
+            else
             
             switch String
                 
@@ -2269,6 +2288,8 @@ classdef controllerEdit < handle
                 set(obj.viewEditHandle.B_NoIteration,'Enable','on')
                 set(obj.viewEditHandle.B_StartMorphOP,'Enable','on')
                 appDesignElementChanger(obj.panelControl);
+            end
+            
             end
             
         end
