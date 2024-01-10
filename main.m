@@ -87,7 +87,9 @@ try
     mSettingsitem3.MenuSelectedFcn = @saveUserSettings;
     
     % Add Menu for Info
-    mInfo = uimenu(mainFig,'Text','Information');
+    mInfo1 = uimenu(mainFig,'Text','Information');
+    mInfo1.MenuSelectedFcn = @openInformationFigure;
+
     
     figure(hf);
     set(hf,'WindowStyle','modal');
@@ -352,4 +354,41 @@ for i = 1:numel(uiControls)
 end
 workbar(2,'Save settings','Save USER settings',mainFigObj);
 end
-% end
+
+function openInformationFigure(~,~)
+% mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+% Create a modal figure
+    modalFig = uifigure('Name', 'App Information', 'NumberTitle', 'off', 'WindowStyle', 'normal');
+    modalFigWidht = modalFig.Position(3);
+    modalFigHeight = modalFig.Position(4);
+    
+    label_1 = uilabel(modalFig, 'Text', 'Muscle-Fiber-Classififcation-Tool', 'Position', [20, modalFigHeight-40, modalFigWidht, 30]);
+    label_1.FontSize = 20;
+    label_1.FontWeight = 'bold';
+    label_1.HorizontalAlignment = 'left';
+    
+    versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
+    label_2 = uilabel(modalFig, 'Text', versionString, 'Position', [20, label_1.Position(2)-20, 300, 20]);
+    label_2.FontSize = 18;
+    label_2.HorizontalAlignment = 'left';
+
+    % Create a label with a link
+    linkLabel = uilabel(modalFig, 'Text', 'Click here for more information.', 'Position', [20, 50, 300, 20]);
+%     linkLabel.FontColor = [0, 0.4, 0.8]; % Set link color
+    linkLabel.FontWeight = 'bold';
+    linkLabel.HorizontalAlignment = 'left';
+
+%     % Add a callback for the link click event
+%     linkLabel.ButtonPushedFcn = @(~, ~) openLink('https://www.example.com');
+% 
+%     % Wait for the modal figure to be closed
+%     waitfor(modalFig);
+
+    figure(modalFig);
+    set(modalFig,'WindowStyle','alwaysontop');
+
+end
+
+
+
+
