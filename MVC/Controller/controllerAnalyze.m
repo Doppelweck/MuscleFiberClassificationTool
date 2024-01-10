@@ -1141,6 +1141,14 @@ classdef controllerAnalyze < handle
             end
             
             obj.busyIndicator(0);
+            if isempty(obj.modelAnalyzeHandle.Stats)
+                set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off');
+                set(obj.viewAnalyzeHandle.B_PreResults,'Enable','off');
+            else
+                set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on');
+                set(obj.viewAnalyzeHandle.B_PreResults,'Enable','on');
+            end
+            appDesignElementChanger(obj.panelControl);
             obj.modelAnalyzeHandle.InfoMessage = '-Set Parameters and press "Start analyzing"';
             obj.modelAnalyzeHandle.InfoMessage = ' ';
         end
@@ -1245,6 +1253,14 @@ classdef controllerAnalyze < handle
                 obj.busyIndicator(0);
                 obj.errorMessage();
             end
+            if isempty(obj.modelAnalyzeHandle.Stats)
+                set(obj.viewAnalyzeHandle.B_StartResults,'Enable','off');
+                set(obj.viewAnalyzeHandle.B_PreResults,'Enable','off');
+            else
+                set(obj.viewAnalyzeHandle.B_StartResults,'Enable','on');
+                set(obj.viewAnalyzeHandle.B_PreResults,'Enable','on');
+            end
+            appDesignElementChanger(obj.panelControl);
             
         end
         
