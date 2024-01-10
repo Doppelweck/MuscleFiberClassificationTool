@@ -5,6 +5,7 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
+    addpath(genpath('Icons'));
     warning('off', 'all');
     cl;
     pause(0.1);
@@ -37,7 +38,7 @@ try
     InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
     text(hf.Children,0.03,0.32,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     text(hf.Children,0.08,0.28,['Sebastian Friedrich  2017 - ' getSettingsValue('Year')],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
-    text(hf.Children,0.08,0.24,['mail.de'],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
+    text(hf.Children,0.08,0.24,'sebastian.friedrich.software@gmail.com','units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
     text(hf.Children,0.03,0.19,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
 %     text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
     % setAlwaysOnTop(hf,true);
@@ -355,37 +356,72 @@ end
 workbar(2,'Save settings','Save USER settings',mainFigObj);
 end
 
-function openInformationFigure(~,~)
-% mainFigObj=findobj(src.Parent.Parent,'Type','figure');
-% Create a modal figure
+function openInformationFigure(src,~)
+    mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+    
+    width = 640; height = 600;
+    
+    % Create a modal figure
     modalFig = uifigure('Name', 'App Information', 'NumberTitle', 'off', 'WindowStyle', 'normal');
+    modalFig.Position(3) = width;
+    modalFig.Position(4) = height;
+    get(mainFigObj,'Position')
+    set(mainFigObj,'units','pixel')
+    Pix_SS = get(mainFigObj,'Position');
+    set(mainFigObj,'units','normalized')
+    get(mainFigObj,'Position')
     modalFigWidht = modalFig.Position(3);
     modalFigHeight = modalFig.Position(4);
     
+    set(modalFig,'Position', [(Pix_SS(3)-width)/2 (Pix_SS(4)-height)/2 width height])
+    
+    % Load your image (replace 'your_image_file.jpg' with your actual image file)
+    [img, map, alphachannel] = imread('Icon4.png');
+    imgHW = 200;
+    % Set the position of the axes for the image in the top right corner
+    ax1=axes(modalFig,'Units', 'pixels', 'Position', [modalFigWidht-imgHW-15, modalFigHeight-imgHW-15, imgHW, imgHW],'Color','none');
+    
+%     tb = axtoolbar(ax1,'default');
+%     tb.Visible = 'off';
+    % Display the image using imshow
+    image(img,'alphadata',im2double(alphachannel),'Parent',ax1);
+    
+    % Remove axis ticks and labels for a cleaner look
+    axis(ax1, 'off');
+    axtoolbar(ax1,{}); 
+  
     label_1 = uilabel(modalFig, 'Text', 'Muscle-Fiber-Classififcation-Tool', 'Position', [20, modalFigHeight-40, modalFigWidht, 30]);
     label_1.FontSize = 20;
     label_1.FontWeight = 'bold';
     label_1.HorizontalAlignment = 'left';
     
     versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
-    label_2 = uilabel(modalFig, 'Text', versionString, 'Position', [20, label_1.Position(2)-20, 300, 20]);
+    label_2 = uilabel(modalFig, 'Text', versionString, 'Position', [20, label_1.Position(2)-20, modalFigWidht, 20]);
     label_2.FontSize = 18;
     label_2.HorizontalAlignment = 'left';
+    
+    label_3 = uilabel(modalFig, 'Text', 'Developed by:', 'Position', [20, label_2.Position(2)-40, modalFigWidht, 20]);
+    label_3.FontSize = 16;
+    label_3.FontWeight = 'bold';
+    label_3.HorizontalAlignment = 'left';
+    
+    label_4 = uilabel(modalFig, 'Text', 'Sebastian Friedrich', 'Position', [60, label_3.Position(2)-20, modalFigWidht, 20]);
+    label_4.FontSize = 16;
+    label_4.HorizontalAlignment = 'left';
+    
+    hlinkMail = uihyperlink(modalFig, 'Position', [60, label_4.Position(2)-20, modalFigWidht, 20]);
+    email = 'sebastian.friedrich.software@gmail.com';
+    hlinkMail.FontSize = 16;
+    hlinkMail.Text = email;
+    hlinkMail.URL = ['mailto:' email];
+    
 
-    % Create a label with a link
-    linkLabel = uilabel(modalFig, 'Text', 'Click here for more information.', 'Position', [20, 50, 300, 20]);
-%     linkLabel.FontColor = [0, 0.4, 0.8]; % Set link color
-    linkLabel.FontWeight = 'bold';
-    linkLabel.HorizontalAlignment = 'left';
-
-%     % Add a callback for the link click event
-%     linkLabel.ButtonPushedFcn = @(~, ~) openLink('https://www.example.com');
-% 
 %     % Wait for the modal figure to be closed
 %     waitfor(modalFig);
 
     figure(modalFig);
     set(modalFig,'WindowStyle','alwaysontop');
+    set(modalFig, 'Resize', 'off');
 
 end
 
