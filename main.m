@@ -358,71 +358,7 @@ end
 
 function openInformationFigure(src,~)
     mainFigObj=findobj(src.Parent.Parent,'Type','figure');
-    
-    width = 640; height = 600;
-    
-    % Create a modal figure
-    modalFig = uifigure('Name', 'App Information', 'NumberTitle', 'off', 'WindowStyle', 'normal');
-    modalFig.Position(3) = width;
-    modalFig.Position(4) = height;
-    get(mainFigObj,'Position')
-    set(mainFigObj,'units','pixel')
-    Pix_SS = get(mainFigObj,'Position');
-    set(mainFigObj,'units','normalized')
-    get(mainFigObj,'Position')
-    modalFigWidht = modalFig.Position(3);
-    modalFigHeight = modalFig.Position(4);
-    
-    set(modalFig,'Position', [(Pix_SS(3)-width)/2 (Pix_SS(4)-height)/2 width height])
-    
-    % Load your image (replace 'your_image_file.jpg' with your actual image file)
-    [img, map, alphachannel] = imread('Icon4.png');
-    imgHW = 200;
-    % Set the position of the axes for the image in the top right corner
-    ax1=axes(modalFig,'Units', 'pixels', 'Position', [modalFigWidht-imgHW-15, modalFigHeight-imgHW-15, imgHW, imgHW],'Color','none');
-    
-%     tb = axtoolbar(ax1,'default');
-%     tb.Visible = 'off';
-    % Display the image using imshow
-    image(img,'alphadata',im2double(alphachannel),'Parent',ax1);
-    
-    % Remove axis ticks and labels for a cleaner look
-    axis(ax1, 'off');
-    axtoolbar(ax1,{}); 
-  
-    label_1 = uilabel(modalFig, 'Text', 'Muscle-Fiber-Classififcation-Tool', 'Position', [20, modalFigHeight-40, modalFigWidht, 30]);
-    label_1.FontSize = 20;
-    label_1.FontWeight = 'bold';
-    label_1.HorizontalAlignment = 'left';
-    
-    versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
-    label_2 = uilabel(modalFig, 'Text', versionString, 'Position', [20, label_1.Position(2)-20, modalFigWidht, 20]);
-    label_2.FontSize = 18;
-    label_2.HorizontalAlignment = 'left';
-    
-    label_3 = uilabel(modalFig, 'Text', 'Developed by:', 'Position', [20, label_2.Position(2)-40, modalFigWidht, 20]);
-    label_3.FontSize = 16;
-    label_3.FontWeight = 'bold';
-    label_3.HorizontalAlignment = 'left';
-    
-    label_4 = uilabel(modalFig, 'Text', 'Sebastian Friedrich', 'Position', [60, label_3.Position(2)-20, modalFigWidht, 20]);
-    label_4.FontSize = 16;
-    label_4.HorizontalAlignment = 'left';
-    
-    hlinkMail = uihyperlink(modalFig, 'Position', [60, label_4.Position(2)-20, modalFigWidht, 20]);
-    email = 'sebastian.friedrich.software@gmail.com';
-    hlinkMail.FontSize = 16;
-    hlinkMail.Text = email;
-    hlinkMail.URL = ['mailto:' email];
-    
-
-%     % Wait for the modal figure to be closed
-%     waitfor(modalFig);
-
-    figure(modalFig);
-    set(modalFig,'WindowStyle','alwaysontop');
-    set(modalFig, 'Resize', 'off');
-
+    showInfoFigure(mainFigObj);
 end
 
 
