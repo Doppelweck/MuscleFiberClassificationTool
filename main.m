@@ -5,6 +5,7 @@ try
     % add files to the current matalb path
     addpath(genpath('MVC'));
     addpath(genpath('Functions'));
+    addpath(genpath('Icons'));
     warning('off', 'all');
     cl;
     pause(0.1);
@@ -37,7 +38,7 @@ try
     InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
     text(hf.Children,0.03,0.32,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
     text(hf.Children,0.08,0.28,['Sebastian Friedrich  2017 - ' getSettingsValue('Year')],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
-    text(hf.Children,0.08,0.24,['mail.de'],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
+    text(hf.Children,0.08,0.24,'sebastian.friedrich.software@gmail.com','units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
     text(hf.Children,0.03,0.19,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
 %     text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
     % setAlwaysOnTop(hf,true);
@@ -87,7 +88,9 @@ try
     mSettingsitem3.MenuSelectedFcn = @saveUserSettings;
     
     % Add Menu for Info
-    mInfo = uimenu(mainFig,'Text','Information');
+    mInfo1 = uimenu(mainFig,'Text','Information');
+    mInfo1.MenuSelectedFcn = @openInformationFigure;
+
     
     figure(hf);
     set(hf,'WindowStyle','modal');
@@ -352,4 +355,12 @@ for i = 1:numel(uiControls)
 end
 workbar(2,'Save settings','Save USER settings',mainFigObj);
 end
-% end
+
+function openInformationFigure(src,~)
+    mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+    showInfoFigure(mainFigObj);
+end
+
+
+
+
