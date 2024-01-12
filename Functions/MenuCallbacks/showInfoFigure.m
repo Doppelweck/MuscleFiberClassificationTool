@@ -9,11 +9,9 @@ width = 660; height = 700;
     
     modalFig.Position(3) = width;
     modalFig.Position(4) = height;
-    get(mainFigObj,'Position')
     set(mainFigObj,'units','pixel')
-    Pix_SS = get(mainFigObj,'Position');
+    Pix_SS = mainFigObj.Position;
     set(mainFigObj,'units','normalized')
-    get(mainFigObj,'Position')
     modalFigWidht = modalFig.Position(3);
     modalFigHeight = modalFig.Position(4);
     
