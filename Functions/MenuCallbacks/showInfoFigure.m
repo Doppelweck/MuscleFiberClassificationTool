@@ -1,4 +1,4 @@
-function showInfo2(mainFigObj)
+function showInfoFigure(mainFigObj)
 
 width = 660; height = 700;
     
