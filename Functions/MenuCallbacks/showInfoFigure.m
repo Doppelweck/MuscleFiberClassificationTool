@@ -1,9 +1,12 @@
-function showInfoFigure(mainFigObj)
+function h=showInfoFigure(mainFigObj)
+
+winState=get(mainFigObj,'WindowState');
 
 width = 660; height = 700;
     
     % Create a modal figure
     modalFig = figure('Name', 'App Information', 'NumberTitle', 'off', 'MenuBar', 'none', 'ToolBar', 'none');
+    set(modalFig,'CloseRequestFcn',{@closeInfoFigure,winState})
 
     set(modalFig, 'Visible', 'off');
     modalFig.Position(3) = width;
@@ -19,38 +22,48 @@ width = 660; height = 700;
     [imgPP, ~, alphachannelPP] = imread('IconPayPal2.png');
     [imgGD, ~, alphachannelGD] = imread('IconGoogleDrive.png');
     
-    
-    set(modalFig, 'Visible', 'on');
-    
-    
-
-    set(modalFig, 'Position', [(Pix_SS(3)-width)/2 (Pix_SS(4)-height)/1.5 width height])
-    
-    
-    % Load your image (replace 'your_image_file.jpg' with your actual image file)
-    
     imgHW = 200;
-    % Set the position of the axes for the image in the top right corner
     ax1=axes(modalFig,'Units', 'pixels', 'Position', [modalFigWidht-imgHW-15, modalFigHeight-imgHW-15, imgHW, imgHW],'Color','none');
     image(img,'alphadata',im2double(alphachannel),'Parent',ax1);
-    
-    % Remove axis ticks and labels for a cleaner look
     axis(ax1, 'off');
 %     axtoolbar(ax1,{}); 
+
+    imgHW = 40;
+    axPP=axes(modalFig,'Units', 'pixels', 'Position', [20, 170, imgHW, imgHW],'Color','none');
+    image(imgPP,'alphadata',im2double(alphachannelPP),'Parent',axPP);
+    axis(axPP, 'off');
+    
+    axGit=axes(modalFig,'Units', 'pixels', 'Position', [20, 250, imgHW, imgHW],'Color','none');
+    image(imgGit,'alphadata',im2double(alphachannelGit),'Parent',axGit);
+    axis(axGit, 'off');
+    
+    axGD=axes(modalFig,'Units', 'pixels', 'Position', [20, 330, imgHW, imgHW],'Color','none');
+    image(imgGD,'alphadata',im2double(alphachannelGD),'Parent',axGD);
+    axis(axGD, 'off');
+    
+    if strcmp(winState,'maximized')
+        set(mainFigObj,'WindowState','maximized');
+        drawnow;
+    end
+    
+    set(modalFig, 'Visible', 'on');
+    set(modalFig, 'Position', [(Pix_SS(3)-width)/2 (Pix_SS(4)-height)/1.5 width height])
+    
+ 
   
-    label_1 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, modalFigHeight-40, modalFigWidht-imgHW-40, 24], 'String', 'Muscle-Fiber-Classification-Tool');
+    label_1 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, modalFigHeight-40, modalFigWidht-250, 24], 'String', 'Muscle-Fiber-Classification-Tool');
     set(label_1,'FontUnits','pixels','FontSize', 24, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
 
     versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
-    label_2 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, label_1.Position(2)-30, modalFigWidht-imgHW-40, 25], 'String', versionString);
+    label_2 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, label_1.Position(2)-30, modalFigWidht-250, 25], 'String', versionString);
     set(label_2,'FontUnits','pixels', 'FontSize', 18, 'HorizontalAlignment', 'left');
     
 
     
-    label_3 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, label_2.Position(2)-40, modalFigWidht-imgHW-40, 25], 'String', 'Developed by:');
+    label_3 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, label_2.Position(2)-40, modalFigWidht-250, 25], 'String', 'Developed by:');
     set(label_3,'FontUnits','pixels', 'FontSize', 18, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
 
-    label_4 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [70, label_3.Position(2)-25, modalFigWidht-imgHW-90, 20], 'String', 'Sebastian Friedrich, BEng');
+    label_4 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [70, label_3.Position(2)-25, modalFigWidht-300, 20], 'String', 'Sebastian Friedrich, BEng');
     set(label_4,'FontUnits','pixels', 'FontSize', 16, 'HorizontalAlignment', 'left');
     
     url = 'sebastian.friedrich.software@gmail.com';
@@ -87,13 +100,6 @@ width = 660; height = 700;
     text = url;
     hlinkDrive2 = uicontrolHyperLink(modalFig,[70, hlinkDrive.Position(2)-20, 555, 20],'pixels',12,text,url);
     
-    imgHW = 40;
-    % Set the position of the axes for the image in the top right corner
-    axGD=axes(modalFig,'Units', 'pixels', 'Position', [20, hlinkDrive.Position(2)-20, imgHW, imgHW],'Color','none');
-    image(imgGD,'alphadata',im2double(alphachannelGD),'Parent',axGD);
-    axis(axGD, 'off');
-%     axtoolbar(axGD,{});
-    
     
     
     label_12 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, hlinkDrive2.Position(2)-40, modalFigWidht, 25], 'String','GitHub repository:');
@@ -107,14 +113,7 @@ width = 660; height = 700;
     hlinkGit2 = uicontrolHyperLink(modalFig,[70, hlinkGit.Position(2)-20, 350, 20],'pixels',12,text,url);
 
     
-    imgHW = 40;
-    axGit=axes(modalFig,'Units', 'pixels', 'Position', [20, hlinkGit.Position(2)-20, imgHW, imgHW],'Color','none');
-    image(imgGit,'alphadata',im2double(alphachannelGit),'Parent',axGit);
-    axis(axGit, 'off');
-%     axtoolbar(axGit,{}); 
     
-    
-
     label_13 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, hlinkGit2.Position(2)-40, modalFigWidht, 25], 'String','PayPal donation:');
     set(label_13,'FontUnits','pixels', 'FontSize', 18, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
     
@@ -125,12 +124,6 @@ width = 660; height = 700;
     text = url;
     hlinkPP2 = uicontrolHyperLink(modalFig,[70, hlinkPP.Position(2)-20, 175, 20],'pixels',12,text,url);
 
-    imgHW = 40;
-    axPP=axes(modalFig,'Units', 'pixels', 'Position', [20, hlinkPP.Position(2)-20, imgHW, imgHW],'Color','none');
-    image(imgPP,'alphadata',im2double(alphachannelPP),'Parent',axPP);
-    axis(axPP, 'off');
-%     axtoolbar(axPP,{}); 
-    
     label_disclaimer = uicontrol('Style', 'text', 'Parent', modalFig, 'String', ['This Appis provided free of charge for use on Windows and macOS platforms. ' ...
         'You can download the latest version from the Google Drive link above. '...
         'Additionally, the source code is available on GitHub.com. '...
@@ -142,13 +135,21 @@ width = 660; height = 700;
         ,'Position', [20, hlinkPP2.Position(2)-140, modalFigWidht-40, 120]);
     set(label_disclaimer,'FontUnits','pixels', 'FontSize', 14, 'FontWeight', 'normal');
     
-    figure(modalFig);
     set(modalFig,'WindowStyle','modal');
     set(modalFig, 'Resize', 'off');
-%     drawnow;
-    
-    
     set(modalFig,'Visible','on');
-   
+
+    h=modalFig;
     
+    figure(modalFig);drawnow;
+end
+
+function closeInfoFigure(src,~,winState)
+    mainFigObj=findobj('Tag','mainFigure');
+
+    delete(src);
+
+    if strcmp(winState,'maximized')
+        set(mainFigObj,'WindowState','maximized');
+    end
 end
