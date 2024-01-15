@@ -61,7 +61,7 @@ try
         'doublebuffer', 'off','Menubar','figure','ToolBar','none','Visible','on',...
         'WindowStyle','normal','NumberTitle','off',...
         'PaperPositionMode','manual',...
-        'InvertHardcopy','off');
+        'InvertHardcopy','off','Tag','mainFigure');
 
     %%Remove unwanted Menu icons
     editMenu = findall(mainFig, 'Tag', 'figMenuFile' ,'-or','Tag', 'figMenuEdit',...
@@ -357,8 +357,10 @@ workbar(2,'Save settings','Save USER settings',mainFigObj);
 end
 
 function openInformationFigure(src,~)
-    mainFigObj=findobj(src.Parent.Parent,'Type','figure');
+
+    mainFigObj=findobj('Tag','mainFigure');
     showInfoFigure(mainFigObj);
+
 end
 
 
