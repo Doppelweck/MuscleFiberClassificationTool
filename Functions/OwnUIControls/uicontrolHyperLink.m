@@ -1,7 +1,6 @@
 function h=uicontrolHyperLink(parentFig,position,units,fontsize,text,url)
 
 %Position [70, label_4.Position(2)-20, modalFigWidht, 20]
-
 iptPointerManager(parentFig, 'enable');
 textUnderline = ['<html><u>' text '</u></html>'];
 hlink = uicontrol('Style', 'pushbutton', 'Parent', parentFig,'FontUnits',units,'Units',units,'Position', position, 'String', textUnderline, 'ForegroundColor', [0 0 1], 'FontWeight', 'bold');
@@ -21,7 +20,6 @@ else
 end
 
 iptSetPointerBehavior(hlink, @(parentFig, currentPoint)set(parentFig, 'Pointer', 'hand'));
-drawnow
 h=hlink;
     
 end 
