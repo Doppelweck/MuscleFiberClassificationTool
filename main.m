@@ -88,7 +88,7 @@ try
     mSettingsitem3.MenuSelectedFcn = @saveUserSettings;
     
     % Add Menu for Info
-    mInfo1 = uimenu(mainFig,'Text','Information');
+    mInfo1 = uimenu(mainFig,'Text','About');
     mInfo1.MenuSelectedFcn = @openInformationFigure;
 
     
