@@ -14,6 +14,11 @@ try
     setSettingsValue('Day','30');
     setSettingsValue('Month','January');
     setSettingsValue('Year','2024');
+    versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
+    % write the current Version to LATEST.txt
+    writeVersionToTxt(versionString);
+    [newVersionAvailable, checkSuccessfull, newVersion] = checkAppForNewVersion(versionString);
+    
     
     % create starting screen
     if ismac
@@ -88,6 +93,11 @@ try
     mSettingsitem3.MenuSelectedFcn = @saveUserSettings;
     
     % Add Menu for Info
+    if(newVersionAvailable && checkSuccessfull)
+        AboutText =['About (NEW VERSION ' newVersion ' AVAILABLE)'];
+    else
+        AboutText ='About';
+    end
     mInfo1 = uimenu(mainFig,'Text','About');
     mInfo1.MenuSelectedFcn = @openInformationFigure;
 
