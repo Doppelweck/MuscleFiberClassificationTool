@@ -41,15 +41,11 @@ width = 660; height = 700;
     image(imgGD,'alphadata',im2double(alphachannelGD),'Parent',axGD);
     axis(axGD, 'off');
     
-    if strcmp(winState,'maximized')
-        set(mainFigObj,'WindowState','maximized');
-        drawnow;
-    end
+    drawnow;
     
-    set(modalFig, 'Visible', 'on');
     set(modalFig, 'Position', [(Pix_SS(3)-width)/2 (Pix_SS(4)-height)/1.5 width height])
     
- 
+    
   
     label_1 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, modalFigHeight-40, modalFigWidht-250, 24], 'String', 'Muscle-Fiber-Classification-Tool');
     set(label_1,'FontUnits','pixels','FontSize', 24, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
@@ -66,14 +62,11 @@ width = 660; height = 700;
     label_4 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [70, label_3.Position(2)-25, modalFigWidht-300, 20], 'String', 'Sebastian Friedrich, BEng');
     set(label_4,'FontUnits','pixels', 'FontSize', 16, 'HorizontalAlignment', 'left');
     
-    url = 'sebastian.friedrich.software@gmail.com';
-    text = url;
-    hlinkMail = uicontrolHyperLink(modalFig,[70, label_4.Position(2)-20, 305, 20],'pixels',16,text,url);
-    drawnow;
     
-
     
-    label_5 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, hlinkMail.Position(2)-40, modalFigWidht/2, 25], 'String', 'With the help of:');
+    
+    
+    label_5 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, 545-40, modalFigWidht/2, 25], 'String', 'With the help of:');
     set(label_5,'FontUnits','pixels', 'FontSize', 18, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
 
     label_6 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [70, label_5.Position(2)-25, modalFigWidht/2, 20], 'String', 'David Goodwin, BSc');
@@ -93,36 +86,21 @@ width = 660; height = 700;
     label_10 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, label_9.Position(2)-40, modalFigWidht-200, 25], 'String','Manual and current version available at:');
     set(label_10,'FontUnits','pixels', 'FontSize', 18, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
 
-    url = 'https://drive.google.com/drive/folders/1ZpQZU2xMfEPq2BbAiHYZUVx-WdxUNUDx?usp=share_link';
-    text = 'Google Drive';
-    hlinkDrive  = uicontrolHyperLink(modalFig,[70, label_10.Position(2)-20, 110, 20],'pixels',16,text,url);
-    
-    text = url;
-    hlinkDrive2 = uicontrolHyperLink(modalFig,[70, hlinkDrive.Position(2)-20, 555, 20],'pixels',12,text,url);
     
     
     
-    label_12 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, hlinkDrive2.Position(2)-40, modalFigWidht, 25], 'String','GitHub repository:');
+    
+    label_12 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, 330-40, modalFigWidht, 25], 'String','GitHub repository:');
     set(label_12,'FontUnits','pixels', 'FontSize', 18, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
     
-    url = 'https://github.com/Doppelweck/MuscleFiberClassificationTool';
-    text = 'Github.com';
-    hlinkGit  = uicontrolHyperLink(modalFig,[70, label_12.Position(2)-20, 90, 20],'pixels',16,text,url);
-    
-    text = url;
-    hlinkGit2 = uicontrolHyperLink(modalFig,[70, hlinkGit.Position(2)-20, 350, 20],'pixels',12,text,url);
+   
 
     
     
-    label_13 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, hlinkGit2.Position(2)-40, modalFigWidht, 25], 'String','PayPal donation:');
+    label_13 = uicontrol('Style', 'text', 'Parent', modalFig, 'Position', [20, 250-40, modalFigWidht, 25], 'String','PayPal donation:');
     set(label_13,'FontUnits','pixels', 'FontSize', 18, 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
     
-    url = 'paypal.me/sFriedrichSoftware';
-    text = 'PayPal.com';
-    hlinkPP  = uicontrolHyperLink(modalFig,[70, label_13.Position(2)-20, 90, 20],'pixels',16,text,url);
-
-    text = url;
-    hlinkPP2 = uicontrolHyperLink(modalFig,[70, hlinkPP.Position(2)-20, 175, 20],'pixels',12,text,url);
+    
 
     label_disclaimer = uicontrol('Style', 'text', 'Parent', modalFig, 'String', ['This Appis provided free of charge for use on Windows and macOS platforms. ' ...
         'You can download the latest version from the Google Drive link above. '...
@@ -132,16 +110,42 @@ width = 660; height = 700;
         'Your contributions are greatly appreciated and help in enhancing the quality and features of this software. '...
         'However, donations are entirely voluntary, and users are under no obligation to contribute. '...
         'Thank you for using my App!']...
-        ,'Position', [20, hlinkPP2.Position(2)-140, modalFigWidht-40, 120]);
+        ,'Position', [20, 170-140, modalFigWidht-40, 120]);
     set(label_disclaimer,'FontUnits','pixels', 'FontSize', 14, 'FontWeight', 'normal');
     
+    set(modalFig, 'Visible', 'on');
+
+    
+    url = 'sebastian.friedrich.software@gmail.com';
+    text = url;
+    hlinkMail = uicontrolHyperLink(modalFig,[70, 545, 305, 20],'pixels',16,text,url);
+    
+    url = 'https://drive.google.com/drive/folders/1ZpQZU2xMfEPq2BbAiHYZUVx-WdxUNUDx?usp=share_link';
+    text = 'Google Drive';
+    hlinkDrive  = uicontrolHyperLink(modalFig,[70, 370-20, 110, 20],'pixels',16,text,url);
+    text = url;
+    hlinkDrive2 = uicontrolHyperLink(modalFig,[70, 350-20, 555, 20],'pixels',12,text,url);
+    
+    url = 'https://github.com/Doppelweck/MuscleFiberClassificationTool';
+    text = 'Github.com';
+    hlinkGit  = uicontrolHyperLink(modalFig,[70, 290-20, 90, 20],'pixels',16,text,url);
+    text = url;
+    hlinkGit2 = uicontrolHyperLink(modalFig,[70, 270-20, 350, 20],'pixels',12,text,url);
+    
+
+    url = 'paypal.me/sFriedrichSoftware';
+    text = 'PayPal.com';
+    hlinkPP  = uicontrolHyperLink(modalFig,[70, 210-20, 90, 20],'pixels',16,text,url);
+    text = url;
+    hlinkPP2 = uicontrolHyperLink(modalFig,[70, 190-20, 175, 20],'pixels',12,text,url);
+   
     set(modalFig,'WindowStyle','modal');
     set(modalFig, 'Resize', 'off');
     set(modalFig,'Visible','on');
 
     h=modalFig;
     
-    figure(modalFig);drawnow;
+    figure(modalFig);
 end
 
 function closeInfoFigure(src,~,winState)
