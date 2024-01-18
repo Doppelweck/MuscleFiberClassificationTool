@@ -1,5 +1,1 @@
-<<<<<<< Updated upstream
-Version 1.6
-=======
 Version 1.5  30-January-2024
->>>>>>> Stashed changes
