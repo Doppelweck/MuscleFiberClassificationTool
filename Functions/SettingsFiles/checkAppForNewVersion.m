@@ -44,12 +44,6 @@ function [newVersionAvailable, checkSuccessfull, newVersion] = checkAppForNewVer
             end
         end
 
-        % Compare version numbers
-        if all(gitMasterVersion > appVersion)
-            disp('The extracted version is greater than or equal to the reference version.');
-        else
-            disp('The extracted version is less than the reference version.');
-        end
     end
     
     
