@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="1170103203" file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="1170103203" file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>MuscleFiberClassificationTool</param.appname>
     <param.icon>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon.ico</param.icon>
     <param.icons>
@@ -8,12 +8,12 @@
       <file>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon_16.png</file>
     </param.icons>
-    <param.version>1.4</param.version>
+    <param.version>1.5</param.version>
     <param.authnamewatermark>Sebastian Friedrich</param.authnamewatermark>
-    <param.email>sebastian.friedrich89@gmail.com</param.email>
-    <param.company>Trier University of Applied Sciences</param.company>
+    <param.email>sebastian.friedrich.software@gmail.com</param.email>
+    <param.company />
     <param.summary />
-    <param.description>Version 1.4 6-November-2023
+    <param.description>Version 1.5 6-November-2024
 
 Application created with MATLAB 2021a.
 If the connection to the MathWorks Server fails:
@@ -21,7 +21,7 @@ If the connection to the MathWorks Server fails:
 1.: Go to https://de.mathworks.com/products/compiler/matlab-runtime.html and download
       the MATLAB Runtime Package R2021a.
 
-2.: Install the the MATLAB Runtime Package R2018a.
+2.: Install the the MATLAB Runtime Package R2021a.
 
 3.: After installing the the correct Runtime Package run the
       MuscleFiberClassificationTool_Installer again.
@@ -29,11 +29,11 @@ If the connection to the MathWorks Server fails:
 Thanks
 
 Sebastian</param.description>
-    <param.screenshot>${PROJECT_ROOT}\Icons\Splash.bmp</param.screenshot>
+    <param.screenshot>${PROJECT_ROOT}\Icons\Icon4.png</param.screenshot>
     <param.guid />
     <param.installpath.string>\TrierUniversityOfAppliedSciences\MuscleFiberClassificationTool\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
-    <param.logo>${PROJECT_ROOT}\Icons\icon.bmp</param.logo>
+    <param.logo />
     <param.install.notes>Application created with MATLAB 2021b.
 
 If the connection to the MathWorks Server fails:
@@ -61,7 +61,7 @@ Sebastian</param.install.notes>
     <param.web.mcr>true</param.web.mcr>
     <param.package.mcr>false</param.package.mcr>
     <param.no.mcr>false</param.no.mcr>
-    <param.web.mcr.name>MuscleFiberClassificationTool_Installer_Version_1_4</param.web.mcr.name>
+    <param.web.mcr.name>MuscleFiberClassificationTool_Installer_Version_1_5</param.web.mcr.name>
     <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
     <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
     <param.windows.command.prompt>true</param.windows.command.prompt>
@@ -71,15 +71,34 @@ Sebastian</param.install.notes>
     <param.checkbox>false</param.checkbox>
     <param.example />
     <param.help.text>Syntax 
-	  -? 
-	 
+	 main -? 
+	 main src ~ 
  Input Arguments 
 	 -?  print help on how to use the application 
-	 input arguments</param.help.text>
+	 src ~  input arguments 
+ Description 
+ 	 Version 1.5 6-November-2024
+
+Application created with MATLAB 2021a.
+If the connection to the MathWorks Server fails:
+
+1.: Go to https://de.mathworks.com/products/compiler/matlab-runtime.html and download
+      the MATLAB Runtime Package R2021a.
+
+2.: Install the the MATLAB Runtime Package R2021a.
+
+3.: After installing the the correct Runtime Package run the
+      MuscleFiberClassificationTool_Installer again.
+
+Thanks
+
+Sebastian</param.help.text>
     <unset>
+      <param.company />
       <param.summary />
       <param.guid />
       <param.installpath.combo />
+      <param.logo />
       <param.target.install.notes />
       <param.intermediate />
       <param.files.only />
@@ -106,17 +125,18 @@ Sebastian</param.install.notes>
     </fileset.main>
     <fileset.resources>
       <file>${PROJECT_ROOT}\Functions</file>
+      <file>${PROJECT_ROOT}\Icons</file>
+      <file>${PROJECT_ROOT}\LATEST.txt</file>
       <file>${PROJECT_ROOT}\MVC</file>
-      <file>${PROJECT_ROOT}\NotifySounds</file>
     </fileset.resources>
     <fileset.package>
       <file>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources</file>
     </fileset.package>
     <fileset.depfun />
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="MuscleFiberClassificationTool.exe" optional="false">C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool\for_testing\MuscleFiberClassificationTool.exe</file>
-      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="readme.txt" optional="true">C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool\for_testing\readme.txt</file>
-      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="splash.png" optional="false">C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool\for_testing\splash.png</file>
+      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="readme.txt" optional="true">C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="MuscleFiberClassificationTool.exe" optional="false">C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool\for_testing\MuscleFiberClassificationTool.exe</file>
+      <file location="${PROJECT_ROOT}\MuscleFiberClassificationTool\for_testing" name="splash.png" optional="false">C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool\for_testing\splash.png</file>
     </build-deliverables>
     <workflow />
     <matlab>
