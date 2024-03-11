@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="3625000557" file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3015469498" file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>MuscleFiberClassificationTool</param.appname>
     <param.icon>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon.ico</param.icon>
     <param.icons>
@@ -13,7 +13,17 @@
     <param.email>sebastian.friedrich.software@gmail.com</param.email>
     <param.company>Sebastian Friedrich</param.company>
     <param.summary>App for semi-automatic analyzing geometric properties and classification of  muscle fiber images.</param.summary>
-    <param.description>Version 1.5 6-November-2024
+    <param.description>Version 1.5 11-March-2024
+
+#WHATS NEW:
+    - App-design can now be changed in the menu bar.
+    - Users can save and load their own settings.
+    - Histograms now show a Gaussian fit.
+    - Boundaries will be plotting faster.
+    - Binary Mask can now be saved as an image after processing the fibers.
+    - Added About selection to the menu bar for more information.
+    - Added Watershed II Automatic Binarisation.
+    - App will now inform the user when a new version is available.
 
 Application created with MATLAB 2021a.
 If the connection to the MathWorks Server fails:
@@ -29,12 +39,22 @@ If the connection to the MathWorks Server fails:
 Thanks
 
 Sebastian</param.description>
-    <param.screenshot />
+    <param.screenshot>${PROJECT_ROOT}\Icons\Icon5.png</param.screenshot>
     <param.guid />
     <param.installpath.string>\MATLAB Apps\MuscleFiberClassificationTool\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
     <param.logo />
     <param.install.notes>Application created with MATLAB 2021b.
+
+#WHATS NEW:
+    - App-design can now be changed in the menu bar.
+    - Users can save and load their own settings.
+    - Histograms now show a Gaussian fit.
+    - Boundaries will be plotting faster.
+    - Binary Mask can now be saved as an image after processing the fibers.
+    - Added About selection to the menu bar for more information.
+    - Added Watershed II Automatic Binarisation.
+    - App will now inform the user when a new version is available.
 
 If the connection to the MathWorks Server fails:
 
@@ -77,7 +97,17 @@ Sebastian</param.install.notes>
 	 -?  print help on how to use the application 
 	 src ~  input arguments 
  Description 
- 	 Version 1.5 6-November-2024
+ 	 Version 1.5 11-March-2024
+
+#WHATS NEW:
+    - App-design can now be changed in the menu bar.
+    - Users can save and load their own settings.
+    - Histograms now show a Gaussian fit.
+    - Boundaries will be plotting faster.
+    - Binary Mask can now be saved as an image after processing the fibers.
+    - Added About selection to the menu bar for more information.
+    - Added Watershed II Automatic Binarisation.
+    - App will now inform the user when a new version is available.
 
 Application created with MATLAB 2021a.
 If the connection to the MathWorks Server fails:
@@ -96,7 +126,6 @@ Sebastian</param.help.text>
     <unset>
       <param.authnamewatermark />
       <param.email />
-      <param.screenshot />
       <param.guid />
       <param.installpath.combo />
       <param.logo />
