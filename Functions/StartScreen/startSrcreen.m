@@ -1,7 +1,7 @@
 function hf = startSrcreen()
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
-Pic = imread('StartScreen3.jpg');
+Pic = imread('StartScreen5.png');
 [m n]= size(Pic);
 hf  = figure('Visible','off','MenuBar','none','NumberTitle','off',...
     'WindowStyle','normal','Units','pixels','ToolBar','none');
