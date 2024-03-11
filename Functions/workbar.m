@@ -1,4 +1,4 @@
-function workbar(fractiondone, message, progtitle, mainFig)
+function workbar(fractiondone, message, progtitle, mainFig,isVisible)
 % WORKBAR Graphically monitors progress of calculations
 %   WORKBAR(X) creates and displays the workbar with the fractional length
 %   "X". It is an alternative to the built-in matlab function WAITBAR,
@@ -52,9 +52,15 @@ function workbar(fractiondone, message, progtitle, mainFig)
 % Daniel Claxton
 %
 % Last Modified: 3-17-05
+arguments
+    fractiondone double = 0
+    message char = ' '
+    progtitle char = ' '
+    mainFig handle = gcf
+    isVisible char = 'on'
+end
 
-
-persistent progfig progpatch starttime lastupdate text 
+persistent progfig progpatch starttime lastupdate text winState
 
 % Set defaults for variables not passed in
 if nargin < 1
@@ -67,7 +73,7 @@ try
     
     % If progress bar needs to be reset, close figure and set handle to empty
     if fractiondone == 0
-        setAlwaysOnTop(progfig,false);
+%         setAlwaysOnTop(progfig,false);
         delete(progfig) % Close progress bar
         progfig = []; % Set to empty so a new progress bar is created
     end
@@ -85,15 +91,15 @@ end
 
 % If task completed, close figure and clear vars, then exit
 percentdone = floor(100*fractiondone);
-if percentdone == 100 % Task completed
+if percentdone > 100 % Task completed
     if ~isempty(progfig)
-        setAlwaysOnTop(progfig,false);
+%         setAlwaysOnTop(progfig,false);
     end
+    set(progfig,'pointer','arrow');
     delete(progfig) % Close progress bar
-    set(mainFig,'WindowState','maximized');
+
     clear progfig progpatch starttime lastupdate % Clear persistent vars
-    
-    if strcmp(get(mainFig,'WindowState'),'maximized')
+    if strcmp(winState,'maximized')
         set(mainFig,'WindowState','maximized');
     end
     return
@@ -104,7 +110,7 @@ if percentdone == 0
 end
 % Create new progress bar if needed
 if isempty(progfig)
-    
+    winState=get(mainFig,'WindowState');
     
     %%%%%%%%%% SET WINDOW SIZE AND POSITION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     winwidth = 400;                                         % Width of timebar window
@@ -144,14 +150,12 @@ if isempty(progfig)
          'color',[1 1 1],...                               % Set the figure color
          'resize','off',...                                 % Turn of figure resizing
          'tag','timebar',...                                % Tag the figure for later checking
-         'WindowStyle','normal',...                            % Stay figure in forground                          
+         'WindowStyle','modal',...                            % Stay figure in forground                          
          'Visible','off');
     
     movegui(progfig,'center');
     set(progfig,'Visible','on')
-    setAlwaysOnTop(progfig,true);
-    
-    
+%     setAlwaysOnTop(progfig,true);    
     
     set(progfig,'CloseRequestFcn','');
     work.progtitle = progtitle;                             % Store initial values for title
@@ -205,12 +209,13 @@ if isempty(progfig)
         'string','');                                       % Initialize the estimated time as blank
     
     text(4) = uicontrol(progfig,'style','text',...          % Prepare the percentage progress
-        'pos',[winwidth-35 winheight-50 30 20],...          % Set the textbox position and size
+        'pos',[winwidth-45 winheight-50 40 20],...          % Set the textbox position and size
         'hor','right',...                                   % Left align the text in the textbox
         'backgroundcolor',[1 1 1],...                      % Set the textbox background color
         'foregroundcolor',0*[1 1 1],...                     % Set the textbox foreground color
         'string','');                                       % Initialize the progress text as blank
     
+    [mainBackgroundColor, mainTextColor, mainTextHighColor] = appDesignChanger(progfig,getSettingsValue('Style'));
     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
     iconsSizeEnums = javaMethod('values',iconsClassName);
     SIZE_32x32 = iconsSizeEnums(1);  % (1) = 16x16,  (2) = 32x32
@@ -218,9 +223,9 @@ if isempty(progfig)
     busyIndicator.setPaintsWhenStopped(false);  % default = false
     busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
     javacomponent(busyIndicator.getComponent, [progfig.Position(3)*0.86,progfig.Position(4)*0.35,20,20], progfig);
-    busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
+    busyIndicator.getComponent.setBackground(java.awt.Color(mainBackgroundColor(1), mainBackgroundColor(2),mainBackgroundColor(3)));
     busyIndicator.start;
-        
+    
     % Set time of last update to ensure a redraw
     lastupdate = clock - 1;
     
@@ -242,7 +247,7 @@ set(progpatch,'XData',[1 fractiondone fractiondone 1])
 
 % Set all dynamic text
 runtime = etime(clock,starttime);
-if ~fractiondone,
+if ~fractiondone
     fractiondone = 0.001;
 end
 work = get(progfig,'userdata');
@@ -261,12 +266,18 @@ set(progfig,'Name',titlebarstr)
 set(text(1),'string',message);
 set(text(3),'string',timeleftstr);
 set(text(4),'string',[num2str(percentdone) ' %']);
-
+set(progfig,'Visible',isVisible);
+if(strcmp(get(progfig,'Visible'),'on'))
+    set(progfig,'pointer','watch');
+else
+    set(progfig,'pointer','arrow');
+end
 % Force redraw to show changes
 drawnow
 
 % Record time of this update
 lastupdate = clock;
+
 
 
 
@@ -298,11 +309,10 @@ timestr = strcat(h0,num2str(h),':',m0,...
 function a=progimage(m)
 
 if m == 1
-    
     a=ones(13,385,3);
-    a(:,:,1)=ones([13,385])*0;
-    a(:,:,2)=ones([13,385])*0.4470*255;
-    a(:,:,3)=ones([13,385])*0.7410*255;
+    a(:,:,1)=ones([13,385])*51;
+    a(:,:,2)=ones([13,385])*153;
+    a(:,:,3)=ones([13,385])*255;
       
 else
     a=ones(13,385,3);

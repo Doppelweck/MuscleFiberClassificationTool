@@ -263,7 +263,7 @@ classdef modelEdit < handle
             
             obj.InfoMessage = '   - searching for bio format file';
             
-            [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
+            [pathstr,name,~] = fileparts([obj.PathName obj.FileName]);
             f = fullfile(pathstr,name);
             
             % Searching for supported bio foramt files with the same name
@@ -357,7 +357,7 @@ classdef modelEdit < handle
                 if ~iscell(tempFileNames) %1 file was selected
                     obj.InfoMessage = '   - 1 file was selected';
                     %Get file information
-                    [pathstr,name,ext] = fileparts(tempFileNames);
+                    [~,~,ext] = fileparts(tempFileNames);
                     
                     %Check file type
                     obj.InfoMessage = '      - check file type';
@@ -400,18 +400,17 @@ classdef modelEdit < handle
                     
                     %Extract information of every single file
                     noFiles = size(tempFileNames,2);
-                    AllExtensions = {};
-                    AllNames = {};
-                    AllPath = {};
-                    AllSizes = {};
+                    AllExtensions = cell(noFiles);
+                    AllNames = cell(noFiles);
+                    AllSizes = cell(noFiles);
                     
                     obj.InfoMessage = ['   - ' num2str(noFiles) ' files were selected'];
                     
-                    obj.InfoMessage = ['   - check file Type'];
+                    obj.InfoMessage = '   - check file Type';
                     
                     %Check if extensions are all the same
                     for i=1:1:noFiles
-                        [pathstr,name,ext] = fileparts(tempFileNames{i});
+                        [~,~,ext] = fileparts(tempFileNames{i});
                         AllExtensions{i} = ext;
                     end
                     tf = ismember(AllExtensions,AllExtensions{1});
@@ -426,15 +425,15 @@ classdef modelEdit < handle
                         
                         %Chek if image is RGB or Grayscale
                         for i=1:1:noFiles
-                            [pathstr,name,ext] = fileparts(tempFileNames{i});
+                            [~,name,ext] = fileparts(tempFileNames{i});
                             ImagMat = imread([tempPathNames tempFileNames{i}]);
                             AllNames{i} = name;
                             if isequal(ImagMat(:,:,1),ImagMat(:,:,2),ImagMat(:,:,3))
                                 %Image is grayscale. No of Channels = 1
                                 AllSizes{i} = 1;
-                            else
-                                %Image is RGB. No of Channels = 3
-                                AllSizes{i} = 1;
+%                             else
+%                                 %Image is RGB. No of Channels = 3
+%                                 AllSizes{i} = 1;
                             end
                         end
                         tf = ismember(cell2mat(AllSizes),AllSizes{1});
@@ -513,18 +512,18 @@ classdef modelEdit < handle
             for i=1:metadata.size()
                 key = metadataKeys.nextElement();
                 value = metadata.get(key);
-                MetaData{i,1}=sprintf('%s', key);
-                MetaData{i,2}=sprintf('%s', value);
+                MetaDataTemp{i,1}=sprintf('%s', key);
+                MetaDataTemp{i,2}=sprintf('%s', value);
                 workbar(0.1+(0.3*i/metadata.size()),'get meta data','Open Bioformat File',obj.controllerEditHandle.mainFigure);
             end
             
-            Parameters = {MetaData{:,1}};
+            Parameters = MetaDataTemp(:,1);
             Parameters = regexprep(Parameters, '\W', '');
             Parameters = regexprep(Parameters, '|', '');
-            Values = {MetaData{:,2}};
+            Values = MetaDataTemp(:,2);
             try
                 
-                obj.MetaData = cell2struct( MetaData, Parameters', 1);
+                obj.MetaData = cell2struct( MetaDataTemp, Parameters', 1);
                 obj.InfoMessage = '     - Read Meta Data From Image';
             catch
                 try
@@ -532,7 +531,7 @@ classdef modelEdit < handle
                     ParametersNewValid = matlab.lang.makeValidName(Parameters);
                     ParametersNewValidUnique =  matlab.lang.makeUniqueStrings(ParametersNewValid,namelengthmax);
                     ParametersNewValidUnique = matlab.lang.makeUniqueStrings(ParametersNewValidUnique);
-                    MetaDataTemp=MetaData;
+                    MetaDataTemp=MetaDataTemp;
                     MetaDataTemp(:,1)=ParametersNewValidUnique;
                     obj.MetaData = cell2struct(MetaDataTemp, ParametersNewValidUnique, 1);
                     obj.InfoMessage = '     - Read Meta Data From Image';
@@ -577,7 +576,7 @@ classdef modelEdit < handle
                 workbar(0.75,'indentifing planes','Open Bioformat File',obj.controllerEditHandle.mainFigure);
                 obj.InfoMessage = '   - indentifing planes';
                 %get ColorPlane Info from metaData
-                [ch_order, ch_wave_name, ch_rgb, ch_rgbname] = get_channel_info(omeMeta);
+                [ch_order, ch_wave_name, ~, ~] = get_channel_info(omeMeta);
                 
                 foundGreen = 0;
                 foundBlue = 0;
@@ -649,15 +648,27 @@ classdef modelEdit < handle
                     try
                         %get bit per pixel from OME Meta Data
                         try
-                            bpp= str2num(obj.MetaData(2).GlobalAcquisitionBitDepth);
-                            obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
+                            bpp = str2double(obj.MetaData(2).GlobalAcquisitionBitDepth);
+                            if(isempty(bpp)||isnan(bpp))
+                                obj.InfoMessage = '         - No Pixel Depth MetaData found';
+                                obj.InfoMessage = '            - assume Pixel Depth...';
+                                bpp = assumePixelDepth(obj);
+                                
+                                if isempty(bpp)
+                                    obj.InfoMessage = '               - failed';
+                                else
+                                    obj.InfoMessage = ['            - Pixel Depth :' num2str(bpp)];
+                                end
+                            else
+                                obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
+                            end
                         catch
-                            obj.InfoMessage = ['         - No Pixel Depth MetaData found'];
-                            obj.InfoMessage = ['            - assume Pixel Depth...'];
+                            obj.InfoMessage = '         - No Pixel Depth MetaData found';
+                            obj.InfoMessage = '            - assume Pixel Depth...';
                             bpp = assumePixelDepth(obj);
                             
                             if isempty(bpp)
-                                obj.InfoMessage = ['               - failed'];
+                                obj.InfoMessage = '               - failed';
                             else
                                 obj.InfoMessage = ['            - Pixel Depth :' num2str(bpp)];
                             end
@@ -729,7 +740,7 @@ classdef modelEdit < handle
                 cd(obj.PathName);
                 
                 %search for brightness adjustment images
-                [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
+                [~,~,ext] = fileparts([obj.PathName obj.FileName]);
                 
                 %find filenemes that started with the letter A for filter A
                 %images
@@ -849,8 +860,8 @@ classdef modelEdit < handle
                         '',...
                         'See MANUAL for more details.',...
                         };
-                    obj.InfoMessage = ['<HTML><FONT color="orange">- Not all brightness adjustment images was found.</FONT></HTML>'];
-                    obj.InfoMessage = ['      - Go to the "Check planes" for more options.'];
+                    obj.InfoMessage = '<HTML><FONT color="orange">- Not all brightness adjustment images was found.</FONT></HTML>';
+                    obj.InfoMessage = '      - Go to the "Check planes" for more options.';
                     %show info message on gui
 %                     obj.controllerEditHandle.viewEditHandle.infoMessage(infotext);
                     
@@ -858,6 +869,7 @@ classdef modelEdit < handle
         end
         
         function pixelDepth = assumePixelDepth(obj)
+%             dataClass = class(obj.PicPlane1);
             maxValue = max([max(max(obj.PicPlane1)) max(max(obj.PicPlane2)) max(max(obj.PicPlane3)) max(max(obj.PicPlane4))]);
             if maxValue <=255
                 pixelDepth = 8;
@@ -865,10 +877,14 @@ classdef modelEdit < handle
                 pixelDepth = 12;
             elseif maxValue <=65535
                 pixelDepth = 16;
+            elseif maxValue <=16777215
+                pixelDepth = 24;
+            elseif maxValue <=4294967295
+                pixelDepth = 32;
             else
                 pixelDepth = [];
             end
-                
+            
         end
         
         function status = openImage(obj)
@@ -961,7 +977,7 @@ classdef modelEdit < handle
                 
                 noImag = size(obj.FileName,2);
                 obj.InfoMessage = ['- ' num2str(noImag) ' images were selected'];
-                obj.InfoMessage = ['   - images are Grayscale images'];
+                obj.InfoMessage = '   - images are Grayscale images';
                 %Extract information of every single file
                 for i=1:1:noImag
                     %Get single image
@@ -981,7 +997,7 @@ classdef modelEdit < handle
                         obj.InfoMessage = ['         - using image MetaData (bpp=' num2str(bpp) ')'];
                         Img = uint8(double(Img)./(2^bpp-1)*255);
                     else
-                        obj.InfoMessage = ['         - using MATLAB function'];
+                        obj.InfoMessage = '         - using MATLAB function';
                         Img = im2uint8(Img);
                     end
                     
@@ -1096,7 +1112,7 @@ classdef modelEdit < handle
                 end
                 
                 
-                [pathstr,name,ext] = fileparts(obj.FileName{1,1});
+                [~,name,~] = fileparts(obj.FileName{1,1});
                 
                 %remove blankets from first file names
                 name = regexprep(name,'\(.*\)',' ');
@@ -1129,18 +1145,7 @@ classdef modelEdit < handle
             obj.PicPlaneGreen = im2uint8(obj.PicPlaneGreen);
             obj.PicPlaneBlue = im2uint8(obj.PicPlaneBlue);
             obj.PicPlaneRed = im2uint8(obj.PicPlaneRed);
-            obj.PicPlaneFarRed = im2uint8(obj.PicPlaneFarRed);
-            
-%             obj.PicPlane1 = uint8(obj.PicPlane1./max(max(max(obj.PicPlane1)))*255);
-%             obj.PicPlane2 = uint8(obj.PicPlane2./max(max(max(obj.PicPlane2)))*255);
-%             obj.PicPlane3 = uint8(obj.PicPlane3./max(max(max(obj.PicPlane3)))*255);
-%             obj.PicPlane4 = uint8(obj.PicPlane4./max(max(max(obj.PicPlane4)))*255);
-%             
-%             obj.PicPlaneGreen = uint8(obj.PicPlaneGreen./max(max(max(obj.PicPlaneGreen)))*255);
-%             obj.PicPlaneBlue = uint8(obj.PicPlaneBlue./max(max(max(obj.PicPlaneBlue)))*255);
-%             obj.PicPlaneRed = uint8(obj.PicPlaneRed./max(max(max(obj.PicPlaneRed)))*255);
-%             obj.PicPlaneFarRed = uint8(obj.PicPlaneFarRed./max(max(max(obj.PicPlaneFarRed)))*255);
-            
+            obj.PicPlaneFarRed = im2uint8(obj.PicPlaneFarRed);           
         end
         
         function createRGBImages(obj)
@@ -1234,7 +1239,7 @@ classdef modelEdit < handle
                 obj.InfoMessage = '         - must have the same filename as the bioformat file';
                 
                 %searching for RGB image
-                [pathstr,name,ext] = fileparts([obj.PathName obj.FileName]);
+                [~,name,~] = fileparts([obj.PathName obj.FileName]);
                 
                 RGBimageName = [];
                 if isempty(RGBimageName)
@@ -1288,7 +1293,7 @@ classdef modelEdit < handle
                     for i=1:1:4
                         %search for the highest correlation coefficient. Plane
                         %and color are the indices of the correlation array r
-                        [plane color] = ind2sub( size(r) , find( r==max(max(r)) ) );
+                        [plane, color] = ind2sub( size(r) , find( r==max(max(r)) ) );
                         
                         switch color
                             
@@ -1348,12 +1353,8 @@ classdef modelEdit < handle
                     success = true;
                 else
                     % no RGB image was found
-                    success = false;
-                    
+                    success = false;  
                 end
-                
-                
-                
             end
         end
         
@@ -1466,9 +1467,6 @@ classdef modelEdit < handle
             end
             workbar(1,'Brightness adjustment Green Plabe','Brightness Adjustment',obj.controllerEditHandle.mainFigure); 
             obj.InfoMessage = '   - brightness adjustment finished';
-            
-            
-            
         end
         
         function calculateBackgroundIllumination(obj,plane)
@@ -1510,7 +1508,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCGreen = smoothedBackground;
                     obj.FilenameBCGreen = 'calculated from Green plane background';
-                    workbar(1,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'smoothing background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Blue'
                     workbar(0.1,'create image for Blue Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
@@ -1547,7 +1545,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCBlue = smoothedBackground;
                     obj.FilenameBCBlue = 'calculated from Blue plane background';
-                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Red'
                     workbar(0.1,'create image for Red Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
@@ -1584,7 +1582,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCRed = smoothedBackground;
                     obj.FilenameBCRed = 'calculated from Red plane background';
-                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 case 'Farred'
                     workbar(0.1,'create image for Farred Plane','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
@@ -1621,7 +1619,7 @@ classdef modelEdit < handle
                     smoothedBackground = smoothedBackground/max(max(smoothedBackground));
                     obj.PicBCFarRed = smoothedBackground;
                     obj.FilenameBCFarRed = 'calculated from Farred plane background';
-                    workbar(1,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
+                    workbar(1.5,'normalize background profile','Calculate Background Illumination',obj.controllerEditHandle.mainFigure);
                     
                 otherwise %calculate all missing images
                     disp('all missing');
@@ -1677,11 +1675,12 @@ classdef modelEdit < handle
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 4 % Use automatic setup for binarization (Watershed I)
-                            obj.autoBinarizationWatershed_1();
+                            obj.PicBW = obj.autoBinarizationWatershed_1();
+                            obj.handlePicBW.CData = obj.PicBW;
                             
                         case 5 % Use automatic setup for binarization (Watershed II)
-                            obj.autoBinarizationWatershed_2();
-                            
+                            obj.PicBW = obj.autoBinarizationWatershed_2();
+                            obj.handlePicBW.CData = obj.PicBW;
                     end
                 else
                     % Binary pictur is invert
@@ -1707,10 +1706,12 @@ classdef modelEdit < handle
                             obj.handlePicBW.CData = obj.PicBW;
                             
                         case 4 % Use automatic setup for binarization (Watershed I)
-                            obj.autoBinarizationWatershed_1();
-
+                            obj.PicBW = ~obj.autoBinarizationWatershed_1();
+                            obj.handlePicBW.CData = obj.PicBW;
+                            
                         case 5 % Use automatic setup for binarization (Watershed II)
-                            obj.autoBinarizationWatershed_2();
+                            obj.PicBW = ~obj.autoBinarizationWatershed_2();
+                            obj.handlePicBW.CData = obj.PicBW;
                     end
                     
                 end
@@ -1735,8 +1736,7 @@ classdef modelEdit < handle
                 else
                     set(obj.handlePicBW,'AlphaData',1);
                 end
-            end
-            
+            end   
         end
         
         function invertPicBWEvent(obj)
@@ -1764,7 +1764,6 @@ classdef modelEdit < handle
                 obj.InfoMessage = '         - Fiber objects white';
                 obj.InfoMessage = '         - Background (Collagen) black';
             end
-            
             
             obj.handlePicBW.CData = ~obj.handlePicBW.CData;
             
@@ -1814,8 +1813,7 @@ classdef modelEdit < handle
                 BW3 = ~eq(BW1,BW2);
                 obj.handlePicBW.CData(BW3 == 1)=obj.ColorValue;
             else
-            end
-           
+            end     
         end
         
         function startDragFcn(obj,CurPos)
@@ -1833,7 +1831,6 @@ classdef modelEdit < handle
             %           obj:    Handle to modelEdit object
             %           CurPos: current cursor position in the binary image
             %
-            
             obj.x1 = double(CurPos(1,1));
             
             obj.y1 = double(CurPos(1,2));
@@ -1850,12 +1847,7 @@ classdef modelEdit < handle
                 % create black circle
                 circlePixels = ~((rowsInImage - double(obj.y1)).^2 + (columnsInImage - double(obj.x1)).^2 <= radius.^2);
                 obj.handlePicBW.CData = obj.handlePicBW.CData & circlePixels;
-%                 
-%                 him=findobj('Tag','him');
-%                 him.CData(obj.y1,obj.x1)=180;
-
-            end
-            
+            end    
         end
         
         function DragFcn(obj,CurPos)
@@ -1894,20 +1886,12 @@ classdef modelEdit < handle
             end
             
             %calculate gradient in x and y direction
-%             obj.dx = double(obj.x1)-obj.x2;
-%             obj.dy = double(obj.y1)-obj.y2;
             obj.dx = double(obj.x2-obj.x1);
             obj.dy = double(obj.y2-obj.y1);
 
             obj.abs_dx = ceil(abs(obj.dx));
             obj.abs_dy = ceil(abs(obj.dy));
-            
-            %calculate eucledian distance between the points.
-%             obj.dist = sqrt((obj.abs_dx)^2+(obj.abs_dy)^2);
-            
-%             obj.x_v = double( sort([obj.x1 obj.x2]) );
-%             obj.y_v = double( sort([obj.y1 obj.y2]) );
-            
+           
             %Calculatae slope and offset of the line
             obj.m=double(obj.dy/obj.dx);
             obj.b = double(obj.y1)-obj.m*double(obj.x1);
@@ -2149,8 +2133,6 @@ classdef modelEdit < handle
                         if mod(i,1)==0
                             tempPic = bwmorph(tempPic,'majority',1);
                         end
-%                         figure
-%                         imshow(tempPic)
                     end
                     
                     %skel the temp binary image again
@@ -2172,7 +2154,7 @@ classdef modelEdit < handle
                     
                 case 'remove incomplete objects'
                     
-                    obj.InfoMessage = ['      - removing objects at the image border'];
+                    obj.InfoMessage = '      - removing objects at the image border';
                     
                     %Check invert status of the binary image
                     if strcmp(obj.PicBWisInvert,'true')
@@ -2188,10 +2170,10 @@ classdef modelEdit < handle
                     % get size of Label Mat
                     [m,n]=size(tempLabelMat);
                     %seperate x and y borders
-                    BordersX(1,:) =tempLabelMat(1,:); %Upper-X Axis
-                    BordersX(2,:) =tempLabelMat(m,:); %Lower-X Axis
-                    BordersY(1,:) =tempLabelMat(:,1); %Left-Y Axis
-                    BordersY(2,:) =tempLabelMat(:,n); %Right-Y Axis
+                    BordersX(1,:) = tempLabelMat(1,:); %Upper-X Axis
+                    BordersX(2,:) = tempLabelMat(m,:); %Lower-X Axis
+                    BordersY(1,:) = tempLabelMat(:,1); %Left-Y Axis
+                    BordersY(2,:) = tempLabelMat(:,n); %Right-Y Axis
                     %Find Labels of Objects at the image edge
                     
                     EdgeObjectsX=unique(BordersX);
@@ -2222,9 +2204,9 @@ classdef modelEdit < handle
             obj.addToBuffer();
         end
         
-        function autoBinarizationWatershed_1(obj)
+        function bicBWreturn = autoBinarizationWatershed_1(obj)
             obj.InfoMessage = '   - running Auto Watershed I Binarization';
-            workbar(0,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
+            workbar(0.1,'running Auto Watershed I Binarization','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
             %green Plane
             switch obj.FiberForeBackGround
@@ -2234,8 +2216,7 @@ classdef modelEdit < handle
                     tempGreenPlane = imcomplement(obj.PicPlaneGreen_adj);
             end
              
-            obj.PicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',0.9);
-            obj.PicBWisInvert = 'false';
+            tempPicBW = imbinarize(tempGreenPlane,'adaptive','ForegroundPolarity','bright','Sensitivity',0.9);
             
             %create Gradient Magnitude image
             workbar(0.2,'compute Gradient-Magnitude image','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
@@ -2258,35 +2239,27 @@ classdef modelEdit < handle
             %extend regional minima using h-min transform
             workbar(0.6,'extend regional minima','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             MinMarker = imextendedmin(gradmag,round(MeanMinGradMag));
-%             MaxMarker = imextendedmax(gradmag,200);
-            %
+           
             MinMarker = imfill(MinMarker,'holes');
             MinMarker = bwareaopen(MinMarker,5);
             MinMarker = imfill(MinMarker,'holes');
-%             figure()
-%             imshow(MinMarker)
+
             MinMarker = imclose(MinMarker,strel('disk',3));
             MinMarker = imerode(MinMarker,strel('disk',1));
             MinMarker = imfill(MinMarker,'holes');
 
-%             figure()
-%             imshow(MinMarker,[])
             workbar(0.7,'remove small fibers','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             stats = regionprops('struct',MinMarker,'Area');
             MeanArea = mean([stats(:).Area]);
             obj.InfoMessage = '      - remove small fiber type markes';
             MinMarker = bwareaopen(MinMarker,round(MeanArea/10));
 
-%             figure()
-%             imshow(MinMarker)
             workbar(0.8,'remove small fibers','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             %Background Markers (currently not used)
             D = bwdist(MinMarker);
             DL = watershed(D);
             bgm = DL == 0;
-%             figure()
-%             imshow(bgm)
-%             gradmag2 = imimposemin(gradmag, bgm | MinMarker);
+
             gradmag2 = imimposemin(gradmag, MinMarker);
             workbar(0.9,'perform watershed transformation','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
             obj.InfoMessage = '      - perform watershed transformation';
@@ -2297,14 +2270,12 @@ classdef modelEdit < handle
             se = strel('disk',1);
             f2 = imdilate(f2,se);
             obj.InfoMessage = '      - create binary mask';
-            obj.PicBW = obj.PicBW | f2;
-            obj.handlePicBW.CData = obj.PicBW | f2;
-            
+            bicBWreturn =  tempPicBW | f2;
             obj.InfoMessage = '   - Auto Watershed I Binarization completed';
             workbar(1,'perform watershed transformation','Auto Watershed I Binarization',obj.controllerEditHandle.mainFigure);
         end
         
-        function autoBinarizationWatershed_2(obj)
+        function bicBWreturn = autoBinarizationWatershed_2(obj)
             obj.InfoMessage = '   - running Auto Watershed II Binarization';
             workbar(0.1,'running Auto Watershed II Binarization','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             %Check if Fibers are shown as Black or White Pixel within the
@@ -2342,8 +2313,6 @@ classdef modelEdit < handle
             BW_Fibers = bwareaopen(BW_Fibers,round(100));
             BW_Fibers = imfill(BW_Fibers,'holes');
 
-%             BW_Fibers = ~bwareaopen(~BW_Fibers, 100,8);
-%             BW_Fibers = bwareaopen(BW_Fibers, 100,8);
             obj.InfoMessage = '     - create distance transformation';
             workbar(0.45,'create distance transformation','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
             D = -bwdist(~BW_Fibers);
@@ -2392,13 +2361,12 @@ classdef modelEdit < handle
             %smoothing
             Mask = bwmorph(Mask,'majority',500);
             workbar(0.95,'create final mask','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
-            obj.PicBW = Mask;
-            obj.handlePicBW.CData = Mask;
+            bicBWreturn =  Mask;
             obj.InfoMessage = '   - Auto Watershed II Binarization completed';
             workbar(1,'finished','Auto Watershed II Binarization',obj.controllerEditHandle.mainFigure);
         end
         
-        function [xOut yOut isInAxes] = checkPosition(obj,PosX,PosY)
+        function [xOut, yOut, isInAxes] = checkPosition(obj,PosX,PosY)
             % Check whether the positon of the cursor is in the binary
             % image while drawing a line. If the positon is out if range
             % the poition will be set to the max and min values of the
@@ -2501,22 +2469,25 @@ classdef modelEdit < handle
             %       - Input
             %           obj:    Handle to modelEdit object.
             %
-            
-            if obj.PicBufferPointer >= obj.BufferSize
-                temp = obj.PicBuffer;
-                
-                for i=1:1:obj.BufferSize-1
-                    obj.PicBuffer{1,i}=temp{1,i+1};
+            try
+                if obj.PicBufferPointer >= obj.BufferSize
+                    temp = obj.PicBuffer;
+
+                    for i=1:1:obj.BufferSize-1
+                        obj.PicBuffer{1,i}=temp{1,i+1};
+                    end
+                    obj.PicBufferPointer = obj.BufferSize;
+                    obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
+                    obj.PicBW = obj.handlePicBW.CData;
+                    obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
+                else
+                    obj.PicBufferPointer =obj.PicBufferPointer+1;
+                    obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
+                    obj.PicBW = obj.handlePicBW.CData;
+                    obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
                 end
-                obj.PicBufferPointer = obj.BufferSize;
-                obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
-                obj.PicBW = obj.handlePicBW.CData;
-                obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
-            else
-                obj.PicBufferPointer =obj.PicBufferPointer+1;
-                obj.PicBuffer{1,obj.PicBufferPointer}=obj.handlePicBW.CData;
-                obj.PicBW = obj.handlePicBW.CData;
-                obj.PicBuffer{2,obj.PicBufferPointer}=obj.PicBWisInvert;
+            catch
+                disp('Error PIC Buffer EditMode')
             end
         end
         

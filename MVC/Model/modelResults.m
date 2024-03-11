@@ -41,6 +41,7 @@ classdef modelResults < handle
         PicPRGBFRPlanes; %RGB image create from color plane images red green blue and farred.
         PicPRGBPlanes; %RGB image create from color plane images red green and blue.
         
+        SaveBinaryMask; %Indicates whether the Binary Mask should be saved.
         SaveFiberTable; %Indicates whether the fiber type table should be saved.
         SaveScatterAll; %Indicates whether the scatter plot with for all fibers should be saved.
         SavePlots; %Indicates whether the statistics plots should be saved.
@@ -51,6 +52,7 @@ classdef modelResults < handle
         ResultUpdateStaus; %Indicates whether the GUI should be updated.
         
         LabelMat; %Label array of all fiber objects.
+        PicBW; %Binary Mask
         
         %Analyze parameters
         AnalyzeMode; %Indicates the selected analyze mode.
@@ -199,28 +201,46 @@ classdef modelResults < handle
             obj.InfoMessage = '- updating GUI...';
             workbar(0.01,'Transform Data','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.transformDataStructToMatrix();
+            
             workbar(0.1,'calculate Fiber Numbers','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.calculateFiberNubers();
-            workbar(0.2,'calculate Area Features','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.15,'calculate Area Features','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.calculateAreaFeatures();
-            workbar(0.3,'create Statistic Table','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.2,'create Statistic Table','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.createMatStatisticTable();
-            workbar(0.4,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.25,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.findFiberGroups();
-            workbar(0.5,'show Axes Data in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
-            obj.controllerResultsHandle.showAxesDataInGUI();
-            workbar(0.6,'show Info Table in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.5,'plot Fiber Count','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesFiberCountGUI();
+            
+            workbar(0.55,'plot Fiber Area','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesFiberAreaGUI();
+            
+            workbar(0.6,'plot Fiber Blue Red','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesScatterBlueRedGUI();
+            
+            workbar(0.65,'plot Fiber Farre Blue','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesScatterFarredRedGUI();
+            
+            workbar(0.7,'plot all Fiber Scatter','Updating Results',obj.controllerResultsHandle.mainFigure);
+            obj.controllerResultsHandle.showAxesScatterAllGUI();
+            
+            workbar(0.75,'plot Info Table in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showInfoInTableGUI();
-            workbar(0.7,'show Histogram in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.8,'plot Histogram in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showHistogramGUI();
-            workbar(0.8,'show Imaged Processed in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.85,'plot Imaged Processed in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicProcessedGUI();
-            workbar(0.9,'show Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
+            
+            workbar(0.9,'plot Fiber Groups in GUI','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.controllerResultsHandle.showPicGroupsGUI();
-            drawnow;
-            pause(0.5);
-            drawnow;
-            obj.InfoMessage = '- updating GUI complete';
+            
             workbar(1,'complete','Updating Results',obj.controllerResultsHandle.mainFigure);
             obj.ResultUpdateStaus = true;
             end
@@ -439,8 +459,8 @@ classdef modelResults < handle
                 obj.AreaMinMaxT2(2) = max(cell2mat(obj.StatsMatDataT2(:,4)));
                 obj.AreaMinMaxObjT2(2) = cell2mat(obj.StatsMatDataT2( find([obj.StatsMatDataT2{:,4}]==obj.AreaMinMaxT2(2),1) ,1));
             else
-                obj.AreaMinMaxT2a = '--';
-                obj.AreaMinMaxObjT2a = '--';
+                obj.AreaMinMaxT2 = '--';
+                obj.AreaMinMaxObjT2 = '--';
 
             end
             
@@ -858,27 +878,15 @@ classdef modelResults < handle
             BW = zeros(size(obj.LabelMat));
             BW(obj.LabelMat>0)=1;
             Hull = BW_C | BW;
-%             Hull = bwconvhull(HullC);
             Hull = imdilate(Hull,se);
             
             obj.InfoMessage = '      - lable space withount fibers';
             Imag(Hull==0)=max(max(Imag))+1;
             ImagDist = bwdist(Imag); %Dist transform
           
-            
-%             figure(9)
-%             imshow(Hull,[])
             obj.InfoMessage = '      - minimize collagen thickness';
             I_WS=watershed(ImagDist); 
-%             I_BW=ones(size(I_WS));
-%             I_BW(I_WS==0)=0; %Binary Mat without Collagen thiknes
-%             
-%             
-%             [I_Bound,I_Label] = bwboundaries(I_BW,8,'noholes');
-%             I_Label = I_Label*(-1); %Set all Labels negativ
-%             
-%             figure()
-%             imshow(Imag,[])
+
             I_Label = double(I_WS)*(-1);
             n = max(max(obj.LabelMat)); %No. of Objects
             
@@ -887,18 +895,7 @@ classdef modelResults < handle
                 Value = unique( I_Label(Imag==i));
                 I_Label(I_Label==Value)=i;
             end
-%             figure()
-%             imshow(I_Label)
-%             figure(10)
-%             imshow(Imag)
-%             CH = bwconvhull(Imag);
-%             figure(11)
-%             imshow(CH)
-% %             CH= activecontour(Imag,CH,100,'edge');
-%             I_Label(CH==0)=0;
-%             
-%             figure(12)
-%             imshow(CH)
+%
             obj.InfoMessage = '      - searching for fiber type groups...';
             IsType1 = find( strcmp({obj.Stats.FiberType} , 'Type 1') );
             IsType12h = find( strcmp({obj.Stats.FiberType} , 'Type 12h') );
@@ -914,19 +911,10 @@ classdef modelResults < handle
             LrgbT2a = [];
             LrgbT2ax = [];
             
-            
-            
-%             
-%             IsType1 = find([obj.Stats.FiberTypeMainGroup] == 1);
-%             IsType2 = find([obj.Stats.FiberTypeMainGroup] == 2);
-%             IsType3 = find([obj.Stats.FiberTypeMainGroup] == 3);
-%             IBWT1=[];
-%             IBWT2=[];
-%             IBWT3=[];
             se = strel('disk',1);
             
             %%%%%%%%%%%%%%%%%%%%% Type-1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.25,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType1)
                 obj.InfoMessage = '         - find Type-1 groups';
                 IBWT1=zeros(size(I_Label));  
@@ -965,7 +953,7 @@ classdef modelResults < handle
             end
             
             %%%%%%%%%%%%%%%%%%%%% Type-12h %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.3,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType12h)
                 obj.InfoMessage = '         - find Type-12h groups';
                 IBWT12h=zeros(size(I_Label));   
@@ -1004,7 +992,7 @@ classdef modelResults < handle
             end
             
              %%%%%%%%%%%%%%%%%%%%% Type-2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.35,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2)
                 obj.InfoMessage = '         - find Type-2 groups';
                 IBWT2=zeros(size(I_Label));  
@@ -1045,6 +1033,7 @@ classdef modelResults < handle
             end
             
             %%%%%%%%%%%%%%%%%%%%% Type-2x %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            workbar(0.4,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2x)
                 obj.InfoMessage = '         - find Type-2x groups';
                 IBWT2x=zeros(size(I_Label));  
@@ -1084,6 +1073,7 @@ classdef modelResults < handle
                 
             end
             %%%%%%%%%%%%%%%%%%%%% Type-2a %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            workbar(0.45,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2a)
                 obj.InfoMessage = '         - find Type-2a groups';
                 IBWT2a=zeros(size(I_Label));  
@@ -1121,7 +1111,7 @@ classdef modelResults < handle
                 obj.GroupStats.NoObjT2a = [];
             end
             %%%%%%%%%%%%%%%%%%%%% Type-2ax %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            
+            workbar(0.49,'find Fiber Groups','Updating Results',obj.controllerResultsHandle.mainFigure);
             if ~isempty(IsType2ax)
                 obj.InfoMessage = '         - find Type-2ax groups';
                 IBWT2ax=zeros(size(I_Label));  
@@ -1185,21 +1175,19 @@ classdef modelResults < handle
             
             obj.InfoMessage = ' ';
             obj.InfoMessage = '   - saving data in the same dir than the file was selected';
-            workbar(0.01,'Transform Data','Saving Results',obj.controllerResultsHandle.mainFigure);
-            %Cell arrays for saving data in excel sheet
-            CellStatisticTable = {};
-            CellFiberTable = {};
+            
+            noOfSaveElements = sum([obj.SaveBinaryMask obj.SaveFiberTable obj.SaveScatterAll obj.SavePlots obj.SaveHisto obj.SavePicProcessed obj.SavePicGroups]);
             
             %Current date and time
             time = datestr(now,'_yyyy_mm_dd_HHMM');
             
-            % Dlete file extension
+            % Delete file extension
             [path,fileName,ext] = fileparts(obj.FileName);
             
             % Save dir is the same as the dir from the selected Pic
             SaveDir = [obj.PathName fileName '_RESULTS'];
             obj.InfoMessage = ['   -' obj.PathName fileName '_RESULTS'];
-            
+             
             % Check if reslut folder already exist.
             if exist( SaveDir ,'dir') == 7
                 % Reslut folder already exist.
@@ -1217,21 +1205,166 @@ classdef modelResults < handle
             %Add folder with time and date in the main result folder.
             SaveDir = fullfile(SaveDir,[fileName '_RESULTS' time]);
             mkdir(SaveDir);
+
+            workbar(0/noOfSaveElements,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveFiberTable(SaveDir,time,0/noOfSaveElements);
+            pause(0.1);
+            workbar(1/noOfSaveElements,'saving plots','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveOverviewPlot(SaveDir,time);
+            pause(0.1);
+            workbar(2/noOfSaveElements,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveHistograms(SaveDir,time);
+            pause(0.1);
+            workbar(3/noOfSaveElements,'saving processed image','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveProcessedImage(SaveDir,time);
+            pause(0.1);
+            workbar(4/noOfSaveElements,'saving fiber group image','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveFiberGroupImage(SaveDir,time);
+            pause(0.1);
+            workbar(5/noOfSaveElements,'saving scatter plot','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveScatterPlot(SaveDir,time);
+            pause(0.1);
+            workbar(6/noOfSaveElements,'saving biary mask','Saving Results',obj.controllerResultsHandle.mainFigure);
+            obj.saveBinaryMask(SaveDir,time);
+            pause(0.1);
+            obj.InfoMessage = '   - Saving data complete';
+            workbar(1.2,'completed','Saving Results',obj.controllerResultsHandle.mainFigure);
+            pause(0.1);
+        end
+        
+        function saveOverviewPlot(obj,SaveDir,time)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
             
+            if obj.SavePlots
+                obj.InfoMessage = '      - saving axes with statistics plots...';
+                
+                obj.InfoMessage = '         - saving area plot as .pdf';
+                picName = [fileName '_AreaPlot' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendAreaPlot');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAArea],fTemp);
+                set(lTemp,'Location','best')
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                clf(fTemp);
+                
+                obj.InfoMessage = '         - saving number of Fiber-Types as .pdf';
+                picName = [fileName '_NumberPlot' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+%                 fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendNumberPlot');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hACount],fTemp);
+                set(lTemp,'Location','best')
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                clf(fTemp);
+                
+                obj.InfoMessage = '         - saving Scatter plot Blue over Red as .pdf';
+                picName = [fileName '_ScatterPlotBlueRed' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+%                 fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendScatterPlotBlueRed');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterBlueRed],fTemp);
+                set(lTemp,'Location','best')
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                clf(fTemp);
+                
+                obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
+                picName = [fileName '_ScatterPlotFarredRed' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                
+%                 fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendScatterPlotFarredRed');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterFarredRed],fTemp);
+                set(lTemp,'Location','best')
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                picName ='';
+                delete(fTemp)
+                
+                obj.InfoMessage = '   - saving plots complete';
+            end
+        end
+        
+        function saveHistograms(obj,SaveDir,time)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
+            if obj.SaveHisto
+                obj.InfoMessage = '      - saving Histograms plots...';
+                
+                obj.InfoMessage = '         - saving Area histogram as .pdf';
+                picName = [fileName '_HistogramArea' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+                fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendAreaHist');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAAreaHist],fTemp);
+                set(lTemp,'Location','best')
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                clf(fTemp);
+                
+                obj.InfoMessage = '         - saving AspectRatio histogram as .pdf';
+                picName = [fileName '_HistogramAspectRatio' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+%                 fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendAspectHist');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAAspectHist],fTemp);
+                set(lTemp,'Location','best');
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                clf(fTemp);
+                
+                obj.InfoMessage = '         - saving Diameter histogram as .pdf';
+                picName = [fileName '_HistogramDiameter' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+%                 fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendDiaHist');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hADiaHist],fTemp);
+                set(lTemp,'Location','best');
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                clf(fTemp);
+                
+                obj.InfoMessage = '         - saving Roundness histogram as .pdf';
+                picName = [fileName '_HistogramRoundness' time '.pdf'];
+                fullFileName = fullfile(SaveDir,picName);
+%                 fTemp = figure('Visible','off');
+                lTemp = findobj('Tag','LegendRoundHist');
+                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hARoundHist],fTemp);
+                set(lTemp,'Location','best');
+                appDesignChanger(fTemp,'light');
+                saveTightFigureOrAxes(fTemp,fullFileName);
+                delete(fTemp);
+                
+                obj.InfoMessage = '   - saving Histograms complete';
+            end
+        end
+        
+        function saveProcessedImage(obj,SaveDir,time)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save image processed
-            workbar(0.1,'saving Image processed','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SavePicProcessed
                 obj.InfoMessage = '      - saving image processed...';
-                
                 try
-                    picName ='';
                     % save picture as vector graphics
-                    picName = [fileName '_image_processed' time '.pdf'];
+                    picName = [fileName '_ImageProcessed' time '.pdf'];
                     fullFileName = fullfile(SaveDir,picName);
-                    saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fullFileName);
+                    fTemp = figure('Visible','off');
+                    copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPProcessed,fTemp);
+                    appDesignChanger(fTemp,'light');
+                    saveTightFigureOrAxes(fTemp,fullFileName);
                     obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
+                    delete(fTemp);
                 catch
                     warning('Problem while saving Image as .pdf. Image could not be saved.');
                     obj.InfoMessage = 'ERROR: Image could not be saved as .pdf vector grafic';
@@ -1245,35 +1378,39 @@ classdef modelResults < handle
                     h.Position = [0 0 1 1];
                     h.DataAspectRatioMode = 'auto';
                     
-                    picName ='';
                     frame = getframe(f);
                     frame=frame.cdata;
-                    picName = [fileName '_image_processed' time '.tif'];
+                    picName = [fileName '_ImageProcessed' time '.tif'];
                     oldPath = pwd;
                     cd(SaveDir)
                     imwrite(frame,picName)
                     cd(oldPath)
-                    picName ='';
                     close(f);
                     obj.InfoMessage = '         - image has been saved as .tif';
                 end
                 picName ='';
                 
             end
+        end
+        
+        function saveFiberGroupImage(obj,SaveDir,time)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save image with fiber type groups
-            workbar(0.3,'saving Image with fiber type groups','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SavePicGroups
-                obj.InfoMessage = '      - saving image with fiber groups...';
+                obj.InfoMessage = '      - saving image fiber groups...';
                 
                 try
-                    % save picture as vector graphics
                     picName ='';
-                    picName = [fileName '_image_groups' time '.pdf'];
+                    % save picture as vector graphics
+                    picName = [fileName '_ImageFiberGroups' time '.pdf'];
                     fullFileName = fullfile(SaveDir,picName);
-                    saveTightFigureOrAxes(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,fullFileName);
+                    fTemp = figure('Visible','off');
+                    copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,fTemp);
+                    appDesignChanger(fTemp,'light');
+                    saveTightFigureOrAxes(fTemp,fullFileName);
                     obj.InfoMessage = '         - image has been saved as .pdf vector grafic';
+                    delete(fTemp);
                 catch
                     warning('Problem while saving Image as .pdf. Image could not be saved.');
                     obj.InfoMessage = 'ERROR: Image could not be saved as .pdf vector grafic';
@@ -1281,7 +1418,7 @@ classdef modelResults < handle
                     % save picture as tif file
                     f = figure('Units','normalized','Visible','off','ToolBar','none','MenuBar', 'none','Color','w');
                     h = copyobj(obj.controllerResultsHandle.viewResultsHandle.hAPGroups,f);
-                    SizeFig = size(obj.PicPRGBPlanes)/max(size(obj.PicPRGBPlanes));
+                    SizeFig = size(obj.PicPRGBFRPlanes)/max(size(obj.PicPRGBFRPlanes));
                     set(f,'Position',[0 0 SizeFig(1) SizeFig(2)])
                     set(h,'Units','normalized');
                     h.Position = [0 0 1 1];
@@ -1290,7 +1427,7 @@ classdef modelResults < handle
                     picName ='';
                     frame = getframe(f);
                     frame=frame.cdata;
-                    picName = [fileName '_image_groups' time '.tif'];
+                    picName = [fileName '_ImageFiberGroups' time '.tif'];
                     oldPath = pwd;
                     cd(SaveDir)
                     imwrite(frame,picName)
@@ -1299,152 +1436,38 @@ classdef modelResults < handle
                     close(f);
                     obj.InfoMessage = '         - image has been saved as .tif';
                 end
-                picName ='';
-                
             end
+        end
+        
+        function saveScatterPlot(obj,SaveDir,time)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
             
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save axes StatisticsTab
-            workbar(0.4,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
-            if obj.SavePlots
-                obj.InfoMessage = '      - saving axes with statistics plots...';
-                
-                obj.InfoMessage = '         - saving area plot as .pdf';
-                picName = [fileName '_processed_AreaPlot' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                
-                fTemp = figure('Visible','off');
-                lTemp = findobj('Tag','LegendAreaPlot');
-                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAArea],fTemp);
-                set(lTemp,'Location','best')
-                
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                workbar(0.42,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '         - saving number of Fiber-Types as .pdf';
-                picName = [fileName '_processed_NumberPlot' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                
-                fTemp = figure('Visible','off');
-                lTemp = findobj('Tag','LegendNumberPlot');
-                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hACount],fTemp);
-                set(lTemp,'Location','best')
-                
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                workbar(0.46,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '         - saving Scatter plot Blue over Red as .pdf';
-                picName = [fileName '_processed_ScatterPlotBlueRed' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                
-                fTemp = figure('Visible','off');
-                lTemp = findobj('Tag','LegendScatterPlotBlueRed');
-                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterBlueRed],fTemp);
-                set(lTemp,'Location','best')
-                
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                workbar(0.48,'saving Statistics Tabs','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
-                picName = [fileName '_processed_ScatterPlotFarredRed' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                
-                fTemp = figure('Visible','off');
-                lTemp = findobj('Tag','LegendScatterPlotFarredRed');
-                copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterFarredRed],fTemp);
-                set(lTemp,'Location','best')
-                
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                obj.InfoMessage = '   - saving plots complete';
-            end
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save Histograms
-            if obj.SaveHisto
-                workbar(0.5,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '      - saving Histograms plots...';
-                
-                obj.InfoMessage = '         - saving Area histogram as .pdf';
-                picName = [fileName '_processed_AreaHisto' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                fTemp = figure('Visible','off');
-                copyobj(obj.controllerResultsHandle.viewResultsHandle.hAAreaHist,fTemp);
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                workbar(0.52,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '         - saving AspectRatio histogram as .pdf';
-                picName = [fileName '_processed_AspectRatioHisto' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                fTemp = figure('Visible','off');
-                copyobj(obj.controllerResultsHandle.viewResultsHandle.hAAspectHist,fTemp);
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                workbar(0.56,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '         - saving Diameter histogram as .pdf';
-                picName = [fileName '_processed_DiameterHisto' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                fTemp = figure('Visible','off');
-                copyobj(obj.controllerResultsHandle.viewResultsHandle.hADiaHist,fTemp);
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                workbar(0.58,'saving Histograms','Saving Results',obj.controllerResultsHandle.mainFigure);
-                obj.InfoMessage = '         - saving Roundness histogram as .pdf';
-                picName = [fileName '_processed_RoundnessHisto' time '.pdf'];
-                fullFileName = fullfile(SaveDir,picName);
-                fTemp = figure('Visible','off');
-                copyobj(obj.controllerResultsHandle.viewResultsHandle.hARoundHist,fTemp);
-                saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
-                delete(fTemp)
-                
-                obj.InfoMessage = '   - saving Histograms complete';
-                
-            end
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % save Scatter all
-            workbar(0.6,'saving Scatter Plots','Saving Results',obj.controllerResultsHandle.mainFigure);
             if obj.SaveScatterAll
                 obj.InfoMessage = '      - saving Scatter all Fibers...';
                 obj.InfoMessage = '         - saving Scatter plot Farred over Redas .pdf';
-                picName = [fileName '_processed_ScatterPlotAll' time '.pdf'];
+                picName = [fileName '_ScatterPlotAll' time '.pdf'];
                 fullFileName = fullfile(SaveDir,picName);
                 
                 fTemp = figure('Visible','off');
                 lTemp = findobj('Tag','LegendScatterPlotAll');
                 copyobj([lTemp,obj.controllerResultsHandle.viewResultsHandle.hAScatterAll],fTemp);
                 set(lTemp,'Location','best')
-                
+                appDesignChanger(fTemp,'light');
                 saveTightFigureOrAxes(fTemp,fullFileName);
-                picName ='';
                 delete(fTemp)
                 
                 obj.InfoMessage = '   - saving Scatter complete';
                 
             end
-            
-            
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            % create Cell Array with Fiber-Type Table
-            workbar(0.7,'saving Cell Array with Fiber-Type Table','Saving Results',obj.controllerResultsHandle.mainFigure);
-            if obj.SaveFiberTable
+        end
+        
+        function saveFiberTable(obj,SaveDir,time,currentProgress)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
+             if obj.SaveFiberTable
                 obj.InfoMessage = '      - creating Fiber-Type struct';
-                
+                                
                 %Get infos from the file name
                 [pathstr,name,ext] = fileparts(obj.FileName);
                 %split string into parts
@@ -1452,7 +1475,6 @@ classdef modelResults < handle
                 strComp = strsplit(name,{' ','-','_'});
                 
                 %dialog input box parameter
-                workbar(1,'saving Cell Array with Fiber-Type Table','Saving Results',obj.controllerResultsHandle.mainFigure);
                 prompt = {'Date','Animal code','Muscle code','Image number','Microscope magnification','treated/control'};
                 dlg_title = 'Completion of the Excel table';
                 num_lines = [1,50];
@@ -1466,12 +1488,12 @@ classdef modelResults < handle
                 end
                 options.Resize='off';
                 options.WindowStyle='modal';
+                workbar(currentProgress,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'off');
                 answer = inputdlg(prompt,dlg_title,num_lines,defaultans,options)';
-                workbar(0.7,'saving Cell Array with Fiber-Type Table','Saving Results',obj.controllerResultsHandle.mainFigure);
                 if isempty(answer)
                     answer = cell(1,size(prompt,2));
                 end
-                
+                workbar(currentProgress,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
                 InfoAnimal = cell(size(obj.StatsMatData,1),size(prompt,2));
                 InfoAnimalT1 = cell(size(obj.StatsMatDataT1,1),size(prompt,2));
                 InfoAnimalT12h = cell(size(obj.StatsMatDataT12h,1),size(prompt,2));
@@ -1489,7 +1511,6 @@ classdef modelResults < handle
                     [InfoAnimalT2x{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2a{:,i}] = deal(answer{1,i});
                     [InfoAnimalT2ax{:,i}] = deal(answer{1,i});
-                    workbar(0.7+(i/size(prompt,2)/10),'create .xlsx file','Saving Results',obj.controllerResultsHandle.mainFigure);
                 end
                 
                 Header = {'Label' sprintf('XPos (\x3BCm)') sprintf('YPos (\x3BCm)')... 
@@ -1511,15 +1532,14 @@ classdef modelResults < handle
                 CellFiberTableT2a = cat(1,Header,cat(2,InfoAnimalT2a,obj.StatsMatDataT2a));
                 CellFiberTableT2ax = cat(1,Header,cat(2,InfoAnimalT2ax,obj.StatsMatDataT2ax));
                 
-            end
+            
 
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % Save DataFile as xls file
-            workbar(0.8,'create .xlsx file','Saving Results',obj.controllerResultsHandle.mainFigure);
             
             if ~isempty(CellFiberTable)
                 obj.InfoMessage = '      - creating .xlsx file';
-                
+                workbar(currentProgress+0.02,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
                 if ismac
                     % OS is macintosh. xlswrite is not supported. Use
                     % undocumented function from the file exchange Matlab
@@ -1541,8 +1561,8 @@ classdef modelResults < handle
                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
                     javaaddpath(path);
                     
-                    elseif ispc
-
+                elseif ispc
+                    
                     obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
                     
                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
@@ -1558,172 +1578,103 @@ classdef modelResults < handle
                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
                     javaaddpath(path);
                 end
-                    
-                    xlsfileName = [fileName '_processed' time '.xlsx'];
-                    
-                    fullFileName = fullfile(SaveDir,xlsfileName);
-%                     oldPath = pwd;
-%                     cd(SaveDir);
-                    workbar(0.82,'write all fiber types','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write all fiber types ';
-                    sheetName = 'Fyber Types';
-                    startRange = 'B2';
-                    % undocumented function from the file exchange Matlab Forum
-                    % for creating .xlsx files on a macintosh OS
-                    status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
-                    
-                    sheetName = 'Statistics';
-                    startRange = 'B2';
-                    workbar(0.84,'write statistic table','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write statistic table ';
-                    status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
-                    
-                    
-                    sheetName = 'Type 1';
-                    startRange = 'B2';
-                    workbar(0.86,'write Type 1 fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write Type 1 fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
-                    
-                    sheetName = 'Type 12h';
-                    startRange = 'B2';
-                    workbar(0.88,'write Type 12h fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write Type 12h fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
-                    
-                    sheetName = 'Type 2';
-                    startRange = 'B2';
-                    workbar(0.90,'write Type 2 fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write Type 2 fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
-                    
-                    sheetName = 'Type 2x';
-                    startRange = 'B2';
-                    workbar(0.92,'write Type 2x fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write Type 2x fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
-                    
-                    sheetName = 'Type 2a';
-                    startRange = 'B2';
-                    obj.InfoMessage = '            - write Type 2a fibers ';
-                    workbar(0.94,'write Type 2a fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
-                    
-                    sheetName = 'Type 2ax';
-                    startRange = 'B2';
-                    workbar(0.96,'write Type 2ax fibers','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    obj.InfoMessage = '            - write Type 2ax fibers ';
-                    status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
-                    
-%                     cd(oldPath);
-                    
-                    if status
-                        obj.InfoMessage = '         - .xlxs file has been created';
-                    else
-                        obj.InfoMessage = '         - .xlxs file could not be created';
-                        obj.InfoMessage = '         - creating .txt file instead...';
-                        txtfileName = [fileName '_processed' time '.txt'];
-                        oldPath = pwd;
-                        cd(SaveDir)
-                        fid=fopen(txtfileName,'a+');
-                        % undocumented function from the file exchange Matlab Forum
-                        % for creating .txt files.
-                        cell2file(fid,DataFile,'EndOfLine','\r\n');
-                        fclose(fid);
-                        cd(oldPath)
-                        obj.InfoMessage = '         - .txt file has been created';
-                    end
-                    workbar(0.98,'file has been created','Saving Results',obj.controllerResultsHandle.mainFigure);
-                    
-%                 elseif ispc
-% 
-%                     obj.InfoMessage = '         - trying to create excel sheet with undocumented function...';
-%                     
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-3.8-20120326.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-3.8-20120326.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/poi-ooxml-schemas-3.8-20120326.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/xmlbeans-2.3.0.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/dom4j-1.6.1.jar'];
-%                     javaaddpath(path);
-%                     path = [pwd '/Functions/xlwrite_for_macOSX/poi_library/stax-api-1.0.1.jar'];
-%                     javaaddpath(path);
-%                     
-%                     xlsfileName = [fileName '_processed' time '.xlsx'];
-% 
-% %                     oldPath = pwd;
-% %                     cd(SaveDir);
-%                     fullFileName = fullfile(SaveDir,xlsfileName);
-%                     
-%                     obj.InfoMessage = '            - write all fiber types ';
-%                     sheetName = 'Fyber Types';
-%                     startRange = 'B2';
-%                     % undocumented function from the file exchange Matlab Forum
-%                     % for creating .xlsx files on a macintosh OS
-%                     status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
-%                     
-%                     sheetName = 'Statistics';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write statistic table ';
-%                     status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
-%                     
-%                     
-%                     sheetName = 'Type 1';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 1 fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 12h';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 12h fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2 fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2x';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2x fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2a';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2a fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
-%                     
-%                     sheetName = 'Type 2ax';
-%                     startRange = 'B2';
-%                     obj.InfoMessage = '            - write Type 2ax fibers ';
-%                     status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
-%                     
-% %                     cd(oldPath);
-%                     
-%                     if status
-%                         obj.InfoMessage = '         - .xlxs file has been created';
-%                     else
-%                         obj.InfoMessage = '         - .xlxs file could not be created';
-%                         obj.InfoMessage = '         - creating .txt file instead...';
-%                         txtfileName = [fileName '_processed' time '.txt'];
-%                         oldPath = pwd;
-%                         cd(SaveDir)
-%                         fid=fopen(txtfileName,'a+');
-%                         % undocumented function from the file exchange Matlab Forum
-%                         % for creating .txt files.
-%                         cell2file(fid,DataFile,'EndOfLine','\r\n');
-%                         fclose(fid);
-%                         cd(oldPath)
-%                         obj.InfoMessage = '         - .txt file has been created';
-%                     end
-%                 end
                 
+                xlsfileName = [fileName '_TablesProcessed' time '.xlsx'];
+                
+                fullFileName = fullfile(SaveDir,xlsfileName);
+                %                     oldPath = pwd;
+                %                     cd(SaveDir);
+                obj.InfoMessage = '            - write all fiber types ';
+                workbar(currentProgress+0.04,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Fyber Types';
+                startRange = 'B2';
+                % undocumented function from the file exchange Matlab Forum
+                % for creating .xlsx files on a macintosh OS
+                status = xlwrite(fullFileName, CellFiberTable , sheetName, startRange);
+                
+                workbar(currentProgress+0.06,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Statistics';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write statistic table ';
+                status = xlwrite(fullFileName, obj.StatisticMat , sheetName, startRange);
+                
+                workbar(currentProgress+0.07,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Type 1';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write Type 1 fibers ';
+                status = xlwrite(fullFileName, CellFiberTableT1 , sheetName, startRange);
+                
+                sheetName = 'Type 12h';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write Type 12h fibers ';
+                status = xlwrite(fullFileName, CellFiberTableT12h , sheetName, startRange);
+                
+                workbar(currentProgress+0.09,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Type 2';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write Type 2 fibers ';
+                status = xlwrite(fullFileName, CellFiberTableT2 , sheetName, startRange);
+                
+                workbar(currentProgress+0.10,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Type 2x';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write Type 2x fibers ';
+                status = xlwrite(fullFileName, CellFiberTableT2x , sheetName, startRange);
+                
+                workbar(currentProgress+0.11,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Type 2a';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write Type 2a fibers ';
+                status = xlwrite(fullFileName, CellFiberTableT2a , sheetName, startRange);
+                
+                workbar(currentProgress+0.12,'saving table as Excel-File','Saving Results',obj.controllerResultsHandle.mainFigure,'on');
+                sheetName = 'Type 2ax';
+                startRange = 'B2';
+                obj.InfoMessage = '            - write Type 2ax fibers ';
+                status = xlwrite(fullFileName, CellFiberTableT2ax , sheetName, startRange);
+                
+                %                     cd(oldPath);
+                
+                if status
+                    obj.InfoMessage = '         - .xlxs file has been created';
+                else
+                    obj.InfoMessage = '         - .xlxs file could not be created';
+                    obj.InfoMessage = '         - creating .txt file instead...';
+                    txtfileName = [fileName '_TablesProcessed' time '.txt'];
+                    oldPath = pwd;
+                    cd(SaveDir)
+                    fid=fopen(txtfileName,'a+');
+                    % undocumented function from the file exchange Matlab Forum
+                    % for creating .txt files.
+                    cell2file(fid,DataFile,'EndOfLine','\r\n');
+                    fclose(fid);
+                    cd(oldPath)
+                    obj.InfoMessage = '         - .txt file has been created';
+                end
             end
-            obj.InfoMessage = '   - Saving data complete';
-            workbar(1,'completed','Saving Results',obj.controllerResultsHandle.mainFigure);
+             end
+        end
+        
+        function saveBinaryMask(obj,SaveDir,time)
+            % Delete file extension
+            [path,fileName,ext] = fileparts(obj.FileName);
+            if obj.SaveBinaryMask
+                obj.InfoMessage = '      - saving Binary Mask...';
+                try
+                    picName ='';
+                    
+                    picName = [fileName '_image_Binary' time '.tif'];
+                    oldPath = pwd;
+                    cd(SaveDir)
+                    imwrite(obj.PicBW,picName)
+                    cd(oldPath)
+                    
+                    obj.InfoMessage = '         - image has been saved as .tif';
+                catch
+                    warning('Problem while saving Binary Mask');
+                    obj.InfoMessage = 'ERROR: Problem while saving Binary Mask';
+                end
+            end
         end
 
         function delete(obj)
