@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="1170103203" file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\fiberclassficationtool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="3625000557" file="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool.prj" location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool" name="MuscleFiberClassificationTool" preferred-package-location="C:\Users\sfriedrich\CloudStation\Developer\Matlab\MuscleFiberClassificationTool\MuscleFiberClassificationTool\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>MuscleFiberClassificationTool</param.appname>
     <param.icon>${PROJECT_ROOT}\MuscleFiberClassificationTool_resources\icon.ico</param.icon>
     <param.icons>
@@ -11,8 +11,8 @@
     <param.version>1.5</param.version>
     <param.authnamewatermark>Sebastian Friedrich</param.authnamewatermark>
     <param.email>sebastian.friedrich.software@gmail.com</param.email>
-    <param.company />
-    <param.summary />
+    <param.company>Sebastian Friedrich</param.company>
+    <param.summary>App for semi-automatic analyzing geometric properties and classification of  muscle fiber images.</param.summary>
     <param.description>Version 1.5 6-November-2024
 
 Application created with MATLAB 2021a.
@@ -29,9 +29,9 @@ If the connection to the MathWorks Server fails:
 Thanks
 
 Sebastian</param.description>
-    <param.screenshot>${PROJECT_ROOT}\Icons\Icon4.png</param.screenshot>
+    <param.screenshot />
     <param.guid />
-    <param.installpath.string>\TrierUniversityOfAppliedSciences\MuscleFiberClassificationTool\</param.installpath.string>
+    <param.installpath.string>\MATLAB Apps\MuscleFiberClassificationTool\</param.installpath.string>
     <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
     <param.logo />
     <param.install.notes>Application created with MATLAB 2021b.
@@ -39,7 +39,7 @@ Sebastian</param.description>
 If the connection to the MathWorks Server fails:
 
 1.: Go to https://de.mathworks.com/products/compiler/matlab-runtime.html and download
-      the MATLAB Runtime Package R2021a (9.1).
+      the MATLAB Runtime Package R2021a (9.10).
 
 2.: Install the the MATLAB Runtime Package R2021a.
 
@@ -94,8 +94,9 @@ Thanks
 
 Sebastian</param.help.text>
     <unset>
-      <param.company />
-      <param.summary />
+      <param.authnamewatermark />
+      <param.email />
+      <param.screenshot />
       <param.guid />
       <param.installpath.combo />
       <param.logo />
