@@ -1,18 +1,21 @@
 try
     
     % find starting path
-    path = cd;
-    % add files to the current matalb path
-    addpath(genpath('MVC'));
-    addpath(genpath('Functions'));
-    addpath(genpath('Icons'));
     warning('off', 'all');
-    cl;
-    pause(0.1);
+    try %%Not need for .exe
+        path = cd;
+        % add files to the current matalb path
+        addpath(genpath('MVC'));
+        addpath(genpath('Functions'));
+        addpath(genpath('Icons'));
+        pause(0.1);
+        cl;
+    catch
+    end
     
     setSettingsValue('Version','1.5');
-    setSettingsValue('Day','30');
-    setSettingsValue('Month','January');
+    setSettingsValue('Day','11');
+    setSettingsValue('Month','March');
     setSettingsValue('Year','2024');
     versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
     % write the current Version to LATEST.txt
@@ -35,30 +38,30 @@ try
     %Create Start Screen
     hf = startSrcreen();
     versionString = ['Version ' getSettingsValue('Version') '  ' getSettingsValue('Day') '-' getSettingsValue('Month') '-' getSettingsValue('Year')];
-    TitleText1=text(hf.Children,0.45,0.92,'Muscle Fiber',...
-        'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
-    TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
-        'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
-    VersionText=text(hf.Children,0.45,0.75,versionString,'units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
-    InfoText=text(hf.Children,0.45,0.7,'Loading please wait... Initialize application...','units','normalized','FontUnits','normalized','FontSize',0.02,'Color','k');
-    text(hf.Children,0.03,0.32,'Developed by:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
-    text(hf.Children,0.08,0.28,['Sebastian Friedrich  2017 - ' getSettingsValue('Year')],'units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
-    text(hf.Children,0.08,0.24,'sebastian.friedrich.software@gmail.com','units','normalized','FontUnits','normalized','FontSize',0.03,'Color',[1 0.5 0]);
-    text(hf.Children,0.03,0.19,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
+    TitleText1=text(hf.Children,0.3,0.965,'Muscle Fiber Classification Tool',...
+        'units','normalized','FontUnits','normalized','FontWeight','bold','FontSize',0.075,'Color',[0 0 0]);
+%     TitleText2=text(hf.Children,0.45,0.83,'Classification Tool',...
+%         'units','normalized','FontUnits','normalized','FontSize',0.08,'Color',[1 0.5 0]);
+    VersionText=text(hf.Children,0.54,0.915,versionString,'units','normalized','FontUnits','normalized','FontWeight','bold','FontSize',0.04,'Color','k');
+    InfoText=text(hf.Children,0.02,0.035,'Loading please wait... Initialize application...','units','normalized','FontWeight','bold','FontUnits','normalized','FontSize',0.03,'Color','k');
+    text(hf.Children,0.02,0.16,'Developed by:','units','normalized','FontUnits','normalized','FontWeight','bold','FontSize',0.04,'Color','k');
+    text(hf.Children,0.02,0.12,['Sebastian Friedrich  2017 - ' getSettingsValue('Year')],'units','normalized','FontUnits','normalized','FontWeight','bold','FontSize',0.03,'Color','k');
+    text(hf.Children,0.02,0.095,'sebastian.friedrich.software@gmail.com','units','normalized','FontUnits','normalized','FontWeight','bold','FontSize',0.025,'Color','k');
+%     text(hf.Children,0.03,0.19,'In cooperation with:','units','normalized','FontUnits','normalized','FontSize',0.03,'Color','k');
 %     text(hf.Children,0.05,0.07,'2017','units','normalized','FontUnits','normalized','FontSize',0.045,'Color','[1 0.5 0]');
     % setAlwaysOnTop(hf,true);
     drawnow;
-    
-    % R2010a and newer
-    iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
-    iconsSizeEnums = javaMethod('values',iconsClassName);
-    SIZE_32x32 = iconsSizeEnums(1);  % (1) = 16x16,  (2) = 32x32
-    busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32);  % icon, label
-    busyIndicator.setPaintsWhenStopped(false);  % default = false
-    busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
-    javacomponent(busyIndicator.getComponent, [hf.Position(3)*0.74,hf.Position(4)*0.72,40,40], hf);
-    busyIndicator.getComponent.setBackground(java.awt.Color(1, 1, 1));
-    busyIndicator.start;
+%     
+%     % R2010a and newer
+%     iconsClassName = 'com.mathworks.widgets.BusyAffordance$AffordanceSize';
+%     iconsSizeEnums = javaMethod('values',iconsClassName);
+%     SIZE_32x32 = iconsSizeEnums(1);  % (1) = 16x16,  (2) = 32x32
+%     busyIndicator = com.mathworks.widgets.BusyAffordance(SIZE_32x32);  % icon, label
+%     busyIndicator.setPaintsWhenStopped(false);  % default = false
+%     busyIndicator.useWhiteDots(false);         % default = false (true is good for dark backgrounds)
+%     javacomponent(busyIndicator.getComponent, [hf.Position(3)*0.2,hf.Position(4)*0.035,40,40], hf);
+%     busyIndicator.getComponent.setBackground(java.awt.Color(0,0,0,0.1));
+%     busyIndicator.start;
     
     % create main figure
     mainFig = figure('Units','normalized','outerposition',hf.Position,...
@@ -204,7 +207,7 @@ try
     pause(0.5);
     
     % delete starting screen
-    busyIndicator.stop;
+%     busyIndicator.stop;
     delete(hf);
     set(mainFig,'Position',[0.01 0.05 0.98 0.85]);
     set(mainFig,'WindowState','maximized');
@@ -229,12 +232,14 @@ catch
     
     mode = struct('WindowStyle','modal','Interpreter','tex');
     
+    uiwait(errordlg(Text,'ERROR: Initalize Program failed:',mode));
+    
     % delete starting screen
     delete(hf);
     delete(InfoText);
     delete(VersionText);
     
-    uiwait(errordlg(Text,'ERROR: Initalize Program failed:',mode));
+    
     
     
     %find all objects
