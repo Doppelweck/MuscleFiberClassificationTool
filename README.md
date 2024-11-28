@@ -1,4 +1,4 @@
-# Muscle_Fiber_Classification_Tool
+# MuscleFiberClassificationTool
 Processing Tool for Muscle Fiber Cross section Images. Developed for Royal Veterinary College (RVC) London UK in Matlab
 
 1. In order to use the App download the folowing folders:
